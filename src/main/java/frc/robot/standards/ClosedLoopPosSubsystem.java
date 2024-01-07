@@ -7,4 +7,6 @@ public interface ClosedLoopPosSubsystem {
   public double getPosition();
 
   public boolean isFinished();
+
+  public void zero();
 }
