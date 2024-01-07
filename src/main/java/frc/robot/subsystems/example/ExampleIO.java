@@ -1,5 +1,3 @@
 package frc.robot.subsystems.example;
 
-public class ExampleIO {
-    
-}
+public class ExampleIO {}
