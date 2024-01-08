@@ -1,5 +1,3 @@
 package frc.robot.subsystems.robotState;
 
-public class RobotStateSubsystem {
-    
-}
+public class RobotStateSubsystem {}

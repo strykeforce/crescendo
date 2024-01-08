@@ -1,5 +1,3 @@
 package frc.robot.subsystems.vision;
 
-public class VisionSubsystem {
-    
-}
+public class VisionSubsystem {}

@@ -1,5 +1,3 @@
 package frc.robot.subsystems.shooter;
 
-public class ShooterSubsystem {
-    
-}
+public class ShooterSubsystem {}
