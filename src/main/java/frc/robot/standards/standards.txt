@@ -1,0 +1,60 @@
+# Naming Standards
+
+## Interfaces
+For any subsystem that follows a general pattern, it must implement one of the interfaces:
+    - Closed Loop Position Subsystem
+    - Closed Loop Speed Subsystem
+    - Open Loop Subsystem
+
+## Auton Paths
+ADD ONCE PATHS ARE MADE
+
+## State Subsystems
+Naming standards for every subsystem that uses State machines:
+    
+    - For State Enum (Public):
+        {Class Name Without Subsystem} + States 
+            (ex. in MagazineSubsytem, MagazineStates would follow the standard)
+
+    - For State Variables (Private):
+        curState
+    
+    - For Storing The Next State (Private):
+        nextState
+
+    - For Getting/Setting Variables (Public):
+        getState
+        setState
+        getNextState
+        setNextState
+
+## Variable Naming
+General private variables should share these names:
+
+    - For setpoint variables (Private):
+        setpoint    - Closed loop position or closed loop speed
+
+## Subsystem Layout
+Every subsystem should follow the same basic layout:
+
+    - Private Variables
+    - Constructor
+    - Getter/Setter Methods
+    - Helper Methods
+    - Periodic Function
+    - Grapher Function
+    - State Enum
+
+## Function Naming
+Certain functions should share similar naming patterns:
+
+    - Getter Method
+        get{What Variable is Storing} (ex. getting the setpoint variable - getPosition())
+
+    - Setter Method
+        set{What Variable is Storing} (ex. setting the setpoint variable - setPosition())
+
+
+## Comments
+Comments should be placed in locations that allow readers to easily identify what code blocks do without reading them. Comments need to easily describe what something does without over describing it (ex. commenting a for loop that runs 4 times as "// Runs 4 times" is redundant).
+
