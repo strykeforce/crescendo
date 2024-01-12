@@ -1,3 +1,8 @@
 package frc.robot.subsystems.magazine;
 
-public class MagazineIOFX {}
+public class MagazineIOFX {
+    private TalonFX 
+    public MagazineIOFX () {
+
+    }
+}
