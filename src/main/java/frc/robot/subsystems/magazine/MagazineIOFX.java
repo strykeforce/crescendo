@@ -1,5 +1,3 @@
 package frc.robot.subsystems.magazine;
 
-public class MagazineIOSRX {
-    
-}
+public class MagazineIOFX {}

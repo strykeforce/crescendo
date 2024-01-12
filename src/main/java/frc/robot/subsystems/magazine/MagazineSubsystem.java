@@ -1,28 +1,23 @@
 package frc.robot.subsystems.magazine;
 
-import java.util.Set;
-
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
-
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
-import frc.robot.subsystems.shooter.ShooterConstants;
+import java.util.Set;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem{
-    // Private Variables
-    TalonSRX magazineMotor;
-    double setpoint = 0.0;
-    MagazineStates curState = MagazineStates.EMPTY;
-    
+public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
+  // Private Variables
+  TalonFX magazineMotor;
+  double setpoint = 0.0;
+  MagazineStates curState = MagazineStates.EMPTY;
 
   // Constructor
   public MagazineSubsystem() {
-    magazineMotor = new TalonSRX(MagazineConstants.kMagazineMotorID);
+    magazineMotor = new TalonFX(MagazineConstants.kMagazineMotorID);
   }
 
   // Getter/Setter Methods
@@ -41,7 +36,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   @Override
   public void setSpeed(double speed) {
     setpoint = speed;
-    magazineMotor.set(TalonSRXControlMode.Velocity, speed);
+    magazineMotor.set(TalonFXControlMode.Velocity, speed);
   }
 
   public MagazineStates getState() {
@@ -59,28 +54,27 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   public void periodic() {
     switch (curState) {
       case EMPTY:
-    
-      break;
+        break;
       case FULL:
-      
-      break;
+        break;
       case INTAKING:
-      
-      break;
+        break;
       case EMPTYING:
-      
-      break;
+        break;
     }
   }
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-      // TODO Auto-generated method stub
-      return null;
+    // TODO Auto-generated method stub
+    return null;
   }
 
   // State Enum
   public enum MagazineStates {
-    EMPTY, FULL, INTAKING, EMPTYING
+    EMPTY,
+    FULL,
+    INTAKING,
+    EMPTYING
   }
 }

@@ -7,33 +7,35 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 public class RobotStateSubsystem {
-    //Private Variables
-    VisionSubsystem visionSubsystem;
-    DriveSubsystem driveSubsystem;
-    ShooterSubsystem shooterSubsystem;
-    IntakeSubsystem intakeSubsystem;
-    PivotSubsystem pivotSubsystem;
+  // Private Variables
+  VisionSubsystem visionSubsystem;
+  DriveSubsystem driveSubsystem;
+  ShooterSubsystem shooterSubsystem;
+  IntakeSubsystem intakeSubsystem;
+  PivotSubsystem pivotSubsystem;
 
-    //Constructor
-    public RobotStateSubsystem(VisionSubsystem visionSubsystem, DriveSubsystem driveSubsystem, ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem, PivotSubsystem pivotSubsystem) {
-        this.visionSubsystem = visionSubsystem;
-        this.driveSubsystem = driveSubsystem;
-        this.shooterSubsystem = shooterSubsystem;
-        this.intakeSubsystem = intakeSubsystem;
-        this.pivotSubsystem = pivotSubsystem;
+  // Constructor
+  public RobotStateSubsystem(
+      VisionSubsystem visionSubsystem,
+      DriveSubsystem driveSubsystem,
+      ShooterSubsystem shooterSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      PivotSubsystem pivotSubsystem) {
+    this.visionSubsystem = visionSubsystem;
+    this.driveSubsystem = driveSubsystem;
+    this.shooterSubsystem = shooterSubsystem;
+    this.intakeSubsystem = intakeSubsystem;
+    this.pivotSubsystem = pivotSubsystem;
+  }
 
-    }
+  // Getter/Setter Methods
 
-    //Getter/Setter Methods
+  // Helper Methods
 
-    //Helper Methods
+  // Periodic
 
-    //Periodic
+  // Grapher
 
-    //Grapher
-
-    //State
-    public enum RobotStates {
-
-    }
+  // State
+  public enum RobotStates {}
 }

@@ -1,14 +1,11 @@
 package frc.robot.subsystems.shooter;
 
-import java.util.Set;
-
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
-
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.standards.*;
+import java.util.Set;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
 public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
 
@@ -71,8 +68,8 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-      // TODO Auto-generated method stub
-      return null;
+    // TODO Auto-generated method stub
+    return null;
   }
 
   // State Enum
