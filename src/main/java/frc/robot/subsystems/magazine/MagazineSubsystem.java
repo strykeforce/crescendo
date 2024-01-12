@@ -1,9 +1,5 @@
 package frc.robot.subsystems.magazine;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
 import java.util.Set;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -29,14 +25,14 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(io.getSpeed() - setpoint)
-        < MagazineConstants.kCloseEnough;
+    return Math.abs(io.getSpeed() - setpoint) < MagazineConstants.kCloseEnough;
   }
 
   @Override
   public void setSpeed(double speed) {
     setpoint = speed;
-    io.setSpeed(speed);;
+    io.setSpeed(speed);
+    ;
   }
 
   public MagazineStates getState() {

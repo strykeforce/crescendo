@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import frc.robot.standards.*;
 import java.util.Set;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -28,14 +26,14 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(io.getSpeed() - setpoint)
-        < ShooterConstants.kCloseEnough;
+    return Math.abs(io.getSpeed() - setpoint) < ShooterConstants.kCloseEnough;
   }
 
   @Override
   public void setSpeed(double speed) {
     setpoint = speed;
-    io.setSpeed(speed);;
+    io.setSpeed(speed);
+    ;
   }
 
   public ShooterStates getState() {
