@@ -1,5 +1,5 @@
 package frc.robot.subsystems.intake;
 
-public class IntakeIOFalcon {
+public class IntakeIOFalcon implements IntakeIO{
     
 }
