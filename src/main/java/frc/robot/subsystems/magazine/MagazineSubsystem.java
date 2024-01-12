@@ -11,32 +11,32 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
   // Private Variables
-  TalonFX magazineMotor;
+  MagazineIO io;
   double setpoint = 0.0;
   MagazineStates curState = MagazineStates.EMPTY;
 
   // Constructor
-  public MagazineSubsystem() {
-    magazineMotor = new TalonFX(MagazineConstants.kMagazineMotorID);
+  public MagazineSubsystem(MagazineIO io) {
+    this.io = io;
   }
 
   // Getter/Setter Methods
 
   @Override
   public double getSpeed() {
-    return magazineMotor.getSelectedSensorVelocity();
+    return io.getSpeed();
   }
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(magazineMotor.getSelectedSensorVelocity() - setpoint)
+    return Math.abs(io.getSpeed() - setpoint)
         < MagazineConstants.kCloseEnough;
   }
 
   @Override
   public void setSpeed(double speed) {
     setpoint = speed;
-    magazineMotor.set(TalonFXControlMode.Velocity, speed);
+    io.setSpeed(speed);;
   }
 
   public MagazineStates getState() {

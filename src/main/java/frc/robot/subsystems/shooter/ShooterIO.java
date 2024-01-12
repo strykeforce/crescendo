@@ -1,16 +1,16 @@
-package frc.robot.subsystems.magazine;
+package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 
-public interface MagazineIO {
-    public static class MagazineIOInputs {
+public interface ShooterIO {
+        public static class ShooterIOInputs {
         public double velocity;
         public double position; 
         public boolean isFwdLimitSwitchClosed = false;
         public boolean isRevLimitSwitchClosed = false;
         
     }
-    public default void updateInputs(MagazineIOInputs inputs) {}
+    public default void updateInputs(ShooterIOInputs inputs) {}
       
     public default void setPct(double percentOutput) {}
       

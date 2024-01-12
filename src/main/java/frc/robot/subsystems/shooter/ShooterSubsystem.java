@@ -10,32 +10,32 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
 
   // Private Variables
-  TalonFX shooterMotor;
+  ShooterIO io;
   double setpoint = 0.0;
   ShooterStates curState = ShooterStates.IDLE;
 
   // Constructor
-  public ShooterSubsystem() {
-    shooterMotor = new TalonFX(ShooterConstants.kShooterTalonID);
+  public ShooterSubsystem(ShooterIO io) {
+    this.io = io;
   }
 
   // Getter/Setter Methods
 
   @Override
   public double getSpeed() {
-    return shooterMotor.getSelectedSensorVelocity();
+    return io.getSpeed();
   }
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(shooterMotor.getSelectedSensorVelocity() - setpoint)
+    return Math.abs(io.getSpeed() - setpoint)
         < ShooterConstants.kCloseEnough;
   }
 
   @Override
   public void setSpeed(double speed) {
     setpoint = speed;
-    shooterMotor.set(TalonFXControlMode.Velocity, speed);
+    io.setSpeed(speed);;
   }
 
   public ShooterStates getState() {
