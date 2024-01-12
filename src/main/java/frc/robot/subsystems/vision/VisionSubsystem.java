@@ -16,7 +16,12 @@ public class VisionSubsystem extends SubsystemBase {
 
   // Private Variables
   WallEyeCam[] cams;
-  Translation3d[] offsets;
+  Translation3d[] offsets = {
+    new Translation3d(0, 0, 0),
+    new Translation3d(0, 0, 0),
+    new Translation3d(0, 0, 0),
+    new Translation3d(0, 0, 0)
+  };
   String[] names = {"1", "2", "3", "4"};
   int[] camIndex = {1, 2, 3, 4};
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>();
@@ -32,7 +37,7 @@ public class VisionSubsystem extends SubsystemBase {
     cams = new WallEyeCam[VisionConstants.kNumCams];
     adaptiveVisionMatrix = VisionConstants.kVisionMeasurementStdDevs.copy();
 
-    //Initialize all walleyecams
+    // Initialize all walleyecams
     for (int i = 0; i < VisionConstants.kNumCams; ++i) {
       cams[i] = new WallEyeCam(names[i], camIndex[i], -1);
     }
@@ -64,7 +69,7 @@ public class VisionSubsystem extends SubsystemBase {
   private double getSeconds() {
     return RobotController.getFPGATime() / 1000000.0;
   }
-  
+
   // FIXME NEED DRIVE ODOMETRY
   private boolean isPoseValidWithWheels(WallEyeResult test, Translation3d pose) {
     if (isPoseValidWithoutWheels(test)) {
@@ -82,22 +87,22 @@ public class VisionSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    //If enough time elapses trust vision or if enough time elapses reset the counter
+    // If enough time elapses trust vision or if enough time elapses reset the counter
     if (getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision) {
       curState = VisionStates.TRUSTVISION;
       updatesToWheels = 0;
     }
 
-    //If the counter gets high enough trust wheels
+    // If the counter gets high enough trust wheels
     if (updatesToWheels >= VisionConstants.kResultsForWheels) {
       curState = VisionStates.TRUSTWHEELS;
       adaptiveVisionMatrix = VisionConstants.kVisionMeasurementStdDevs.copy();
     }
 
-    //Clear out old results
+    // Clear out old results
     validResults.clear();
 
-    //Go through each camera and store result and array idx in pair
+    // Go through each camera and store result and array idx in pair
     for (int i = 0; i < VisionConstants.kNumCams; ++i) {
       if (cams[i].hasNewUpdate()) {
         timeLastVision = getSeconds();
@@ -105,17 +110,15 @@ public class VisionSubsystem extends SubsystemBase {
       }
     }
 
-    //Tightens std devs if time elapses
+    // Tightens std devs if time elapses
     if (getSeconds() - timeLastVision >= VisionConstants.kTimeToDecayDev) {
 
-      //Take x and y weights and linearly decrease them
+      // Take x and y weights and linearly decrease them
       for (int i = 0; i < 2; ++i) {
         double estimatedWeight =
             VisionConstants.kVisionMeasurementStdDevs.get(i, 0)
                 - VisionConstants.kStdDevDecayCoeff
-                    * (getSeconds()
-                        - timeLastVision
-                        - VisionConstants.kTimeToDecayDev);
+                    * (getSeconds() - timeLastVision - VisionConstants.kTimeToDecayDev);
         adaptiveVisionMatrix.set(
             i,
             0,
@@ -125,25 +128,24 @@ public class VisionSubsystem extends SubsystemBase {
       }
     }
 
-    //Go through results
+    // Go through results
     for (Pair<WallEyeResult, Integer> res : validResults) {
 
-      //Take out data from pair
+      // Take out data from pair
       WallEyeResult result = res.getFirst();
       int idx = res.getSecond();
+      System.out.print(result.getCameraPose());
 
-      //Get center of Robot pose
+      // Get center of Robot pose
       Pose3d cameraPose = result.getCameraPose();
       Translation3d centerPose =
-          cameraPose
-              .getTranslation()
-              .plus(offsets[idx].rotateBy(cameraPose.getRotation()));
+          cameraPose.getTranslation().plus(offsets[idx].rotateBy(cameraPose.getRotation()));
 
-      //If updating with vision go into state machine to update
+      // If updating with vision go into state machine to update
       if (visionUpdates) {
         switch (curState) {
 
-          //Uses wheels to act as a filter for the cameras
+            // Uses wheels to act as a filter for the cameras
           case TRUSTWHEELS:
             if (isPoseValidWithWheels(result, centerPose)) {
               // Feed into odometry
@@ -151,7 +153,7 @@ public class VisionSubsystem extends SubsystemBase {
             }
             break;
 
-          //Purely trust vision
+            // Purely trust vision
           case TRUSTVISION:
             if (isPoseValidWithoutWheels(result)) {
               updatesToWheels++;
