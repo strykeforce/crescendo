@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.VisionConstants;
@@ -16,6 +17,7 @@ import frc.robot.constants.VisionConstants;
 import java.util.ArrayList;
 
 import org.strykeforce.deadeye.Deadeye;
+import org.strykeforce.deadeye.TargetListTargetData;
 
 public class VisionSubsystem extends SubsystemBase {
 
@@ -36,6 +38,8 @@ public class VisionSubsystem extends SubsystemBase {
   boolean visionUpdates = true;
   double timeLastVision = 0;
   int updatesToWheels = 0;
+
+  //Deadeye<TargetListTargetData> cam = new Deadeye<TargetListTargetData>("A0", TargetListTargetData.class, NetworkTableInstance.getDefault(), null);
   
   public Matrix<N3, N1> adaptiveVisionMatrix;
 
@@ -93,6 +97,8 @@ public class VisionSubsystem extends SubsystemBase {
   // Periodic
   @Override
   public void periodic() {
+    
+    //cam.getEnabled();
 
     // If enough time elapses trust vision or if enough time elapses reset the counter
     if (getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision) {
