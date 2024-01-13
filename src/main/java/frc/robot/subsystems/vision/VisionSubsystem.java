@@ -5,6 +5,7 @@ import WallEye.WallEyeResult;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -18,12 +19,14 @@ public class VisionSubsystem extends SubsystemBase {
   WallEyeCam[] cams;
   Translation3d[] offsets = {
     new Translation3d(0, 0, 0),
-    new Translation3d(0, 0, 0),
-    new Translation3d(0, 0, 0),
     new Translation3d(0, 0, 0)
   };
-  String[] names = {"1", "2", "3", "4"};
-  int[] camIndex = {1, 2, 3, 4};
+  Rotation3d[] rotsOff = {
+    new Rotation3d(0, 0, 0),
+    new Rotation3d(0,0,0)
+  };
+  String[] names = {"1", "2"};
+  int[] camIndex = {1, 2};
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>();
   VisionStates curState = VisionStates.TRUSTWHEELS;
   boolean visionUpdates = true;
@@ -139,7 +142,7 @@ public class VisionSubsystem extends SubsystemBase {
       // Get center of Robot pose
       Pose3d cameraPose = result.getCameraPose();
       Translation3d centerPose =
-          cameraPose.getTranslation().plus(offsets[idx].rotateBy(cameraPose.getRotation()));
+          cameraPose.getTranslation().plus(offsets[idx].rotateBy(cameraPose.getRotation().minus(rotsOff[idx])));
 
       // If updating with vision go into state machine to update
       if (visionUpdates) {
