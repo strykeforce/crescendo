@@ -76,6 +76,9 @@ dependencies {
     implementation 'net.jafama:jafama:2.3.2' //fastMath
     implementation 'ch.qos.logback:logback-classic:1.3.5' //logging
 
+    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+
 }
 
 test {
@@ -125,3 +128,4 @@ repositories() {
     }
     mavenLocal()
 }
+

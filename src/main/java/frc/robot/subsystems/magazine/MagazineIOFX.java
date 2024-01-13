@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import frc.robot.constants.MagazineConstants;
 
 public class MagazineIOFX implements MagazineIO {
   private TalonFX magazine;
@@ -19,7 +20,7 @@ public class MagazineIOFX implements MagazineIO {
   @Override
   public void updateInputs(MagazineIOInputs inputs) {
     inputs.position = magazine.getSelectedSensorPosition();
-    inputs.velocity = magazine.getSelectedSensorVelocity();
+    inputs.velocityTicksPer100ms = magazine.getSelectedSensorVelocity();
     inputs.isFwdLimitSwitchClosed = magazine.isFwdLimitSwitchClosed() == 1;
     inputs.isRevLimitSwitchClosed = magazine.isRevLimitSwitchClosed() == 1;
   }

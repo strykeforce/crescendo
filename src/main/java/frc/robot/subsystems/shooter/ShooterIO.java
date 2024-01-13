@@ -1,8 +1,11 @@
 package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface ShooterIO {
+
+  @AutoLog
   public static class ShooterIOInputs {
     public double velocity;
     public double position;

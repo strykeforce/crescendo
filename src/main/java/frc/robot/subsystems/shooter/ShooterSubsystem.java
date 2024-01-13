@@ -1,7 +1,10 @@
 package frc.robot.subsystems.shooter;
 
+import frc.robot.constants.ShooterConstants;
 import frc.robot.standards.*;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -11,6 +14,11 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   ShooterIO io;
   double setpoint = 0.0;
   ShooterStates curState = ShooterStates.IDLE;
+
+  ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+  private Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
+  private org.littletonrobotics.junction.Logger advLogger =
+      org.littletonrobotics.junction.Logger.getInstance();
 
   // Constructor
   public ShooterSubsystem(ShooterIO io) {
@@ -49,6 +57,9 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   // Periodic
   @Override
   public void periodic() {
+    io.updateInputs(inputs);
+    advLogger.processInputs("Magazine", inputs);
+
     switch (curState) {
       case SHOOT:
         break;
