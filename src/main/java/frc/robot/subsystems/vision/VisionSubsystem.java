@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 
+import org.strykeforce.deadeye.Deadeye;
+
 public class VisionSubsystem extends SubsystemBase {
 
   // Private Variables
@@ -29,7 +31,7 @@ public class VisionSubsystem extends SubsystemBase {
   boolean visionUpdates = true;
   double timeLastVision = 0;
   int updatesToWheels = 0;
-
+  
   public Matrix<N3, N1> adaptiveVisionMatrix;
 
   // Constructor
@@ -69,7 +71,7 @@ public class VisionSubsystem extends SubsystemBase {
   private double getSeconds() {
     return RobotController.getFPGATime() / 1000000.0;
   }
-
+  
   // FIXME NEED DRIVE ODOMETRY
   private boolean isPoseValidWithWheels(WallEyeResult test, Translation3d pose) {
     if (isPoseValidWithoutWheels(test)) {
