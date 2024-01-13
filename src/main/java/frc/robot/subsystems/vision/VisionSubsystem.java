@@ -11,6 +11,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.VisionConstants;
+
 import java.util.ArrayList;
 
 public class VisionSubsystem extends SubsystemBase {
