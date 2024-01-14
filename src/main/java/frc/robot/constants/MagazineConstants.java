@@ -1,7 +1,7 @@
 package frc.robot.constants;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class MagazineConstants {
   public static final int kMagazineFalconID = 0;

@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import org.littletonrobotics.junction.AutoLog;
+import org.strykeforce.telemetry.TelemetryService;
 
 public interface ShooterIO {
 
@@ -20,7 +21,7 @@ public interface ShooterIO {
   public default void setSupplyCurrentLimit(
       SupplyCurrentLimitConfiguration supplyCurrentLimitConfiguration) {}
 
-  public default void registerWith() {}
+  public default void registerWith(TelemetryService telemetryService) {}
 
   public default void setSpeed(double speed) {}
 

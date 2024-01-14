@@ -12,13 +12,11 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   // Private Variables
   ShooterIO io;
-  double setpoint = 0.0;
   ShooterStates curState = ShooterStates.IDLE;
+  private double setpoint = 0.0;
 
   ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
-  private org.littletonrobotics.junction.Logger advLogger =
-      org.littletonrobotics.junction.Logger.getInstance();
 
   // Constructor
   public ShooterSubsystem(ShooterIO io) {
@@ -41,7 +39,6 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   public void setSpeed(double speed) {
     setpoint = speed;
     io.setSpeed(speed);
-    ;
   }
 
   public ShooterStates getState() {
@@ -58,7 +55,6 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    advLogger.processInputs("Magazine", inputs);
 
     switch (curState) {
       case SHOOT:
