@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
 public class IntakeConstants {
-    double kIntakePercentOutput;
+  public static double kIntakePercentOutput;
+  public static int kIntakeFxId = 0;
+  public static int kBeamBreakStableCounts = 2;
 }
