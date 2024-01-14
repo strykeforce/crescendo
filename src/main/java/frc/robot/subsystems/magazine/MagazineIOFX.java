@@ -62,11 +62,6 @@ public class MagazineIOFX implements MagazineIO {
   }
 
   @Override
-  public double getSpeed() {
-    return currVelocity.refresh().getValue();
-  }
-
-  @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(magazine, true);
   }

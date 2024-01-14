@@ -62,11 +62,6 @@ public class ShooterIOFX implements ShooterIO {
   }
 
   @Override
-  public double getSpeed() {
-    return currVelocity.refresh().getValue();
-  }
-
-  @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(shooter, true);
   }

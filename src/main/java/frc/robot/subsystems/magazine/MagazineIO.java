@@ -25,10 +25,6 @@ public interface MagazineIO {
 
   public default void setSpeed(double speed) {}
 
-  public default double getSpeed() {
-    return 2767.0;
-  }
-
   public default boolean getFwdLimitSwitch() {
     return false;
   }

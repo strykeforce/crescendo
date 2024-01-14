@@ -27,12 +27,12 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   @Override
   public double getSpeed() {
-    return io.getSpeed();
+    return inputs.velocity;
   }
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(io.getSpeed() - setpoint) < ShooterConstants.kCloseEnough;
+    return Math.abs(inputs.velocity - setpoint) < ShooterConstants.kCloseEnough;
   }
 
   @Override

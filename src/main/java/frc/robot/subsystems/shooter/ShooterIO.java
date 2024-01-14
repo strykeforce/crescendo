@@ -24,8 +24,4 @@ public interface ShooterIO {
   public default void registerWith(TelemetryService telemetryService) {}
 
   public default void setSpeed(double speed) {}
-
-  public default double getSpeed() {
-    return 2767.0;
-  }
 }

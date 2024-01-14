@@ -26,12 +26,12 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   @Override
   public double getSpeed() {
-    return io.getSpeed();
+    return inputs.velocity;
   }
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(io.getSpeed() - setpoint) < MagazineConstants.kCloseEnough;
+    return Math.abs(inputs.velocity - setpoint) < MagazineConstants.kCloseEnough;
   }
 
   @Override
