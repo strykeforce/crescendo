@@ -13,9 +13,10 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
+import frc.robot.subsystems.drive.SwerveIO.SwerveIOInputs;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
@@ -34,15 +35,16 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class DriveSubsystem extends MeasurableSubsystem {
   private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
   private org.littletonrobotics.junction.Logger advLogger =
-      org.littletonrobotics.junction.Logger.getInstance();  
+      org.littletonrobotics.junction.Logger.getInstance();
   private final Swerve swerve;
+  private SwerveIOInputsAutoLogged inputs = new SwerveIOInputsAutoLogged();
   private final SwerveDrive swerveDrive;
   private final HolonomicDriveController holonomicController;
+  private RobotStateSubsystem robotStateSubsystem;
 
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
   private final PIDController yController;
-  
 
   public DriveStates currDriveState = DriveStates.IDLE;
 

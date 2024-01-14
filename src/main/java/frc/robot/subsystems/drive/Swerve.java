@@ -1,10 +1,12 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.kauailabs.navx.frc.AHRS.SerialDataType;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -13,14 +15,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SerialPort;
-import frc.robot.constants.Constants;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
+
+import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
-import org.strykeforce.swerve.TalonSwerveModule;
 import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.swerve.V6TalonSwerveModule;
 
 public class Swerve implements SwerveIO {
 
@@ -29,33 +33,35 @@ public class Swerve implements SwerveIO {
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;
 
-  private AHRS ahrs;
+  private SF_AHRS ahrs;
+
+  private TalonFXConfigurator configurator;
 
   public Swerve() {
+    
     var moduleBuilder =
-        new TalonSwerveModule.Builder()
+        new V6TalonSwerveModule.V6Builder()
             .driveGearRatio(DriveConstants.kDriveGearRatio)
             .wheelDiameterInches(DriveConstants.kWheelDiameterInches)
             .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond);
 
-    TalonSwerveModule[] swerveModules = new TalonSwerveModule[4];
+    V6TalonSwerveModule[] swerveModules = new V6TalonSwerveModule[4];
     Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
 
     for (int i = 0; i < 4; i++) {
       var azimuthTalon = new TalonSRX(i);
-      azimuthTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
+      azimuthTalon.configFactoryDefault(RobotConstants.kTalonConfigTimeout);
       azimuthTalon.configAllSettings(
-          DriveConstants.getAzimuthTalonConfig(), Constants.kTalonConfigTimeout);
+          DriveConstants.getAzimuthTalonConfig(), RobotConstants.kTalonConfigTimeout);
       azimuthTalon.enableCurrentLimit(true);
       azimuthTalon.enableVoltageCompensation(true);
       azimuthTalon.setNeutralMode(NeutralMode.Coast);
 
       var driveTalon = new TalonFX(i + 10);
-      driveTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
-      driveTalon.configAllSettings(
-          DriveConstants.getDriveTalonConfig(), Constants.kTalonConfigTimeout);
-      driveTalon.enableVoltageCompensation(true);
-      driveTalon.setNeutralMode(NeutralMode.Brake);
+      configurator = driveTalon.getConfigurator();
+      configurator.apply(new TalonFXConfiguration());
+      configurator.apply(DriveConstants.getDriveTalonConfig());
+      
 
       // var driveTalonFollower = new TalonFX(i + 14);
       // driveTalonFollower.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -79,7 +85,7 @@ public class Swerve implements SwerveIO {
       // else if (i == 3) followerThree = driveTalon;
     }
 
-    ahrs = new AHRS(SerialPort.Port.kUSB, SerialDataType.kProcessedData, (byte) 200);
+    ahrs = new SF_AHRS(SerialPort.Port.kUSB, SerialDataType.kProcessedData, (byte) 200);
     swerveDrive = new SwerveDrive(ahrs, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
@@ -115,7 +121,7 @@ public class Swerve implements SwerveIO {
   }
 
   public SwerveModuleState[] getSwerveModuleStates() {
-    TalonSwerveModule[] swerveModules = (TalonSwerveModule[]) swerveDrive.getSwerveModules();
+    V6TalonSwerveModule[] swerveModules = (V6TalonSwerveModule[]) swerveDrive.getSwerveModules();
     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
       swerveModuleStates[i] = swerveModules[i].getState();
