@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 public class RobotContainer {
+
   VisionSubsystem visionSubsystem;
 
   public RobotContainer() {
