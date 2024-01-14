@@ -28,7 +28,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public double getPosition() {
-    return inputs.positionTicks;
+    return inputs.position;
   }
 
   public WristStates getState() {
@@ -40,7 +40,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isFinished() {
-    return Math.abs(inputs.positionTicks - setpoint) <= WristConstants.kCloseEnoughTicks;
+    return Math.abs(inputs.position - setpoint) <= WristConstants.kCloseEnoughTicks;
   }
 
   public void zero() {

@@ -1,7 +1,6 @@
 package frc.robot.constants;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class WristConstants {
   public static final int kWristTalonFxId = 0;
