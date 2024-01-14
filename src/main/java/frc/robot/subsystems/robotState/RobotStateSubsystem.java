@@ -1,8 +1,8 @@
 package frc.robot.subsystems.robotState;
 
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
@@ -12,7 +12,7 @@ public class RobotStateSubsystem {
   DriveSubsystem driveSubsystem;
   ShooterSubsystem shooterSubsystem;
   IntakeSubsystem intakeSubsystem;
-  PivotSubsystem pivotSubsystem;
+  ElbowSubsystem elbowSubsystem;
 
   // Constructor
   public RobotStateSubsystem(
@@ -20,12 +20,12 @@ public class RobotStateSubsystem {
       DriveSubsystem driveSubsystem,
       ShooterSubsystem shooterSubsystem,
       IntakeSubsystem intakeSubsystem,
-      PivotSubsystem pivotSubsystem) {
+      ElbowSubsystem elbowSubsystem) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.shooterSubsystem = shooterSubsystem;
     this.intakeSubsystem = intakeSubsystem;
-    this.pivotSubsystem = pivotSubsystem;
+    this.elbowSubsystem = elbowSubsystem;
   }
 
   // Getter/Setter Methods
