@@ -15,6 +15,13 @@ public class VisionConstants {
   public static final double kMinStdDev = 0.01;
   public static final double kMaxAmbig = 0.15;
 
+  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(0));
+
+  // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
+  // in the form [theta], with units in radians.
+  public static Matrix<N1, N1> kLocalMeasurementStdDevs =
+      VecBuilder.fill(Units.degreesToRadians(0.01));
+
   // Increase these numbers to trust global measurements from vision less. This matrix is in the
   // form [x, y, theta]ᵀ, with units in meters and radians.
   // Vision Odometry Standard devs
