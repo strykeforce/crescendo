@@ -1,0 +1,20 @@
+{
+    "fileName": "deadeye.json",
+    "name": "StrykeForce-Deadeye",
+    "version": "22.2.0",
+    "uuid": "a8620993-3ffc-425e-95d9-a5e73eabef40",
+    "frcYear": "2024",
+    "mavenUrls": [
+        "https://d1cfub2bqs98lp.cloudfront.net/repo"
+    ],
+    "jsonUrl": "http://maven.strykeforce.org/deadeye.json",
+    "javaDependencies": [
+        {
+            "groupId": "org.strykeforce",
+            "artifactId": "deadeye",
+            "version": "22.2.0"
+        }
+    ],
+    "jniDependencies": [],
+    "cppDependencies": []
+}
