@@ -4,17 +4,65 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import ch.qos.logback.classic.util.ContextInitializer;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.constants.BuildConstants;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  org.slf4j.Logger txtLogger;
+  private DigitalInput eventFlag;
+  private Boolean isEvent;
 
   @Override
   public void robotInit() {
+    if (isReal()) {
+      Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+      Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+      Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+      Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+      Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+      switch (BuildConstants.DIRTY) {
+        case 0:
+          Logger.recordMetadata("GitDirty", "All Changes Committed");
+          break;
+        case 1:
+          Logger.recordMetadata("GitDirty", "Uncommitted changes");
+          break;
+        default:
+          Logger.recordMetadata("GitDirty", "Unknown");
+          break;
+      }
+      Logger.addDataReceiver(new WPILOGWriter());
+
+      // Comp robot conditions or not
+      eventFlag = new DigitalInput(0);
+      isEvent = eventFlag.get();
+      if (isEvent) {
+        System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
+        System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");
+      } else {
+        Logger.addDataReceiver(new NT4Publisher()); // publish advantage kit data to network tables
+      }
+    } else {
+      setUseTiming(false);
+      String logPath = LogFileUtil.findReplayLog(); // pull replay log from advantage scope
+      Logger.setReplaySource(new WPILOGReader(logPath));
+      Logger.addDataReceiver(
+          new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // save outputs to new log
+    }
+    Logger.start();
+
     m_robotContainer = new RobotContainer();
   }
 

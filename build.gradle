@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2024.1.1"
     id "com.diffplug.spotless" version "6.12.1"
+    id "com.peterabeles.gversion" version "1.10"
 }
 
 java {
@@ -78,6 +79,7 @@ dependencies {
 
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+    
 
 }
 
@@ -129,3 +131,22 @@ repositories() {
     mavenLocal()
 }
 
+configurations.all {
+    exclude group: "edu.wpi.first.wpilibj"
+}
+
+task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
+    mainClass = "org.littletonrobotics.junction.CheckInstall"
+    classpath = sourceSets.main.runtimeClasspath
+}
+compileJava.finalizedBy checkAkitInstall
+
+project.compileJava.dependsOn(createVersionFile)
+gversion {
+    srcDir = "src/main/java/"
+    classPackage = "frc.robot.constants"
+    className = "BuildConstants"
+    dateFormat = "yyy-MM-dd HH:mm:ss z"
+    timeZone = "America/New_York"
+    indent = "  "
+}
