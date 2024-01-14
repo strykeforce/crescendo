@@ -1,17 +1,20 @@
 {
-  "fileName": "thirdcoast.json",
-  "name": "StrykeForce-ThirdCoast",
-  "version": "23.3.0",
-  "uuid": "13c4f4b5-a1c0-4670-8f8d-b7b03628c0d3",
-  "mavenUrls": ["https://d1cfub2bqs98lp.cloudfront.net/repo"],
-  "jsonUrl": "http://maven.strykeforce.org/thirdcoast.json",
-  "javaDependencies": [
-    {
-      "groupId": "org.strykeforce",
-      "artifactId": "thirdcoast",
-      "version": "23.3.0"
-    }
-  ],
-  "jniDependencies": [],
-  "cppDependencies": []
+    "fileName": "thirdcoast.json",
+    "name": "StrykeForce-ThirdCoast",
+    "version": "24.0.0",
+    "uuid": "13c4f4b5-a1c0-4670-8f8d-b7b03628c0d3",
+    "frcYear": "2024",
+    "mavenUrls": [
+        "https://dl9vkdsodilqp.cloudfront.net/repo"
+    ],
+    "jsonUrl": "http://maven.strykeforce.org/thirdcoast.json",
+    "javaDependencies": [
+        {
+            "groupId": "org.strykeforce",
+            "artifactId": "thirdcoast",
+            "version": "24.0.0"
+        }
+    ],
+    "jniDependencies": [],
+    "cppDependencies": []
 }
