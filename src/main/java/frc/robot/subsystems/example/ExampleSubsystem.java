@@ -1,12 +1,17 @@
 package frc.robot.subsystems.example;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ExampleConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
+import java.util.Set;
+import org.littletonrobotics.junction.Logger;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class ExampleSubsystem extends SubsystemBase implements ClosedLoopPosSubsystem {
+public class ExampleSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
   // Private Variables
   private final ExampleIO io;
+  private final ExampleIOInputsAutoLogged inputs = new ExampleIOInputsAutoLogged();
   private double setpoint = 0.0;
   private ExampleState curState = ExampleState.INIT;
 
@@ -23,7 +28,7 @@ public class ExampleSubsystem extends SubsystemBase implements ClosedLoopPosSubs
 
   @Override
   public double getPosition() {
-    return setpoint;
+    return inputs.position;
   }
 
   @Override
@@ -41,16 +46,42 @@ public class ExampleSubsystem extends SubsystemBase implements ClosedLoopPosSubs
 
   @Override
   public boolean isFinished() {
-    return Math.abs(setpoint) <= ExampleConstants.kCloseEnough;
+    return Math.abs(setpoint - inputs.position) <= ExampleConstants.kCloseEnough;
   }
 
   // Periodic Function
   @Override
   public void periodic() {
-    super.periodic();
+    // Read Inputs
+    io.updateInputs(inputs);
+
+    // State Machine
+    switch (curState) {
+      case INIT:
+        break;
+      case ZEROED:
+        break;
+      default:
+        break;
+    }
+
+    // Log Outputs
+    Logger.recordOutput("Example/curState", curState.ordinal());
+    Logger.recordOutput("Example/setpoint", setpoint);
   }
 
   // Grapher
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+
+    super.registerWith(telemetryService);
+    io.registerWith(telemetryService);
+  }
+
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of(new Measure("State", () -> curState.ordinal()));
+  }
 
   // State Enum
   public enum ExampleState {
