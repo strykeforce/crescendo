@@ -1,9 +1,9 @@
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.wrist;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
 
-public interface ElbowEncoderIO {
+public interface WristEncoderIO {
 
   @AutoLog
   public static class ElbowEncoderIOInputs {

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.elbow;
 
 import frc.robot.constants.ElbowConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
@@ -14,6 +14,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private final ElbowIOInputsAutoLogged inputs = new ElbowIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(ElbowSubsystem.class);
   private double setpoint = 0;
+  private ElbowStates curState;
 
   public ElbowSubsystem(ElbowIO io, ElbowEncoderIO encoderIO) {
     this.io = io;
@@ -30,6 +31,14 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return inputs.positionTicks;
   }
 
+  public ElbowStates getState() {
+    return curState;
+  }
+
+  public void setState(ElbowStates state) {
+    curState = state;
+  }
+
   public boolean isFinished() {
     return Math.abs(inputs.positionTicks - setpoint) <= ElbowConstants.kCloseEnoughTicks;
   }
@@ -42,10 +51,13 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    switch (curState) {
+      case IDLE:
+        break;
 
-    // advLogger.processInputs("Pivot", inputs);
-
-    // advLogger.recordOutput("Pivot/setpoint", setpoint);
+      case MOVING:
+        break;
+    }
   }
 
   @Override
@@ -58,5 +70,10 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
     io.registerWith(telemetryService);
+  }
+
+  public enum ElbowStates {
+    IDLE,
+    MOVING
   }
 }
