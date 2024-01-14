@@ -1,7 +1,11 @@
 package frc.robot.subsystems.example;
 
+import org.littletonrobotics.junction.AutoLog;
+import org.strykeforce.telemetry.TelemetryService;
+
 public interface ExampleIO {
 
+  @AutoLog
   public static class ExampleIOInputs {
     public double position = 0.0;
     public double velocity = 0.0;
@@ -13,5 +17,5 @@ public interface ExampleIO {
 
   public default void zero() {}
 
-  public default void registerWith() {}
+  public default void registerWith(TelemetryService telemetryService) {}
 }
