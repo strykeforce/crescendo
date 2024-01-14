@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.kauailabs.navx.frc.AHRS.SerialDataType;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,13 +17,12 @@ import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
-
 import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
-import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.swerve.V6TalonSwerveModule;
+import org.strykeforce.telemetry.TelemetryService;
 
 public class Swerve implements SwerveIO {
 
@@ -38,7 +36,7 @@ public class Swerve implements SwerveIO {
   private TalonFXConfigurator configurator;
 
   public Swerve() {
-    
+
     var moduleBuilder =
         new V6TalonSwerveModule.V6Builder()
             .driveGearRatio(DriveConstants.kDriveGearRatio)
@@ -61,7 +59,6 @@ public class Swerve implements SwerveIO {
       configurator = driveTalon.getConfigurator();
       configurator.apply(new TalonFXConfiguration());
       configurator.apply(DriveConstants.getDriveTalonConfig());
-      
 
       // var driveTalonFollower = new TalonFX(i + 14);
       // driveTalonFollower.configFactoryDefault(Constants.kTalonConfigTimeout);

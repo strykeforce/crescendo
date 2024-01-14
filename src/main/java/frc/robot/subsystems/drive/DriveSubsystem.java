@@ -14,9 +14,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.DriveConstants;
-import frc.robot.subsystems.drive.SwerveIO.SwerveIOInputs;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;

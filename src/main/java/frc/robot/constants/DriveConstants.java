@@ -6,14 +6,13 @@ package frc.robot.constants;
 // import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 // import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 // import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import java.util.ArrayList;
-
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public final class DriveConstants {
   public static final double kFieldMaxX = 16.540988; // m
@@ -139,15 +138,15 @@ public final class DriveConstants {
     return trajectoryConfig;
   }
 
-public static TalonSRXConfiguration getAzimuthTalonConfig() {
+  public static TalonSRXConfiguration getAzimuthTalonConfig() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getAzimuthTalonConfig'");
-}
+  }
 
-public static TalonFXConfiguration getDriveTalonConfig() {
+  public static TalonFXConfiguration getDriveTalonConfig() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getDriveTalonConfig'");
-}
+  }
 
   //   // Azimuth Talon Config
   //   public static SupplyCurrentLimitConfiguration getAzimuthSupplyCurrentLimit() {
