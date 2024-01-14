@@ -14,8 +14,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   MagazineIOInputsAutoLogged inputs = new MagazineIOInputsAutoLogged();
   MagazineStates curState = MagazineStates.EMPTY;
   private Logger logger = LoggerFactory.getLogger(MagazineSubsystem.class);
-  private org.littletonrobotics.junction.Logger advLogger =
-      org.littletonrobotics.junction.Logger.getInstance();
 
   double setpoint = inputs.position;
 
@@ -56,7 +54,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    advLogger.processInputs("Magazine", inputs);
 
     switch (curState) {
       case EMPTY:
@@ -64,8 +61,18 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
+        if (io.getFwdLimitSwitch()) {
+          logger.info("INTAKING -> FULL");
+          curState = MagazineStates.FULL;
+          io.setSpeed(0.0);
+        }
         break;
       case EMPTYING:
+        if (!io.getFwdLimitSwitch()) {
+          logger.info("EMPTYING -> EMPTY");
+          curState = MagazineStates.EMPTY;
+          io.setSpeed(0.0);
+        }
         break;
     }
   }

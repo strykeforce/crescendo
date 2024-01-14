@@ -77,4 +77,9 @@ public class MagazineIOFX implements MagazineIO {
     // TODO Auto-generated method stub
     MagazineIO.super.setSupplyCurrentLimit(supplyCurrentLimitConfiguration);
   }
+
+  @Override
+  public boolean getFwdLimitSwitch() {
+    return fwdLimitSwitch.refresh().getValue().value == 1;
+  }
 }
