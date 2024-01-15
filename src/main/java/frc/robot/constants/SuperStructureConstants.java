@@ -3,6 +3,10 @@ package frc.robot.constants;
 public class SuperStructureConstants {
   // SEQUENCE
   public static final double kElbowMinToMoveWrist = 0.0;
+  public static final double kWristMinToMoveElbow = 0.0;
+
+  //SHOOT
+  public static final double kWristShootSetPoint = 0.0;
 
   // AMP
   public static final double kWristAmpSetPoint = 0.0;
