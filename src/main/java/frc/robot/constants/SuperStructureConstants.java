@@ -5,7 +5,7 @@ public class SuperStructureConstants {
   public static final double kElbowMinToMoveWrist = 0.0;
   public static final double kWristMinToMoveElbow = 0.0;
 
-  //SHOOT
+  // SHOOT
   public static final double kWristShootSetPoint = 0.0;
 
   // AMP
