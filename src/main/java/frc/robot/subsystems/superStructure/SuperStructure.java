@@ -43,14 +43,14 @@ public class SuperStructure extends MeasurableSubsystem {
     return curState;
   }
 
-  public void setState(SuperStructureStates state) {
-    if (state != SuperStructureStates.IDLE) {
-      curState = SuperStructureStates.TRANSFER;
-      nextState = state;
-    } else {
-      curState = state;
-    }
-  }
+  // public void setState(SuperStructureStates state) {
+  //   if (state != SuperStructureStates.IDLE) {
+  //     curState = SuperStructureStates.TRANSFER;
+  //     nextState = state;
+  //   } else {
+  //     curState = state;
+  //   }
+  // }
 
   // Helper Methods
 
