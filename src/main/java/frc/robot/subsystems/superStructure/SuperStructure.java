@@ -174,6 +174,7 @@ public class SuperStructure extends MeasurableSubsystem {
           }
         }
 
+        // Once all subsystems are at position go into the desired state
         if (isFinished()) {
           logger.info("TRANSFER -> {}", nextState);
           curState = nextState;
