@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-
 public class SuperStructure extends MeasurableSubsystem {
   // Private Variables
   WristSubsystem wristSubsystem;
@@ -95,7 +93,6 @@ public class SuperStructure extends MeasurableSubsystem {
     shooterSubsystem.setSpeed(shooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
 
-
     logger.info("{} -> TRANSFER(POST_CLIMB)");
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
@@ -137,7 +134,6 @@ public class SuperStructure extends MeasurableSubsystem {
 
     shooterSubsystem.setSpeed(shooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
-
 
     logger.info("{} -> TRANSFER(INTAKE)");
     flipMagazineOut = false;
