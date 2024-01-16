@@ -1,0 +1,23 @@
+{
+  "Clients": {
+    "open": true
+  },
+  "Connections": {
+    "open": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "10.27.67.2"
+  },
+  "Server": {
+    "open": true
+  },
+  "WallEye_Client@1": {
+    "open": true
+  },
+  "transitory": {
+    "AdvantageKit": {
+      "open": true
+    }
+  }
+}

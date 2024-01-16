@@ -5,9 +5,13 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.Set;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class RobotStateSubsystem {
+public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public Alliance getAllianceColor() {
     return Alliance.Red;
@@ -20,6 +24,7 @@ public class RobotStateSubsystem {
   ShooterSubsystem shooterSubsystem;
   IntakeSubsystem intakeSubsystem;
   ElbowSubsystem elbowSubsystem;
+  SuperStructure superStructure;
 
   // Constructor
   public RobotStateSubsystem(
@@ -27,12 +32,14 @@ public class RobotStateSubsystem {
       DriveSubsystem driveSubsystem,
       ShooterSubsystem shooterSubsystem,
       IntakeSubsystem intakeSubsystem,
-      ElbowSubsystem elbowSubsystem) {
+      ElbowSubsystem elbowSubsystem,
+      SuperStructure superStructure) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.shooterSubsystem = shooterSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.elbowSubsystem = elbowSubsystem;
+    this.superStructure = superStructure;
   }
 
   // Getter/Setter Methods
@@ -42,6 +49,10 @@ public class RobotStateSubsystem {
   // Periodic
 
   // Grapher
+  @Override
+  public Set<Measure> getMeasures() {
+    return null;
+  }
 
   // State
   public enum RobotStates {}
