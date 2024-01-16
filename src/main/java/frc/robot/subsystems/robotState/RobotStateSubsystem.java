@@ -1,5 +1,6 @@
 package frc.robot.subsystems.robotState;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -7,6 +8,12 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 public class RobotStateSubsystem {
+
+  public Alliance getAllianceColor() {
+    return Alliance.Red;
+    // FIXME
+  }
+
   // Private Variables
   VisionSubsystem visionSubsystem;
   DriveSubsystem driveSubsystem;
