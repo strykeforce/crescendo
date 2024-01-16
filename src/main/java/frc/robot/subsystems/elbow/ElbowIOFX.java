@@ -51,7 +51,7 @@ public class ElbowIOFX implements ElbowIO {
   @Override
   public void setPosition(double position) {
     setpoint = position - relSetpointOffset;
-    elbow.setControl(positionRequst.withPosition(position)); // FIXME: setpoint instead of position?
+    elbow.setControl(positionRequst.withPosition(setpoint));
   }
 
   @Override
