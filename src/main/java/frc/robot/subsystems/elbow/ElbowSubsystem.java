@@ -11,6 +11,7 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
   private final ElbowIO io;
+  // private final ElbowEncoderIO encoderIo;
   private final ElbowIOInputsAutoLogged inputs = new ElbowIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(ElbowSubsystem.class);
   private double setpoint = 0;
@@ -18,6 +19,8 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public ElbowSubsystem(ElbowIO io, ElbowEncoderIO encoderIO) {
     this.io = io;
+    // this.encoderIo = encoderIo;
+
     zero();
   }
 
@@ -25,6 +28,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     io.setPosition(position);
     setpoint = position;
     curState = ElbowStates.MOVING;
+
     logger.info("Elbow moving to {} ticks", setpoint);
   }
 
@@ -50,6 +54,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void zero() {
     io.zero();
+
     logger.info("Elbow zeroed");
   }
 
