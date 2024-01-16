@@ -14,7 +14,7 @@ public class ElbowIOFX implements ElbowIO {
   private Logger logger;
   private TalonFX elbow;
 
-  private double absSesorInitial;
+  private double absSensorInitial;
   private double relSetpointOffset;
   private double setpoint;
 
@@ -27,7 +27,7 @@ public class ElbowIOFX implements ElbowIO {
   public ElbowIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     elbow = new TalonFX(ElbowConstants.kElbowTalonFxId);
-    absSesorInitial = elbow.getPosition().getValue();
+    absSensorInitial = elbow.getPosition().getValue();
 
     configurator = elbow.getConfigurator();
     configurator.apply(new TalonFXConfiguration());
@@ -39,10 +39,11 @@ public class ElbowIOFX implements ElbowIO {
 
   @Override
   public void zero() {
-    relSetpointOffset = absSesorInitial - ElbowConstants.kElbowZeroTicks;
+    relSetpointOffset = absSensorInitial - ElbowConstants.kElbowZeroTicks;
+
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}",
-        absSesorInitial,
+        absSensorInitial,
         ElbowConstants.kElbowZeroTicks,
         relSetpointOffset);
   }
@@ -50,7 +51,7 @@ public class ElbowIOFX implements ElbowIO {
   @Override
   public void setPosition(double position) {
     setpoint = position - relSetpointOffset;
-    elbow.setControl(positionRequst.withPosition(position));
+    elbow.setControl(positionRequst.withPosition(position)); // FIXME: setpoint instead of position?
   }
 
   @Override

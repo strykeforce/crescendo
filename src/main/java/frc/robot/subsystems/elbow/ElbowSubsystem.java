@@ -14,11 +14,10 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private final ElbowIOInputsAutoLogged inputs = new ElbowIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(ElbowSubsystem.class);
   private double setpoint = 0;
-  private ElbowStates curState;
+  private ElbowStates curState = ElbowStates.IDLE;
 
   public ElbowSubsystem(ElbowIO io, ElbowEncoderIO encoderIO) {
     this.io = io;
-
     zero();
   }
 
@@ -29,6 +28,10 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public double getPosition() {
     return inputs.positionTicks;
+  }
+
+  public double getSetpoint() {
+    return setpoint;
   }
 
   public ElbowStates getState() {
@@ -45,17 +48,21 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void zero() {
     io.zero();
-    logger.info("Pivot zeroed");
+    logger.info("Elbow zeroed");
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+
     switch (curState) {
       case IDLE:
         break;
 
       case MOVING:
+        break;
+
+      default:
         break;
     }
   }
