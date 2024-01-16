@@ -1,10 +1,5 @@
 package frc.robot.subsystems.robotState;
 
-import java.util.Set;
-
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
-
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
@@ -12,6 +7,9 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.Set;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
 
@@ -34,7 +32,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       DriveSubsystem driveSubsystem,
       ShooterSubsystem shooterSubsystem,
       IntakeSubsystem intakeSubsystem,
-      ElbowSubsystem elbowSubsystem, SuperStructure superStructure) {
+      ElbowSubsystem elbowSubsystem,
+      SuperStructure superStructure) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.shooterSubsystem = shooterSubsystem;
@@ -52,7 +51,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-      return null;
+    return null;
   }
 
   // State
