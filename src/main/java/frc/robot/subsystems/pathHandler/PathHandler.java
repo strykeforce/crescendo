@@ -18,6 +18,7 @@ public class PathHandler extends MeasurableSubsystem {
   ArrayList<Integer> noteOrder;
   PathData nextPath;
   PathData endPath;
+  PathData lastReturnedPath;
   DriveSubsystem driveSubsystem;
   boolean useDeadeye;
   float numPieces;
@@ -72,7 +73,12 @@ public class PathHandler extends MeasurableSubsystem {
     noteOrder = list;
   }
 
+  public boolean hasNewPath() {
+    return nextPath != lastReturnedPath;
+  }
+
   public PathData getNextPath() {
+    lastReturnedPath = nextPath;
     if (curState == PathStates.FETCH && noteOrder.size() > 1) noteOrder.remove(0);
     return nextPath;
   }
@@ -105,6 +111,7 @@ public class PathHandler extends MeasurableSubsystem {
         if (robotStateSubsystem.hasGamePiece()) {
           logger.info("FETCH -> SHOOT");
           nextPath = paths[noteOrder.get(0)][0];
+          noteOrder.remove(0);
           curState = PathStates.SHOOT;
         }
         break;
