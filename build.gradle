@@ -80,7 +80,7 @@ dependencies {
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
 
-    implementation 'org.strykeforce:wallEYE:2024.1.1'    
+    implementation 'org.strykeforce:wallEYE:2024.0.0'    
 
 }
 

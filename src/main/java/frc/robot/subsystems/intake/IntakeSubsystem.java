@@ -35,9 +35,8 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
   public void toIntaking() {
     // logger.info("To Intaking");
-    curState = IntakeState.INTAKING;
     setPercent();
-    ;
+    curState = IntakeState.INTAKING;
   }
 
   // public void intakeOpenLoop(double percentOutput) {
@@ -55,7 +54,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     else beamBreakStableCounts = 0;
 
     beamBroken = (beamBreakStableCounts > IntakeConstants.kBeamBreakStableCounts);
-    return (beamBreakStableCounts > IntakeConstants.kBeamBreakStableCounts);
+    return beamBroken;
   }
 
   // intake state system
@@ -69,7 +68,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
       case INTAKING:
         if (isBeamBroken()) {
           io.setPct(0);
-          ;
+
           curState = IntakeState.HAS_PIECE;
         }
         break;

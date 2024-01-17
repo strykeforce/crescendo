@@ -10,12 +10,12 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
   // Private Variables
-  MagazineIO io;
-  MagazineIOInputsAutoLogged inputs = new MagazineIOInputsAutoLogged();
-  MagazineStates curState = MagazineStates.EMPTY;
+  private MagazineIO io;
+  private MagazineIOInputsAutoLogged inputs = new MagazineIOInputsAutoLogged();
+  private MagazineStates curState = MagazineStates.EMPTY;
   private Logger logger = LoggerFactory.getLogger(MagazineSubsystem.class);
 
-  double setpoint = inputs.position;
+  private double setpoint = inputs.position;
 
   // Constructor
   public MagazineSubsystem(MagazineIO io) {
@@ -23,7 +23,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   // Getter/Setter Methods
-
   @Override
   public double getSpeed() {
     return inputs.velocity;
@@ -49,6 +48,19 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   // Helper Methods
+  public void toIntaking() {
+    setSpeed(MagazineConstants.kIntakingSpeed);
+    setState(MagazineStates.INTAKING);
+  }
+
+  public void toEmptying() {
+    setSpeed(MagazineConstants.kEmptyingSpeed);
+    setState(MagazineStates.EMPTYING);
+  }
+
+  public boolean hasPiece() {
+    return curState == MagazineStates.FULL || curState == MagazineStates.EMPTYING;
+  }
 
   // Periodic
   @Override
@@ -79,7 +91,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
     return null;
   }
 

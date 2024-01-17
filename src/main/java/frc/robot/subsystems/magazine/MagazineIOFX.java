@@ -20,13 +20,13 @@ public class MagazineIOFX implements MagazineIO {
   private double setpoint;
   private final double absSensorIntial;
 
-  TalonFXConfigurator configurator;
+  private TalonFXConfigurator configurator;
   private VelocityDutyCycle velocityRequest =
       new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
-  StatusSignal<Double> currPosition;
-  StatusSignal<Double> currVelocity;
-  StatusSignal<ForwardLimitValue> fwdLimitSwitch;
-  StatusSignal<ReverseLimitValue> revLimitSwitch;
+  private StatusSignal<Double> currPosition;
+  private StatusSignal<Double> currVelocity;
+  private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
+  private StatusSignal<ReverseLimitValue> revLimitSwitch;
 
   public MagazineIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
