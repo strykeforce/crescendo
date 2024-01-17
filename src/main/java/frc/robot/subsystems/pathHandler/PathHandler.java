@@ -22,6 +22,7 @@ public class PathHandler extends MeasurableSubsystem {
   boolean useDeadeye;
   float numPieces;
   Logger logger;
+  boolean canShoot = false;
 
   //  NOTE NUMBERS ARE BASED ON THE STANDARDS DOCUMENT
   // A 6x6 array that stores all paths (0 is shootPos, 1 is first note, etc)
@@ -76,12 +77,18 @@ public class PathHandler extends MeasurableSubsystem {
     return nextPath;
   }
 
+  //Command calls this when drive path is done driving
+  public void startShot() {
+    canShoot = true;
+  }
+
   @Override
   public void periodic() {
     switch (curState) {
       case SHOOT:
-        if (true /*FIXME need a way to determine if shooting path done */) {
+        if (canShoot) {
           robotStateSubsystem.shoot();
+          canShoot = false;
         }
 
         if (!robotStateSubsystem.hasGamePiece()) {
