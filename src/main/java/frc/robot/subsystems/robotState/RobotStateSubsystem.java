@@ -21,7 +21,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private ElbowSubsystem elbowSubsystem;
   private SuperStructure superStructure;
   private MagazineSubsystem magazineSubsystem;
-  private RobotStates curState, nextState;
+  private RobotStates curState;
 
   // Constructor
   public RobotStateSubsystem(
@@ -49,11 +49,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // Helper Methods
   public void toIntake() {
-    intakeSubsystem.toIntaking();
-    magazineSubsystem.toIntaking();
     superStructure.intake();
+    intakeSubsystem.toIntaking();
 
-    curState = RobotStates.INTAKING;
+    curState = RobotStates.TO_INTAKING;
   }
 
   public void toAmp() {
@@ -69,6 +68,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case IDLE:
         break;
 
+      case TO_INTAKING:
+        if (superStructure.isFinished()) {
+          magazineSubsystem.toIntaking();
+
+          curState = RobotStates.INTAKING;
+        }
+        break;
+
       case INTAKING:
         if (magazineSubsystem.hasPiece()) {
           curState = RobotStates.IDLE;
@@ -81,6 +88,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case AMP:
+        if (!magazineSubsystem.hasPiece()) {
+          curState = RobotStates.IDLE;
+        }
         break;
 
       default:
@@ -97,6 +107,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // State
   public enum RobotStates {
     INTAKING,
+    TO_INTAKING,
     IDLE,
     TO_AMP,
     AMP
