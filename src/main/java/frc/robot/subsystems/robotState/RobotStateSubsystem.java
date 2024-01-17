@@ -36,8 +36,15 @@ public class RobotStateSubsystem {
   }
 
   // Getter/Setter Methods
-
+  public boolean hasGamePiece() {
+    // FIXME
+    return true;
+  }
   // Helper Methods
+
+  public void shoot() {
+    // FIXME
+  }
 
   // Periodic
 
