@@ -17,10 +17,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.ArrayList;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class VisionSubsystem extends SubsystemBase {
+public class VisionSubsystem extends MeasurableSubsystem {
 
   // Private Variables
   WallEyeCam[] cams;
@@ -221,7 +225,12 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   // Grapher
-
+  @Override
+  public Set<Measure> getMeasures() {
+      // TODO Auto-generated method stub
+      return null;
+  }
+  
   // State Enum
   public enum VisionStates {
     TRUSTWHEELS,

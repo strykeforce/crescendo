@@ -7,6 +7,11 @@ For any subsystem that follows a general pattern, it must implement one of the i
     - Open Loop Subsystem
 
 ## Auton Paths
+For naming purposes of the gamepieces, it follows a letter + number pattern. The letter 
+corresponds to what "zone" the piece is in with the middle pieces having an "M" and the wing
+pieces having a "W". The numbers start at 1 which is the piece with that letter that is closest 
+to the amp side wall. It the ascends up. So the closest piece to the amp in the wing section would be W1.
+
 ADD ONCE PATHS ARE MADE
 
 ## State Subsystems
@@ -56,5 +61,7 @@ Certain functions should share similar naming patterns:
 
 
 ## Comments
-Comments should be placed in locations that allow readers to easily identify what code blocks do without reading them. Comments need to easily describe what something does without over describing it (ex. commenting a for loop that runs 4 times as "// Runs 4 times" is redundant).
+Comments should be placed in locations that allow readers to easily identify what code 
+blocks do without reading them. Comments need to easily describe what something does without
+ over describing it (ex. commenting a for loop that runs 4 times as "// Runs 4 times" is redundant).
 
