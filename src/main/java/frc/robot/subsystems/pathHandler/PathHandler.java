@@ -21,7 +21,7 @@ public class PathHandler extends MeasurableSubsystem {
   PathData lastReturnedPath;
   DriveSubsystem driveSubsystem;
   boolean useDeadeye;
-  float numPieces;
+  double numPieces;
   Logger logger;
   boolean canShoot = false;
 
@@ -40,22 +40,25 @@ public class PathHandler extends MeasurableSubsystem {
       RobotStateSubsystem robotStateSubsystem,
       DriveSubsystem driveSubsystem,
       ArrayList<Integer> order,
-      String[][] paths,
+      String[][] pathNames,
       boolean useDeadeye,
-      float numPieces,
+      double numPieces,
       String endPath) {
     this.deadeye = deadeye;
     this.robotStateSubsystem = robotStateSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.useDeadeye = useDeadeye;
-    this.numPieces = numPieces;
+    this.numPieces = numPieces - 1.0;
     noteOrder = order;
 
     logger = LoggerFactory.getLogger(this.getClass());
 
+    paths = new PathData[6][6];
+
     for (int i = 0; i < 6; ++i)
       for (int j = 0; j < 6; ++j) {
-        if (i != j) this.paths[i][j] = driveSubsystem.generateTrajectory(paths[i][j]);
+        if (i != j && (noteOrder.contains(i) || i == 0) && (noteOrder.contains(j) || j == 0))
+          paths[i][j] = driveSubsystem.generateTrajectory(pathNames[i][j]);
       }
 
     this.endPath = driveSubsystem.generateTrajectory(endPath);
@@ -80,10 +83,14 @@ public class PathHandler extends MeasurableSubsystem {
   public PathData getNextPath() {
     lastReturnedPath = nextPath;
     if (curState == PathStates.FETCH && noteOrder.size() > 1) noteOrder.remove(0);
+    if (curState == PathStates.SHOOT && hasNewPath())  {
+            logger.info("SHOOT -> FETCH");
+            curState = PathStates.FETCH;
+        }
     return nextPath;
   }
 
-  //Command calls this when drive path is done driving
+  // Command calls this when drive path is done driving
   public void startShot() {
     canShoot = true;
   }
@@ -98,17 +105,22 @@ public class PathHandler extends MeasurableSubsystem {
         }
 
         if (!robotStateSubsystem.hasGamePiece()) {
-          logger.info("SHOOT -> FETCH");
-          nextPath = paths[0][noteOrder.get(0)];
-          curState = PathStates.FETCH;
+          numPieces -= 0.5;
+          if (noteOrder.size() == 0 || numPieces < 0.01) {
+            nextPath = endPath;
+          } else {
+              nextPath = paths[0][noteOrder.get(0)];
+          }
         }
         break;
 
       case FETCH:
-        if (noteOrder.size() > 1) nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
-        else nextPath = endPath;
+        if (noteOrder.size() > 1) {
+            nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
+        } else nextPath = endPath;
 
-        if (robotStateSubsystem.hasGamePiece()) {
+        if (robotStateSubsystem.hasGamePiece() && numPieces > 0.51) {
+          numPieces -= 0.5;
           logger.info("FETCH -> SHOOT");
           nextPath = paths[noteOrder.get(0)][0];
           noteOrder.remove(0);
