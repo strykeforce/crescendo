@@ -13,7 +13,8 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   // Private Variables
   ShooterIO io;
   ShooterStates curState = ShooterStates.IDLE;
-  private double setpoint = 0.0;
+  private double leftSetpoint = 0.0;
+  double rightSetpoint = 0.0;
 
   ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
@@ -27,18 +28,30 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   @Override
   public double getSpeed() {
-    return inputs.velocity;
+    return inputs.velocityLeft;
   }
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(inputs.velocity - setpoint) < ShooterConstants.kCloseEnough;
+    return Math.abs(inputs.velocityLeft - leftSetpoint) < ShooterConstants.kCloseEnough
+        && Math.abs(inputs.velcoityRight - rightSetpoint) < ShooterConstants.kCloseEnough;
   }
 
   @Override
   public void setSpeed(double speed) {
-    setpoint = speed;
+    leftSetpoint = speed;
+    rightSetpoint = speed;
     io.setSpeed(speed);
+  }
+
+  public void setLeftSpeed(double speed) {
+    leftSetpoint = speed;
+    io.setLeftSpeed(speed);
+  }
+
+  public void setRightSpeed(double speed) {
+    rightSetpoint = speed;
+    io.setRightSpeed(speed);
   }
 
   public ShooterStates getState() {
