@@ -65,9 +65,9 @@ public class PathHandler extends MeasurableSubsystem {
     noteOrder.add(0);
 
     for (int i : noteOrder)
-        for (int j : noteOrder) 
-            if (i != j) paths[i][j] = driveSubsystem.generateTrajectory(pathNames[i][j]);
-    
+      for (int j : noteOrder)
+        if (i != j) paths[i][j] = driveSubsystem.generateTrajectory(pathNames[i][j]);
+
     noteOrder.remove(noteOrder.indexOf(0));
 
     this.endPath = driveSubsystem.generateTrajectory(endPath);
@@ -165,7 +165,7 @@ public class PathHandler extends MeasurableSubsystem {
 
         case DRIVE_FETCH:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
-          
+
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
             logger.info("DRIVE_FETCH -> FETCH");
             timer.reset();
