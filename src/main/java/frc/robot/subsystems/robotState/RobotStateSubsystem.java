@@ -9,11 +9,16 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   // Private Variables
+  private Logger logger = LoggerFactory.getLogger(IntakeSubsystem.class);
+
   private VisionSubsystem visionSubsystem;
   private DriveSubsystem driveSubsystem;
   private ShooterSubsystem shooterSubsystem;
@@ -47,18 +52,25 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     // FIXME
   }
 
+  // For convinient logging
+  private void setState(RobotStates newState) {
+    logger.info("{} -> {}", curState, newState);
+    curState = newState;
+  }
+
   // Helper Methods
   public void toIntake() {
     superStructure.intake();
     intakeSubsystem.toIntaking();
+    magazineSubsystem.toIntaking();
 
-    curState = RobotStates.TO_INTAKING;
+    setState(RobotStates.TO_INTAKING);
   }
 
   public void toAmp() {
     superStructure.amp();
 
-    curState = RobotStates.TO_AMP;
+    setState(RobotStates.TO_AMP);
   }
 
   // Periodic
@@ -70,26 +82,27 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_INTAKING:
         if (superStructure.isFinished()) {
-          magazineSubsystem.toIntaking();
 
-          curState = RobotStates.INTAKING;
+          setState(RobotStates.INTAKING);
         }
         break;
 
       case INTAKING:
         if (magazineSubsystem.hasPiece()) {
-          curState = RobotStates.IDLE;
+          // Magazine stops running upon detecting a game piece
+          intakeSubsystem.setPercent(0);
+          setState(RobotStates.IDLE);
         }
         break;
 
       case TO_AMP:
         if (superStructure.isFinished()) {
-          curState = RobotStates.AMP;
+          setState(RobotStates.AMP);
         }
         break;
       case AMP:
         if (!magazineSubsystem.hasPiece()) {
-          curState = RobotStates.IDLE;
+          setState(RobotStates.IDLE);
         }
         break;
 
@@ -106,9 +119,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // State
   public enum RobotStates {
+    IDLE,
     INTAKING,
     TO_INTAKING,
-    IDLE,
     TO_AMP,
     AMP
   }

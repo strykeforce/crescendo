@@ -29,14 +29,18 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     return curState;
   }
 
+  private void setState(IntakeState state) {
+    logger.info("{} -> {}", curState, state);
+    curState = state;
+  }
+
   public boolean getObjectStatus() {
     return (curState == IntakeState.HAS_PIECE);
   }
 
   public void toIntaking() {
-    // logger.info("To Intaking");
-    setPercent();
-    curState = IntakeState.INTAKING;
+    setPercent(IntakeConstants.kIntakePercentOutput);
+    setState(IntakeState.INTAKING);
   }
 
   // public void intakeOpenLoop(double percentOutput) {
@@ -44,8 +48,8 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
   // }
 
   @Override
-  public void setPercent() {
-    io.setPct(IntakeConstants.kIntakePercentOutput);
+  public void setPercent(double pct) {
+    io.setPct(pct);
   }
 
   // if the switch is closed, a stable count is incremented. if not, stable count is reset to zero.
@@ -63,13 +67,11 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
     switch (curState) {
       case HAS_PIECE:
-        // has a gamepiece, disables intake
+        // has a gamepiece, does not disable intake
         break;
       case INTAKING:
-        if (isBeamBroken()) {
-          io.setPct(0);
-
-          curState = IntakeState.HAS_PIECE;
+        if (isBeamBroken()) {        
+          setState(IntakeState.HAS_PIECE);
         }
         break;
       default:

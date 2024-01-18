@@ -44,6 +44,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   public void setState(MagazineStates state) {
+    logger.info("{} -> {}", curState, state);
     curState = state;
   }
 
@@ -74,16 +75,14 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case INTAKING:
         if (io.getFwdLimitSwitch()) {
-          logger.info("INTAKING -> FULL");
-          curState = MagazineStates.FULL;
-          io.setSpeed(0.0);
+          setSpeed(0.0);
+          setState(MagazineStates.FULL);
         }
         break;
       case EMPTYING:
         if (!io.getFwdLimitSwitch()) {
-          logger.info("EMPTYING -> EMPTY");
-          curState = MagazineStates.EMPTY;
-          io.setSpeed(0.0);
+          setSpeed(0.0);
+          setState(MagazineStates.EMPTY);
         }
         break;
     }
