@@ -25,6 +25,7 @@ public class WristIOSRX implements WristIO {
     double absolute = wrist.getSensorCollection().getQuadraturePosition() & 0xFFF;
     double offset = absolute - WristConstants.kWristZeroTicks;
     wrist.setSelectedSensorPosition(offset);
+
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}", absolute, ElbowConstants.kElbowZeroTicks, offset);
   }
