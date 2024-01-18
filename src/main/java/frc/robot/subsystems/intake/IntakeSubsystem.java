@@ -70,7 +70,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
         // has a gamepiece, does not disable intake
         break;
       case INTAKING:
-        if (isBeamBroken()) {        
+        if (isBeamBroken()) {
           setState(IntakeState.HAS_PIECE);
         }
         break;

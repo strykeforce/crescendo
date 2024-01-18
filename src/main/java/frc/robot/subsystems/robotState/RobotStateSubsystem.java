@@ -14,7 +14,6 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
 import java.util.List;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -70,6 +69,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       this.curState = robotState;
     }
   }
+
   public Alliance getAllianceColor() {
     return Alliance.Red;
     // FIXME
@@ -89,6 +89,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     setState(RobotStates.TO_AMP);
   }
+
   private void parseLookupTable() {
     try {
       CSVReader csvReader = new CSVReader(new FileReader(RobotStateConstants.kLookupTablePath));
@@ -119,7 +120,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           distance,
           RobotStateConstants.kLookupMaxDistance);
     } else {
-      index = (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance);
+      index = (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance) / RobotStateConstants.kDistanceIncrement;
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]);
@@ -184,10 +185,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
 
-
       case WAIT_DRIVE:
         // if drive velocity == 0
         // set azimuth to x angle
+        double[] shootSolution = getShootSolution(0);
+
+        if (driveSubsystem.getFieldRelSpeed().vxMetersPerSecond == 0 && driveSubsystem.getFieldRelSpeed().vyMetersPerSecond == 0) {
+          // Not moving
+        }
 
         setState(RobotStates.AZIMUTH);
 
@@ -198,7 +203,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         // use vision to get lookup data
         // tell super structure to move to lookup data
 
-        double[] shootSolution = getShootSolution(0);
+        
 
         superStructure.shoot(shootSolution[0], shootSolution[1]);
 

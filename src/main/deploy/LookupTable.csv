@@ -1,4 +1,4 @@
-Distance,Speed,Elbow
-1,2.0,2340
-2,2.2,2200
-3,3.0,2100
+Distance,Left,Right,Elbow,TOF
+1,2.0,2340,0
+2,2.2,2200,0
+3,3.0,2100,0
