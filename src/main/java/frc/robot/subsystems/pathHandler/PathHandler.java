@@ -1,5 +1,9 @@
 package frc.robot.subsystems.pathHandler;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.PathData;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -24,6 +28,10 @@ public class PathHandler extends MeasurableSubsystem {
   double numPieces;
   Logger logger;
   boolean canShoot = false;
+  boolean handling = false;
+  Timer timer = new Timer();
+  Rotation2d robotHeading;
+  Trajectory curTrajectory;
 
   //  NOTE NUMBERS ARE BASED ON THE STANDARDS DOCUMENT
   // A 6x6 array that stores all paths (0 is shootPos, 1 is first note, etc)
@@ -54,12 +62,13 @@ public class PathHandler extends MeasurableSubsystem {
     logger = LoggerFactory.getLogger(this.getClass());
 
     paths = new PathData[6][6];
+    noteOrder.add(0);
 
-    for (int i = 0; i < 6; ++i)
-      for (int j = 0; j < 6; ++j) {
-        if (i != j && (noteOrder.contains(i) || i == 0) && (noteOrder.contains(j) || j == 0))
-          paths[i][j] = driveSubsystem.generateTrajectory(pathNames[i][j]);
-      }
+    for (int i : noteOrder)
+        for (int j : noteOrder) 
+            if (i != j) paths[i][j] = driveSubsystem.generateTrajectory(pathNames[i][j]);
+    
+    noteOrder.remove(noteOrder.indexOf(0));
 
     this.endPath = driveSubsystem.generateTrajectory(endPath);
   }
@@ -80,14 +89,9 @@ public class PathHandler extends MeasurableSubsystem {
     return nextPath != lastReturnedPath;
   }
 
-  public PathData getNextPath() {
-    lastReturnedPath = nextPath;
-    if (curState == PathStates.FETCH && noteOrder.size() > 1) noteOrder.remove(0);
-    if (curState == PathStates.SHOOT && hasNewPath())  {
-            logger.info("SHOOT -> FETCH");
-            curState = PathStates.FETCH;
-        }
-    return nextPath;
+  public void startHandling() {
+    timer.reset();
+    handling = true;
   }
 
   // Command calls this when drive path is done driving
@@ -95,38 +99,96 @@ public class PathHandler extends MeasurableSubsystem {
     canShoot = true;
   }
 
+  public PathData getNextPath() {
+    lastReturnedPath = nextPath;
+    if (curState == PathStates.FETCH && noteOrder.size() > 1) noteOrder.remove(0);
+    return nextPath;
+  }
+
+  public void startNewPath(PathData path) {
+    curTrajectory = path.trajectory;
+    robotHeading = path.targetYaw;
+    driveSubsystem.setEnableHolo(true);
+    driveSubsystem.resetHolonomicController();
+    driveSubsystem.grapherTrajectoryActive(true);
+    logger.info("Begin new path");
+    timer.reset();
+
+    driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
+  }
+
   @Override
   public void periodic() {
-    switch (curState) {
-      case SHOOT:
-        if (canShoot) {
-          robotStateSubsystem.shoot();
-          canShoot = false;
-        }
-
-        if (!robotStateSubsystem.hasGamePiece()) {
-          numPieces -= 0.5;
-          if (noteOrder.size() == 0 || numPieces < 0.01) {
-            nextPath = endPath;
-          } else {
-              nextPath = paths[0][noteOrder.get(0)];
+    if (handling) {
+      switch (curState) {
+        case SHOOT:
+          if (canShoot) {
+            robotStateSubsystem.shoot();
+            canShoot = false;
           }
-        }
-        break;
 
-      case FETCH:
-        if (noteOrder.size() > 1) {
+          if (!robotStateSubsystem.hasGamePiece()) {
+            numPieces -= 0.5;
+            if (noteOrder.size() == 0 || numPieces < 0.01) {
+              nextPath = endPath;
+            } else {
+              nextPath = paths[0][noteOrder.get(0)];
+            }
+
+            startNewPath(nextPath);
+            logger.info("SHOOT -> DRIVE_FETCH");
+            curState = PathStates.DRIVE_FETCH;
+          }
+          break;
+
+        case FETCH:
+          if (noteOrder.size() > 1) {
             nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
-        } else nextPath = endPath;
+          } else nextPath = endPath;
 
-        if (robotStateSubsystem.hasGamePiece() && numPieces > 0.51) {
-          numPieces -= 0.5;
-          logger.info("FETCH -> SHOOT");
-          nextPath = paths[noteOrder.get(0)][0];
-          noteOrder.remove(0);
-          curState = PathStates.SHOOT;
-        }
-        break;
+          if (robotStateSubsystem.hasGamePiece() && numPieces > 0.51) {
+            numPieces -= 0.5;
+            logger.info("FETCH -> DRIVE_SHOOT");
+            nextPath = paths[noteOrder.get(0)][0];
+            noteOrder.remove(0);
+            curState = PathStates.SHOOT;
+            startNewPath(nextPath);
+          }
+
+          if (timer.hasElapsed(AutonConstants.delayForPickup)) {
+            logger.info("FETCH -> DRIVE_FETCH");
+            noteOrder.remove(0);
+            curState = PathStates.DRIVE_FETCH;
+            startNewPath(nextPath);
+          }
+          break;
+
+        case DRIVE_FETCH:
+          driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
+          
+          if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
+            logger.info("DRIVE_FETCH -> FETCH");
+            timer.reset();
+            curState = PathStates.FETCH;
+            driveSubsystem.setEnableHolo(false);
+            driveSubsystem.grapherTrajectoryActive(false);
+          }
+
+          break;
+        case DRIVE_SHOOT:
+          driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
+
+          if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
+            logger.info("DRIVE_SHOOT -> SHOOT");
+            timer.reset();
+            curState = PathStates.SHOOT;
+            startShot();
+            driveSubsystem.setEnableHolo(false);
+            driveSubsystem.grapherTrajectoryActive(false);
+          }
+
+          break;
+      }
     }
   }
 
@@ -138,6 +200,8 @@ public class PathHandler extends MeasurableSubsystem {
 
   public enum PathStates {
     SHOOT,
-    FETCH
+    FETCH,
+    DRIVE_FETCH,
+    DRIVE_SHOOT
   }
 }
