@@ -14,56 +14,83 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class ShooterIOFX implements ShooterIO {
-  private TalonFX shooter;
+  private TalonFX shooterLeft;
+  private TalonFX shooterRight;
   private Logger logger;
 
   private double setpoint;
   private final double absSensorIntial;
 
   TalonFXConfigurator configurator;
-  private VelocityDutyCycle velocityRequest =
+  private VelocityDutyCycle velocityLeftRequest =
       new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
-  StatusSignal<Double> currPosition;
-  StatusSignal<Double> currVelocity;
+  private VelocityDutyCycle velocityRightRequest =
+      new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
+  StatusSignal<Double> curLeftPosition;
+  StatusSignal<Double> curLeftVelocity;
+  StatusSignal<Double> curRightPosition;
+  StatusSignal<Double> curRightVelocity;
   StatusSignal<ForwardLimitValue> fwdLimitSwitch;
   StatusSignal<ReverseLimitValue> revLimitSwitch;
 
   public ShooterIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    shooter = new TalonFX(ShooterConstants.kShooterTalonID);
-    absSensorIntial = shooter.getPosition().getValue();
+    shooterLeft = new TalonFX(ShooterConstants.kLeftShooterTalonID);
+    shooterRight = new TalonFX(ShooterConstants.kRightShooterTalonID);
+    absSensorIntial = shooterLeft.getPosition().getValue();
 
-    configurator = shooter.getConfigurator();
+    configurator = shooterLeft.getConfigurator();
     configurator.apply(new TalonFXConfiguration());
     configurator.apply(ShooterConstants.getShooterConfig());
 
-    currPosition = shooter.getPosition();
-    currVelocity = shooter.getVelocity();
-    fwdLimitSwitch = shooter.getForwardLimit();
-    revLimitSwitch = shooter.getReverseLimit();
+    configurator = shooterRight.getConfigurator();
+    configurator.apply(new TalonFXConfiguration());
+    configurator.apply(ShooterConstants.getShooterConfig());
+
+    curLeftPosition = shooterLeft.getPosition();
+    curLeftVelocity = shooterLeft.getVelocity();
+    fwdLimitSwitch = shooterLeft.getForwardLimit();
+    revLimitSwitch = shooterLeft.getReverseLimit();
+
+    curRightPosition = shooterRight.getPosition();
+    curRightVelocity = shooterRight.getVelocity();
   }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    inputs.velocity = currVelocity.refresh().getValue();
-    inputs.position = currPosition.refresh().getValue();
+    inputs.velocityLeft = curLeftVelocity.refresh().getValue();
+    inputs.positionLeft = curLeftPosition.refresh().getValue();
+    inputs.velcoityRight = curRightVelocity.refresh().getValue();
+    inputs.positionRight = curRightPosition.refresh().getValue();
     inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
     inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 1;
   }
 
   @Override
   public void setPct(double percentOutput) {
-    shooter.set(percentOutput);
+    shooterLeft.set(percentOutput);
+    shooterRight.set(percentOutput);
   }
 
   @Override
   public void setSpeed(double speed) {
-    shooter.setControl(velocityRequest.withVelocity(speed));
+    shooterLeft.setControl(velocityLeftRequest.withVelocity(speed));
+    shooterRight.setControl(velocityRightRequest.withVelocity(speed));
+  }
+
+  @Override
+  public void setLeftSpeed(double speed) {
+    shooterLeft.setControl(velocityLeftRequest.withVelocity(speed));
+  }
+
+  @Override
+  public void setRightSpeed(double speed) {
+    shooterRight.setControl(velocityRightRequest.withVelocity(speed));
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-    telemetryService.register(shooter, true);
+    telemetryService.register(shooterLeft, true);
   }
 
   @Override
