@@ -26,7 +26,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private ElbowSubsystem elbowSubsystem;
   private SuperStructure superStructure;
   private MagazineSubsystem magazineSubsystem;
-  private RobotStates curState;
+  private RobotStates curState = RobotStates.IDLE;
 
   // Constructor
   public RobotStateSubsystem(
