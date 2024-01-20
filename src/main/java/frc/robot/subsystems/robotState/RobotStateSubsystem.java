@@ -144,6 +144,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void shoot() {
     driveSubsystem.setIsAligningShot(true);
 
+    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     nextState = RobotStates.SHOOT_ALIGN;
   }
 
@@ -183,19 +186,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case SHOOT_ALIGN:
-        if (driveSubsystem.isVelocityStable() && driveSubsystem.isPointingAtGoal()) {
-          double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+        double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+        superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
-          superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
-
-          setState(RobotStates.SHOOT_AIM);
-        }
-
-        break;
-
-      case SHOOT_AIM:
-        if (superStructure.isFinished()) {
-          driveSubsystem.setIsAligningShot(false);
+        if (driveSubsystem.isVelocityStable()
+            && driveSubsystem.isPointingAtGoal()
+            && superStructure.isFinished()) {
 
           magazineSubsystem.setSpeed(MagazineConstants.kFeedingSpeed);
 
@@ -205,12 +201,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           setState(RobotStates.SHOOTING);
         }
+
         break;
 
       case SHOOTING:
         if (shootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
           shootDelayTimer.stop();
-
+          driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
 
           setState(RobotStates.STOW);
@@ -238,7 +235,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     AMP,
     STOW,
     SHOOT_ALIGN,
-    SHOOTING,
-    SHOOT_AIM
+    SHOOTING
   }
 }
