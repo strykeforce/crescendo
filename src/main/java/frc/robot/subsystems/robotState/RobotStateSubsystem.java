@@ -2,9 +2,7 @@ package frc.robot.subsystems.robotState;
 
 import com.opencsv.CSVReader;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
@@ -199,9 +197,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           hasNote = true;
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
-          
+
           setState(RobotStates.IDLE);
-          //FIXME should this be Stow?
+          // FIXME should this be Stow?
         }
         break;
 
@@ -214,7 +212,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (!magazineSubsystem.hasPiece()) {
           hasNote = false;
           setState(RobotStates.IDLE);
-          //FIXME should this be Stow or intaking?
+          // FIXME should this be Stow or intaking?
         }
         break;
 
