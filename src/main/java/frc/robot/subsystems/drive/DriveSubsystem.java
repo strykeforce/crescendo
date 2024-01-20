@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
   private boolean isOnAllianceSide;
+  private boolean isAligningShot = false;
 
   public DriveSubsystem() {
     this.swerve = new Swerve();
@@ -85,7 +87,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
-    swerveDrive.drive(vXmps, vYmps, vOmegaRadps, true);
+    if (!isAligningShot) {
+      swerveDrive.drive(vXmps, vYmps, vOmegaRadps, true);
+    } else {
+      double vOmegaRadpsNew =
+          omegaController.calculate(
+              getPoseMeters().getRotation().getRadians(), getAngleToSpeaker().getRadians());
+
+      swerveDrive.drive(vXmps, vYmps, vOmegaRadpsNew, true);
+    }
   }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
@@ -191,6 +201,34 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return swerve.getFieldRelSpeed();
   }
 
+  // FIXME: maybe call apply with the output?
+  public Translation2d getShooterPos() {
+    Pose2d pose = getPoseMeters();
+    Translation2d shooterOffset =
+        new Translation2d(-RobotConstants.kShooterOffset, pose.getRotation());
+
+    return pose.getTranslation().plus(shooterOffset);
+  }
+
+  public double getDistanceToSpeaker() {
+    return getShooterPos().getDistance(RobotConstants.kSpeakerPos);
+  }
+
+  // FIXME: probably doesn't work with red alliance side
+  public Rotation2d getAngleToSpeaker() {
+    return RobotConstants.kSpeakerPos.minus(getPoseMeters().getTranslation()).getAngle();
+  }
+
+  public boolean isVelocityStable() {
+    double wheelSpeed = swerveDrive.getSwerveModules()[0].getState().speedMetersPerSecond;
+    double gyroRate = swerveDrive.getGyroRate();
+
+    boolean velStable = Math.abs(wheelSpeed) <= DriveConstants.kSpeedThreshold;
+    boolean gyroStable = Math.abs(gyroRate) <= DriveConstants.kGyroRateThreshold;
+
+    return velStable && gyroStable;
+  }
+
   // Trajectory TOML Parsing
   public PathData generateTrajectory(String trajectoryName) {
     try {
@@ -284,6 +322,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
         swerveModules[i].setAzimuthRotation2d(Rotation2d.fromDegrees(-45.0));
       }
     }
+  }
+
+  public void setIsAligningShot(boolean isAligningShot) {
+    this.isAligningShot = isAligningShot;
   }
 
   public void setDriveState(DriveStates driveStates) {

@@ -33,8 +33,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
 
-  private RobotStates curState = RobotStates.IDLE;
-  private RobotStates nextState = RobotStates.IDLE;
+  private RobotStates curState = RobotStates.STOW;
+  private RobotStates nextState = RobotStates.STOW;
 
   private boolean hasNote = false;
 
@@ -75,6 +75,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Helper Methods
+  private void toNextState() {
+    setState(nextState);
+
+    nextState = RobotStates.STOW;
+  }
+
   private void parseLookupTable() {
     try {
       CSVReader csvReader = new CSVReader(new FileReader(RobotStateConstants.kLookupTablePath));
@@ -117,94 +123,47 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // Control Methods
   public void shoot() {
-    // _____ WAIT_DRIVE _____
-    // wait drive velocity = 0
-    // use odometry and control azimuth
+    driveSubsystem.setIsAligningShot(true);
 
-    // _____ AZIMUTH _____
-    // wait azimuth to angle
-    // use camera to get lookup data
-
-    // _____ SUPERSTRUCTURE _____
-    // wait superstructure uses lookup data
-    // activate magazine
-
-    // _____ FEEDING_NOTE _____
-    // wait for beambreak
-    // start timer
-
-    // _____ SHOOTING _____
-    // wait for timer
-    // go to INTAKING
+    nextState = RobotStates.SHOOT_ALIGN;
   }
 
   // Periodic
   @Override
   public void periodic() {
     switch (curState) {
-      case IDLE:
-        break;
-
-      case INTAKING:
-        break;
-
-      case WAIT_DRIVE:
-        // if drive velocity == 0
-        // set azimuth to x angle
-
-        // double desiredYaw = 
-
-        if (driveSubsystem.getFieldRelSpeed().vxMetersPerSecond == 0 && driveSubsystem.getFieldRelSpeed().vyMetersPerSecond == 0) {
-          // Stationary now
-        }
-
-        setState(RobotStates.AZIMUTH);
+      case STOW:
+        toNextState();
 
         break;
 
-      case AZIMUTH:
-        // if azimuth at angle
-        // use vision to get lookup data
-        // tell super structure to move to lookup data
-
-        double[] shootSolution = getShootSolution(0);
+      case SHOOT_ALIGN:
+        double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
 
         superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
-        setState(RobotStates.SUPERSTRUCTURE);
+        if (driveSubsystem.isVelocityStable() && superStructure.isFinished()) {
+          driveSubsystem.setIsAligningShot(false);
 
-        break;
+          magazineSubsystem.setSpeed(0.0 /* kFeedingSpeed */);
 
-      case SUPERSTRUCTURE:
-        if (!superStructure.isFinished()) break;
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
 
-        magazineSubsystem.setSpeed(0.0 /* kFeedingSpeed */);
-
-        setState(RobotStates.FEEDING_NOTE);
-
-        break;
-
-      case FEEDING_NOTE:
-        // if beambreak broken break;
-
-        magazineSubsystem.setSpeed(
-            0); // FIXME: maybe put inside SHOOTING if the note can still be in the magazine when
-        // the beambreak is unbroken
-
-        shootDelayTimer.stop();
-        shootDelayTimer.reset();
-        shootDelayTimer.start();
-
-        setState(RobotStates.SHOOTING);
+          setState(RobotStates.SHOOTING);
+        }
 
         break;
 
       case SHOOTING:
-        if (!shootDelayTimer.hasElapsed(0.0 /* kShootTime */)) break;
+        if (shootDelayTimer.hasElapsed(0.0 /* kShootTime */)) {
+          shootDelayTimer.stop();
 
-        shootDelayTimer.stop();
+          magazineSubsystem.setSpeed(0);
 
-        setState(RobotStates.INTAKING);
+          setState(RobotStates.STOW);
+        }
 
         break;
 
@@ -221,12 +180,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // State
   public enum RobotStates {
-    IDLE,
-    INTAKING,
-    WAIT_DRIVE,
-    AZIMUTH,
-    SUPERSTRUCTURE,
-    FEEDING_NOTE,
+    STOW,
+    SHOOT_ALIGN,
     SHOOTING
   }
 }
