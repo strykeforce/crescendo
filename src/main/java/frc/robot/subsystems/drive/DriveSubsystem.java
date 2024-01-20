@@ -13,7 +13,6 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Robot;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -93,7 +92,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
     } else {
       double vOmegaRadpsNew =
           omegaController.calculate(
-              getPoseMeters().getRotation().getRadians(), getPoseMeters().getRotation().getRadians() + getAngleToSpeaker().getRadians());
+              getPoseMeters().getRotation().getRadians(),
+              getPoseMeters().getRotation().getRadians() + getAngleToSpeaker().getRadians());
 
       swerveDrive.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
@@ -212,7 +212,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public double getDistanceToSpeaker() {
-    return getShooterPos().getDistance(robotStateSubsystem.getAllianceColor() == Alliance.Blue ? RobotConstants.kRedSpeakerPos : RobotConstants.kBlueSpeakerPos);
+    return getShooterPos()
+        .getDistance(
+            robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                ? RobotConstants.kRedSpeakerPos
+                : RobotConstants.kBlueSpeakerPos);
   }
 
   // FIXME: probably doesn't work with red alliance side

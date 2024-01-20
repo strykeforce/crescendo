@@ -17,7 +17,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double setpoint = 0;
   private ElbowStates curState = ElbowStates.IDLE;
 
-  public ElbowSubsystem(ElbowIO io, ElbowEncoderIO encoderIO) {
+  public ElbowSubsystem(ElbowIO io) {
     this.io = io;
     // this.encoderIo = encoderIo;
 

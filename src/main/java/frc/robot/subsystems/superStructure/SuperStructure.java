@@ -164,6 +164,21 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.DEFENSE;
   }
 
+  public void stow() {
+    elbowSetpoint = SuperStructureConstants.kElbowStowSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristStowSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> TRANSFER(DEFENSE)");
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.DEFENSE;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -204,6 +219,8 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case DEFENSE:
         break;
+      case STOW:
+        break;
     }
   }
   // Grapher
@@ -222,6 +239,7 @@ public class SuperStructure extends MeasurableSubsystem {
     POST_CLIMB,
     TRANSFER,
     INTAKE,
-    DEFENSE
+    DEFENSE,
+    STOW
   }
 }

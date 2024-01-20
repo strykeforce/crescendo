@@ -63,6 +63,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return curState;
   }
 
+  public boolean hasNote() {
+    return hasNote;
+  }
+
   public void setState(RobotStates robotState) {
     if (this.curState != robotState) {
       logger.info("{} -> {}", this.curState, robotState);
@@ -89,7 +93,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     setState(RobotStates.TO_AMP);
   }
-  
+
   private void toNextState() {
     setState(nextState);
 
@@ -126,7 +130,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           distance,
           RobotStateConstants.kLookupMaxDistance);
     } else {
-      index = (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance) / RobotStateConstants.kDistanceIncrement;
+      index =
+          (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
+              / RobotStateConstants.kDistanceIncrement;
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]);
@@ -143,16 +149,32 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
-    nextState = RobotStates.SHOOT_ALIGN;
+    setState(RobotStates.SHOOT_ALIGN);
+  }
+
+  public void toStow() {
+    setState(RobotStates.TO_STOW);
+    intakeSubsystem.setPercent(0.0);
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.stow();
+  }
+
+  //FIXME
+  public void releaseGamePiece() {
+    magazineSubsystem.toEmptying();
   }
 
   // Periodic
   @Override
   public void periodic() {
     switch (curState) {
-      case STOW:
-        toNextState();
+      case TO_STOW:
+        if (superStructure.isFinished()) {
+          setState(RobotStates.STOW);
+        }
 
+        break;
+      case STOW:
         break;
 
       case TO_INTAKING:
@@ -164,6 +186,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case INTAKING:
         if (magazineSubsystem.hasPiece()) {
+          hasNote = true;
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
           setState(RobotStates.IDLE);
@@ -177,13 +200,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case AMP:
         if (!magazineSubsystem.hasPiece()) {
+          hasNote = false;
           setState(RobotStates.IDLE);
         }
         break;
 
       case SHOOT_ALIGN:
-
-        if (driveSubsystem.isVelocityStable() && superStructure.isFinished() && driveSubsystem.isPointingAtGoal()) {
+        if (driveSubsystem.isVelocityStable()
+            && superStructure.isFinished()
+            && driveSubsystem.isPointingAtGoal()) {
           driveSubsystem.setIsAligningShot(false);
 
           magazineSubsystem.setSpeed(0.0 /* kFeedingSpeed */);
@@ -202,8 +227,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
 
           magazineSubsystem.setSpeed(0);
-
-          setState(RobotStates.STOW);
+          hasNote = false;
+          toIntake();
         }
 
         break;
@@ -228,6 +253,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     AMP,
     STOW,
     SHOOT_ALIGN,
-    SHOOTING
+    SHOOTING,
+    TO_STOW
   }
 }
