@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import org.strykeforce.telemetry.TelemetryController;
+import org.strykeforce.telemetry.TelemetryService;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,6 +52,8 @@ public class RobotContainer {
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
 
+    private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
+
   public RobotContainer() {
     driveSubsystem = new DriveSubsystem();
     visionSubsystem = new VisionSubsystem(driveSubsystem);
@@ -72,6 +77,20 @@ public class RobotContainer {
 
     configureDriverBindings();
     configureOperatorBindings();
+    configureTelemetry();
+  }
+
+  private void configureTelemetry() {
+    driveSubsystem.registerWith(telemetryService);
+    visionSubsystem.registerWith(telemetryService);
+    wristSubsystem.registerWith(telemetryService);
+    elbowSubsystem.registerWith(telemetryService);
+    shooterSubsystem.registerWith(telemetryService);
+    superStructure.registerWith(telemetryService);
+    climbSubsystem.registerWith(telemetryService);
+    intakeSubsystem.registerWith(telemetryService);
+    magazineSubsystem.registerWith(telemetryService);
+    robotStateSubsystem.registerWith(telemetryService);
   }
 
   private void configureOperatorBindings() {

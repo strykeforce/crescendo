@@ -7,6 +7,7 @@ import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -227,6 +228,11 @@ public class SuperStructure extends MeasurableSubsystem {
   @Override
   public Set<Measure> getMeasures() {
     return null;
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+      super.registerWith(telemetryService);
   }
 
   // State Enum
