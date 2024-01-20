@@ -92,6 +92,8 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
         .withSize(1, 1)
         .withPosition(0, 0);
+
+
   }
 
   private void configureMatchDashboard() {
@@ -99,6 +101,8 @@ public class RobotContainer {
         .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
         .withSize(1, 1)
         .withPosition(0, 0);
+
+        
   }
 
   private void configureTelemetry() {
