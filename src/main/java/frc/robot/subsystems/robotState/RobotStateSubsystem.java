@@ -104,7 +104,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private double[] getShootSolution(double distance) {
-    double[] shootSolution = new double[2];
+    double[] shootSolution = new double[3];
     int index;
 
     if (distance < RobotStateConstants.kLookupMinDistance) {
@@ -125,6 +125,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][2]);
+    shootSolution[2] = Double.parseDouble(lookupTable[index][3]);
 
     return shootSolution;
   }
@@ -194,6 +195,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           // Not moving
         }
 
+        // double desiredYaw = 
+
+        if (driveSubsystem.getFieldRelSpeed().vxMetersPerSecond == 0 && driveSubsystem.getFieldRelSpeed().vyMetersPerSecond == 0) {
+          // Stationary now
+        }
+
         setState(RobotStates.AZIMUTH);
 
         break;
@@ -205,7 +212,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
         
 
-        superStructure.shoot(shootSolution[0], shootSolution[1]);
+        superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
         setState(RobotStates.SUPERSTRUCTURE);
 

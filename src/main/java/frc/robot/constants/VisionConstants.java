@@ -14,6 +14,12 @@ public class VisionConstants {
   public static final double kStdDevDecayCoeff = -0.005;
   public static final double kMinStdDev = 0.01;
   public static final double kMaxAmbig = 0.15;
+  public static final int kMaxTimesOffWheels = 5;
+
+  // Velocity Filter
+  public static final double kLinearCoeffOnVelFilter = 0.1;
+  public static final double kOffsetOnVelFilter = 0.2;
+  public static final double kSquaredCoeffOnVelFilter = 0.2;
 
   public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(0));
 

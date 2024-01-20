@@ -8,8 +8,10 @@ public interface ShooterIO {
 
   @AutoLog
   public static class ShooterIOInputs {
-    public double velocity;
-    public double position;
+    public double velocityLeft;
+    public double positionLeft;
+    public double velcoityRight;
+    public double positionRight;
     public boolean isFwdLimitSwitchClosed = false;
     public boolean isRevLimitSwitchClosed = false;
   }
@@ -24,4 +26,8 @@ public interface ShooterIO {
   public default void registerWith(TelemetryService telemetryService) {}
 
   public default void setSpeed(double speed) {}
+
+  public default void setLeftSpeed(double speed) {}
+
+  public default void setRightSpeed(double speed) {}
 }
