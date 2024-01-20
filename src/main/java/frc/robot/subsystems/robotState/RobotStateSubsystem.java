@@ -2,7 +2,9 @@ package frc.robot.subsystems.robotState;
 
 import com.opencsv.CSVReader;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
@@ -40,6 +42,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private Timer shootDelayTimer = new Timer();
 
+  private Alliance allianceColor = Alliance.Blue;
+
   // Constructor
   public RobotStateSubsystem(
       VisionSubsystem visionSubsystem,
@@ -75,9 +79,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void setAllianceColor(Alliance alliance) {
+    allianceColor = alliance;
+    logger.info("Change color to: {}", allianceColor);
+  }
+
   public Alliance getAllianceColor() {
-    return Alliance.Red;
-    // FIXME
+    return allianceColor;
   }
 
   // Helper Methods
