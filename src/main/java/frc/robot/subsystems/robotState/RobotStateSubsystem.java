@@ -30,8 +30,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
 
-  private RobotStates curState = RobotStates.IDLE;
-  private RobotStates nextState = RobotStates.IDLE;
+  private RobotStates curState = RobotStates.STOW;
+  private RobotStates nextState = RobotStates.STOW;
 
   private boolean hasNote = false;
 
@@ -89,6 +89,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     setState(RobotStates.TO_AMP);
   }
+  
+  private void toNextState() {
+    setState(nextState);
+
+    nextState = RobotStates.STOW;
+  }
 
   private void parseLookupTable() {
     try {
@@ -132,32 +138,21 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // Control Methods
   public void shoot() {
-    // _____ WAIT_DRIVE _____
-    // wait drive velocity = 0
-    // use odometry and control azimuth
+    driveSubsystem.setIsAligningShot(true);
+    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
 
-    // _____ AZIMUTH _____
-    // wait azimuth to angle
-    // use camera to get lookup data
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
-    // _____ SUPERSTRUCTURE _____
-    // wait superstructure uses lookup data
-    // activate magazine
-
-    // _____ FEEDING_NOTE _____
-    // wait for beambreak
-    // start timer
-
-    // _____ SHOOTING _____
-    // wait for timer
-    // go to INTAKING
+    nextState = RobotStates.SHOOT_ALIGN;
   }
 
   // Periodic
   @Override
   public void periodic() {
     switch (curState) {
-      case IDLE:
+      case STOW:
+        toNextState();
+
         break;
 
       case TO_INTAKING:
@@ -186,68 +181,30 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
 
-      case WAIT_DRIVE:
-        // if drive velocity == 0
-        // set azimuth to x angle
-        double[] shootSolution = getShootSolution(0);
+      case SHOOT_ALIGN:
 
-        if (driveSubsystem.getFieldRelSpeed().vxMetersPerSecond == 0 && driveSubsystem.getFieldRelSpeed().vyMetersPerSecond == 0) {
-          // Not moving
+        if (driveSubsystem.isVelocityStable() && superStructure.isFinished() && driveSubsystem.isPointingAtGoal()) {
+          driveSubsystem.setIsAligningShot(false);
+
+          magazineSubsystem.setSpeed(0.0 /* kFeedingSpeed */);
+
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+
+          setState(RobotStates.SHOOTING);
         }
-
-        // double desiredYaw = 
-
-        if (driveSubsystem.getFieldRelSpeed().vxMetersPerSecond == 0 && driveSubsystem.getFieldRelSpeed().vyMetersPerSecond == 0) {
-          // Stationary now
-        }
-
-        setState(RobotStates.AZIMUTH);
-
-        break;
-
-      case AZIMUTH:
-        // if azimuth at angle
-        // use vision to get lookup data
-        // tell super structure to move to lookup data
-
-        
-
-        superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
-
-        setState(RobotStates.SUPERSTRUCTURE);
-
-        break;
-
-      case SUPERSTRUCTURE:
-        if (!superStructure.isFinished()) break;
-
-        magazineSubsystem.setSpeed(0.0 /* kFeedingSpeed */);
-
-        setState(RobotStates.FEEDING_NOTE);
-
-        break;
-
-      case FEEDING_NOTE:
-        // if beambreak broken break;
-
-        magazineSubsystem.setSpeed(
-            0); // FIXME: maybe put inside SHOOTING if the note can still be in the magazine when
-        // the beambreak is unbroken
-
-        shootDelayTimer.stop();
-        shootDelayTimer.reset();
-        shootDelayTimer.start();
-
-        setState(RobotStates.SHOOTING);
 
         break;
 
       case SHOOTING:
-        if (!shootDelayTimer.hasElapsed(0.0 /* kShootTime */)) break;
+        if (shootDelayTimer.hasElapsed(0.0 /* kShootTime */)) {
+          shootDelayTimer.stop();
 
-        shootDelayTimer.stop();
+          magazineSubsystem.setSpeed(0);
 
-        setState(RobotStates.INTAKING);
+          setState(RobotStates.STOW);
+        }
 
         break;
 
@@ -269,10 +226,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_INTAKING,
     TO_AMP,
     AMP,
-    WAIT_DRIVE,
-    AZIMUTH,
-    SUPERSTRUCTURE,
-    FEEDING_NOTE,
+    STOW,
+    SHOOT_ALIGN,
     SHOOTING
   }
 }
