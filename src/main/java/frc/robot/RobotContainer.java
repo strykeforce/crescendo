@@ -17,6 +17,7 @@ import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.controllers.FlyskyJoystick;
+import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowIOFX;
@@ -141,33 +142,5 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
-  }
-
-  public enum Button {
-    SWA(1),
-    SWB_UP(2),
-    SWB_DWN(3),
-    M_SWC(4),
-    SWD(5),
-    M_SWE(6),
-    SWF_UP(7),
-    SWF_DWN(8),
-    SWG_UP(9),
-    SWG_DWN(10),
-    M_SWH(11),
-    M_LTRIM_UP(12),
-    M_LTRIM_DWN(13),
-    M_LTRIM_L(14),
-    M_LTRIM_R(15),
-    M_RTRIM_UP(16),
-    M_RTRIM_DWN(17),
-    M_RTRIM_L(18),
-    M_RTRIM_R(19);
-
-    public final int id;
-
-    Button(int id) {
-      this.id = id;
-    }
   }
 }
