@@ -93,8 +93,8 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-      super.registerWith(telemetryService);
-      io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
+    io.registerWith(telemetryService);
   }
 
   // State Enum

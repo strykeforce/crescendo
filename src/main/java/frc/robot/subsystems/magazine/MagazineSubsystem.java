@@ -96,7 +96,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-        io.registerWith(telemetryService);  
+    io.registerWith(telemetryService);
     super.registerWith(telemetryService);
   }
 

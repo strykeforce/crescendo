@@ -160,7 +160,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.stow();
   }
 
-  //FIXME
+  // FIXME
   public void releaseGamePiece() {
     magazineSubsystem.toEmptying();
   }
@@ -247,7 +247,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-      super.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
   // State

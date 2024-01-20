@@ -232,7 +232,7 @@ public class SuperStructure extends MeasurableSubsystem {
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-      super.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
   // State Enum
