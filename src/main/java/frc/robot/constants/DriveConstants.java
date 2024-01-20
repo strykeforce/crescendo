@@ -24,6 +24,7 @@ public final class DriveConstants {
 
   public static final double kSpeedThreshold = 0.1; // meters per second
   public static final double kGyroRateThreshold = 0.5; // degrees per second
+  public static final double kDegreesCloseEnough = 1;
 
   public static final double kDriveMotorOutputGear = 30;
   public static final double kDriveInputGear = 44;
