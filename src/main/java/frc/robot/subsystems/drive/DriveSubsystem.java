@@ -222,8 +222,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
   // FIXME: probably doesn't work with red alliance side
   public Rotation2d getAngleToSpeaker() {
     if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
-      return RobotConstants.kBlueSpeakerPos.minus(getPoseMeters().getTranslation()).getAngle();
-    return RobotConstants.kRedSpeakerPos.minus(getPoseMeters().getTranslation()).getAngle();
+      return RobotConstants.kBlueSpeakerPos
+          .minus(getPoseMeters().getTranslation())
+          .getAngle()
+          .minus(getPoseMeters().getRotation().rotateBy(Rotation2d.fromDegrees(180)));
+    return RobotConstants.kRedSpeakerPos
+        .minus(getPoseMeters().getTranslation())
+        .getAngle()
+        .minus(getPoseMeters().getRotation().rotateBy(Rotation2d.fromDegrees(180)));
   }
 
   public boolean isPointingAtGoal() {
