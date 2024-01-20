@@ -243,7 +243,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     double vY = getFieldRelSpeed().vyMetersPerSecond;
 
     //Take fieldRel Speed and get the magnitude of the vector
-    double wheelSpeed = FastMath.sqrt(vX*vX + vY*vY);
+    double wheelSpeed = FastMath.hypot(vX, vY);
     
     double gyroRate = swerveDrive.getGyroRate();
 
