@@ -180,7 +180,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_INTAKING:
         if (superStructure.isFinished()) {
-
+          intakeSubsystem.toIntaking();
+          magazineSubsystem.toIntaking();
           setState(RobotStates.INTAKING);
         }
         break;
@@ -190,7 +191,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           hasNote = true;
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
+          
           setState(RobotStates.IDLE);
+          //FIXME should this be Stow?
         }
         break;
 
@@ -203,6 +206,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (!magazineSubsystem.hasPiece()) {
           hasNote = false;
           setState(RobotStates.IDLE);
+          //FIXME should this be Stow or intaking?
         }
         break;
 
