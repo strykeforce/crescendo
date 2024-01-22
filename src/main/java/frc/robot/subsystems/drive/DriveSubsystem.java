@@ -24,7 +24,6 @@ import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseResult;
 import net.consensys.cava.toml.TomlTable;
 import net.jafama.FastMath;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.swerve.SwerveDrive;
@@ -242,9 +241,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
     double vX = getFieldRelSpeed().vxMetersPerSecond;
     double vY = getFieldRelSpeed().vyMetersPerSecond;
 
-    //Take fieldRel Speed and get the magnitude of the vector
+    // Take fieldRel Speed and get the magnitude of the vector
     double wheelSpeed = FastMath.hypot(vX, vY);
-    
+
     double gyroRate = swerveDrive.getGyroRate();
 
     boolean velStable = Math.abs(wheelSpeed) <= DriveConstants.kSpeedThreshold;
