@@ -231,8 +231,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (driveSubsystem.isVelocityStable()
             && driveSubsystem.isPointingAtGoal()
             && superStructure.isFinished()) {
-
-          magazineSubsystem.setSpeed(MagazineConstants.kFeedingSpeed);
+            
+            magazineSubsystem.toEmptying();
 
           shootDelayTimer.stop();
           shootDelayTimer.reset();
