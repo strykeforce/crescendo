@@ -6,10 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
@@ -27,15 +25,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private VisionSubsystem visionSubsystem;
   private DriveSubsystem driveSubsystem;
-  private ShooterSubsystem shooterSubsystem;
   private IntakeSubsystem intakeSubsystem;
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
 
   private RobotStates curState = RobotStates.STOW;
   private RobotStates nextState = RobotStates.STOW;
-
-  private boolean hasNote = false;
 
   private String[][] lookupTable;
 
@@ -47,14 +42,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public RobotStateSubsystem(
       VisionSubsystem visionSubsystem,
       DriveSubsystem driveSubsystem,
-      ShooterSubsystem shooterSubsystem,
       IntakeSubsystem intakeSubsystem,
-      ElbowSubsystem elbowSubsystem,
       MagazineSubsystem magazineSubsystem,
       SuperStructure superStructure) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
-    this.shooterSubsystem = shooterSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
@@ -67,11 +59,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return curState;
   }
 
-  public boolean hasNote() {
-    return hasNote;
-  }
-
-  public void setState(RobotStates robotState) {
+  private void setState(RobotStates robotState) {
     if (this.curState != robotState) {
       logger.info("{} -> {}", this.curState, robotState);
       this.curState = robotState;
@@ -87,6 +75,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return allianceColor;
   }
 
+  public boolean hasNote() {
+    return magazineSubsystem.hasPiece() || intakeSubsystem.isBeamBroken();
+  }
+
   // Helper Methods
   public void toIntake() {
 
@@ -94,6 +86,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.intake();
     intakeSubsystem.toIntaking();
     magazineSubsystem.toIntaking();
+    driveSubsystem.setIsAligningShot(false);
 
     setState(RobotStates.TO_INTAKING);
   }
@@ -102,6 +95,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     driveSubsystem.setIsAligningShot(false);
     superStructure.amp();
+    driveSubsystem.setIsAligningShot(false);
 
     setState(RobotStates.TO_AMP);
   }
@@ -112,6 +106,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     nextState = RobotStates.STOW;
   }
 
+  // Order of Columns: dist meters, left shoot, right shoot, elbow, time of flight
   private void parseLookupTable() {
     try {
       CSVReader csvReader = new CSVReader(new FileReader(RobotStateConstants.kLookupTablePath));
@@ -147,20 +142,22 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
               / RobotStateConstants.kDistanceIncrement;
     }
 
-    shootSolution[0] = Double.parseDouble(lookupTable[index][1]);
-    shootSolution[1] = Double.parseDouble(lookupTable[index][2]);
-    shootSolution[2] = Double.parseDouble(lookupTable[index][3]);
+    shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
+    shootSolution[1] = Double.parseDouble(lookupTable[index][2]); // Right Shooter
+    shootSolution[2] = Double.parseDouble(lookupTable[index][3]); // Elbow
 
     return shootSolution;
   }
 
   // Control Methods
-  public void shoot() {
+  public void startShoot() {
     driveSubsystem.setIsAligningShot(true);
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+    
+    magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
-
+    
     setState(RobotStates.SHOOT_ALIGN);
   }
 
@@ -201,12 +198,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case INTAKING:
         if (magazineSubsystem.hasPiece()) {
-          hasNote = true;
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
 
-          setState(RobotStates.IDLE);
-          // FIXME should this be Stow?
+          toStow();
         }
         break;
 
@@ -217,17 +212,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case AMP:
         if (!magazineSubsystem.hasPiece()) {
-          hasNote = false;
-          setState(RobotStates.IDLE);
-          // FIXME should this be Stow or intaking?
+          toStow(); // FIXME: call stow() and possibly wait for timeout
         }
         break;
 
-      case SHOOT_ALIGN:
+      case TO_SHOOT:
         double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
         superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
-        if (driveSubsystem.isVelocityStable()
+        if (driveSubsystem.isDriveStill()
             && driveSubsystem.isPointingAtGoal()
             && superStructure.isFinished()) {
 
@@ -247,8 +240,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
-          hasNote = false;
-          toIntake();
+          
+          toStow();
         }
 
         break;
@@ -256,12 +249,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       default:
         break;
     }
+
+    org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState.ordinal());
   }
 
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
   @Override
@@ -272,14 +267,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // State
   public enum RobotStates {
     IDLE,
-    INTAKING,
     TO_INTAKING,
+    INTAKING,
     TO_AMP,
     AMP,
-    STOW,
-    SHOOT_ALIGN,
-    SHOOTING,
     TO_STOW,
-    SHOOT_AIM
+    STOW,
+    TO_SHOOT,
+    SHOOTING
   }
 }
