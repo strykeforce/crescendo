@@ -6,6 +6,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -209,7 +210,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
               String outputAccept =
                   "VisionSubsystem/AcceptedCam" + res.getSecond().toString() + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
-              // Feed into odometry FIXME
+
+              driveSubsystem.addVisionMeasurement(
+                  new Pose2d(
+                      new Translation2d(centerPose.getX(), centerPose.getY()), new Rotation2d()),
+                  result.getTimeStamp() / 1000000);
 
               offWheels--;
 
@@ -233,7 +238,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
                   "VisionSubsystem/AcceptedCam" + res.getSecond().toString() + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
               updatesToWheels++;
-              // Feed in to odometry FIXME
+
+              driveSubsystem.addVisionMeasurement(
+                  new Pose2d(
+                      new Translation2d(centerPose.getX(), centerPose.getY()), new Rotation2d()),
+                  result.getTimeStamp() / 1000000);
 
             } else {
               String output =
