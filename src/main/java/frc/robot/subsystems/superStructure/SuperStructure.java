@@ -56,6 +56,11 @@ public class SuperStructure extends MeasurableSubsystem {
 
   // Helper Methods
 
+  public void stopShoot() {
+    logger.info("Stop Shooter Wheels");
+    shooterSubsystem.setSpeed(0.0);
+  }
+
   // Basic methods to go to each position
   //    Works by setting each axes' setpoint and starting intial movement
   //      Then determines if elbow or wrist go first by flipMagazineOut boolean

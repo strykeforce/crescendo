@@ -35,6 +35,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private String[][] lookupTable;
 
   private Timer shootDelayTimer = new Timer();
+  private Timer ampStowTimer = new Timer();
 
   private Alliance allianceColor = Alliance.Blue;
 
@@ -80,26 +81,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Helper Methods
-  public void toIntake() {
-
-    driveSubsystem.setIsAligningShot(false);
-    superStructure.intake();
-    intakeSubsystem.toIntaking();
-    magazineSubsystem.toIntaking();
-    driveSubsystem.setIsAligningShot(false);
-
-    setState(RobotStates.TO_INTAKING);
-  }
-
-  public void toAmp() {
-
-    driveSubsystem.setIsAligningShot(false);
-    superStructure.amp();
-    driveSubsystem.setIsAligningShot(false);
-
-    setState(RobotStates.TO_AMP);
-  }
-
   private void toNextState() {
     setState(nextState);
 
@@ -150,6 +131,26 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Control Methods
+  public void toIntake() {
+
+    driveSubsystem.setIsAligningShot(false);
+    superStructure.intake();
+    intakeSubsystem.toIntaking();
+    magazineSubsystem.toIntaking();
+    driveSubsystem.setIsAligningShot(false);
+
+    setState(RobotStates.TO_INTAKING);
+  }
+
+  public void toAmp() {
+
+    driveSubsystem.setIsAligningShot(false);
+    superStructure.amp();
+    driveSubsystem.setIsAligningShot(false);
+
+    setState(RobotStates.TO_AMP);
+  }
+
   public void startShoot() {
     driveSubsystem.setIsAligningShot(true);
 
@@ -162,7 +163,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStow() {
-
     driveSubsystem.setIsAligningShot(false);
     setState(RobotStates.TO_STOW);
     intakeSubsystem.setPercent(0.0);
@@ -212,6 +212,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case AMP:
         if (!magazineSubsystem.hasPiece()) {
+          ampStowTimer.stop();
+          ampStowTimer.reset();
+          ampStowTimer.start();
+        }
+
+        if (!magazineSubsystem.hasPiece() && ampStowTimer.hasElapsed(RobotStateConstants.kTimeToStowPostAmp)) {
+          ampStowTimer.stop();
+          ampStowTimer.reset();
+          ampStowTimer.start();
+
           toStow(); // FIXME: call stow() and possibly wait for timeout
         }
         break;
@@ -240,7 +250,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
-
+          
+          superStructure.stopShoot();
           toStow();
         }
 

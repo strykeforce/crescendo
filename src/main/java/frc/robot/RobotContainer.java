@@ -6,7 +6,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -34,6 +38,9 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
+
+import java.util.Map;
+
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -55,6 +62,9 @@ public class RobotContainer {
 
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
+  private Alliance alliance = Alliance.Blue;
+    private SuppliedValueWidget<Boolean> allianceColor;
+
   public RobotContainer() {
     driveSubsystem = new DriveSubsystem();
     visionSubsystem = new VisionSubsystem(driveSubsystem);
@@ -74,6 +84,8 @@ public class RobotContainer {
     configureOperatorBindings();
     configureMatchDashboard();
 
+    robotStateSubsystem.setAllianceColor(Alliance.Blue);
+
     configureTelemetry();
     configurePitDashboard();
   }
@@ -89,10 +101,15 @@ public class RobotContainer {
   }
 
   private void configureMatchDashboard() {
+    allianceColor = Shuffleboard.getTab("Match").addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
+    .withProperties(Map.of("colorWhenFalse", "blue"))
+    .withSize(2, 2)
+    .withPosition(0, 0);
+
     Shuffleboard.getTab("Match")
         .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
         .withSize(1, 1)
-        .withPosition(0, 0);
+        .withPosition(2, 0);
   }
 
   private void configureTelemetry() {
@@ -107,6 +124,21 @@ public class RobotContainer {
     magazineSubsystem.registerWith(telemetryService);
     robotStateSubsystem.registerWith(telemetryService);
     telemetryService.start();
+  }
+
+  public void setAllianceColor(Alliance alliance) {
+    this.alliance = alliance;
+    allianceColor.withProperties(
+        Map.of(
+            "colorWhenTrue", alliance == Alliance.Red ? "red" : "blue", "colorWhenFalse", "black"));
+    robotStateSubsystem.setAllianceColor(alliance);
+
+     // Flips gyro angle if alliance is red team
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
+      driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(180));
+    } else {
+      driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
+    }
   }
 
   private void configureOperatorBindings() {
