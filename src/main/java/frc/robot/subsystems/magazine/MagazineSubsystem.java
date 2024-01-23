@@ -18,6 +18,9 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   private double setpoint = inputs.velocity;
 
+  private int beamBroken = 0;
+  private int beamOpen = 0;
+
   // Constructor
   public MagazineSubsystem(MagazineIO io) {
     this.io = io;
@@ -55,17 +58,33 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   // Helper Methods
   public void toIntaking() {
+    beamBroken = 0;
     setSpeed(MagazineConstants.kIntakingSpeed);
     setState(MagazineStates.INTAKING);
   }
 
   public void toEmptying() {
+    beamOpen = 0;
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EMPTYING);
   }
 
   public boolean hasPiece() {
     return curState == MagazineStates.FULL || curState == MagazineStates.EMPTYING;
+  }
+
+  public boolean isBeamBroken() {
+    if (inputs.isFwdLimitSwitchClosed) beamBroken++;
+    else beamBroken = 0;
+
+    return beamBroken > MagazineConstants.kMinBeamBreaks;
+  }
+
+  public boolean isBeamOpen() {
+    if (!inputs.isFwdLimitSwitchClosed) beamOpen++;
+    else beamOpen = 0;
+
+    return beamOpen > MagazineConstants.kMinBeamBreaks;
   }
 
   // Periodic
@@ -80,13 +99,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
-        if (inputs.isFwdLimitSwitchClosed) {
+        if (isBeamBroken()) {
           setSpeed(0.0);
           setState(MagazineStates.FULL);
         }
         break;
       case EMPTYING:
-        if (!inputs.isFwdLimitSwitchClosed) {
+        if (isBeamOpen()) {
           setSpeed(0.0);
           setState(MagazineStates.EMPTY);
         }

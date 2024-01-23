@@ -154,11 +154,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.setIsAligningShot(true);
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
-    
+
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
-    
-    setState(RobotStates.SHOOT_ALIGN);
+
+    setState(RobotStates.TO_SHOOT);
   }
 
   public void toStow() {
@@ -240,7 +240,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
-          
+
           toStow();
         }
 

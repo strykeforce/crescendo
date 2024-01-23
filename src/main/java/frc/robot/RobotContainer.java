@@ -68,13 +68,7 @@ public class RobotContainer {
 
     robotStateSubsystem =
         new RobotStateSubsystem(
-            visionSubsystem,
-            driveSubsystem,
-            shooterSubsystem,
-            intakeSubsystem,
-            elbowSubsystem,
-            magazineSubsystem,
-            superStructure);
+            visionSubsystem, driveSubsystem, intakeSubsystem, magazineSubsystem, superStructure);
 
     configureDriverBindings();
     configureOperatorBindings();

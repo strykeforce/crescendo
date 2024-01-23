@@ -23,13 +23,13 @@ public class VisionShootCommand extends Command {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.shoot();
+    robotStateSubsystem.startShoot();
   }
 
   @Override
   public boolean isFinished() {
     RobotStates curState = robotStateSubsystem.getState();
 
-    return (curState != RobotStates.SHOOTING || curState != RobotStates.SHOOT_ALIGN);
+    return (curState != RobotStates.SHOOTING || curState != RobotStates.TO_SHOOT);
   }
 }
