@@ -27,14 +27,19 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   // Private Variables
   WallEyeCam[] cams;
+
   Translation3d[] offsets = {
-    new Translation3d(0, 0, 0), new Translation3d(0, 0, 0)
-  }; // FIXME: put in VisionConstants
+    VisionConstants.kCam1Pose.getTranslation(), VisionConstants.kCam2Pose.getTranslation()
+  };
+
   Rotation3d[] rotsOff = {
-    new Rotation3d(0, 0, 0), new Rotation3d(0, 0, 0)
-  }; // FIXME: put in VisionConstants
-  String[] names = {"1", "2"};
-  int[] camIndex = {1, 2};
+    VisionConstants.kCam1Pose.getRotation(), VisionConstants.kCam2Pose.getRotation()
+  };
+
+  String[] names = {VisionConstants.kCam1Name, VisionConstants.kCam2Name};
+
+  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx};
+
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
   VisionStates curState = VisionStates.TRUSTWHEELS;
   boolean visionUpdates = true;
@@ -123,6 +128,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
 
+    org.littletonrobotics.junction.Logger.recordOutput("State", curState.name());
+
     // cam.getEnabled();
 
     // If enough time elapses trust vision or if enough time elapses reset the counter
@@ -192,9 +199,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
               .getTranslation()
               .plus(offsets[idx].rotateBy(cameraPose.getRotation().minus(rotsOff[idx])));
 
-      String output = "VisionSubsystem/Cam" + res.getSecond().toString() + "Pose";
-      org.littletonrobotics.junction.Logger.recordOutput(output, centerPose);
-
       // If updating with vision go into state machine to update
       if (visionUpdates) {
         switch (curState) {
@@ -205,10 +209,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
               String outputAccept =
                   "VisionSubsystem/AcceptedCam" + res.getSecond().toString() + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
-              // Feed into odometry
+              // Feed into odometry FIXME
+
               offWheels--;
 
             } else {
+
+              String output =
+                  "VisionSubsystem/NotAcceptedCam" + res.getSecond().toString() + "Pose";
+              org.littletonrobotics.junction.Logger.recordOutput(output, centerPose);
               offWheels = offWheels < 0 ? 1 : offWheels++;
               if (offWheels >= VisionConstants.kMaxTimesOffWheels) {
                 logger.info("{} -> TRUSTVISION", curState);
@@ -224,7 +233,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
                   "VisionSubsystem/AcceptedCam" + res.getSecond().toString() + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
               updatesToWheels++;
-              // Feed into odometry
+              // Feed in to odometry FIXME
+
+            } else {
+              String output =
+                  "VisionSubsystem/NotAcceptedCam" + res.getSecond().toString() + "Pose";
+              org.littletonrobotics.junction.Logger.recordOutput(output, centerPose);
             }
 
             break;

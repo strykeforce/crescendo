@@ -2,12 +2,14 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
 public class VisionConstants {
-  public static final int kNumCams = 1;
   public static final double kMaxTimeNoVision = 5;
   public static final int kResultsForWheels = 5;
   public static final double kTimeToDecayDev = 3;
@@ -22,6 +24,21 @@ public class VisionConstants {
   public static final double kSquaredCoeffOnVelFilter = 0.2;
 
   public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(0));
+
+  // Constants for cameras
+  public static final int kNumCams = 2;
+  
+  // Names
+  public static final String kCam1Name = "cam1";
+  public static final String kCam2Name = "cam2";
+
+  // Indexs
+  public static final int kCam1Idx = 1;
+  public static final int kCam2Idx = 1;
+
+  // Poses
+  public static final Pose3d kCam1Pose = new Pose3d(new Translation3d(), new Rotation3d());
+  public static final Pose3d kCam2Pose = new Pose3d(new Translation3d(), new Rotation3d());
 
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.
