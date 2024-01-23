@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseResult;
 import net.consensys.cava.toml.TomlTable;
+import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.swerve.SwerveDrive;
@@ -32,8 +34,6 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class DriveSubsystem extends MeasurableSubsystem {
   private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
-  private org.littletonrobotics.junction.Logger advLogger =
-      org.littletonrobotics.junction.Logger.getInstance();
   private final Swerve swerve;
   private SwerveIOInputsAutoLogged inputs = new SwerveIOInputsAutoLogged();
   private final SwerveDrive swerveDrive;
@@ -52,7 +52,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
-  private boolean isOnAllianceSide;
+  private boolean isAligningShot = false;
 
   public DriveSubsystem() {
     this.swerve = new Swerve();
@@ -85,7 +85,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
-    swerveDrive.drive(vXmps, vYmps, vOmegaRadps, true);
+    if (!isAligningShot) {
+      swerveDrive.drive(vXmps, vYmps, vOmegaRadps, true);
+    } else {
+      double vOmegaRadpsNew =
+          omegaController.calculate(
+              getPoseMeters().getRotation().getRadians(),
+              getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
+
+      swerveDrive.move(vXmps, vYmps, vOmegaRadpsNew, true);
+    }
   }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
@@ -127,6 +136,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     omegaController.reset(swerve.getGyroRotation2d().getRadians());
   }
 
+  public void resetOmegaController() {
+    omegaController.reset(swerve.getGyroRotation2d().getRadians());
+  }
+
   public Rotation2d getGyroRotation2d() {
     return swerve.getGyroRotation2d();
   }
@@ -155,11 +168,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("Holonomic Controller Enabled: {}", enabled);
   }
 
+  // Field flipping stuff
   private boolean shouldFlip() {
     return robotStateSubsystem.getAllianceColor() == Alliance.Red;
   }
 
-  // Field flipping stuff
   public Translation2d apply(Translation2d translation) {
     if (shouldFlip()) {
       return new Translation2d(DriveConstants.kFieldMaxX - translation.getX(), translation.getY());
@@ -189,6 +202,54 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public ChassisSpeeds getFieldRelSpeed() {
     return swerve.getFieldRelSpeed();
+  }
+
+  public Translation2d getShooterPos() {
+    Pose2d pose = getPoseMeters();
+    Translation2d shooterOffset =
+        new Translation2d(-RobotConstants.kShooterOffset, pose.getRotation());
+
+    return pose.getTranslation().plus(shooterOffset);
+  }
+
+  public double getDistanceToSpeaker() {
+    return getShooterPos()
+        .getDistance(
+            robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                ? RobotConstants.kRedSpeakerPos
+                : RobotConstants.kBlueSpeakerPos);
+  }
+
+  // FIXME: probably doesn't work with red alliance side
+  public Rotation2d getShooterAngleToSpeaker() {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
+      return RobotConstants.kBlueSpeakerPos
+          .minus(getPoseMeters().getTranslation())
+          .getAngle()
+          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
+    return RobotConstants.kRedSpeakerPos
+        .minus(getPoseMeters().getTranslation())
+        .getAngle()
+        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
+  }
+
+  public boolean isPointingAtGoal() {
+    return Math.abs(getShooterAngleToSpeaker().getDegrees()) <= DriveConstants.kDegreesCloseEnough;
+  }
+
+  public boolean isDriveStill() {
+    double vX = getFieldRelSpeed().vxMetersPerSecond;
+    double vY = getFieldRelSpeed().vyMetersPerSecond;
+
+    // Take fieldRel Speed and get the magnitude of the vector
+    double wheelSpeed = FastMath.hypot(vX, vY);
+
+    double gyroRate = swerveDrive.getGyroRate();
+
+    boolean velStill = Math.abs(wheelSpeed) <= DriveConstants.kSpeedStillThreshold;
+    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+
+    return velStill && gyroStill;
   }
 
   // Trajectory TOML Parsing
@@ -286,6 +347,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void setIsAligningShot(boolean isAligningShot) {
+    this.isAligningShot = isAligningShot;
+    if (isAligningShot) resetOmegaController();
+  }
+
   public void setDriveState(DriveStates driveStates) {
     logger.info("{} -> {}", currDriveState, driveStates);
     currDriveState = driveStates;
@@ -302,17 +368,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     swerve.updateInputs(inputs);
-    advLogger.processInputs("Swerve", inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Swerve", inputs);
     // Update swerve module states every robot loop
     swerve.periodic();
 
     // Log Outputs FIXME
-    advLogger.recordOutput(
-        "Swerve/OdometryRotation2d(deg)", swerve.getPoseMeters().getRotation().getDegrees());
-    advLogger.recordOutput("Swerve/OdometryX", swerve.getPoseMeters().getX());
-    advLogger.recordOutput("Swerve/OdometryY", swerve.getPoseMeters().getY());
-    advLogger.recordOutput("Swerve/Odometry", swerve.getPoseMeters());
-    advLogger.recordOutput("Swerve/GyroRotation2d(deg)", swerve.getGyroRotation2d().getDegrees());
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Odometry", swerve.getPoseMeters());
 
     switch (currDriveState) {
       case IDLE:
@@ -328,7 +389,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-    // TODO Auto-generated method stub
     super.registerWith(telemetryService);
     swerve.registerWith(telemetryService);
   }

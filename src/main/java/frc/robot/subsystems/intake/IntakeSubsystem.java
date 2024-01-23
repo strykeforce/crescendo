@@ -29,24 +29,23 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     return curState;
   }
 
-  public boolean getObjectStatus() {
+  private void setState(IntakeState state) {
+    logger.info("{} -> {}", curState, state);
+    curState = state;
+  }
+
+  public boolean hasNote() {
     return (curState == IntakeState.HAS_PIECE);
   }
 
   public void toIntaking() {
-    // logger.info("To Intaking");
-    curState = IntakeState.INTAKING;
-    setPercent();
-    ;
+    setPercent(IntakeConstants.kIntakePercentOutput);
+    setState(IntakeState.INTAKING);
   }
 
-  // public void intakeOpenLoop(double percentOutput) {
-  //     // intakeFalcon.set(ControlMode.PercentOutput, percentOutput)
-  // }
-
   @Override
-  public void setPercent() {
-    io.setPct(IntakeConstants.kIntakePercentOutput);
+  public void setPercent(double pct) {
+    io.setPct(pct);
   }
 
   // if the switch is closed, a stable count is incremented. if not, stable count is reset to zero.
@@ -55,22 +54,22 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     else beamBreakStableCounts = 0;
 
     beamBroken = (beamBreakStableCounts > IntakeConstants.kBeamBreakStableCounts);
-    return (beamBreakStableCounts > IntakeConstants.kBeamBreakStableCounts);
+    return beamBroken;
   }
 
   // intake state system
   @Override
   public void periodic() {
+    io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Intake", inputs);
 
     switch (curState) {
       case HAS_PIECE:
-        // has a gamepiece, disables intake
+        // has a gamepiece, does not disable intake
         break;
       case INTAKING:
         if (isBeamBroken()) {
-          io.setPct(0);
-          ;
-          curState = IntakeState.HAS_PIECE;
+          setState(IntakeState.HAS_PIECE);
         }
         break;
       default:
@@ -86,6 +85,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
     io.registerWith(telemetryService);
   }
 

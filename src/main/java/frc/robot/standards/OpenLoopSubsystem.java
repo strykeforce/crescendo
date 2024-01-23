@@ -2,5 +2,5 @@ package frc.robot.standards;
 
 public interface OpenLoopSubsystem {
 
-  public void setPercent();
+  public void setPercent(double pct);
 }

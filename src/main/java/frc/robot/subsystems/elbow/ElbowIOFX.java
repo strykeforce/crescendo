@@ -30,7 +30,7 @@ public class ElbowIOFX implements ElbowIO {
     absSensorInitial = elbow.getPosition().getValue();
 
     configurator = elbow.getConfigurator();
-    configurator.apply(new TalonFXConfiguration());
+    configurator.apply(new TalonFXConfiguration()); // factory default
     configurator.apply(ElbowConstants.getFxConfiguration());
 
     currPosition = elbow.getPosition();
@@ -56,7 +56,7 @@ public class ElbowIOFX implements ElbowIO {
 
   @Override
   public void updateInputs(ElbowIOInputs inputs) {
-    inputs.positionTicks = currPosition.refresh().getValue();
+    inputs.positionRots = currPosition.refresh().getValue();
   }
 
   @Override

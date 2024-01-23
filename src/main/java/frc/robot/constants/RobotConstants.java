@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,21 @@ public class RobotConstants {
   public static final int kMinAutoSwitchID = 0;
   public static final int kMaxAutoSwitchID = 5;
   public static final int kEventInterlockID = 6;
+
+  // Field Positions
+  // FIXME: need to measure or get distance from CAD or something
+  public static final double kRedSpeakerXPos = 0;
+  public static final double kRedSpeakerYPos = 5.547868;
+  public static final double kBlueSpeakerXPos = 0;
+  public static final double kBlueSpeakerYPos = 5.547868;
+  public static final Translation2d kRedSpeakerPos =
+      new Translation2d(kRedSpeakerXPos, kRedSpeakerYPos);
+  public static final Translation2d kBlueSpeakerPos =
+      new Translation2d(kBlueSpeakerXPos, kBlueSpeakerYPos);
+
+  // Robot Sizes
+  public static final double kShooterOffset = 0.2; // meters
+  public static final Rotation2d kShooterHeading = Rotation2d.fromDegrees(180);
 
   // Constants Different between Comp and Proto
   public static Double kWheelDiameterInches = 3.0;

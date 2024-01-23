@@ -22,6 +22,10 @@ public final class DriveConstants {
   public static final double kRobotLength = 0.5725;
   public static final double kRobotWidth = 0.525;
 
+  public static final double kSpeedStillThreshold = 0.1; // meters per second
+  public static final double kGyroRateStillThreshold = 0.5; // degrees per second
+  public static final double kDegreesCloseEnough = 1;
+
   public static final double kDriveMotorOutputGear = 30;
   public static final double kDriveInputGear = 44;
   public static final double kBevelInputGear = 15;

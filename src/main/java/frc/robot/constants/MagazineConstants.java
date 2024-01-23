@@ -4,8 +4,11 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class MagazineConstants {
-  public static final int kMagazineFalconID = 0;
+  public static final int kMagazineFalconID = 25;
   public static final double kCloseEnough = 300;
+  public static final double kFeedingSpeed = 0;
+  public static double kIntakingSpeed;
+  public static double kEmptyingSpeed;
 
   public static final TalonFXConfiguration getMagazineConfig() {
     return new TalonFXConfiguration();

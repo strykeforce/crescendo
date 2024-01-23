@@ -34,13 +34,13 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   @Override
   public boolean atSpeed() {
     return Math.abs(inputs.velocityLeft - leftSetpoint) < ShooterConstants.kCloseEnough
-        && Math.abs(inputs.velcoityRight - rightSetpoint) < ShooterConstants.kCloseEnough;
+        && Math.abs(inputs.velocityRight - rightSetpoint) < ShooterConstants.kCloseEnough;
   }
 
   @Override
   public void setSpeed(double speed) {
     leftSetpoint = speed;
-    rightSetpoint = speed;
+    rightSetpoint = -speed; // FIXME: add inversion where appropriate
     io.setSpeed(speed);
   }
 
@@ -68,6 +68,7 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Shooter", inputs);
 
     switch (curState) {
       case SHOOT:
@@ -86,8 +87,7 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
   // State Enum

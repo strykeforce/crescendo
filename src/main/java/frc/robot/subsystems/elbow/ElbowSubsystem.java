@@ -29,11 +29,11 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     setpoint = position;
     curState = ElbowStates.MOVING;
 
-    logger.info("Elbow moving to {} ticks", setpoint);
+    logger.info("Elbow moving to {} rotations", setpoint);
   }
 
   public double getPosition() {
-    return inputs.positionTicks;
+    return inputs.positionRots;
   }
 
   public double getSetpoint() {
@@ -49,7 +49,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isFinished() {
-    return Math.abs(inputs.positionTicks - setpoint) <= ElbowConstants.kCloseEnoughTicks;
+    return Math.abs(inputs.positionRots - setpoint) <= ElbowConstants.kCloseEnoughTicks;
   }
 
   public void zero() {
@@ -61,6 +61,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Elbow", inputs);
 
     switch (curState) {
       case IDLE:
@@ -76,8 +77,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
   @Override

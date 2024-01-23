@@ -1,9 +1,9 @@
 package frc.robot.subsystems.magazine;
 
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
@@ -18,26 +18,23 @@ public class MagazineIOFX implements MagazineIO {
   private Logger logger;
 
   private double setpoint;
-  private final double absSensorIntial;
 
-  TalonFXConfigurator configurator;
+  private TalonFXConfigurator configurator;
   private VelocityDutyCycle velocityRequest =
       new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
-  StatusSignal<Double> currPosition;
-  StatusSignal<Double> currVelocity;
-  StatusSignal<ForwardLimitValue> fwdLimitSwitch;
-  StatusSignal<ReverseLimitValue> revLimitSwitch;
+  private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
+  private StatusSignal<Double> currVelocity;
+  private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
+  private StatusSignal<ReverseLimitValue> revLimitSwitch;
 
   public MagazineIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     magazine = new TalonFX(MagazineConstants.kMagazineFalconID);
-    absSensorIntial = magazine.getPosition().getValue();
 
     configurator = magazine.getConfigurator();
     configurator.apply(new TalonFXConfiguration());
     configurator.apply(MagazineConstants.getMagazineConfig());
 
-    currPosition = magazine.getPosition();
     currVelocity = magazine.getVelocity();
     fwdLimitSwitch = magazine.getForwardLimit();
     revLimitSwitch = magazine.getReverseLimit();
@@ -46,14 +43,13 @@ public class MagazineIOFX implements MagazineIO {
   @Override
   public void updateInputs(MagazineIOInputs inputs) {
     inputs.velocity = currVelocity.refresh().getValue();
-    inputs.position = currPosition.refresh().getValue();
     inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
     inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 1;
   }
 
   @Override
   public void setPct(double percentOutput) {
-    magazine.set(percentOutput);
+    magazine.setControl(dutyCycleRequest.withOutput(percentOutput));
   }
 
   @Override
@@ -64,17 +60,5 @@ public class MagazineIOFX implements MagazineIO {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(magazine, true);
-  }
-
-  @Override
-  public void setSupplyCurrentLimit(
-      SupplyCurrentLimitConfiguration supplyCurrentLimitConfiguration) {
-    // TODO Auto-generated method stub
-    MagazineIO.super.setSupplyCurrentLimit(supplyCurrentLimitConfiguration);
-  }
-
-  @Override
-  public boolean getFwdLimitSwitch() {
-    return fwdLimitSwitch.refresh().getValue().value == 1;
   }
 }
