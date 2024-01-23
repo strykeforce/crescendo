@@ -226,8 +226,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
-    return null;
+    return Set.of(new Measure("State", () -> curState.ordinal()));
   }
 
   @Override

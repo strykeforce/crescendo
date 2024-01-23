@@ -3,7 +3,6 @@ package frc.robot.subsystems.robotState;
 import com.opencsv.CSVReader;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -231,8 +230,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (driveSubsystem.isVelocityStable()
             && driveSubsystem.isPointingAtGoal()
             && superStructure.isFinished()) {
-            
-            magazineSubsystem.toEmptying();
+
+          magazineSubsystem.toEmptying();
 
           shootDelayTimer.stop();
           shootDelayTimer.reset();
