@@ -212,8 +212,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
               org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
 
               driveSubsystem.addVisionMeasurement(
-                  new Pose2d(
-                      centerPose.toTranslation2d(), new Rotation2d()),
+                  new Pose2d(centerPose.toTranslation2d(), new Rotation2d()),
                   result.getTimeStamp() / 1000000);
 
               offWheels--;
@@ -240,8 +239,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
               updatesToWheels++;
 
               driveSubsystem.addVisionMeasurement(
-                  new Pose2d(
-                      centerPose.toTranslation2d(), new Rotation2d()),
+                  new Pose2d(centerPose.toTranslation2d(), new Rotation2d()),
                   result.getTimeStamp() / 1000000);
 
             } else {
