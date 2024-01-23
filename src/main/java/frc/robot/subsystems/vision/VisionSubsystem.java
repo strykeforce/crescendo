@@ -213,7 +213,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
               driveSubsystem.addVisionMeasurement(
                   new Pose2d(
-                      new Translation2d(centerPose.getX(), centerPose.getY()), new Rotation2d()),
+                      centerPose.toTranslation2d(), new Rotation2d()),
                   result.getTimeStamp() / 1000000);
 
               offWheels--;
@@ -241,7 +241,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
               driveSubsystem.addVisionMeasurement(
                   new Pose2d(
-                      new Translation2d(centerPose.getX(), centerPose.getY()), new Rotation2d()),
+                      centerPose.toTranslation2d(), new Rotation2d()),
                   result.getTimeStamp() / 1000000);
 
             } else {
