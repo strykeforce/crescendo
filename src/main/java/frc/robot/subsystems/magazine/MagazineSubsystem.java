@@ -15,7 +15,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   private MagazineStates curState = MagazineStates.EMPTY;
   private Logger logger = LoggerFactory.getLogger(MagazineSubsystem.class);
 
-  private double setpoint = inputs.position;
+  private double setpoint = inputs.velocity;
 
   // Constructor
   public MagazineSubsystem(MagazineIO io) {
@@ -37,6 +37,10 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   public void setSpeed(double speed) {
     setpoint = speed;
     io.setSpeed(speed);
+  }
+
+  public void setPercent(double percentOutput) {
+    io.setPct(percentOutput);
   }
 
   public MagazineStates getState() {
@@ -67,6 +71,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Magazine", inputs);
 
     switch (curState) {
       case EMPTY:
@@ -74,13 +79,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
-        if (io.getFwdLimitSwitch()) {
+        if (inputs.isFwdLimitSwitchClosed) {
           setSpeed(0.0);
           setState(MagazineStates.FULL);
         }
         break;
       case EMPTYING:
-        if (!io.getFwdLimitSwitch()) {
+        if (!inputs.isFwdLimitSwitchClosed) {
           setSpeed(0.0);
           setState(MagazineStates.EMPTY);
         }
@@ -90,7 +95,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
   // State Enum

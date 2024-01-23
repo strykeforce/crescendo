@@ -92,8 +92,8 @@ public class SuperStructure extends MeasurableSubsystem {
   public void postClimb() {
     elbowSetpoint = SuperStructureConstants.kElbowPostClimbSetPoint;
     wristSetpoint = SuperStructureConstants.kWristPostClimbSetPoint;
-    leftShooterSpeed = SuperStructureConstants.kShooterPreClimbSetPoint;
-    rightShooterSpeed = SuperStructureConstants.kShooterPreClimbSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterPostClimbSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterPostClimbSetPoint;
 
     shooterSubsystem.setSpeed(rightShooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
@@ -205,11 +205,12 @@ public class SuperStructure extends MeasurableSubsystem {
       case DEFENSE:
         break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState.ordinal());
   }
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
   // State Enum

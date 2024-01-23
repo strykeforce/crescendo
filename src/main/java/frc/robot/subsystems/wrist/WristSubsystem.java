@@ -59,6 +59,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Wrist", inputs);
 
     switch (curState) {
       case IDLE:
@@ -74,8 +75,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
   @Override

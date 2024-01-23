@@ -34,7 +34,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     curState = state;
   }
 
-  public boolean getObjectStatus() {
+  public boolean hasNote() {
     return (curState == IntakeState.HAS_PIECE);
   }
 
@@ -42,10 +42,6 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     setPercent(IntakeConstants.kIntakePercentOutput);
     setState(IntakeState.INTAKING);
   }
-
-  // public void intakeOpenLoop(double percentOutput) {
-  //     // intakeFalcon.set(ControlMode.PercentOutput, percentOutput)
-  // }
 
   @Override
   public void setPercent(double pct) {
@@ -64,6 +60,8 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
   // intake state system
   @Override
   public void periodic() {
+    io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Intake", inputs);
 
     switch (curState) {
       case HAS_PIECE:
@@ -87,6 +85,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
     io.registerWith(telemetryService);
   }
 

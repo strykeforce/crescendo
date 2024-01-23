@@ -57,16 +57,8 @@ public class Swerve implements SwerveIO {
 
       var driveTalon = new TalonFX(i + 10);
       configurator = driveTalon.getConfigurator();
-      configurator.apply(new TalonFXConfiguration());
+      configurator.apply(new TalonFXConfiguration()); // factory default
       configurator.apply(DriveConstants.getDriveTalonConfig());
-
-      // var driveTalonFollower = new TalonFX(i + 14);
-      // driveTalonFollower.configFactoryDefault(Constants.kTalonConfigTimeout);
-      // driveTalonFollower.configAllSettings(
-      //     DriveConstants.getDriveTalonConfig(), Constants.kTalonConfigTimeout);
-      // driveTalonFollower.enableVoltageCompensation(true);
-      // driveTalonFollower.setNeutralMode(NeutralMode.Brake);
-      // driveTalonFollower.follow(driveTalon);
 
       swerveModules[i] =
           moduleBuilder
@@ -75,11 +67,6 @@ public class Swerve implements SwerveIO {
               .wheelLocationMeters(wheelLocations[i])
               .build();
       swerveModules[i].loadAndSetAzimuthZeroReference();
-
-      // if (i == 0) followerZero = driveTalon;
-      // else if (i == 1) followerOne = driveTalon;
-      // else if (i == 2) followerTwo = driveTalon;
-      // else if (i == 3) followerThree = driveTalon;
     }
 
     ahrs = new SF_AHRS(SerialPort.Port.kUSB, SerialDataType.kProcessedData, (byte) 200);
@@ -197,9 +184,5 @@ public class Swerve implements SwerveIO {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     swerveDrive.registerWith(telemetryService);
-    // telemetryService.register(followerZero);
-    // telemetryService.register(followerOne);
-    // telemetryService.register(followerTwo);
-    // telemetryService.register(followerThree);
   }
 }

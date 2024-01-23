@@ -24,11 +24,15 @@ public class VisionSubsystem extends SubsystemBase {
 
   // Private Variables
   WallEyeCam[] cams;
-  Translation3d[] offsets = {new Translation3d(0, 0, 0), new Translation3d(0, 0, 0)};
-  Rotation3d[] rotsOff = {new Rotation3d(0, 0, 0), new Rotation3d(0, 0, 0)};
+  Translation3d[] offsets = {
+    new Translation3d(0, 0, 0), new Translation3d(0, 0, 0)
+  }; // FIXME: put in VisionConstants
+  Rotation3d[] rotsOff = {
+    new Rotation3d(0, 0, 0), new Rotation3d(0, 0, 0)
+  }; // FIXME: put in VisionConstants
   String[] names = {"1", "2"};
   int[] camIndex = {1, 2};
-  ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>();
+  ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
   VisionStates curState = VisionStates.TRUSTWHEELS;
   boolean visionUpdates = true;
   double timeLastVision = 0;
@@ -40,7 +44,7 @@ public class VisionSubsystem extends SubsystemBase {
   // Deadeye<TargetListTargetData> cam = new Deadeye<TargetListTargetData>("A0",
   // TargetListTargetData.class, NetworkTableInstance.getDefault(), null);
 
-  public Matrix<N3, N1> adaptiveVisionMatrix;
+  private Matrix<N3, N1> adaptiveVisionMatrix;
 
   // Constructor
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
@@ -120,9 +124,16 @@ public class VisionSubsystem extends SubsystemBase {
 
     // If enough time elapses trust vision or if enough time elapses reset the counter
     if ((getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision)
-        && (curState != VisionStates.TRUSTVISION || updatesToWheels >= 1)) {
+        && (curState != VisionStates.TRUSTVISION)) {
       logger.info("{} -> TRUSTVISION");
       curState = VisionStates.TRUSTVISION;
+      updatesToWheels = 0;
+    }
+
+    // If enough time elapses between camera updates - reset count of updates to 0
+    if ((getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision)
+        && updatesToWheels >= 1) {
+      logger.info("Reset # of Vision updates to 0");
       updatesToWheels = 0;
     }
 
@@ -170,7 +181,6 @@ public class VisionSubsystem extends SubsystemBase {
       // Take out data from pair
       WallEyeResult result = res.getFirst();
       int idx = res.getSecond();
-      System.out.print(result.getCameraPose());
 
       // Get center of Robot pose
       Pose3d cameraPose = result.getCameraPose();

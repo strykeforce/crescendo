@@ -1,5 +1,6 @@
 package frc.robot.constants;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotController;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ public class RobotConstants {
 
   // Robot Sizes
   public static final double kShooterOffset = 0.2; // meters
+  public static final Rotation2d kShooterHeading = Rotation2d.fromDegrees(180);
 
   // Constants Different between Comp and Proto
   public static Double kWheelDiameterInches = 3.0;
