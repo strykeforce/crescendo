@@ -4,11 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.intake.OpenLoopIntakeCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
@@ -38,9 +38,7 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
-
 import java.util.Map;
-
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -63,7 +61,7 @@ public class RobotContainer {
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   private Alliance alliance = Alliance.Blue;
-    private SuppliedValueWidget<Boolean> allianceColor;
+  private SuppliedValueWidget<Boolean> allianceColor;
 
   public RobotContainer() {
     driveSubsystem = new DriveSubsystem();
@@ -101,10 +99,12 @@ public class RobotContainer {
   }
 
   private void configureMatchDashboard() {
-    allianceColor = Shuffleboard.getTab("Match").addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
-    .withProperties(Map.of("colorWhenFalse", "blue"))
-    .withSize(2, 2)
-    .withPosition(0, 0);
+    allianceColor =
+        Shuffleboard.getTab("Match")
+            .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
+            .withProperties(Map.of("colorWhenFalse", "blue"))
+            .withSize(2, 2)
+            .withPosition(0, 0);
 
     Shuffleboard.getTab("Match")
         .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
@@ -133,7 +133,7 @@ public class RobotContainer {
             "colorWhenTrue", alliance == Alliance.Red ? "red" : "blue", "colorWhenFalse", "black"));
     robotStateSubsystem.setAllianceColor(alliance);
 
-     // Flips gyro angle if alliance is red team
+    // Flips gyro angle if alliance is red team
     if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
       driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(180));
     } else {
@@ -143,17 +143,24 @@ public class RobotContainer {
 
   private void configureOperatorBindings() {
     // Amp Command
-    new JoystickButton(xboxController, XboxController.Button.kA.value)
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Intake Command
-    new JoystickButton(xboxController, XboxController.Button.kB.value)
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(
             new IntakeCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
-    // Stow Command
+    // Open Loop Intake Command
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
+        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
+
     new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
+
+    // Stow Command
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));

@@ -217,7 +217,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           ampStowTimer.start();
         }
 
-        if (!magazineSubsystem.hasPiece() && ampStowTimer.hasElapsed(RobotStateConstants.kTimeToStowPostAmp)) {
+        if (!magazineSubsystem.hasPiece()
+            && ampStowTimer.hasElapsed(RobotStateConstants.kTimeToStowPostAmp)) {
           ampStowTimer.stop();
           ampStowTimer.reset();
           ampStowTimer.start();
@@ -250,7 +251,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
-          
+
           superStructure.stopShoot();
           toStow();
         }

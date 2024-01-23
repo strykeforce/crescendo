@@ -27,7 +27,7 @@ public class VisionConstants {
 
   // Constants for cameras
   public static final int kNumCams = 2;
-  
+
   // Names
   public static final String kCam1Name = "cam1";
   public static final String kCam2Name = "cam2";
