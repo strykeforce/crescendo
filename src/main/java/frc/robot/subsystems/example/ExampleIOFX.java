@@ -55,15 +55,14 @@ public class ExampleIOFX implements ExampleIO {
 
   @Override
   public void setPosition(double position) {
-    setpoint = position - relSetpointOffset;
+    setpoint = position + relSetpointOffset;
     talonFx.setControl(positionRequest.withPosition(setpoint));
   }
 
   @Override
   public void updateInputs(ExampleIOInputs inputs) {
     inputs.velocity = currVelocity.refresh().getValue();
-    inputs.absPos = currPosition.refresh().getValue();
-    inputs.position = relSetpointOffset - inputs.absPos;
+    inputs.position = currPosition.refresh().getValue() - relSetpointOffset;
   }
 
   @Override
