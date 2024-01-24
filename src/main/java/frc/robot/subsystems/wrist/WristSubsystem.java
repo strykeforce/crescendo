@@ -30,6 +30,11 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     logger.info("Wrist moving to {} ticks", setpoint);
   }
 
+  public void setPct(double pct) {
+    io.setPct(pct);
+    logger.info("Wrist open loop moving at {}", pct);
+  }
+
   public double getPosition() {
     return inputs.position;
   }
