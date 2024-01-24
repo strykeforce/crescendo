@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 public final class DriveConstants {
   public static final double kFieldMaxX = 16.540988; // m
+  public static final double kFieldMaxY = 8.21055; // m
 
   public static final int kTalonConfigTimeout = 10; // ms
 
