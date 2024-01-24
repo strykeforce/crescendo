@@ -8,6 +8,7 @@ public interface ExampleIO {
   @AutoLog
   public static class ExampleIOInputs {
     public double position = 0.0;
+    public double absPos = 0.0;
     public double velocity = 0.0;
   }
 

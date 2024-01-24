@@ -45,12 +45,12 @@ public class ExampleIOFX implements ExampleIO {
 
   @Override
   public void zero() {
-    relSetpointOffset = absSensorInitial - ExampleConstants.kZeroTicks;
+    relSetpointOffset = ExampleConstants.kZeroTicks;
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}",
         absSensorInitial,
         ExampleConstants.kZeroTicks,
-        relSetpointOffset);
+        absSensorInitial - ExampleConstants.kZeroTicks);
   }
 
   @Override
@@ -61,8 +61,9 @@ public class ExampleIOFX implements ExampleIO {
 
   @Override
   public void updateInputs(ExampleIOInputs inputs) {
-    inputs.position = currPosition.refresh().getValue();
     inputs.velocity = currVelocity.refresh().getValue();
+    inputs.absPos = currPosition.refresh().getValue();
+    inputs.position = relSetpointOffset - inputs.absPos;
   }
 
   @Override

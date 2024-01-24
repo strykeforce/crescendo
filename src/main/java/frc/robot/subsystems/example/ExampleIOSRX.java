@@ -39,6 +39,7 @@ public class ExampleIOSRX implements ExampleIO {
   public void updateInputs(ExampleIOInputs inputs) {
     inputs.position = talonSRX.getSelectedSensorPosition();
     inputs.velocity = talonSRX.getSelectedSensorVelocity();
+    inputs.absPos = talonSRX.getSensorCollection().getQuadraturePosition() & 0xFFF;
   }
 
   @Override
