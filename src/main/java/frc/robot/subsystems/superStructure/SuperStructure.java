@@ -164,6 +164,36 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.DEFENSE;
   }
 
+  public void subwoofer() {
+    elbowSetpoint = SuperStructureConstants.kElbowSubwooferSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristSubwooferSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterSubwooferSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterSubwooferSetPoint;
+
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    elbowSubsystem.setPosition(elbowSetpoint);
+
+    logger.info("{} -> TRANSFER(SUBWOOFER)");
+    flipMagazineOut = true;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.SUBWOOFER;
+  }
+
+  public void podium() {
+    elbowSetpoint = SuperStructureConstants.kElbowPodiumSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristPodiumSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
+
+    shooterSubsystem.setSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> TRANSFER(PODIUM)");
+    flipMagazineOut = true;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.PODIUM;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -204,6 +234,10 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case DEFENSE:
         break;
+      case PODIUM:
+        break;
+      case SUBWOOFER:
+        break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState.ordinal());
   }
@@ -223,6 +257,8 @@ public class SuperStructure extends MeasurableSubsystem {
     POST_CLIMB,
     TRANSFER,
     INTAKE,
-    DEFENSE
+    DEFENSE,
+    PODIUM,
+    SUBWOOFER
   }
 }

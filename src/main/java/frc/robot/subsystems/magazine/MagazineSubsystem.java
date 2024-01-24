@@ -17,6 +17,9 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   private double setpoint = inputs.velocity;
 
+  private boolean edgeOne;
+  private boolean edgeTwo;
+
   // Constructor
   public MagazineSubsystem(MagazineIO io) {
     this.io = io;
@@ -31,6 +34,10 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   @Override
   public boolean atSpeed() {
     return Math.abs(inputs.velocity - setpoint) < MagazineConstants.kCloseEnough;
+  }
+
+  public boolean atShootSpeed() {
+    return Math.abs(inputs.velocity - setpoint) < MagazineConstants.kShootCloseEnough;
   }
 
   @Override
@@ -63,6 +70,16 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.EMPTYING);
   }
 
+  public void toShooting() {
+    setSpeed(MagazineConstants.kShootSpeed);
+    setState(MagazineStates.SHOOT);
+  }
+
+  public void preparePodium() {
+    setSpeed(MagazineConstants.kPodiumPrepareSpeed);
+    setState(MagazineStates.PREPARING_PODIUM);
+  }
+
   public boolean hasPiece() {
     return curState == MagazineStates.FULL || curState == MagazineStates.EMPTYING;
   }
@@ -90,6 +107,20 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
           setState(MagazineStates.EMPTY);
         }
         break;
+      case SPEEDUP:
+        if (atShootSpeed()) {
+          curState = MagazineStates.SHOOT;
+        }
+        break;
+      case PREPARING_PODIUM:
+        //if we have edge 2 beam break was triggered, go to the shooting speed (edge 2 meaning 2nd edge of the note)
+        // if (inputs.isSecondFwdLimitSwitchClosed) {
+        //  setSpeed(0.0);
+        //  setState(MagazineStates.SPEEDUP);
+        // }
+        break;
+      case SHOOT:
+        break;
     }
   }
   // Grapher
@@ -103,6 +134,9 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     EMPTY,
     FULL,
     INTAKING,
-    EMPTYING
+    EMPTYING,
+    SPEEDUP,
+    PREPARING_PODIUM,
+    SHOOT
   }
 }

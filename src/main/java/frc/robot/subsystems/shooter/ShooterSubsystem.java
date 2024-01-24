@@ -54,12 +54,21 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
     io.setRightSpeed(speed);
   }
 
+
   public ShooterStates getState() {
     return curState;
   }
 
   public void setState(ShooterStates state) {
     curState = state;
+  }
+
+  public void preparePodium() {
+      
+  } 
+
+  public void toEmptying() {
+    
   }
 
   // Helper Methods
@@ -82,6 +91,10 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
       case IDLE:
         break;
+      case PODIUM:
+        break;
+      case EMPTYING:
+        break;
     }
   }
   // Grapher
@@ -94,6 +107,8 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   public enum ShooterStates {
     SHOOT,
     SPEEDUP,
-    IDLE
+    IDLE,
+    PODIUM,
+    EMPTYING
   }
 }

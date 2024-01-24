@@ -8,6 +8,7 @@ import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
@@ -27,6 +28,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private IntakeSubsystem intakeSubsystem;
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
+  private ShooterSubsystem shooterSubsystem;
 
   private RobotStates curState = RobotStates.STOW;
   private RobotStates nextState = RobotStates.STOW;
@@ -37,18 +39,22 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private Timer shootDelayTimer = new Timer();
 
+  private boolean atPodium = false;
+
   // Constructor
   public RobotStateSubsystem(
       VisionSubsystem visionSubsystem,
       DriveSubsystem driveSubsystem,
       IntakeSubsystem intakeSubsystem,
       MagazineSubsystem magazineSubsystem,
-      SuperStructure superStructure) {
+      SuperStructure superStructure,
+      ShooterSubsystem shooterSubsystem) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
+    this.shooterSubsystem = shooterSubsystem;
 
     parseLookupTable();
   }
@@ -97,6 +103,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     nextState = RobotStates.STOW;
   }
 
+  private void toPodium() {
+    superStructure.podium();
+    driveSubsystem.setIsAligningShot(false);
+    magazineSubsystem.preparePodium();
+    shooterSubsystem.preparePodium();
+  }
+
   // Order of Columns: dist meters, left shoot, right shoot, elbow, time of flight
   private void parseLookupTable() {
     try {
@@ -143,13 +156,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Control Methods
   public void startShoot() {
     driveSubsystem.setIsAligningShot(true);
-
+    
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
 
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     magazineSubsystem.setSpeed(0.0);
     nextState = RobotStates.TO_SHOOT;
-  }
+  } 
+
+
+
 
   // Periodic
   @Override
@@ -217,6 +233,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
         break;
 
+      case TO_PODIUM:
+        
+        break;
+
+      case PODIUM :
+        break;
+
       default:
         break;
     }
@@ -239,6 +262,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     AMP,
     STOW,
     TO_SHOOT,
-    SHOOTING
+    SHOOTING,
+    TO_PODIUM,
+    PODIUM
   }
 }
