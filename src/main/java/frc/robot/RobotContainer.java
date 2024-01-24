@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 public class RobotContainer {
@@ -15,8 +16,9 @@ public class RobotContainer {
   DriveSubsystem driveSubsystem;
 
   public RobotContainer() {
-    DriveSubsystem driveSubsystem = new DriveSubsystem();
+    DriveSubsystem driveSubsystem = new DriveSubsystem(new Swerve());
     VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
+
     configureBindings();
   }
 
