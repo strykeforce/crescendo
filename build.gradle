@@ -119,6 +119,7 @@ spotless {
         googleJavaFormat()
         removeUnusedImports()
         lineEndings = 'GIT_ATTRIBUTES'
+        targetExclude("src/main/java/frc/robot/constants/BuildConstants.java")
     }
 }
 
