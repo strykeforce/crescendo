@@ -87,10 +87,7 @@ public class Swerve implements SwerveIO {
     swerveDrive.setOdometry(odometryStrategy);
   }
 
-  public SwerveDrive getSwerveDrive() {
-    return swerveDrive;
-  }
-
+  // Getters/Setter
   public SwerveModule[] getSwerveModules() {
     return swerveDrive.getSwerveModules();
   }
@@ -113,30 +110,6 @@ public class Swerve implements SwerveIO {
     return swerveModuleStates;
   }
 
-  public Rotation2d getGyroRotation2d() {
-    return swerveDrive.getHeading();
-  }
-
-  public double getGyroPitch() {
-    return ahrs.getPitch();
-  }
-
-  public void resetGyro() {
-    swerveDrive.resetGyro();
-  }
-
-  public double getGyroRoll() {
-    return ahrs.getRoll();
-  }
-
-  public void periodic() {
-    swerveDrive.periodic();
-  }
-
-  public boolean isConnected() {
-    return ahrs.isConnected();
-  }
-
   public ChassisSpeeds getFieldRelSpeed() {
     SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
     SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
@@ -157,28 +130,45 @@ public class Swerve implements SwerveIO {
     return swerveDrive.getKinematics();
   }
 
+  public void setOdometry(Rotation2d Odom) {
+    swerveDrive.setOdometry(null);
+  }
+
   public void setGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
+  }
+
+  public void resetGyro() {
+    swerveDrive.resetGyro();
+  }
+
+  public void updateSwerve() {
+    swerveDrive.periodic();
   }
 
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
   }
 
-  public void setOdometry(Rotation2d Odom) {
-    swerveDrive.setOdometry(null);
+  public void drive(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
+    swerveDrive.drive(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
-  public Pose2d getPoseMeters() {
-    return swerveDrive.getPoseMeters();
+  public void move(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
+    swerveDrive.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
   @Override
   public void updateInputs(SwerveIOInputs inputs) {
     inputs.odometryX = swerveDrive.getPoseMeters().getX();
     inputs.odometryY = swerveDrive.getPoseMeters().getY();
-    inputs.gyroRotation = getGyroRotation2d().getDegrees();
     inputs.odometryRotation2D = swerveDrive.getPoseMeters().getRotation().getDegrees();
+    inputs.gyroRotation2d = swerveDrive.getHeading();
+    inputs.gyroPitch = ahrs.getPitch();
+    inputs.gyroRoll = ahrs.getRoll();
+    inputs.gyroRate = swerveDrive.getGyroRate();
+    inputs.isConnected = ahrs.isConnected();
+    inputs.poseMeters = swerveDrive.getPoseMeters();
   }
 
   @Override
