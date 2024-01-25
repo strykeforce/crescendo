@@ -7,6 +7,7 @@ import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -54,6 +55,11 @@ public class SuperStructure extends MeasurableSubsystem {
   // }
 
   // Helper Methods
+
+  public void stopShoot() {
+    logger.info("Stop Shooter Wheels");
+    shooterSubsystem.setSpeed(0.0);
+  }
 
   // Basic methods to go to each position
   //    Works by setting each axes' setpoint and starting intial movement
@@ -164,6 +170,21 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.DEFENSE;
   }
 
+  public void stow() {
+    elbowSetpoint = SuperStructureConstants.kElbowStowSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristStowSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> TRANSFER(DEFENSE)");
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.DEFENSE;
+  }
+
   public void subwoofer() {
     elbowSetpoint = SuperStructureConstants.kElbowSubwooferSetPoint;
     wristSetpoint = SuperStructureConstants.kWristSubwooferSetPoint;
@@ -178,6 +199,8 @@ public class SuperStructure extends MeasurableSubsystem {
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.SUBWOOFER;
   }
+
+  public void preparePodium() {}
 
   public void podium() {
     elbowSetpoint = SuperStructureConstants.kElbowPodiumSetPoint;
@@ -234,6 +257,8 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case DEFENSE:
         break;
+      case STOW:
+        break;
       case PODIUM:
         break;
       case SUBWOOFER:
@@ -247,6 +272,11 @@ public class SuperStructure extends MeasurableSubsystem {
     return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+  }
+
   // State Enum
   public enum SuperStructureStates {
     IDLE,
@@ -258,6 +288,7 @@ public class SuperStructure extends MeasurableSubsystem {
     TRANSFER,
     INTAKE,
     DEFENSE,
+    STOW,
     PODIUM,
     SUBWOOFER
   }

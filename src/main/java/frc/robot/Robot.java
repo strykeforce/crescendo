@@ -6,6 +6,8 @@ package frc.robot;
 
 import ch.qos.logback.classic.util.ContextInitializer;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.BuildConstants;
@@ -16,6 +18,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.slf4j.LoggerFactory;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -24,9 +27,12 @@ public class Robot extends LoggedRobot {
   org.slf4j.Logger txtLogger;
   private DigitalInput eventFlag;
   private Boolean isEvent;
+  private boolean hasAlliance = false;
+  private static org.slf4j.Logger logger;
 
   @Override
   public void robotInit() {
+    logger = LoggerFactory.getLogger(Robot.class);
     if (isReal()) {
       Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
       Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -65,11 +71,24 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     m_robotContainer = new RobotContainer();
+    m_robotContainer.setIsEvent(isEvent);
+    if (!isEvent) {
+      m_robotContainer.configureTelemetry();
+      m_robotContainer.configurePitDashboard();
+    }
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    if (!hasAlliance) {
+      Alliance alliance = DriverStation.getAlliance().get();
+      if (alliance == Alliance.Blue || alliance == Alliance.Red) {
+        hasAlliance = true;
+        m_robotContainer.setAllianceColor(alliance);
+        logger.info("Set Alliance to {}", alliance);
+      }
+    }
   }
 
   @Override

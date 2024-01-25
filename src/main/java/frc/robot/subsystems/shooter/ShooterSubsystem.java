@@ -5,6 +5,7 @@ import frc.robot.standards.*;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -54,7 +55,6 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
     io.setRightSpeed(speed);
   }
 
-
   public ShooterStates getState() {
     return curState;
   }
@@ -63,13 +63,7 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
     curState = state;
   }
 
-  public void preparePodium() {
-      
-  } 
-
-  public void toEmptying() {
-    
-  }
+  public void toEmptying() {}
 
   // Helper Methods
 
@@ -101,6 +95,12 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   @Override
   public Set<Measure> getMeasures() {
     return Set.of(new Measure("state", () -> curState.ordinal()));
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+    io.registerWith(telemetryService);
   }
 
   // State Enum

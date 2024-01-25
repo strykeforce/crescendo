@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -7,6 +8,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -26,7 +29,6 @@ import net.consensys.cava.toml.TomlTable;
 import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -34,9 +36,8 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class DriveSubsystem extends MeasurableSubsystem {
   private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
-  private final Swerve swerve;
+  private final SwerveIO io;
   private SwerveIOInputsAutoLogged inputs = new SwerveIOInputsAutoLogged();
-  private final SwerveDrive swerveDrive;
   private final HolonomicDriveController holonomicController;
   private RobotStateSubsystem robotStateSubsystem;
 
@@ -54,9 +55,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
 
-  public DriveSubsystem() {
-    this.swerve = new Swerve();
-    this.swerveDrive = swerve.getSwerveDrive();
+  public DriveSubsystem(SwerveIO io) {
+    this.io = io;
 
     // Setup Holonomic Controller
     omegaController =
@@ -86,86 +86,164 @@ public class DriveSubsystem extends MeasurableSubsystem {
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
     if (!isAligningShot) {
-      swerveDrive.drive(vXmps, vYmps, vOmegaRadps, true);
+      io.drive(vXmps, vYmps, vOmegaRadps, true);
     } else {
       double vOmegaRadpsNew =
           omegaController.calculate(
               getPoseMeters().getRotation().getRadians(),
               getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
 
-      swerveDrive.move(vXmps, vYmps, vOmegaRadpsNew, true);
+      io.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
   }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
   public void move(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
-    swerveDrive.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
+    io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
   // Holonomic Controller
   public void calculateController(State desiredState, Rotation2d desiredAngle) {
     holoContInput = desiredState;
     holoContAngle = desiredAngle;
-    holoContOutput =
-        holonomicController.calculate(swerve.getPoseMeters(), desiredState, desiredAngle);
+    holoContOutput = holonomicController.calculate(inputs.poseMeters, desiredState, desiredAngle);
     // logger.info("input: {}, output: {}, angle: {}", holoContInput,
     // holoContOutput, desiredAngle);
-    swerveDrive.move(
+    io.move(
         holoContOutput.vxMetersPerSecond,
         holoContOutput.vyMetersPerSecond,
         holoContOutput.omegaRadiansPerSecond,
         false);
   }
 
-  public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
-    this.robotStateSubsystem = robotStateSubsystem;
-  }
-
   public void resetOdometry(Pose2d pose) {
-    swerve.resetOdometry(pose);
+    io.resetOdometry(pose);
     logger.info("reset odometry with: {}", pose);
   }
 
-  public Pose2d getPoseMeters() {
-    return swerve.getPoseMeters();
+  public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    io.addVisionMeasurement(pose, timestamp);
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
+    io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController() {
     xController.reset();
     yController.reset();
-    omegaController.reset(swerve.getGyroRotation2d().getRadians());
+    omegaController.reset(inputs.gyroRotation2d.getRadians());
   }
 
   public void resetOmegaController() {
-    omegaController.reset(swerve.getGyroRotation2d().getRadians());
+    omegaController.reset(inputs.gyroRotation2d.getRadians());
+  }
+
+  // Getters/Setters
+  public Pose2d getPoseMeters() {
+    return inputs.poseMeters;
   }
 
   public Rotation2d getGyroRotation2d() {
-    return swerve.getGyroRotation2d();
+    return inputs.gyroRotation2d;
+  }
+
+  public ChassisSpeeds getFieldRelSpeed() {
+    return io.getFieldRelSpeed();
+  }
+
+  public Translation2d getShooterPos() {
+    Pose2d pose = getPoseMeters();
+    Translation2d shooterOffset =
+        new Translation2d(-RobotConstants.kShooterOffset, pose.getRotation());
+
+    return pose.getTranslation().plus(shooterOffset);
+  }
+
+  public double getDistanceToSpeaker() {
+    return getShooterPos()
+        .getDistance(
+            robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                ? RobotConstants.kRedSpeakerPos
+                : RobotConstants.kBlueSpeakerPos);
+  }
+
+  // FIXME: probably doesn't work with red alliance side
+  public Rotation2d getShooterAngleToSpeaker() {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
+      return RobotConstants.kBlueSpeakerPos
+          .minus(getPoseMeters().getTranslation())
+          .getAngle()
+          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
+    return RobotConstants.kRedSpeakerPos
+        .minus(getPoseMeters().getTranslation())
+        .getAngle()
+        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
+  }
+
+  public DriveStates getDriveState() {
+    return currDriveState;
+  }
+
+  public boolean isPointingAtGoal() {
+    return Math.abs(getShooterAngleToSpeaker().getDegrees()) <= DriveConstants.kDegreesCloseEnough;
+  }
+
+  public boolean isDriveStill() {
+    double vX = getFieldRelSpeed().vxMetersPerSecond;
+    double vY = getFieldRelSpeed().vyMetersPerSecond;
+
+    // Take fieldRel Speed and get the magnitude of the vector
+    double wheelSpeed = FastMath.hypot(vX, vY);
+
+    double gyroRate = inputs.gyroRate;
+
+    boolean velStill = Math.abs(wheelSpeed) <= DriveConstants.kSpeedStillThreshold;
+    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+
+    return velStill && gyroStill;
+  }
+
+  public boolean isNavxWorking() {
+    return inputs.isConnected;
+  }
+
+  public void setGyroOffset(Rotation2d rotation) {
+    io.setGyroOffset(rotation);
+  }
+
+  public void setEnableHolo(boolean enabled) {
+    holonomicController.setEnabled(enabled);
+    logger.info("Holonomic Controller Enabled: {}", enabled);
+  }
+
+  public void setIsAligningShot(boolean isAligningShot) {
+    this.isAligningShot = isAligningShot;
+    if (isAligningShot) resetOmegaController();
+  }
+
+  public void setDriveState(DriveStates driveStates) {
+    logger.info("{} -> {}", currDriveState, driveStates);
+    currDriveState = driveStates;
+  }
+
+  public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
+    this.robotStateSubsystem = robotStateSubsystem;
   }
 
   public void teleResetGyro() {
     logger.info("Driver Joystick: Reset Gyro");
     double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
-    swerve.setGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
-    swerve.resetGyro();
-    swerve.resetOdometry(
-        new Pose2d(swerve.getPoseMeters().getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));
-  }
-
-  public void setGyroOffset(Rotation2d rotation) {
-    swerve.setGyroOffset(rotation);
+    io.setGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
+    io.resetGyro();
+    io.resetOdometry(
+        new Pose2d(inputs.poseMeters.getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));
   }
 
   // Make whether a trajectory is currently active obvious on grapher
   public void grapherTrajectoryActive(Boolean active) {
     if (active) trajectoryActive = 1.0;
     else trajectoryActive = 0.0;
-  }
-
-  public void setEnableHolo(boolean enabled) {
-    holonomicController.setEnabled(enabled);
-    logger.info("Holonomic Controller Enabled: {}", enabled);
   }
 
   // Field flipping stuff
@@ -198,58 +276,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (shouldFlip()) {
       return new Rotation2d(-rotation.getCos(), rotation.getSin());
     } else return rotation;
-  }
-
-  public ChassisSpeeds getFieldRelSpeed() {
-    return swerve.getFieldRelSpeed();
-  }
-
-  public Translation2d getShooterPos() {
-    Pose2d pose = getPoseMeters();
-    Translation2d shooterOffset =
-        new Translation2d(-RobotConstants.kShooterOffset, pose.getRotation());
-
-    return pose.getTranslation().plus(shooterOffset);
-  }
-
-  public double getDistanceToSpeaker() {
-    return getShooterPos()
-        .getDistance(
-            robotStateSubsystem.getAllianceColor() == Alliance.Blue
-                ? RobotConstants.kRedSpeakerPos
-                : RobotConstants.kBlueSpeakerPos);
-  }
-
-  // FIXME: probably doesn't work with red alliance side
-  public Rotation2d getShooterAngleToSpeaker() {
-    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
-      return RobotConstants.kBlueSpeakerPos
-          .minus(getPoseMeters().getTranslation())
-          .getAngle()
-          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
-    return RobotConstants.kRedSpeakerPos
-        .minus(getPoseMeters().getTranslation())
-        .getAngle()
-        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
-  }
-
-  public boolean isPointingAtGoal() {
-    return Math.abs(getShooterAngleToSpeaker().getDegrees()) <= DriveConstants.kDegreesCloseEnough;
-  }
-
-  public boolean isDriveStill() {
-    double vX = getFieldRelSpeed().vxMetersPerSecond;
-    double vY = getFieldRelSpeed().vyMetersPerSecond;
-
-    // Take fieldRel Speed and get the magnitude of the vector
-    double wheelSpeed = FastMath.hypot(vX, vY);
-
-    double gyroRate = swerveDrive.getGyroRate();
-
-    boolean velStill = Math.abs(wheelSpeed) <= DriveConstants.kSpeedStillThreshold;
-    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
-
-    return velStill && gyroStill;
   }
 
   // Trajectory TOML Parsing
@@ -316,7 +342,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
               DriveConstants.endPose2d,
               DriveConstants.getDefaultTrajectoryConfig());
 
-      return new PathData(swerve.getGyroRotation2d(), trajectoryGenerated);
+      return new PathData(inputs.gyroRotation2d, trajectoryGenerated);
     }
   }
 
@@ -327,15 +353,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
         Rotation2d.fromDegrees(parseResult.getTable(pose).getDouble("angle")));
   }
 
+  // Control Methods
   public void lockZero() {
-    SwerveModule[] swerveModules = swerve.getSwerveModules();
+    SwerveModule[] swerveModules = io.getSwerveModules();
     for (int i = 0; i < 4; i++) {
       swerveModules[i].setAzimuthRotation2d(Rotation2d.fromDegrees(0.0));
     }
   }
 
   public void xLock() {
-    SwerveModule[] swerveModules = swerve.getSwerveModules();
+    SwerveModule[] swerveModules = io.getSwerveModules();
     for (int i = 0; i < 4; i++) {
       if (i == 0 || i == 3) {
         swerveModules[i].setAzimuthRotation2d(Rotation2d.fromDegrees(45.0));
@@ -347,33 +374,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
-  public void setIsAligningShot(boolean isAligningShot) {
-    this.isAligningShot = isAligningShot;
-    if (isAligningShot) resetOmegaController();
-  }
-
-  public void setDriveState(DriveStates driveStates) {
-    logger.info("{} -> {}", currDriveState, driveStates);
-    currDriveState = driveStates;
-  }
-
-  public DriveStates getDriveState() {
-    return currDriveState;
-  }
-
-  public boolean isNavxWorking() {
-    return swerve.isConnected();
-  }
-
   @Override
   public void periodic() {
-    swerve.updateInputs(inputs);
+    io.updateInputs(inputs);
     org.littletonrobotics.junction.Logger.processInputs("Swerve", inputs);
     // Update swerve module states every robot loop
-    swerve.periodic();
+    io.updateSwerve();
 
     // Log Outputs FIXME
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Odometry", swerve.getPoseMeters());
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Odometry", inputs.poseMeters);
 
     switch (currDriveState) {
       case IDLE:
@@ -390,20 +399,19 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    swerve.registerWith(telemetryService);
+    io.registerWith(telemetryService);
   }
 
   @Override
   public Set<Measure> getMeasures() {
     return Set.of(
         new Measure("State", () -> currDriveState.ordinal()),
-        new Measure("Gyro roll", () -> swerve.getGyroRoll()),
-        new Measure("Gyro pitch", () -> swerve.getGyroPitch()),
-        new Measure("Gyro Rotation2D(deg)", () -> swerve.getGyroRotation2d().getDegrees()),
-        new Measure("Odometry X", () -> swerve.getPoseMeters().getX()),
-        new Measure("Odometry Y", () -> swerve.getPoseMeters().getY()),
-        new Measure(
-            "Odometry Rotation2D(deg)", () -> swerve.getPoseMeters().getRotation().getDegrees()),
+        new Measure("Gyro roll", () -> inputs.gyroRoll),
+        new Measure("Gyro pitch", () -> inputs.gyroPitch),
+        new Measure("Gyro Rotation2D(deg)", () -> inputs.gyroRotation2d.getDegrees()),
+        new Measure("Odometry X", () -> inputs.poseMeters.getX()),
+        new Measure("Odometry Y", () -> inputs.poseMeters.getY()),
+        new Measure("Odometry Rotation2D(deg)", () -> inputs.poseMeters.getRotation().getDegrees()),
         new Measure("Trajectory Vel", () -> holoContInput.velocityMetersPerSecond),
         new Measure("Trajectory Accel", () -> holoContInput.accelerationMetersPerSecondSq),
         new Measure("Trajectory X", () -> holoContInput.poseMeters.getX()),
@@ -416,14 +424,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Holonomic Cont Vy", () -> holoContOutput.vyMetersPerSecond),
         new Measure("Holonomic Cont Vomega", () -> holoContOutput.omegaRadiansPerSecond),
         new Measure("Trajectory Active", () -> trajectoryActive),
-        new Measure("Wheel 0 Angle", () -> swerve.getSwerveModuleStates()[0].angle.getDegrees()),
-        new Measure("Wheel 0 Speed", () -> swerve.getSwerveModuleStates()[0].speedMetersPerSecond),
-        new Measure("Wheel 1 Angle", () -> swerve.getSwerveModuleStates()[1].angle.getDegrees()),
-        new Measure("Wheel 1 Speed", () -> swerve.getSwerveModuleStates()[1].speedMetersPerSecond),
-        new Measure("Wheel 2 Angle", () -> swerve.getSwerveModuleStates()[2].angle.getDegrees()),
-        new Measure("Wheel 2 Speed", () -> swerve.getSwerveModuleStates()[2].speedMetersPerSecond),
-        new Measure("Wheel 3 Angle", () -> swerve.getSwerveModuleStates()[3].angle.getDegrees()),
-        new Measure("Wheel 3 Speed", () -> swerve.getSwerveModuleStates()[3].speedMetersPerSecond),
+        new Measure("Wheel 0 Angle", () -> io.getSwerveModuleStates()[0].angle.getDegrees()),
+        new Measure("Wheel 0 Speed", () -> io.getSwerveModuleStates()[0].speedMetersPerSecond),
+        new Measure("Wheel 1 Angle", () -> io.getSwerveModuleStates()[1].angle.getDegrees()),
+        new Measure("Wheel 1 Speed", () -> io.getSwerveModuleStates()[1].speedMetersPerSecond),
+        new Measure("Wheel 2 Angle", () -> io.getSwerveModuleStates()[2].angle.getDegrees()),
+        new Measure("Wheel 2 Speed", () -> io.getSwerveModuleStates()[2].speedMetersPerSecond),
+        new Measure("Wheel 3 Angle", () -> io.getSwerveModuleStates()[3].angle.getDegrees()),
+        new Measure("Wheel 3 Speed", () -> io.getSwerveModuleStates()[3].speedMetersPerSecond),
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]));

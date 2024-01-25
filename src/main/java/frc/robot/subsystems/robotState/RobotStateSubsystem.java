@@ -8,7 +8,6 @@ import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -28,18 +28,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private IntakeSubsystem intakeSubsystem;
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
-  private ShooterSubsystem shooterSubsystem;
 
   private RobotStates curState = RobotStates.STOW;
   private RobotStates nextState = RobotStates.STOW;
-
-  private boolean hasNote = false;
 
   private String[][] lookupTable;
 
   private Timer shootDelayTimer = new Timer();
 
   private boolean atPodium = false;
+  private Timer ampStowTimer = new Timer();
+
+  private Alliance allianceColor = Alliance.Blue;
 
   // Constructor
   public RobotStateSubsystem(
@@ -47,14 +47,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       DriveSubsystem driveSubsystem,
       IntakeSubsystem intakeSubsystem,
       MagazineSubsystem magazineSubsystem,
-      SuperStructure superStructure,
-      ShooterSubsystem shooterSubsystem) {
+      SuperStructure superStructure) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
-    this.shooterSubsystem = shooterSubsystem;
 
     parseLookupTable();
   }
@@ -71,9 +69,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void setAllianceColor(Alliance alliance) {
+    allianceColor = alliance;
+    logger.info("Change color to: {}", allianceColor);
+  }
+
   public Alliance getAllianceColor() {
-    return Alliance.Red;
-    // FIXME
+    return allianceColor;
   }
 
   public boolean hasNote() {
@@ -81,22 +83,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Helper Methods
-  public void toIntake() {
-    superStructure.intake();
-    intakeSubsystem.toIntaking();
-    magazineSubsystem.toIntaking();
-    driveSubsystem.setIsAligningShot(false);
-
-    setState(RobotStates.TO_INTAKING);
-  }
-
-  public void toAmp() {
-    superStructure.amp();
-    driveSubsystem.setIsAligningShot(false);
-
-    setState(RobotStates.TO_AMP);
-  }
-
   private void toNextState() {
     setState(nextState);
 
@@ -107,7 +93,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.podium();
     driveSubsystem.setIsAligningShot(false);
     magazineSubsystem.preparePodium();
-    shooterSubsystem.preparePodium();
+    superStructure.preparePodium();
   }
 
   // Order of Columns: dist meters, left shoot, right shoot, elbow, time of flight
@@ -154,31 +140,67 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Control Methods
+  public void toIntake() {
+
+    driveSubsystem.setIsAligningShot(false);
+    superStructure.intake();
+    intakeSubsystem.toIntaking();
+    magazineSubsystem.toIntaking();
+    driveSubsystem.setIsAligningShot(false);
+
+    setState(RobotStates.TO_INTAKING);
+  }
+
+  public void toAmp() {
+
+    driveSubsystem.setIsAligningShot(false);
+    superStructure.amp();
+    driveSubsystem.setIsAligningShot(false);
+
+    setState(RobotStates.TO_AMP);
+  }
+
   public void startShoot() {
     driveSubsystem.setIsAligningShot(true);
-    
+
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
 
-    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     magazineSubsystem.setSpeed(0.0);
-    nextState = RobotStates.TO_SHOOT;
-  } 
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
+    setState(RobotStates.TO_SHOOT);
+  }
 
+  public void toStow() {
+    driveSubsystem.setIsAligningShot(false);
+    setState(RobotStates.TO_STOW);
+    intakeSubsystem.setPercent(0.0);
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.stow();
+  }
 
+  // FIXME
+  public void releaseGamePiece() {
+    magazineSubsystem.toEmptying();
+  }
 
   // Periodic
   @Override
   public void periodic() {
     switch (curState) {
-      case STOW:
-        toNextState();
+      case TO_STOW:
+        if (superStructure.isFinished()) {
+          setState(RobotStates.STOW);
+        }
 
+        break;
+      case STOW:
         break;
 
       case TO_INTAKING:
         if (superStructure.isFinished()) {
-
+          intakeSubsystem.toIntaking();
+          magazineSubsystem.toIntaking();
           setState(RobotStates.INTAKING);
         }
         break;
@@ -187,7 +209,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
-          setState(RobotStates.STOW);
+
+          toStow();
         }
         break;
 
@@ -198,7 +221,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case AMP:
         if (!magazineSubsystem.hasPiece()) {
-          setState(RobotStates.IDLE); // FIXME: call stow() and possibly wait for timeout
+          ampStowTimer.stop();
+          ampStowTimer.reset();
+          ampStowTimer.start();
+        }
+
+        if (!magazineSubsystem.hasPiece()
+            && ampStowTimer.hasElapsed(RobotStateConstants.kTimeToStowPostAmp)) {
+          ampStowTimer.stop();
+          ampStowTimer.reset();
+          ampStowTimer.start();
+
+          toStow(); // FIXME: call stow() and possibly wait for timeout
         }
         break;
 
@@ -226,18 +260,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
-          // FIXME: stop shooter
 
-          setState(RobotStates.STOW); // FIMXE: actually stow
+          superStructure.stopShoot();
+          toStow();
         }
 
         break;
 
       case TO_PODIUM:
-        
         break;
 
-      case PODIUM :
+      case PODIUM:
         break;
 
       default:
@@ -253,13 +286,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+  }
+
   // State
   public enum RobotStates {
     IDLE,
-    INTAKING,
     TO_INTAKING,
+    INTAKING,
     TO_AMP,
     AMP,
+    TO_STOW,
     STOW,
     TO_SHOOT,
     SHOOTING,
