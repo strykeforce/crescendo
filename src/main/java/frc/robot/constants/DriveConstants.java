@@ -144,12 +144,12 @@ public final class DriveConstants {
 
   public static TalonSRXConfiguration getAzimuthTalonConfig() {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getAzimuthTalonConfig'");
+    return new TalonSRXConfiguration();
   }
 
   public static TalonFXConfiguration getDriveTalonConfig() {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getDriveTalonConfig'");
+    return new TalonFXConfiguration();
   }
 
   //   // Azimuth Talon Config

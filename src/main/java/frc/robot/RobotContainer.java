@@ -7,14 +7,17 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.vision.DeadeyeSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 public class RobotContainer {
 
   VisionSubsystem visionSubsystem;
   DriveSubsystem driveSubsystem;
+  DeadeyeSubsystem deadeye;
 
   public RobotContainer() {
+    DeadeyeSubsystem deadeyeSubsystem = new DeadeyeSubsystem();
     DriveSubsystem driveSubsystem = new DriveSubsystem();
     VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
     configureBindings();

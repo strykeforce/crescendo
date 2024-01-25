@@ -41,9 +41,6 @@ public class VisionSubsystem extends SubsystemBase {
   int offWheels = 0;
   Logger logger;
 
-  // Deadeye<TargetListTargetData> cam = new Deadeye<TargetListTargetData>("A0",
-  // TargetListTargetData.class, NetworkTableInstance.getDefault(), null);
-
   private Matrix<N3, N1> adaptiveVisionMatrix;
 
   // Constructor
@@ -119,8 +116,6 @@ public class VisionSubsystem extends SubsystemBase {
   // Periodic
   @Override
   public void periodic() {
-
-    // cam.getEnabled();
 
     // If enough time elapses trust vision or if enough time elapses reset the counter
     if ((getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision)
