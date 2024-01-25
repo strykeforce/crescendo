@@ -21,6 +21,7 @@ public final class DriveConstants {
   public static final double kRateLimitYaw = 3.0;
 
   public static final double kFieldMaxX = 16.540988; // m
+  public static final double kFieldMaxY = 8.21055; // m
 
   public static final int kTalonConfigTimeout = 10; // ms
 
