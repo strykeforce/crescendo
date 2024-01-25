@@ -15,12 +15,21 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import java.util.ArrayList;
 
 public final class DriveConstants {
+  public static final double kDeadbandAllStick = 0.075;
+  public static final double kExpoScaleYawFactor = 0.75;
+  public static final double kRateLimitFwdStr = 3.5;
+  public static final double kRateLimitYaw = 3.0;
+
   public static final double kFieldMaxX = 16.540988; // m
 
   public static final int kTalonConfigTimeout = 10; // ms
 
   public static final double kRobotLength = 0.5725;
   public static final double kRobotWidth = 0.525;
+
+  public static final double kSpeedStillThreshold = 0.1; // meters per second
+  public static final double kGyroRateStillThreshold = 0.5; // degrees per second
+  public static final double kDegreesCloseEnough = 1;
 
   public static final double kDriveMotorOutputGear = 30;
   public static final double kDriveInputGear = 44;

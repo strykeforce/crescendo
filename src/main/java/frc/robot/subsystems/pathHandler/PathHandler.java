@@ -123,11 +123,11 @@ public class PathHandler extends MeasurableSubsystem {
       switch (curState) {
         case SHOOT:
           if (canShoot) {
-            robotStateSubsystem.shoot();
+            robotStateSubsystem.startShoot();
             canShoot = false;
           }
 
-          if (!robotStateSubsystem.hasGamePiece()) {
+          if (!robotStateSubsystem.hasNote()) {
             numPieces -= 0.5;
             if (noteOrder.size() == 0 || numPieces < 0.01) {
               nextPath = endPath;
@@ -146,7 +146,7 @@ public class PathHandler extends MeasurableSubsystem {
             nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
           } else nextPath = endPath;
 
-          if (robotStateSubsystem.hasGamePiece() && numPieces > 0.51) {
+          if (robotStateSubsystem.hasNote() && numPieces > 0.51) {
             numPieces -= 0.5;
             logger.info("FETCH -> DRIVE_SHOOT");
             nextPath = paths[noteOrder.get(0)][0];

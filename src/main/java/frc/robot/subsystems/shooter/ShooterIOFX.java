@@ -1,75 +1,83 @@
 package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ForwardLimitValue;
-import com.ctre.phoenix6.signals.ReverseLimitValue;
 import frc.robot.constants.ShooterConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class ShooterIOFX implements ShooterIO {
-  private TalonFX shooter;
+  private TalonFX shooterLeft;
+  private TalonFX shooterRight;
   private Logger logger;
 
   private double setpoint;
-  private final double absSensorIntial;
 
   TalonFXConfigurator configurator;
-  private VelocityDutyCycle velocityRequest =
+  private VelocityDutyCycle velocityLeftRequest =
       new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
-  StatusSignal<Double> currPosition;
-  StatusSignal<Double> currVelocity;
-  StatusSignal<ForwardLimitValue> fwdLimitSwitch;
-  StatusSignal<ReverseLimitValue> revLimitSwitch;
+  private VelocityDutyCycle velocityRightRequest =
+      new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
+  private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
+  StatusSignal<Double> curLeftVelocity;
+  StatusSignal<Double> curRightVelocity;
 
   public ShooterIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    shooter = new TalonFX(ShooterConstants.kShooterTalonID);
-    absSensorIntial = shooter.getPosition().getValue();
+    shooterLeft = new TalonFX(ShooterConstants.kLeftShooterTalonID);
+    shooterRight = new TalonFX(ShooterConstants.kRightShooterTalonID);
 
-    configurator = shooter.getConfigurator();
-    configurator.apply(new TalonFXConfiguration());
+    configurator = shooterLeft.getConfigurator();
+    configurator.apply(new TalonFXConfiguration()); // factory default
     configurator.apply(ShooterConstants.getShooterConfig());
 
-    currPosition = shooter.getPosition();
-    currVelocity = shooter.getVelocity();
-    fwdLimitSwitch = shooter.getForwardLimit();
-    revLimitSwitch = shooter.getReverseLimit();
+    configurator = shooterRight.getConfigurator();
+    configurator.apply(new TalonFXConfiguration()); // factory default
+    configurator.apply(ShooterConstants.getShooterConfig());
+
+    curLeftVelocity = shooterLeft.getVelocity();
+    curRightVelocity = shooterRight.getVelocity();
   }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    inputs.velocity = currVelocity.refresh().getValue();
-    inputs.position = currPosition.refresh().getValue();
-    inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
-    inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 1;
+    inputs.velocityLeft = curLeftVelocity.refresh().getValue();
+    inputs.velocityRight = curRightVelocity.refresh().getValue();
   }
 
   @Override
   public void setPct(double percentOutput) {
-    shooter.set(percentOutput);
+    shooterLeft.setControl(dutyCycleRequest.withOutput(percentOutput));
+    shooterRight.setControl(
+        dutyCycleRequest.withOutput(
+            -percentOutput)); // FIXME: figure out which needs to be inverted to shoot = positive
   }
 
   @Override
   public void setSpeed(double speed) {
-    shooter.setControl(velocityRequest.withVelocity(speed));
+    shooterLeft.setControl(velocityLeftRequest.withVelocity(speed));
+    shooterRight.setControl(
+        velocityRightRequest.withVelocity(
+            -speed)); // FIXME: figure out which needs to be inverted to shoot = positive
+  }
+
+  @Override
+  public void setLeftSpeed(double speed) {
+    shooterLeft.setControl(velocityLeftRequest.withVelocity(speed));
+  }
+
+  @Override
+  public void setRightSpeed(double speed) {
+    shooterRight.setControl(velocityRightRequest.withVelocity(speed));
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-    telemetryService.register(shooter, true);
-  }
-
-  @Override
-  public void setSupplyCurrentLimit(
-      SupplyCurrentLimitConfiguration supplyCurrentLimitConfiguration) {
-    // TODO Auto-generated method stub
-    ShooterIO.super.setSupplyCurrentLimit(supplyCurrentLimitConfiguration);
+    telemetryService.register(shooterLeft, true);
   }
 }

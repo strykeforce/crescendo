@@ -5,17 +5,21 @@ import frc.robot.standards.ClosedLoopSpeedSubsystem;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
   // Private Variables
-  MagazineIO io;
-  MagazineIOInputsAutoLogged inputs = new MagazineIOInputsAutoLogged();
-  MagazineStates curState = MagazineStates.EMPTY;
+  private MagazineIO io;
+  private MagazineIOInputsAutoLogged inputs = new MagazineIOInputsAutoLogged();
+  private MagazineStates curState = MagazineStates.EMPTY;
   private Logger logger = LoggerFactory.getLogger(MagazineSubsystem.class);
 
-  double setpoint = inputs.position;
+  private double setpoint = inputs.velocity;
+
+  private int beamBroken = 0;
+  private int beamOpen = 0;
 
   // Constructor
   public MagazineSubsystem(MagazineIO io) {
@@ -23,7 +27,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   // Getter/Setter Methods
-
   @Override
   public double getSpeed() {
     return inputs.velocity;
@@ -40,20 +43,55 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     io.setSpeed(speed);
   }
 
+  public void setPercent(double percentOutput) {
+    io.setPct(percentOutput);
+  }
+
   public MagazineStates getState() {
     return curState;
   }
 
   public void setState(MagazineStates state) {
+    logger.info("{} -> {}", curState, state);
     curState = state;
   }
 
   // Helper Methods
+  public void toIntaking() {
+    beamBroken = 0;
+    setSpeed(MagazineConstants.kIntakingSpeed);
+    setState(MagazineStates.INTAKING);
+  }
+
+  public void toEmptying() {
+    beamOpen = 0;
+    setSpeed(MagazineConstants.kEmptyingSpeed);
+    setState(MagazineStates.EMPTYING);
+  }
+
+  public boolean hasPiece() {
+    return curState == MagazineStates.FULL || curState == MagazineStates.EMPTYING;
+  }
+
+  public boolean isBeamBroken() {
+    if (inputs.isFwdLimitSwitchClosed) beamBroken++;
+    else beamBroken = 0;
+
+    return beamBroken > MagazineConstants.kMinBeamBreaks;
+  }
+
+  public boolean isBeamOpen() {
+    if (!inputs.isFwdLimitSwitchClosed) beamOpen++;
+    else beamOpen = 0;
+
+    return beamOpen > MagazineConstants.kMinBeamBreaks;
+  }
 
   // Periodic
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Magazine", inputs);
 
     switch (curState) {
       case EMPTY:
@@ -61,17 +99,15 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
-        if (io.getFwdLimitSwitch()) {
-          logger.info("INTAKING -> FULL");
-          curState = MagazineStates.FULL;
-          io.setSpeed(0.0);
+        if (isBeamBroken()) {
+          setSpeed(0.0);
+          setState(MagazineStates.FULL);
         }
         break;
       case EMPTYING:
-        if (!io.getFwdLimitSwitch()) {
-          logger.info("EMPTYING -> EMPTY");
-          curState = MagazineStates.EMPTY;
-          io.setSpeed(0.0);
+        if (isBeamOpen()) {
+          setSpeed(0.0);
+          setState(MagazineStates.EMPTY);
         }
         break;
     }
@@ -79,8 +115,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
   // State Enum

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.wrist;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.constants.ElbowConstants;
@@ -14,10 +15,13 @@ public class WristIOSRX implements WristIO {
 
   public WristIOSRX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    wrist = new TalonSRX(WristConstants.kWristTalonFxId);
+    wrist = new TalonSRX(WristConstants.kWristTalonSrxId);
 
     wrist.configFactoryDefault();
     wrist.configAllSettings(WristConstants.getSrxConfiguration());
+    wrist.enableCurrentLimit(true);
+    wrist.setNeutralMode(NeutralMode.Brake);
+    wrist.enableVoltageCompensation(true);
   }
 
   @Override
@@ -25,6 +29,7 @@ public class WristIOSRX implements WristIO {
     double absolute = wrist.getSensorCollection().getQuadraturePosition() & 0xFFF;
     double offset = absolute - WristConstants.kWristZeroTicks;
     wrist.setSelectedSensorPosition(offset);
+
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}", absolute, ElbowConstants.kElbowZeroTicks, offset);
   }
@@ -37,7 +42,6 @@ public class WristIOSRX implements WristIO {
   @Override
   public void updateInputs(WristIOInputs inputs) {
     inputs.position = wrist.getSelectedSensorPosition();
-    inputs.velocity = wrist.getSelectedSensorVelocity();
   }
 
   @Override

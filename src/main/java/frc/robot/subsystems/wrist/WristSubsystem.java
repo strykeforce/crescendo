@@ -16,7 +16,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double setpoint = 0;
   private WristStates curState;
 
-  public WristSubsystem(WristIO io, WristEncoderIO encoderIO) {
+  public WristSubsystem(WristIO io) {
     this.io = io;
 
     zero();
@@ -25,10 +25,17 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void setPosition(double position) {
     io.setPosition(position);
     setpoint = position;
+    curState = WristStates.MOVING;
+
+    logger.info("Wrist moving to {} ticks", setpoint);
   }
 
   public double getPosition() {
     return inputs.position;
+  }
+
+  public double getSetpoint() {
+    return setpoint;
   }
 
   public WristStates getState() {
@@ -45,25 +52,30 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void zero() {
     io.zero();
-    logger.info("Pivot zeroed");
+
+    logger.info("Wrist zeroed");
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Wrist", inputs);
+
     switch (curState) {
       case IDLE:
         break;
 
       case MOVING:
+        if (isFinished()) {
+          curState = WristStates.IDLE;
+        }
         break;
     }
   }
 
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
   }
 
   @Override

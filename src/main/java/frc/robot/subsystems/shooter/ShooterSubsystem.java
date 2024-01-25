@@ -5,6 +5,7 @@ import frc.robot.standards.*;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -13,7 +14,8 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   // Private Variables
   ShooterIO io;
   ShooterStates curState = ShooterStates.IDLE;
-  private double setpoint = 0.0;
+  private double leftSetpoint = 0.0;
+  double rightSetpoint = 0.0;
 
   ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
@@ -27,18 +29,30 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   @Override
   public double getSpeed() {
-    return inputs.velocity;
+    return inputs.velocityLeft;
   }
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(inputs.velocity - setpoint) < ShooterConstants.kCloseEnough;
+    return Math.abs(inputs.velocityLeft - leftSetpoint) < ShooterConstants.kCloseEnough
+        && Math.abs(inputs.velocityRight - rightSetpoint) < ShooterConstants.kCloseEnough;
   }
 
   @Override
   public void setSpeed(double speed) {
-    setpoint = speed;
+    leftSetpoint = speed;
+    rightSetpoint = -speed; // FIXME: add inversion where appropriate
     io.setSpeed(speed);
+  }
+
+  public void setLeftSpeed(double speed) {
+    leftSetpoint = speed;
+    io.setLeftSpeed(speed);
+  }
+
+  public void setRightSpeed(double speed) {
+    rightSetpoint = speed;
+    io.setRightSpeed(speed);
   }
 
   public ShooterStates getState() {
@@ -55,6 +69,7 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    org.littletonrobotics.junction.Logger.processInputs("Shooter", inputs);
 
     switch (curState) {
       case SHOOT:
@@ -73,8 +88,13 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
-    return null;
+    return Set.of(new Measure("state", () -> curState.ordinal()));
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+    io.registerWith(telemetryService);
   }
 
   // State Enum
