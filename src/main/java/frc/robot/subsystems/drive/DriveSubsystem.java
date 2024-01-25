@@ -360,11 +360,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     if (table.contains("dataPoint")) {
       switch (table.getString("dataPoint")) {
-        // Starting Positions
+          // Starting Positions
         case "MI1":
           return Setpoints.MI1;
 
-        // Wing Notes
+          // Wing Notes
         case "W1":
           return Setpoints.W1;
         case "W2":
@@ -372,7 +372,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "W3":
           return Setpoints.W3;
 
-        // Middle Notes
+          // Middle Notes
         case "M1":
           return Setpoints.M1;
         case "M2":
@@ -384,7 +384,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "M5":
           return Setpoints.M5;
 
-        // Shooting Positions
+          // Shooting Positions
         case "AS1":
           return Setpoints.AS1;
         case "MS1":
