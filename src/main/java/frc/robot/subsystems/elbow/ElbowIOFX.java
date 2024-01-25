@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elbow;
 
+import com.ctre.phoenix.CANifier;
+import com.ctre.phoenix.CANifier.PWMChannel;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -13,6 +15,7 @@ import org.strykeforce.telemetry.TelemetryService;
 public class ElbowIOFX implements ElbowIO {
   private Logger logger;
   private TalonFX elbow;
+  private CANifier remoteEncoder;
 
   private double absSensorInitial;
   private double relSetpointOffset;
@@ -27,6 +30,8 @@ public class ElbowIOFX implements ElbowIO {
   public ElbowIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     elbow = new TalonFX(ElbowConstants.kElbowTalonFxId);
+    remoteEncoder = new CANifier(ElbowConstants.kRemoteEncoderID);
+
     absSensorInitial = elbow.getPosition().getValue();
 
     configurator = elbow.getConfigurator();
@@ -37,9 +42,18 @@ public class ElbowIOFX implements ElbowIO {
     currVelocity = elbow.getVelocity();
   }
 
+  public int getPulseWidthFor(PWMChannel channel) {
+    double[] pulseWidthandPeriod = new double[2];
+    remoteEncoder.getPWMInput(channel, pulseWidthandPeriod);
+    return (int) (4096.0 * pulseWidthandPeriod[0] / pulseWidthandPeriod[1]);
+  }
+
   @Override
   public void zero() {
-    relSetpointOffset = absSensorInitial - ElbowConstants.kElbowZeroTicks;
+    int absoluteTicks = getPulseWidthFor(PWMChannel.PWMChannel0);
+
+    relSetpointOffset = absoluteTicks - ElbowConstants.kElbowZeroTicks;
+    elbow.setPosition(relSetpointOffset);
 
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}",
@@ -50,7 +64,7 @@ public class ElbowIOFX implements ElbowIO {
 
   @Override
   public void setPosition(double position) {
-    setpoint = position - relSetpointOffset;
+    setpoint = position + relSetpointOffset;
     elbow.setControl(positionRequst.withPosition(setpoint));
   }
 
