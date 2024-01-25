@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.constants.AutonConstants.Setpoints;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -284,15 +285,21 @@ public class DriveSubsystem extends MeasurableSubsystem {
       if (shouldFlip()) {
         logger.info("Flipping path");
       }
+
       TomlParseResult parseResult =
           Toml.parse(Paths.get("/home/lvuser/deploy/paths/" + trajectoryName + ".toml"));
+
       logger.info("Generating Trajectory: {}", trajectoryName);
-      Pose2d startPose = parsePose2d(parseResult, "start_pose");
+
+      Pose2d startPose = parseEndPoint(parseResult, "start_pose");
+      Pose2d endPose = parseEndPoint(parseResult, "end_pose");
+
       startPose = apply(startPose);
-      Pose2d endPose = parsePose2d(parseResult, "end_pose");
       endPose = apply(endPose);
+
       TomlArray internalPointsToml = parseResult.getArray("internal_points");
       ArrayList<Translation2d> path = new ArrayList<>();
+
       logger.info("Toml Internal Points Array Size: {}", internalPointsToml.size());
 
       // Create a table for each internal point and put them into a translation2d
@@ -311,9 +318,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
           new TrajectoryConfig(
               parseResult.getDouble("max_velocity"), parseResult.getDouble("max_acceleration"));
       logger.info("max velocity/acceleration worked");
+
       trajectoryConfig.setReversed(parseResult.getBoolean("is_reversed"));
       trajectoryConfig.setStartVelocity(parseResult.getDouble("start_velocity"));
       logger.info("start velocity worked");
+
       trajectoryConfig.setEndVelocity(parseResult.getDouble("end_velocity"));
       logger.info("end velocity worked");
 
@@ -343,6 +352,55 @@ public class DriveSubsystem extends MeasurableSubsystem {
               DriveConstants.getDefaultTrajectoryConfig());
 
       return new PathData(inputs.gyroRotation2d, trajectoryGenerated);
+    }
+  }
+
+  private Pose2d parseEndPoint(TomlParseResult parseResult, String pose) {
+    TomlTable table = parseResult.getTable(pose);
+
+    if (table.contains("dataPoint")) {
+      switch (table.getString("dataPoint")) {
+          // Starting Positions
+        case "MI1":
+          return Setpoints.MI1;
+
+          // Wing Notes
+        case "W1":
+          return Setpoints.W1;
+        case "W2":
+          return Setpoints.W2;
+        case "W3":
+          return Setpoints.W3;
+
+          // Middle Notes
+        case "M1":
+          return Setpoints.M1;
+        case "M2":
+          return Setpoints.M2;
+        case "M3":
+          return Setpoints.M3;
+        case "M4":
+          return Setpoints.M4;
+        case "M5":
+          return Setpoints.M5;
+
+          // Shooting Positions
+        case "AS1":
+          return Setpoints.AS1;
+        case "MS1":
+          return Setpoints.MS1;
+        case "NAS1":
+          return Setpoints.NAS1;
+
+        default:
+          logger.warn("Bad data point {}", table.getString("dataPoint"));
+          return new Pose2d();
+      }
+    } else {
+      return new Pose2d(
+          table.getDouble("x"),
+          table.getDouble("y"),
+          Rotation2d.fromDegrees(table.getDouble("angle")));
     }
   }
 
