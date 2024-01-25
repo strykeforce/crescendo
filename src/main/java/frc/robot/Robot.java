@@ -71,6 +71,11 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     m_robotContainer = new RobotContainer();
+    m_robotContainer.setIsEvent(isEvent);
+    if (!isEvent) {
+      m_robotContainer.configureTelemetry();
+      m_robotContainer.configurePitDashboard();
+    }
   }
 
   @Override

@@ -25,6 +25,7 @@ import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.elbow.ElbowIOFX;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeIOFX;
@@ -62,9 +63,10 @@ public class RobotContainer {
 
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
+  private Boolean isEvent = true;
 
   public RobotContainer() {
-    driveSubsystem = new DriveSubsystem();
+    driveSubsystem = new DriveSubsystem(new Swerve());
     visionSubsystem = new VisionSubsystem(driveSubsystem);
     wristSubsystem = new WristSubsystem(new WristIOSRX());
     elbowSubsystem = new ElbowSubsystem(new ElbowIOFX());
@@ -78,17 +80,19 @@ public class RobotContainer {
         new RobotStateSubsystem(
             visionSubsystem, driveSubsystem, intakeSubsystem, magazineSubsystem, superStructure);
 
+    driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
+
     configureDriverBindings();
     configureOperatorBindings();
     configureMatchDashboard();
 
     robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
-    configureTelemetry();
-    configurePitDashboard();
+    // configureTelemetry();
+    // configurePitDashboard();
   }
 
-  private void configurePitDashboard() {
+  public void configurePitDashboard() {
     Shuffleboard.getTab("Pit")
         .add(
             "Stow",
@@ -112,7 +116,7 @@ public class RobotContainer {
         .withPosition(2, 0);
   }
 
-  private void configureTelemetry() {
+  public void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
     visionSubsystem.registerWith(telemetryService);
     wristSubsystem.registerWith(telemetryService);
@@ -139,6 +143,10 @@ public class RobotContainer {
     } else {
       driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
     }
+  }
+
+  public void setIsEvent(boolean isEvent) {
+    this.isEvent = isEvent;
   }
 
   private void configureOperatorBindings() {

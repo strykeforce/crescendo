@@ -1,11 +1,14 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.telemetry.TelemetryService;
@@ -54,6 +57,10 @@ public interface SwerveIO {
   public default void updateSwerve() {}
 
   public default void resetOdometry(Pose2d pose) {}
+
+  public default void addVisionMeasurement(Pose2d pose, double timestamp) {}
+
+  public default void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevs) {}
 
   public default void drive(
       double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {}

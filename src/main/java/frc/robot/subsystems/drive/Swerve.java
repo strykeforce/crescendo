@@ -95,14 +95,6 @@ public class Swerve implements SwerveIO {
     return swerveDrive.getSwerveModules();
   }
 
-  public void addVisionMeasurement(Pose2d pose, double timestamp) {
-    odometryStrategy.addVisionMeasurement(pose, timestamp);
-  }
-
-  public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevs) {
-    odometryStrategy.addVisionMeasurement(pose, timestamp, stdDevs);
-  }
-
   public SwerveModulePosition[] getSwerveModulePositions() {
     SwerveModule[] swerveModules = getSwerveModules();
     SwerveModulePosition[] temp = {null, null, null, null};
@@ -159,6 +151,14 @@ public class Swerve implements SwerveIO {
 
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    odometryStrategy.addVisionMeasurement(pose, timestamp);
+  }
+
+  public void addVisionMeasurement(Pose2d pose2d, double timestamp, Matrix<N3, N1> stdDevs) {
+    odometryStrategy.addVisionMeasurement(pose2d, timestamp, stdDevs);
   }
 
   public void drive(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {

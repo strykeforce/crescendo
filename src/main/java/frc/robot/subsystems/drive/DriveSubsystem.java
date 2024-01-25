@@ -121,6 +121,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("reset odometry with: {}", pose);
   }
 
+  public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    io.addVisionMeasurement(pose, timestamp);
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
+    io.addVisionMeasurement(pose, timestamp, stdDevvs);
+  }
+
   public void resetHolonomicController() {
     xController.reset();
     yController.reset();
