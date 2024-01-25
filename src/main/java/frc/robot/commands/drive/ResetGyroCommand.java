@@ -8,6 +8,7 @@ public class ResetGyroCommand extends InstantCommand {
 
   public ResetGyroCommand(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
+    addRequirements(driveSubsystem);
   }
 
   @Override

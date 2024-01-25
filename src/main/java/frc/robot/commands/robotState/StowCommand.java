@@ -9,9 +9,6 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class StowCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
-  SuperStructure superStructure;
-  MagazineSubsystem magazineSubsystem;
-  IntakeSubsystem intakeSubsystem;
 
   public StowCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -20,9 +17,6 @@ public class StowCommand extends Command {
       IntakeSubsystem intakeSubsystem) {
     addRequirements(superStructure, magazineSubsystem, intakeSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
-    this.superStructure = superStructure;
-    this.magazineSubsystem = magazineSubsystem;
-    this.intakeSubsystem = intakeSubsystem;
   }
 
   @Override

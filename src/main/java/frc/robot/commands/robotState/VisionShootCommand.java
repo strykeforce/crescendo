@@ -8,8 +8,6 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class VisionShootCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
-  SuperStructure superStructure;
-  MagazineSubsystem magazineSubsystem;
 
   public VisionShootCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -17,8 +15,6 @@ public class VisionShootCommand extends Command {
       MagazineSubsystem magazineSubsystem) {
     addRequirements(superStructure, magazineSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
-    this.superStructure = superStructure;
-    this.magazineSubsystem = magazineSubsystem;
   }
 
   @Override
