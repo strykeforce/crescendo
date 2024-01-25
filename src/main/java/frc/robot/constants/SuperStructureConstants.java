@@ -37,4 +37,9 @@ public class SuperStructureConstants {
   public static final double kWristDefenseSetPoint = 0.0;
   public static final double kElbowDefenseSetPoint = 0.0;
   public static final double kShooterDefenseSetPoint = 0.0;
+
+  // STOW
+  public static final double kWristStowSetPoint = 0.0;
+  public static final double kElbowStowSetPoint = 0.0;
+  public static final double kShooterStowSetPoint = 0.0;
 }

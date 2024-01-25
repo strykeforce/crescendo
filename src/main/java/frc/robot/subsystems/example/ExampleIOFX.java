@@ -45,24 +45,24 @@ public class ExampleIOFX implements ExampleIO {
 
   @Override
   public void zero() {
-    relSetpointOffset = absSensorInitial - ExampleConstants.kZeroTicks;
+    relSetpointOffset = ExampleConstants.kZeroTicks;
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}",
         absSensorInitial,
         ExampleConstants.kZeroTicks,
-        relSetpointOffset);
+        absSensorInitial - ExampleConstants.kZeroTicks);
   }
 
   @Override
   public void setPosition(double position) {
-    setpoint = position - relSetpointOffset;
+    setpoint = position + relSetpointOffset;
     talonFx.setControl(positionRequest.withPosition(setpoint));
   }
 
   @Override
   public void updateInputs(ExampleIOInputs inputs) {
-    inputs.position = currPosition.refresh().getValue();
     inputs.velocity = currVelocity.refresh().getValue();
+    inputs.position = currPosition.refresh().getValue() - relSetpointOffset;
   }
 
   @Override

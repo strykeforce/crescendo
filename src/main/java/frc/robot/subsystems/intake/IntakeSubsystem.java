@@ -87,6 +87,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
     io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
   public enum IntakeState {

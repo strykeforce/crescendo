@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -7,6 +8,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -117,6 +120,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void resetOdometry(Pose2d pose) {
     io.resetOdometry(pose);
     logger.info("reset odometry with: {}", pose);
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    io.addVisionMeasurement(pose, timestamp);
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
+    io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController() {

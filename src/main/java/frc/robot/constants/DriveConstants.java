@@ -15,6 +15,11 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import java.util.ArrayList;
 
 public final class DriveConstants {
+  public static final double kDeadbandAllStick = 0.075;
+  public static final double kExpoScaleYawFactor = 0.75;
+  public static final double kRateLimitFwdStr = 3.5;
+  public static final double kRateLimitYaw = 3.0;
+
   public static final double kFieldMaxX = 16.540988; // m
   public static final double kFieldMaxY = 8.21055; // m
 

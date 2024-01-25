@@ -7,6 +7,7 @@ import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -54,6 +55,11 @@ public class SuperStructure extends MeasurableSubsystem {
   // }
 
   // Helper Methods
+
+  public void stopShoot() {
+    logger.info("Stop Shooter Wheels");
+    shooterSubsystem.setSpeed(0.0);
+  }
 
   // Basic methods to go to each position
   //    Works by setting each axes' setpoint and starting intial movement
@@ -164,6 +170,21 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.DEFENSE;
   }
 
+  public void stow() {
+    elbowSetpoint = SuperStructureConstants.kElbowStowSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristStowSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> TRANSFER(DEFENSE)");
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.DEFENSE;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -204,6 +225,8 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case DEFENSE:
         break;
+      case STOW:
+        break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState.ordinal());
   }
@@ -211,6 +234,11 @@ public class SuperStructure extends MeasurableSubsystem {
   @Override
   public Set<Measure> getMeasures() {
     return Set.of(new Measure("state", () -> curState.ordinal()));
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
   }
 
   // State Enum
@@ -223,6 +251,7 @@ public class SuperStructure extends MeasurableSubsystem {
     POST_CLIMB,
     TRANSFER,
     INTAKE,
-    DEFENSE
+    DEFENSE,
+    STOW
   }
 }
