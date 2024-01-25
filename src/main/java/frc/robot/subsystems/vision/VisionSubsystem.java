@@ -6,6 +6,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -13,25 +14,33 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.ArrayList;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class VisionSubsystem extends SubsystemBase {
+public class VisionSubsystem extends MeasurableSubsystem {
 
   // Private Variables
   WallEyeCam[] cams;
+
   Translation3d[] offsets = {
-    new Translation3d(0, 0, 0), new Translation3d(0, 0, 0)
-  }; // FIXME: put in VisionConstants
+    VisionConstants.kCam1Pose.getTranslation(), VisionConstants.kCam2Pose.getTranslation()
+  };
+
   Rotation3d[] rotsOff = {
-    new Rotation3d(0, 0, 0), new Rotation3d(0, 0, 0)
-  }; // FIXME: put in VisionConstants
-  String[] names = {"1", "2"};
-  int[] camIndex = {1, 2};
+    VisionConstants.kCam1Pose.getRotation(), VisionConstants.kCam2Pose.getRotation()
+  };
+
+  String[] names = {VisionConstants.kCam1Name, VisionConstants.kCam2Name};
+
+  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx};
+
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
   VisionStates curState = VisionStates.TRUSTWHEELS;
   boolean visionUpdates = true;
@@ -120,6 +129,8 @@ public class VisionSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
+    org.littletonrobotics.junction.Logger.recordOutput("State", curState.name());
+
     // cam.getEnabled();
 
     // If enough time elapses trust vision or if enough time elapses reset the counter
@@ -189,9 +200,6 @@ public class VisionSubsystem extends SubsystemBase {
               .getTranslation()
               .plus(offsets[idx].rotateBy(cameraPose.getRotation().minus(rotsOff[idx])));
 
-      String output = "VisionSubsystem/Cam" + res.getSecond().toString() + "Pose";
-      org.littletonrobotics.junction.Logger.recordOutput(output, centerPose);
-
       // If updating with vision go into state machine to update
       if (visionUpdates) {
         switch (curState) {
@@ -202,10 +210,18 @@ public class VisionSubsystem extends SubsystemBase {
               String outputAccept =
                   "VisionSubsystem/AcceptedCam" + res.getSecond().toString() + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
-              // Feed into odometry
+
+              driveSubsystem.addVisionMeasurement(
+                  new Pose2d(centerPose.toTranslation2d(), new Rotation2d()),
+                  result.getTimeStamp() / 1000000);
+
               offWheels--;
 
             } else {
+
+              String output =
+                  "VisionSubsystem/NotAcceptedCam" + res.getSecond().toString() + "Pose";
+              org.littletonrobotics.junction.Logger.recordOutput(output, centerPose);
               offWheels = offWheels < 0 ? 1 : offWheels++;
               if (offWheels >= VisionConstants.kMaxTimesOffWheels) {
                 logger.info("{} -> TRUSTVISION", curState);
@@ -221,7 +237,15 @@ public class VisionSubsystem extends SubsystemBase {
                   "VisionSubsystem/AcceptedCam" + res.getSecond().toString() + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
               updatesToWheels++;
-              // Feed into odometry
+
+              driveSubsystem.addVisionMeasurement(
+                  new Pose2d(centerPose.toTranslation2d(), new Rotation2d()),
+                  result.getTimeStamp() / 1000000);
+
+            } else {
+              String output =
+                  "VisionSubsystem/NotAcceptedCam" + res.getSecond().toString() + "Pose";
+              org.littletonrobotics.junction.Logger.recordOutput(output, centerPose);
             }
 
             break;
@@ -231,6 +255,15 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   // Grapher
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of(new Measure("State", () -> curState.ordinal()));
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+  }
 
   // State Enum
   public enum VisionStates {

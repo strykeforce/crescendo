@@ -6,5 +6,7 @@ public class RobotStateConstants {
   public static final int kLookupMaxDistance = 0;
   public static final int kDistanceIncrement = 0;
 
-  private static final double kSpeakerY = 5.547868; // m
+  public static final double kSpeakerY = 5.547868; // m
+
+  public static final double kTimeToStowPostAmp = 0.1;
 }

@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.kauailabs.navx.frc.AHRS.SerialDataType;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -13,6 +14,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
@@ -148,6 +151,14 @@ public class Swerve implements SwerveIO {
 
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    odometryStrategy.addVisionMeasurement(pose, timestamp);
+  }
+
+  public void addVisionMeasurement(Pose2d pose2d, double timestamp, Matrix<N3, N1> stdDevs) {
+    odometryStrategy.addVisionMeasurement(pose2d, timestamp, stdDevs);
   }
 
   public void drive(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
