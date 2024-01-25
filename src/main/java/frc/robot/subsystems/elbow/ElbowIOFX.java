@@ -11,6 +11,7 @@ import frc.robot.constants.ElbowConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.CanifierMeasurable;
 
 public class ElbowIOFX implements ElbowIO {
   private Logger logger;
@@ -45,7 +46,11 @@ public class ElbowIOFX implements ElbowIO {
   public int getPulseWidthFor(PWMChannel channel) {
     double[] pulseWidthandPeriod = new double[2];
     remoteEncoder.getPWMInput(channel, pulseWidthandPeriod);
-    return (int) (4096.0 * pulseWidthandPeriod[0] / pulseWidthandPeriod[1]);
+    return (int)
+        (ElbowConstants.kFxToMechRatio
+            / ElbowConstants.kAbsEncoderToMechRatio
+            * pulseWidthandPeriod[0]
+            / pulseWidthandPeriod[1]);
   }
 
   @Override
@@ -76,5 +81,6 @@ public class ElbowIOFX implements ElbowIO {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(elbow, true);
+    telemetryService.register(new CanifierMeasurable(remoteEncoder));
   }
 }

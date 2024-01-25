@@ -9,8 +9,9 @@ public class ElbowConstants {
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
   public static final double kElbowZeroTicks = 0;
-  public static final double kAbsEncoderToMechRatio = 0;
-  public static final double kFxToMechRatio = 0;
+
+  public static final double kAbsEncoderToMechRatio = 1;
+  public static final double kFxToMechRatio = 1;
 
   public static TalonFXConfiguration getFxConfiguration() {
     return new TalonFXConfiguration();
