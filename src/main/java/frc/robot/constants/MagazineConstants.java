@@ -12,6 +12,8 @@ public class MagazineConstants {
   public static final int kMinBeamBreaks = 3;
   public static double kIntakingSpeed;
   public static double kEmptyingSpeed;
+
+  public static final double kMinEdgeBeamBreaks = 3;
   public static double kPodiumPrepareSpeed;
 
   public static final TalonFXConfiguration getMagazineConfig() {

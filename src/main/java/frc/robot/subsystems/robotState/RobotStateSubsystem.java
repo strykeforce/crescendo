@@ -179,6 +179,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.stow();
   }
 
+  public void toPreparePodium() {
+    driveSubsystem.setIsAligningShot(false);
+    setState(RobotStates.TO_PODIUM);
+    magazineSubsystem.preparePodium();
+    intakeSubsystem.setPercent(0.0);
+    superStructure.preparePodium();
+
+    setState(RobotStates.TO_PODIUM);
+  }
+
   // FIXME
   public void releaseGamePiece() {
     magazineSubsystem.toEmptying();
@@ -192,8 +202,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (superStructure.isFinished()) {
           setState(RobotStates.STOW);
         }
-
         break;
+
       case STOW:
         break;
 
@@ -219,6 +229,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           setState(RobotStates.AMP);
         }
         break;
+
       case AMP:
         if (!magazineSubsystem.hasPiece()) {
           ampStowTimer.stop();
@@ -252,7 +263,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           setState(RobotStates.SHOOTING);
         }
-
         break;
 
       case SHOOTING:
@@ -268,9 +278,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case TO_PODIUM:
+        // 
         break;
 
-      case PODIUM:
+      case PODIUM_SHOOTING:
         break;
 
       default:
@@ -303,6 +314,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_SHOOT,
     SHOOTING,
     TO_PODIUM,
-    PODIUM
+    PODIUM_SHOOTING
   }
 }

@@ -38,7 +38,13 @@ public class SuperStructureConstants {
   public static final double kElbowDefenseSetPoint = 0.0;
   public static final double kShooterDefenseSetPoint = 0.0;
 
+  // PODIUM PREP
+  public static final double kWristPodiumPrepSetPoint = 0.0;
+  public static final double kElbowPodiumPrepSetPoint = 0.0;
+  public static final double kShooterPodiumPrepSetPoint = 0.0;
+
   // PODIUM
+
   public static final double kWristPodiumSetPoint = 0.0;
   public static final double kElbowPodiumSetPoint = 0.0;
   public static final double kShooterPodiumSetPoint = 0.0;

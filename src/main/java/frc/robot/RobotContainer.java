@@ -71,10 +71,10 @@ public class RobotContainer {
     wristSubsystem = new WristSubsystem(new WristIOSRX());
     elbowSubsystem = new ElbowSubsystem(new ElbowIOFX());
     shooterSubsystem = new ShooterSubsystem(new ShooterIOFX());
-    superStructure = new SuperStructure(wristSubsystem, elbowSubsystem, shooterSubsystem);
     climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
+    superStructure = new SuperStructure(wristSubsystem, elbowSubsystem, shooterSubsystem, magazineSubsystem);
 
     robotStateSubsystem =
         new RobotStateSubsystem(

@@ -46,6 +46,10 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     curState = state;
   }
 
+  public boolean getIsRevLimitSwitch() {
+    return inputs.isRevLimitSwitch;
+  }
+
   public boolean isFinished() {
     return Math.abs(inputs.position - setpoint) <= WristConstants.kCloseEnoughTicks;
   }
