@@ -404,13 +404,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
-  private Pose2d parsePose2d(TomlParseResult parseResult, String pose) {
-    return new Pose2d(
-        parseResult.getTable(pose).getDouble("x"),
-        parseResult.getTable(pose).getDouble("y"),
-        Rotation2d.fromDegrees(parseResult.getTable(pose).getDouble("angle")));
-  }
-
   // Control Methods
   public void lockZero() {
     SwerveModule[] swerveModules = io.getSwerveModules();
