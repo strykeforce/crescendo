@@ -12,17 +12,17 @@
 
 | Subsystem | Type     | Talon      | ID  | Comp PDP | Proto PDP | Motor  | Breaker |
 | --------- | -------- | ---------- | --- | -------- | --------- | ------ | ------- |
-| Drive     | SRX      | azimuth    | 0   |          |           | 9015   |         |
-| Drive     | SRX      | azimuth    | 1   |          |           | 9015   |         |
-| Drive     | SRX      | azimuth    | 2   |          |           | 9015   |         |
-| Drive     | SRX      | azimuth    | 3   |          |           | 9015   |         |
-| Drive     | FX       | drive      | 10  |          |           | kraken |         |
-| Drive     | FX       | drive      | 11  |          |           | kraken |         |
-| Drive     | FX       | drive      | 12  |          |           | kraken |         |
-| Drive     | FX       | drive      | 13  |          |           | kraken |         |
+| Drive     | SRX      | azimuth    | 0   |          | 16        | 9015   |         |
+| Drive     | SRX      | azimuth    | 1   |          | 2         | 9015   |         |
+| Drive     | SRX      | azimuth    | 2   |          | 17        | 9015   |         |
+| Drive     | SRX      | azimuth    | 3   |          | 4         | 9015   |         |
+| Drive     | FX       | drive      | 10  |          | 18        | kraken |         |
+| Drive     | FX       | drive      | 11  |          | 1         | kraken |         |
+| Drive     | FX       | drive      | 12  |          | 19        | kraken |         |
+| Drive     | FX       | drive      | 13  |          | 0         | kraken |         |
 | Intake    | FX       | intake     | 20  |          |           | falcon |         |
 | Magazine  | FX       | magazine   | 25  |          |           | falcon |         |
-| Elbow     | FX       | elbow      | 30  |          |           | falcon |         |
+| Elbow     | FX       | elbow      | 30  |          | 5         | falcon |         |
 | Elbow     | CANifier | canifier   | 31  |          |           | -      |         |
 | Wrist     | SRX      | wrist      | 35  |          |           | 9015   |         |
 | Shooter   | FX       | leftShoot  | 40  |          |           | falcon |         |
