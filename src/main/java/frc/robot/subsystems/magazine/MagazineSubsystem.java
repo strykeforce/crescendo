@@ -148,10 +148,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         }
         break;
       case EMPTYING:
-        if (wristSubsystem.isFwdBeamOpen()) {
-          setSpeed(0.0);
-          setState(MagazineStates.EMPTY);
-        }
         break;
       case SPEEDUP:
         if (atShootSpeed()) {

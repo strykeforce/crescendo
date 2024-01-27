@@ -10,8 +10,8 @@ public final class MagazineConstants {
   // public static final double kFeedingSpeed = 0.5;
   public static final double kShootSpeed = 0;
   public static final int kMinBeamBreaks = 3;
-  public static final double kIntakingSpeed = 0.5;
-  public static final double kEmptyingSpeed = 0.5;
+  public static final double kIntakingSpeed = -0.5;
+  public static final double kEmptyingSpeed = -0.75;
 
   public static final double kPodiumPrepareSpeed = 0.1;
 

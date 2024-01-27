@@ -15,8 +15,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.intake.OpenLoopIntakeCommand;
+import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.StowCommand;
+import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -73,6 +74,9 @@ public class RobotContainer {
     climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
+
+    magazineSubsystem.setWristSubsystem(wristSubsystem);
+
     superStructure =
         new SuperStructure(wristSubsystem, elbowSubsystem, shooterSubsystem, magazineSubsystem);
 
@@ -118,15 +122,15 @@ public class RobotContainer {
 
   public void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
-    // visionSubsystem.registerWith(telemetryService);
-    // wristSubsystem.registerWith(telemetryService);
+    visionSubsystem.registerWith(telemetryService);
+    wristSubsystem.registerWith(telemetryService);
     elbowSubsystem.registerWith(telemetryService);
-    // shooterSubsystem.registerWith(telemetryService);
-    // superStructure.registerWith(telemetryService);
+    shooterSubsystem.registerWith(telemetryService);
+    superStructure.registerWith(telemetryService);
     // climbSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
-    // magazineSubsystem.registerWith(telemetryService);
-    // robotStateSubsystem.registerWith(telemetryService);
+    magazineSubsystem.registerWith(telemetryService);
+    robotStateSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -202,8 +206,16 @@ public class RobotContainer {
 
     // Intake
     new JoystickButton(driveJoystick, Button.SWD.id)
-        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, -0.5))
-        .onFalse(new OpenLoopIntakeCommand(intakeSubsystem, 0));
+        .onTrue(
+            new IntakeCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
+        .onFalse(
+            new StowCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    // Shoot
+    new JoystickButton(driveJoystick, Button.M_SWH.id)
+        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     //   // Release Game Piece Command
     //   new JoystickButton(driveJoystick, Button.SWD.id)

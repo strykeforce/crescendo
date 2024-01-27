@@ -74,7 +74,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isFwdBeamBroken() {
-    if (inputs.isRevLimitSwitch) fwdBeamBrokenCount++;
+    if (inputs.isFwdLimitSwitchClosed) fwdBeamBrokenCount++;
     else fwdBeamBrokenCount = 0;
 
     return fwdBeamBrokenCount > WristConstants.kMinBeamBreaks;

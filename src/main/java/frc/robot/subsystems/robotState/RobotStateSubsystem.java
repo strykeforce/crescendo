@@ -215,6 +215,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case INTAKING:
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
+
           intakeSubsystem.setPercent(0);
 
           toStow();
@@ -270,7 +271,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           magazineSubsystem.setSpeed(0);
 
           superStructure.stopShoot();
-          toStow();
+          toIntake();
         }
 
         break;

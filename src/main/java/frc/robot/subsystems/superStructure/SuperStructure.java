@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superStructure;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.SuperStructureConstants;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
@@ -26,6 +27,7 @@ public class SuperStructure extends MeasurableSubsystem {
   private double elbowSetpoint = 0.0;
   private double wristSetpoint = 0.0;
   private boolean flipMagazineOut = false;
+  private Timer timer = new Timer();
 
   // Constructor
   public SuperStructure(
@@ -42,7 +44,8 @@ public class SuperStructure extends MeasurableSubsystem {
 
   // Getter/Setter Methods
   public boolean isFinished() {
-    return elbowSubsystem.isFinished() && wristSubsystem.isFinished() && shooterSubsystem.atSpeed();
+    return /*elbowSubsystem.isFinished() && wristSubsystem.isFinished() && */ shooterSubsystem
+        .atSpeed();
   }
 
   public SuperStructureStates getState() {
@@ -203,6 +206,9 @@ public class SuperStructure extends MeasurableSubsystem {
     shooterSubsystem.setSpeed(leftShooterSpeed);
     // elbowSubsystem.setPosition(elbowSetpoint);
 
+    timer.restart();
+    timer.start();
+
     logger.info("{} -> TRANSFER(SUBWOOFER)");
     flipMagazineOut = true;
     curState = SuperStructureStates.TRANSFER;
@@ -259,7 +265,7 @@ public class SuperStructure extends MeasurableSubsystem {
         // }
 
         // Once all subsystems are at position go into the desired state
-        if (isFinished()) {
+        if (timer.hasElapsed(0.05)) {
           logger.info("TRANSFER -> {}", nextState);
           curState = nextState;
         }
