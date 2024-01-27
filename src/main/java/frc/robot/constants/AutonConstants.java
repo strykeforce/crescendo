@@ -24,6 +24,6 @@ public final class AutonConstants {
     // Shooting Positions
     public static final Pose2d AS1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
-    public static final Pose2d NAS1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d NAS1 = new Pose2d(3.021, 3.038, Rotation2d.fromDegrees(0.0));
   }
 }

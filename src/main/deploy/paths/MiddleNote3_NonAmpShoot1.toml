@@ -12,9 +12,5 @@ target_yaw = 0.0 #degrees
     dataPoint = "NAS1"
 
 [[internal_points]]
-    x = 5.82
-    y = 3.74
-
-[[internal_points]]
-    x = 3.07
-    y = 4.88
+    x = 5.821
+    y = 3.567
