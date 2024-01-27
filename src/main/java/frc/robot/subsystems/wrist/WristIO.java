@@ -8,6 +8,8 @@ public interface WristIO {
   @AutoLog
   public static class WristIOInputs {
     public double position = 0.0;
+    public boolean isRevLimitSwitch = false;
+    public boolean isFwdLimitSwitchClosed = false;
   }
 
   public default void updateInputs(WristIOInputs inputs) {}

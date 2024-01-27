@@ -2,6 +2,7 @@ package frc.robot.subsystems.superStructure;
 
 import frc.robot.constants.SuperStructureConstants;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
+import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.Set;
@@ -16,6 +17,7 @@ public class SuperStructure extends MeasurableSubsystem {
   WristSubsystem wristSubsystem;
   ElbowSubsystem elbowSubsystem;
   ShooterSubsystem shooterSubsystem;
+  MagazineSubsystem magazineSubsystem;
   Logger logger;
   SuperStructureStates curState = SuperStructureStates.IDLE;
   SuperStructureStates nextState = SuperStructureStates.IDLE;
@@ -29,10 +31,12 @@ public class SuperStructure extends MeasurableSubsystem {
   public SuperStructure(
       WristSubsystem wristSubsystem,
       ElbowSubsystem elbowSubsystem,
-      ShooterSubsystem shooterSubsystem) {
+      ShooterSubsystem shooterSubsystem,
+      MagazineSubsystem magazineSubsystem) {
     this.elbowSubsystem = elbowSubsystem;
     this.wristSubsystem = wristSubsystem;
     this.shooterSubsystem = shooterSubsystem;
+    this.magazineSubsystem = magazineSubsystem;
     logger = LoggerFactory.getLogger(this.getClass());
   }
 
@@ -59,6 +63,11 @@ public class SuperStructure extends MeasurableSubsystem {
   public void stopShoot() {
     logger.info("Stop Shooter Wheels");
     shooterSubsystem.setSpeed(0.0);
+  }
+
+  public void stopPodiumShoot() {
+    logger.info("Stop Magazine Belts");
+    magazineSubsystem.setSpeed(0.0);
   }
 
   // Basic methods to go to each position
@@ -185,6 +194,51 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.DEFENSE;
   }
 
+  public void subwoofer() {
+    elbowSetpoint = SuperStructureConstants.kElbowSubwooferSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristSubwooferSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterSubwooferSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterSubwooferSetPoint;
+
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    elbowSubsystem.setPosition(elbowSetpoint);
+
+    logger.info("{} -> TRANSFER(SUBWOOFER)");
+    flipMagazineOut = true;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.SUBWOOFER;
+  }
+
+  public void preparePodium() {
+    elbowSetpoint = SuperStructureConstants.kElbowPodiumPrepSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristPodiumPrepSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
+
+    shooterSubsystem.setSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> TRANSFER(PREP_PODIUM)");
+    flipMagazineOut = true;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.PREP_PODIUM;
+  }
+
+  public void podiumShoot() {
+    elbowSetpoint = SuperStructureConstants.kElbowPodiumSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristPodiumSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
+
+    shooterSubsystem.setSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> TRANSFER(PODIUM)");
+    flipMagazineOut = true;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.PODIUM;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -227,6 +281,12 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case STOW:
         break;
+      case PREP_PODIUM:
+        break;
+      case PODIUM:
+        break;
+      case SUBWOOFER:
+        break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState.ordinal());
   }
@@ -252,6 +312,9 @@ public class SuperStructure extends MeasurableSubsystem {
     TRANSFER,
     INTAKE,
     DEFENSE,
-    STOW
+    STOW,
+    PODIUM,
+    PREP_PODIUM,
+    SUBWOOFER
   }
 }

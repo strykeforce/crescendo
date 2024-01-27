@@ -8,6 +8,7 @@ import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
+import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
@@ -35,6 +36,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private String[][] lookupTable;
 
   private Timer shootDelayTimer = new Timer();
+  private Timer magazineShootDelayTimer = new Timer();
+
   private Timer ampStowTimer = new Timer();
 
   private Alliance allianceColor = Alliance.Blue;
@@ -132,21 +135,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // Control Methods
   public void toIntake() {
-
     driveSubsystem.setIsAligningShot(false);
     superStructure.intake();
     intakeSubsystem.toIntaking();
     magazineSubsystem.toIntaking();
-    driveSubsystem.setIsAligningShot(false);
 
     setState(RobotStates.TO_INTAKING);
   }
 
   public void toAmp() {
-
     driveSubsystem.setIsAligningShot(false);
     superStructure.amp();
-    driveSubsystem.setIsAligningShot(false);
 
     setState(RobotStates.TO_AMP);
   }
@@ -170,6 +169,23 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.stow();
   }
 
+  public void toPreparePodium() {
+    driveSubsystem.setIsAligningShot(false);
+    magazineSubsystem.preparePodium();
+    intakeSubsystem.setPercent(0.0);
+    superStructure.preparePodium();
+
+    setState(RobotStates.TO_PODIUM);
+  }
+
+  public void toSubwoofer() {
+    driveSubsystem.setIsAligningShot(false);
+    intakeSubsystem.setPercent(0.0);
+    superStructure.subwoofer();
+
+    setState(RobotStates.TO_SUBWOOFER);
+  }
+
   // FIXME
   public void releaseGamePiece() {
     magazineSubsystem.toEmptying();
@@ -183,8 +199,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (superStructure.isFinished()) {
           setState(RobotStates.STOW);
         }
-
         break;
+
       case STOW:
         break;
 
@@ -207,9 +223,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_AMP:
         if (superStructure.isFinished()) {
+          magazineSubsystem.toEmptying();
           setState(RobotStates.AMP);
         }
         break;
+
       case AMP:
         if (!magazineSubsystem.hasPiece()) {
           ampStowTimer.stop();
@@ -243,7 +261,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           setState(RobotStates.SHOOTING);
         }
-
         break;
 
       case SHOOTING:
@@ -256,6 +273,42 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toStow();
         }
 
+        break;
+
+      case TO_PODIUM:
+        if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
+          superStructure.stopShoot();
+        }
+        if (superStructure.isFinished() && magazineSubsystem.getState() == MagazineStates.SHOOT) {
+          superStructure.podiumShoot();
+
+          magazineShootDelayTimer.stop();
+          magazineShootDelayTimer.reset();
+          magazineShootDelayTimer.start();
+
+          setState(RobotStates.PODIUM_SHOOTING);
+        }
+        break;
+
+      case PODIUM_SHOOTING:
+        if (magazineShootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
+          magazineShootDelayTimer.stop();
+
+          superStructure.stopPodiumShoot();
+          toStow();
+        }
+        break;
+
+      case TO_SUBWOOFER:
+        if (superStructure.isFinished()) {
+          magazineSubsystem.toEmptying();
+
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+
+          setState(RobotStates.SHOOTING);
+        }
         break;
 
       default:
@@ -286,6 +339,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_STOW,
     STOW,
     TO_SHOOT,
-    SHOOTING
+    SHOOTING,
+    TO_PODIUM,
+    PODIUM_SHOOTING,
+    TO_SUBWOOFER
   }
 }
