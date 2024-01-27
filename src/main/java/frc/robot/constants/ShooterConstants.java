@@ -3,7 +3,7 @@ package frc.robot.constants;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-public class ShooterConstants {
+public final class ShooterConstants {
   public static final int kLeftShooterTalonID = 40;
   public static final int kRightShooterTalonID = 41;
   public static final double kCloseEnough = 100;

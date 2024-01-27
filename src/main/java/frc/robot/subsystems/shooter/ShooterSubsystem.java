@@ -12,8 +12,8 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
 
   // Private Variables
-  ShooterIO io;
-  ShooterStates curState = ShooterStates.IDLE;
+  private ShooterIO io;
+  private ShooterStates curState = ShooterStates.IDLE;
   private double leftSetpoint = 0.0;
   double rightSetpoint = 0.0;
 

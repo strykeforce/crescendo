@@ -2,7 +2,7 @@ package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-public class ElbowConstants {
+public final class ElbowConstants {
   public static final int kElbowTalonFxId = 30;
   public static final double kCloseEnoughTicks = 100;
   public static final double kMaxPivotTicks = 0;

@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-public class SuperStructureConstants {
+public final class SuperStructureConstants {
   // SEQUENCE
   public static final double kElbowMinToMoveWrist = 0.0;
   public static final double kWristMinToMoveElbow = 0.0;
@@ -44,7 +44,6 @@ public class SuperStructureConstants {
   public static final double kShooterPodiumPrepSetPoint = 0.0;
 
   // PODIUM
-
   public static final double kWristPodiumSetPoint = 0.0;
   public static final double kElbowPodiumSetPoint = 0.0;
   public static final double kShooterPodiumSetPoint = 0.0;
@@ -52,7 +51,7 @@ public class SuperStructureConstants {
   // SUBWOOFER
   public static final double kWristSubwooferSetPoint = 0.0;
   public static final double kElbowSubwooferSetPoint = 0.0;
-  public static final double kShooterSubwooferSetPoint = 0.0;
+  public static final double kShooterSubwooferSetPoint = 0.4;
 
   // STOW
   public static final double kWristStowSetPoint = 0.0;

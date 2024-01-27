@@ -37,7 +37,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
-
   private Timer ampStowTimer = new Timer();
 
   private Alliance allianceColor = Alliance.Blue;
@@ -163,10 +162,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStow() {
     driveSubsystem.setIsAligningShot(false);
-    setState(RobotStates.TO_STOW);
     intakeSubsystem.setPercent(0.0);
     magazineSubsystem.setSpeed(0.0);
     superStructure.stow();
+
+    setState(RobotStates.TO_STOW);
   }
 
   public void toPreparePodium() {
