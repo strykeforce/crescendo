@@ -3,10 +3,6 @@ package frc.robot.subsystems.wrist;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.signals.ForwardLimitValue;
-import com.ctre.phoenix6.signals.ReverseLimitValue;
-
 import frc.robot.constants.ElbowConstants;
 import frc.robot.constants.WristConstants;
 import org.slf4j.Logger;

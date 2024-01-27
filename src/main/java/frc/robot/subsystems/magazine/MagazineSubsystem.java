@@ -3,7 +3,6 @@ package frc.robot.subsystems.magazine;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
-
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +26,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   // Podium Preparation Variables
   private boolean atEdgeOne = false;
   private boolean pastEdgeOne = false;
-  private int edgeOneBeamBroken = 0;
-  private int edgeOneBeamOpen = 0; 
-  private int edgeTwoBeamBroken = 0;
 
   // Constructor
   public MagazineSubsystem(MagazineIO io) {
@@ -71,7 +67,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   public void setWristSubsystem(WristSubsystem wristSubsystem) {
-    this.wristSubsystem = wristSubsystem; 
+    this.wristSubsystem = wristSubsystem;
   }
 
   // Helper Methods
@@ -109,27 +105,30 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
     return beamOpen > MagazineConstants.kMinBeamBreaks;
   }
-  
+
   public boolean isNotePrepped() {
     // If the first edge of the note has been detected, set at edge one to be true
-    if (wristSubsystem.getIsRevLimitSwitch()) edgeOneBeamBroken++;
-    else edgeOneBeamBroken = 0;
-    if (edgeOneBeamBroken > MagazineConstants.kMinBeamBreaks) atEdgeOne = true;
+    if (!atEdgeOne && wristSubsystem.isBeamBroken()) {
+      atEdgeOne = true;
+    }
 
-    // if the first edge has been detected, and the open space of the note has been detected set past first edge to be true
-    if (atEdgeOne && !wristSubsystem.getIsRevLimitSwitch()) edgeOneBeamOpen++;
-    else edgeOneBeamOpen = 0;
-    if (edgeOneBeamOpen > MagazineConstants.kMinBeamBreaks) pastEdgeOne = true;
+    // if the first edge has been detected, and the open space of the note has been
+    // detected set
+    // past first edge to be true
+    if (atEdgeOne && !pastEdgeOne && wristSubsystem.isBeamOpen()) {
+      pastEdgeOne = true;
+    }
 
-    // if the first edge, the open space has been detected, and the second edge of the note has been detected,  
+    // if the first edge, the open space has been detected, and the second edge of
+    // the note has been
+    // detected,
     // the note has been prepped.
-    if (atEdgeOne && pastEdgeOne && wristSubsystem.getIsRevLimitSwitch()) edgeTwoBeamBroken++;
-    else edgeTwoBeamBroken = 0;
-    
-    return edgeTwoBeamBroken > MagazineConstants.kMinEdgeBeamBreaks; 
+    if (atEdgeOne && pastEdgeOne && wristSubsystem.isBeamBroken()) {
+      return true;
+    } else {
+      return false;
+    }
   }
-
-
 
   // Periodic
   @Override
@@ -161,8 +160,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case PREP_PODIUM:
         if (isNotePrepped()) {
-          setSpeed(0.0);
-          setState(MagazineStates.SPEEDUP); 
+          setSpeed(MagazineConstants.kShootSpeed);
+          setState(MagazineStates.SPEEDUP);
           atEdgeOne = false;
           pastEdgeOne = false;
         }
@@ -171,6 +170,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
     }
   }
+
   // Grapher
   @Override
   public Set<Measure> getMeasures() {

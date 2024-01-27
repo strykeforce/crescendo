@@ -10,11 +10,10 @@ public class MagazineConstants {
   public static final double kFeedingSpeed = 0;
   public static final double kShootSpeed = 0;
   public static final int kMinBeamBreaks = 3;
-  public static double kIntakingSpeed;
-  public static double kEmptyingSpeed;
+  public static final double kIntakingSpeed = 0;
+  public static final double kEmptyingSpeed = 0;
 
-  public static final double kMinEdgeBeamBreaks = 3;
-  public static double kPodiumPrepareSpeed;
+  public static final double kPodiumPrepareSpeed = 0;
 
   public static final TalonFXConfiguration getMagazineConfig() {
     return new TalonFXConfiguration();

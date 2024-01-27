@@ -197,8 +197,8 @@ public class SuperStructure extends MeasurableSubsystem {
   public void subwoofer() {
     elbowSetpoint = SuperStructureConstants.kElbowSubwooferSetPoint;
     wristSetpoint = SuperStructureConstants.kWristSubwooferSetPoint;
-    rightShooterSpeed = SuperStructureConstants.kShooterSubwooferSetPoint;
     leftShooterSpeed = SuperStructureConstants.kShooterSubwooferSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterSubwooferSetPoint;
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
     elbowSubsystem.setPosition(elbowSetpoint);
@@ -224,7 +224,7 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.PREP_PODIUM;
   }
 
-    public void podiumShoot() {
+  public void podiumShoot() {
     elbowSetpoint = SuperStructureConstants.kElbowPodiumSetPoint;
     wristSetpoint = SuperStructureConstants.kWristPodiumSetPoint;
     leftShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
@@ -238,8 +238,6 @@ public class SuperStructure extends MeasurableSubsystem {
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.PODIUM;
   }
-
-  public void podium() {}
 
   // Periodic
   @Override

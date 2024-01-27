@@ -14,6 +14,8 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(WristSubsystem.class);
   private double setpoint = 0;
+  private int beamBrokenCount = 0;
+  private int beamOpenCount = 0;
   private WristStates curState;
 
   public WristSubsystem(WristIO io) {
@@ -48,6 +50,20 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public boolean getIsRevLimitSwitch() {
     return inputs.isRevLimitSwitch;
+  }
+
+  public boolean isBeamBroken() {
+    if (inputs.isRevLimitSwitch) beamBrokenCount++;
+    else beamBrokenCount = 0;
+
+    return beamBrokenCount > WristConstants.kMinBeamBreaks;
+  }
+
+  public boolean isBeamOpen() {
+    if (!inputs.isRevLimitSwitch) beamOpenCount++;
+    else beamOpenCount = 0;
+
+    return beamOpenCount > WristConstants.kMinBeamBreaks;
   }
 
   public boolean isFinished() {
