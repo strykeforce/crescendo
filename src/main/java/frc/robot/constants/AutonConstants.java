@@ -7,6 +7,7 @@ public final class AutonConstants {
   public final class Setpoints {
     // Starting Positions
     public static final Pose2d MI1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d NAI1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
 
     // Wing Notes
     public static final Pose2d W1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
