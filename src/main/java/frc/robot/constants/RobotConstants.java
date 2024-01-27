@@ -38,8 +38,11 @@ public class RobotConstants {
 
   // Constants Different between Comp and Proto
   public static Double kWheelDiameterInches = 3.0;
+  public static Double kElbowZero = 0.0;
+  public static Double kWristZero = 0.0;
 
   public RobotConstants() {
+    logger.info("SN: {}, isCompBot: {}", RobotController.getSerialNumber(), isCompBot);
     if (isCompBot) {
       logger.info("Using Comp Robot Constants");
       kWheelDiameterInches = CompConstants.kWheelDiameterInches;
@@ -52,10 +55,22 @@ public class RobotConstants {
   public static class CompConstants {
     // Drive
     public static final Double kWheelDiameterInches = 3.0;
+
+    // Elbow
+    public static final Double kElbowZero = 0.0;
+
+    // Wrist
+    public static final Double kWristZero = 0.0;
   }
 
   public static class ProtoConstants {
     // Drive
     public static final Double kWheelDiameterInches = 3.0;
+
+    // Elbow
+    public static final Double kElbowZero = 0.0;
+
+    // Wrist
+    public static final Double kWristZero = 0.0;
   }
 }

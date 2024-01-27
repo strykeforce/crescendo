@@ -14,7 +14,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(WristSubsystem.class);
   private double setpoint = 0;
-  private WristStates curState;
+  private WristStates curState = WristStates.IDLE;
 
   public WristSubsystem(WristIO io) {
     this.io = io;

@@ -16,11 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.intake.OpenLoopIntakeCommand;
-import frc.robot.commands.robotState.AmpCommand;
-import frc.robot.commands.robotState.IntakeCommand;
-import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
-import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -45,6 +42,7 @@ import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
 
+  private final RobotConstants robotConstants;
   private final VisionSubsystem visionSubsystem;
   private final DriveSubsystem driveSubsystem;
   private final SuperStructure superStructure;
@@ -66,6 +64,7 @@ public class RobotContainer {
   private Boolean isEvent = true;
 
   public RobotContainer() {
+    robotConstants = new RobotConstants();
     driveSubsystem = new DriveSubsystem(new Swerve());
     visionSubsystem = new VisionSubsystem(driveSubsystem);
     wristSubsystem = new WristSubsystem(new WristIOSRX());
@@ -83,10 +82,10 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     configureDriverBindings();
-    configureOperatorBindings();
+    // configureOperatorBindings();
     configureMatchDashboard();
 
-    robotStateSubsystem.setAllianceColor(Alliance.Blue);
+    // robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
     // configureTelemetry();
     // configurePitDashboard();
@@ -118,15 +117,15 @@ public class RobotContainer {
 
   public void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
-    visionSubsystem.registerWith(telemetryService);
-    wristSubsystem.registerWith(telemetryService);
+    // visionSubsystem.registerWith(telemetryService);
+    // wristSubsystem.registerWith(telemetryService);
     elbowSubsystem.registerWith(telemetryService);
-    shooterSubsystem.registerWith(telemetryService);
-    superStructure.registerWith(telemetryService);
-    climbSubsystem.registerWith(telemetryService);
+    // shooterSubsystem.registerWith(telemetryService);
+    // superStructure.registerWith(telemetryService);
+    // climbSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
-    magazineSubsystem.registerWith(telemetryService);
-    robotStateSubsystem.registerWith(telemetryService);
+    // magazineSubsystem.registerWith(telemetryService);
+    // robotStateSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -149,30 +148,30 @@ public class RobotContainer {
     this.isEvent = isEvent;
   }
 
-  private void configureOperatorBindings() {
-    // Amp Command
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+  // private void configureOperatorBindings() {
+  //   // Amp Command
+  //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+  //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
-    // Intake Command
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(
-            new IntakeCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+  //   // Intake Command
+  //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+  //       .onTrue(
+  //           new IntakeCommand(
+  //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
-    // Open Loop Intake Command
-    new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
+  //   // Open Loop Intake Command
+  //   new JoystickButton(xboxController, XboxController.Button.kA.value)
+  //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
 
-    new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
+  //   new JoystickButton(xboxController, XboxController.Button.kB.value)
+  //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
 
-    // Stow Command
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-  }
+  //   // Stow Command
+  //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+  //       .onTrue(
+  //           new StowCommand(
+  //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+  // }
 
   private void configureDriverBindings() {
     FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
@@ -185,22 +184,30 @@ public class RobotContainer {
             driveSubsystem,
             robotStateSubsystem));
 
-    // Vision Shoot Command
-    new JoystickButton(driveJoystick, Button.SWD.id)
-        .onTrue(new VisionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    //   // Vision Shoot Command
+    //   new JoystickButton(driveJoystick, Button.SWD.id)
+    //       .onTrue(new VisionShootCommand(robotStateSubsystem, superStructure,
+    // magazineSubsystem));
 
-    // Stow Command
-    new JoystickButton(driveJoystick, Button.SWD.id)
-        .onTrue(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    //   // Stow Command
+    //   new JoystickButton(driveJoystick, Button.SWD.id)
+    //       .onTrue(
+    //           new StowCommand(
+    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Reset Gyro Command
-    new JoystickButton(driveJoystick, Button.SWD.id).onTrue(new ResetGyroCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_LTRIM_UP.id)
+        .onTrue(new ResetGyroCommand(driveSubsystem));
 
-    // Release Game Piece Command
+    // Intake
     new JoystickButton(driveJoystick, Button.SWD.id)
-        .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, -0.5))
+        .onFalse(new OpenLoopIntakeCommand(intakeSubsystem, 0));
+
+    //   // Release Game Piece Command
+    //   new JoystickButton(driveJoystick, Button.SWD.id)
+    //       .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure,
+    // magazineSubsystem));
   }
 
   public Command getAutonomousCommand() {

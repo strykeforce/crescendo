@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.ElbowConstants;
+import frc.robot.constants.RobotConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -39,12 +40,12 @@ public class ElbowIOFX implements ElbowIO {
 
   @Override
   public void zero() {
-    relSetpointOffset = absSensorInitial - ElbowConstants.kElbowZeroTicks;
+    relSetpointOffset = absSensorInitial - RobotConstants.kElbowZero;
 
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}",
         absSensorInitial,
-        ElbowConstants.kElbowZeroTicks,
+        RobotConstants.kElbowZero,
         relSetpointOffset);
   }
 

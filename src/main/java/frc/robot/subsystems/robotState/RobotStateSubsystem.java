@@ -29,8 +29,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
 
-  private RobotStates curState = RobotStates.STOW;
-  private RobotStates nextState = RobotStates.STOW;
+  private RobotStates curState = RobotStates.IDLE;
+  private RobotStates nextState = RobotStates.IDLE;
 
   private String[][] lookupTable;
 
