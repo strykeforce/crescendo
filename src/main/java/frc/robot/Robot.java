@@ -73,7 +73,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.setCamEnabled(false);
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -98,6 +100,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.setCamEnabled(true);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

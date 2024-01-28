@@ -21,7 +21,6 @@ public class DeadeyeSubsystem extends MeasurableSubsystem {
 
   public DeadeyeSubsystem() {
     cam = new Deadeye<>("W0", TargetListTargetData.class);
-    cam.setEnabled(true);
     borderLengthX = cam.getCapture().width / 3;
     border1 = borderLengthX;
     border2 = borderLengthX + border1;

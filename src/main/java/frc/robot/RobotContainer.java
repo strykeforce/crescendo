@@ -17,9 +17,9 @@ public class RobotContainer {
   DeadeyeSubsystem deadeye;
 
   public RobotContainer() {
-    DeadeyeSubsystem deadeyeSubsystem = new DeadeyeSubsystem();
-    DriveSubsystem driveSubsystem = new DriveSubsystem();
-    VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
+    deadeye = new DeadeyeSubsystem();
+    driveSubsystem = new DriveSubsystem();
+    visionSubsystem = new VisionSubsystem(driveSubsystem);
     configureBindings();
   }
 
@@ -27,5 +27,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
+  }
+
+  public void setCamEnabled(boolean val) {
+    deadeye.setCamEnabled(val);
   }
 }
