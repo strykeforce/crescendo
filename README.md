@@ -20,13 +20,13 @@
 | Drive     | FX       | drive      | 11  |          | 1         | kraken |         |
 | Drive     | FX       | drive      | 12  |          | 19        | kraken |         |
 | Drive     | FX       | drive      | 13  |          | 0         | kraken |         |
-| Intake    | FX       | intake     | 20  |          |           | falcon |         |
-| Magazine  | FX       | magazine   | 25  |          |           | falcon |         |
+| Intake    | FX       | intake     | 20  |          | 3         | falcon |         |
+| Magazine  | FX       | magazine   | 25  |          | 13        | falcon |         |
 | Elbow     | FX       | elbow      | 30  |          | 5         | falcon |         |
 | Elbow     | CANifier | canifier   | 31  |          |           | -      |         |
-| Wrist     | SRX      | wrist      | 35  |          |           | 9015   |         |
-| Shooter   | FX       | leftShoot  | 40  |          |           | falcon |         |
-| Shooter   | FX       | rightShoot | 41  |          |           | falcon |         |
+| Wrist     | SRX      | wrist      | 35  |          | 11        | 9015   |         |
+| Shooter   | FX       | leftShoot  | 40  |          | 12        | falcon |         |
+| Shooter   | FX       | rightShoot | 41  |          | 10        | falcon |         |
 | Climb     | FX       | climb      | 50  |          |           | falcon |         |
 * intake beam break: to wheel 0 azimuth fwd lim
 * magazine y-axis beam break: to wrist fwd lim
