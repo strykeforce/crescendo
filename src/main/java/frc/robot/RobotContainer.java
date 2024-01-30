@@ -209,9 +209,12 @@ public class RobotContainer {
 
     // Release Game Piece Command
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+        .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem))
+        .onFalse(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+        .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem))
+        .onFalse(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    ;
   }
 
   public Command getAutonomousCommand() {
