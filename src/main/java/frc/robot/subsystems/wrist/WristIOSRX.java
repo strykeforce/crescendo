@@ -42,6 +42,8 @@ public class WristIOSRX implements WristIO {
   @Override
   public void updateInputs(WristIOInputs inputs) {
     inputs.position = wrist.getSelectedSensorPosition();
+    inputs.isRevLimitSwitch = wrist.isRevLimitSwitchClosed() == 1;
+    inputs.isFwdLimitSwitchClosed = wrist.isFwdLimitSwitchClosed() == 1;
   }
 
   @Override

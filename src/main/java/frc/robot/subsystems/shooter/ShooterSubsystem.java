@@ -63,6 +63,8 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
     curState = state;
   }
 
+  public void toEmptying() {}
+
   // Helper Methods
 
   // Periodic
@@ -83,6 +85,10 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
       case IDLE:
         break;
+      case PODIUM:
+        break;
+      case EMPTYING:
+        break;
     }
   }
   // Grapher
@@ -101,6 +107,8 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   public enum ShooterStates {
     SHOOT,
     SPEEDUP,
-    IDLE
+    IDLE,
+    PODIUM,
+    EMPTYING
   }
 }

@@ -10,6 +10,7 @@ public interface MagazineIO {
     public double velocity = 0.0;
     public boolean isFwdLimitSwitchClosed = false;
     public boolean isRevLimitSwitchClosed = false;
+    public boolean isSecondFwdLimitSwitchClosed = false;
   }
 
   public default void updateInputs(MagazineIOInputs inputs) {}
