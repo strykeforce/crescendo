@@ -194,16 +194,23 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(
             new StowCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
+        .onFalse(
+            new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Reset Gyro Command
     new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
 
     // X-Lock
-    new JoystickButton(driveJoystick, Button.SWD.id).onTrue(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.SWD.id)
+        .onTrue(new XLockCommand(driveSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
 
     // Release Game Piece Command
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
+        .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
         .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
   }
 
