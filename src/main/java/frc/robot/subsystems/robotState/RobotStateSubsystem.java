@@ -178,6 +178,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_PODIUM);
   }
 
+  public void toDefense() {
+    setState(RobotStates.TO_DEFENSE);
+
+    intakeSubsystem.setPercent(0.0);
+    magazineSubsystem.setPercent(0.0);
+
+    superStructure.defense();
+  }
+
   public void toSubwoofer() {
     driveSubsystem.setIsAligningShot(false);
     intakeSubsystem.setPercent(0.0);
@@ -311,6 +320,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
 
+      case TO_DEFENSE:
+        if (superStructure.isFinished()) {
+          setState(RobotStates.DEFENSE);
+        }
+
       default:
         break;
     }
@@ -342,6 +356,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     SHOOTING,
     TO_PODIUM,
     PODIUM_SHOOTING,
-    TO_SUBWOOFER
+    TO_SUBWOOFER,
+    TO_DEFENSE,
+    DEFENSE
   }
 }

@@ -15,8 +15,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.intake.OpenLoopIntakeCommand;
+import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.robotState.AmpCommand;
+import frc.robot.commands.robotState.DefenseCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
@@ -152,7 +153,7 @@ public class RobotContainer {
 
   private void configureOperatorBindings() {
     // Amp Command
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
         .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Intake Command
@@ -161,15 +162,14 @@ public class RobotContainer {
             new IntakeCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
-    // Open Loop Intake Command
-    new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
-
+    // Defense Command
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
+        .onTrue(
+            new DefenseCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Stow Command
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
+    new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .onTrue(
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
@@ -187,20 +187,23 @@ public class RobotContainer {
             robotStateSubsystem));
 
     // Vision Shoot Command
-    new JoystickButton(driveJoystick, Button.SWD.id)
+    new JoystickButton(driveJoystick, Button.M_SWH.id)
         .onTrue(new VisionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Stow Command
-    new JoystickButton(driveJoystick, Button.SWD.id)
+    new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Reset Gyro Command
-    new JoystickButton(driveJoystick, Button.SWD.id).onTrue(new ResetGyroCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
+
+    // X-Lock
+    new JoystickButton(driveJoystick, Button.SWD.id).onTrue(new XLockCommand(driveSubsystem));
 
     // Release Game Piece Command
-    new JoystickButton(driveJoystick, Button.SWD.id)
+    new JoystickButton(driveJoystick, Button.SWF_UP.id)
         .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
   }
 
