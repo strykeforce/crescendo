@@ -30,7 +30,7 @@
 | Shooter   | FX       | leftShoot  | 40  |          | 12        | falcon |         |
 | Shooter   | FX       | rightShoot | 41  |          | 10        | falcon |         |
 | Climb     | FX       | climb      | 50  |          |           | falcon |         |
-* intake beam break: to wheel 0 azimuth fwd lim
+* intake beam break: to wheel 1 azimuth fwd lim
 * magazine y-axis beam break: to wrist fwd lim
 * magazine z-axis beam break: to wrist rev lim
 *abs encoder for elbow to canifier
