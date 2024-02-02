@@ -1,14 +1,14 @@
-package frc.robot.commands.auto;
+package frc.robot.commands.auton;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
-import frc.robot.commands.drive.ZeroGyroCommand;
+import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.robotState.MinimalRobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
 
-public class newAuto4PieceTurn extends SequentialCommandGroup implements AutoCommandInterface {
+public class NonAmpInitial_WingNotes_B extends SequentialCommandGroup{
 
   DriveAutonCommand firstPath;
   DriveAutonCommand secondPath;
@@ -18,12 +18,12 @@ public class newAuto4PieceTurn extends SequentialCommandGroup implements AutoCom
   DriveAutonCommand fallbackPath;
   DriveAutonCommand fallbackPath2;
   private boolean hasGenerated = false;
-  private Alliance alliance = Alliance.Invalid;
-  private MinimalRobotStateSubsystem robotStateSubsystem;
+  private Alliance alliance = Alliance.Blue;
+  private RobotStateSubsystem robotStateSubsystem;
 
-  public newAuto4PieceTurn(
+  public NonAmpInitial_WingNotes_B(
       DriveSubsystem driveSubsystem,
-      MinimalRobotStateSubsystem robotStateSubsystem,
+      RobotStateSubsystem robotStateSubsystem,
       String pathOne,
       String pathTwo,
       String pathThree,
@@ -37,7 +37,7 @@ public class newAuto4PieceTurn extends SequentialCommandGroup implements AutoCom
     this.robotStateSubsystem = robotStateSubsystem;
 
     addCommands(
-        new ZeroGyroCommand(driveSubsystem),
+        new ResetGyroCommand(driveSubsystem),
         new setAngleOffsetCommand(driveSubsystem, -60.0),
         firstPath,
         secondPath,
