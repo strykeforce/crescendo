@@ -4,6 +4,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public final class AutonConstants {
+  // field width (x) = 16.540988 m;
+  // field height (y) = 8.21055 m;
+
   public final class Setpoints {
     // Starting Positions
     public static final Pose2d MI1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
