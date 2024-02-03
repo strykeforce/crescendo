@@ -75,6 +75,11 @@ public class ElbowIOFX implements ElbowIO {
   }
 
   @Override
+  public void setPct(double percentOutput) {
+      elbow.set(percentOutput);
+  }
+
+  @Override
   public void updateInputs(ElbowIOInputs inputs) {
     inputs.positionRots = currPosition.refresh().getValue();
   }
