@@ -31,15 +31,27 @@ public class LedSubsystem extends MeasurableSubsystem{
         return currState;
     }
 
+    public void setColor(int r, int g, int b) {
+        currState = LedState.SOLID;
+        for (var i = 0; i < ledBuffer.getLength(); i++) {
+            ledBuffer.setRGB(i, r, g, b);
+        }
+    }
+
+    public void setGreen() {
+        setColor(0, 255, 0);
+    }
+
+    public void setFlaming() {
+        currState = LedState.FLAMING;
+    }
+    
+    public void setOff() {
+        currState = LedState.OFF;
+    }
+
     @Override
     public void periodic() {
-        if (intakeSubsystem.getState() == IntakeState.INTAKING) {
-            currState = LedState.FLAMING;
-        } else if (intakeSubsystem.getState() == IntakeState.HAS_PIECE) {
-            currState = LedState.RECIEVED;
-        } else {
-            currState = LedState.OFF;
-        }
 
         switch (currState) {
             case FLAMING:
@@ -47,15 +59,10 @@ public class LedSubsystem extends MeasurableSubsystem{
                     ledBuffer.setRGB(i, 250, (int) (Math.random() * 185), 0);
                 }
                 break;
-            case RECIEVED:
-                for (var i = 0; i < ledBuffer.getLength(); i++) {
-                    ledBuffer.setRGB(i, 5, 250, 21);
-                }
+            case SOLID:
                 break;
             default:
-                for (var i = 0; i < ledBuffer.getLength(); i++) {
-                    ledBuffer.setRGB(i, 0, 0, 0);
-                }
+                setColor(0, 0, 0);
                 break;
         }
     }
@@ -69,8 +76,8 @@ public class LedSubsystem extends MeasurableSubsystem{
 
     public enum LedState {
         OFF,
-        FLAMING,
-        RECIEVED
+        SOLID,
+        FLAMING
     }
     
 }
