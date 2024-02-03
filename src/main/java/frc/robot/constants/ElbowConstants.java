@@ -1,6 +1,9 @@
 package frc.robot.constants;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 
 public final class ElbowConstants {
   public static final int kElbowTalonFxId = 30;
@@ -10,6 +13,9 @@ public final class ElbowConstants {
   // public static final double kElbowZeroTicks = 0;
 
   public static TalonFXConfiguration getFxConfiguration() {
-    return new TalonFXConfiguration();
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    
+
+    return config;
   }
 }
