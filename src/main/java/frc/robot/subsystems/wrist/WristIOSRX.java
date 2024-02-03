@@ -40,6 +40,11 @@ public class WristIOSRX implements WristIO {
   }
 
   @Override
+  public void setPct(double percentOutput) {
+    wrist.set(TalonSRXControlMode.PercentOutput, percentOutput);
+  }
+
+  @Override
   public void updateInputs(WristIOInputs inputs) {
     inputs.position = wrist.getSelectedSensorPosition();
     inputs.isRevLimitSwitch = wrist.isRevLimitSwitchClosed() == 1;

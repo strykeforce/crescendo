@@ -14,6 +14,8 @@ public interface ElbowIO {
 
   public default void setPosition(double position) {}
 
+  public default void setPct(double percentOutput) {}
+
   public default void zero() {}
 
   public default void registerWith(TelemetryService telemetryService) {}
