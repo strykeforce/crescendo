@@ -29,16 +29,21 @@ public final class VisionConstants {
   public static final int kNumCams = 2;
 
   // Names
-  public static final String kCam1Name = "cam1";
-  public static final String kCam2Name = "cam2";
+  public static final String kCam1Name = "Front";
+  public static final String kCam2Name = "Back";
 
   // Indexs
-  public static final int kCam1Idx = 1;
-  public static final int kCam2Idx = 1;
+  public static final int kCam1Idx = 0;
+  public static final int kCam2Idx = 0;
 
   // Poses
-  public static final Pose3d kCam1Pose = new Pose3d(new Translation3d(), new Rotation3d());
-  public static final Pose3d kCam2Pose = new Pose3d(new Translation3d(), new Rotation3d());
+  public static final Pose3d kCam1Pose =
+      new Pose3d(
+          new Translation3d(0.2, 0.30, 0.58), new Rotation3d(0, Units.degreesToRadians(20.0), 0));
+  public static final Pose3d kCam2Pose =
+      new Pose3d(
+          new Translation3d(0.25, 0.34, 0.44),
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(15.0)));
 
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.
