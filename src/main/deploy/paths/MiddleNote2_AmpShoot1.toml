@@ -6,7 +6,7 @@ is_reversed = false
 target_yaw = -90.0 #degrees
 
 [start_pose]
-    dataPoint = "M1"
+    dataPoint = "M2"
 
 [end_pose]
     dataPoint = "AS1"

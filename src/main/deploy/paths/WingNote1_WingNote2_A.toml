@@ -6,8 +6,7 @@ is_reversed = false
 target_yaw = 0.0 #degrees
 
 [start_pose]
-    x = 2.59
-    y = 6.86
+    dataPoint = "W1"
     angle = 30.0
 [end_pose]
     x = 2.59
