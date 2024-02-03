@@ -76,7 +76,7 @@ public class ElbowIOFX implements ElbowIO {
 
   @Override
   public void setPct(double percentOutput) {
-      elbow.set(percentOutput);
+    elbow.set(percentOutput);
   }
 
   @Override
