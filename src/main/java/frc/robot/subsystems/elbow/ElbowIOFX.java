@@ -1,22 +1,22 @@
 package frc.robot.subsystems.elbow;
 
-import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.PWMChannel;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.ElbowConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
-import org.strykeforce.telemetry.measurable.CanifierMeasurable;
+import org.strykeforce.telemetry.measurable.CancoderMeasureable;
 
 public class ElbowIOFX implements ElbowIO {
   private Logger logger;
   private TalonFX elbow;
-  private CANifier remoteEncoder;
+  private CANcoder remoteEncoder;
 
   private double absSensorInitial;
   private double relSetpointOffset;
@@ -31,7 +31,7 @@ public class ElbowIOFX implements ElbowIO {
   public ElbowIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     elbow = new TalonFX(ElbowConstants.kElbowTalonFxId);
-    remoteEncoder = new CANifier(ElbowConstants.kRemoteEncoderID);
+    remoteEncoder = new CANcoder(ElbowConstants.kRemoteEncoderID);
 
     absSensorInitial = elbow.getPosition().getValue();
 
@@ -45,7 +45,8 @@ public class ElbowIOFX implements ElbowIO {
 
   public int getPulseWidthFor(PWMChannel channel) {
     double[] pulseWidthandPeriod = new double[2];
-    remoteEncoder.getPWMInput(channel, pulseWidthandPeriod);
+    // remoteEncoder.getPWMInput(channel, pulseWidthandPeriod);
+    remoteEncoder.getPosition();
     return (int)
         (ElbowConstants.kFxToMechRatio
             / ElbowConstants.kAbsEncoderToMechRatio
@@ -81,6 +82,6 @@ public class ElbowIOFX implements ElbowIO {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(elbow, true);
-    telemetryService.register(new CanifierMeasurable(remoteEncoder));
+    telemetryService.register(new CancoderMeasureable(remoteEncoder));
   }
 }
