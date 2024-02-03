@@ -11,6 +11,12 @@ public final class WristConstants {
   public static final int kMinBeamBreaks = 0;
 
   public static TalonSRXConfiguration getSrxConfiguration() {
-    return new TalonSRXConfiguration();
+    TalonSRXConfiguration config = new TalonSRXConfiguration();
+
+    config.continuousCurrentLimit = 20;
+    config.peakCurrentDuration = 20;
+    config.peakCurrentLimit = 25;
+
+    return config;
   }
 }

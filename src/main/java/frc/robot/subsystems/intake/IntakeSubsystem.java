@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.standards.OpenLoopSubsystem;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -41,6 +42,10 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
   public void toIntaking() {
     setPercent(IntakeConstants.kIntakePercentOutput);
     setState(IntakeState.INTAKING);
+  }
+
+  public void setFwdLimitSwitchSupplier(BooleanSupplier fwdLimitSupplier) {
+    io.setFwdLimitSwitchSupplier(fwdLimitSupplier);
   }
 
   @Override

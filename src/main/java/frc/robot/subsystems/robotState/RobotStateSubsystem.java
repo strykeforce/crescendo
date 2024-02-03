@@ -207,12 +207,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case TO_INTAKING:
         if (superStructure.isFinished()) {
           intakeSubsystem.toIntaking();
-          magazineSubsystem.toIntaking();
           setState(RobotStates.INTAKING);
         }
         break;
 
       case INTAKING:
+        if (intakeSubsystem.isBeamBroken()
+            && magazineSubsystem.getState() != MagazineStates.INTAKING) {
+          magazineSubsystem.toIntaking();
+        }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
 

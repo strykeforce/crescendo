@@ -13,11 +13,16 @@ import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.elbow.OpenLoopElbowCommand;
+import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -76,6 +81,7 @@ public class RobotContainer {
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
 
     magazineSubsystem.setWristSubsystem(wristSubsystem);
+    intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
 
     superStructure =
         new SuperStructure(wristSubsystem, elbowSubsystem, shooterSubsystem, magazineSubsystem);
@@ -153,30 +159,54 @@ public class RobotContainer {
     this.isEvent = isEvent;
   }
 
-  // private void configureOperatorBindings() {
-  //   // Amp Command
-  //   new JoystickButton(xboxController, XboxController.Button.kX.value)
-  //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+  private void configureOperatorBindings() {
+    // Open Loop Wrist
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.1))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.1))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
 
-  //   // Intake Command
-  //   new JoystickButton(xboxController, XboxController.Button.kX.value)
-  //       .onTrue(
-  //           new IntakeCommand(
-  //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // Open Loop Elbow
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, 0.1))
+        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
+        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
 
-  //   // Open Loop Intake Command
-  //   new JoystickButton(xboxController, XboxController.Button.kA.value)
-  //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
+    // Open Loop Magazine
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
+        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, MagazineConstants.kEmptyingSpeed))
+        .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
+    new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, -MagazineConstants.kEmptyingSpeed))
+        .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
-  //   new JoystickButton(xboxController, XboxController.Button.kB.value)
-  //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
+    //   // Amp Command
+    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
-  //   // Stow Command
-  //   new JoystickButton(xboxController, XboxController.Button.kX.value)
-  //       .onTrue(
-  //           new StowCommand(
-  //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-  // }
+    //   // Intake Command
+    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //       .onTrue(
+    //           new IntakeCommand(
+    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    //   // Open Loop Intake Command
+    //   new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
+
+    //   new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
+
+    //   // Stow Command
+    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //       .onTrue(
+    //           new StowCommand(
+    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+  }
 
   private void configureDriverBindings() {
     FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);

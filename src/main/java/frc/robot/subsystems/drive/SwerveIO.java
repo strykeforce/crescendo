@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.telemetry.TelemetryService;
@@ -71,4 +72,8 @@ public interface SwerveIO {
   public default void updateInputs(SwerveIOInputs inputs) {}
 
   public default void registerWith(TelemetryService telemetryService) {}
+
+  public default BooleanSupplier getAzimuth1FwdLimitSwitch() {
+    return () -> false;
+  }
 }
