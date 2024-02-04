@@ -27,7 +27,7 @@ public class WristIOSRX implements WristIO {
 
   @Override
   public void zero() {
-    double absolute = wrist.getSensorCollection().getQuadraturePosition() & 0xFFF;
+    double absolute = wrist.getSensorCollection().getPulseWidthPosition() & 0xFFF;
     double offset = absolute - RobotConstants.kWristZero;
     wrist.setSelectedSensorPosition(offset);
 

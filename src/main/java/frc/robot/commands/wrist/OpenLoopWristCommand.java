@@ -1,9 +1,9 @@
 package frc.robot.commands.wrist;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.wrist.WristSubsystem;
 
-public class OpenLoopWristCommand extends Command {
+public class OpenLoopWristCommand extends InstantCommand {
   private final WristSubsystem wristSubsystem;
   private double percentOutput;
 

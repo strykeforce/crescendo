@@ -22,7 +22,6 @@ import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
-import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -93,7 +92,7 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     configureDriverBindings();
-    // configureOperatorBindings();
+    configureOperatorBindings();
     configureMatchDashboard();
 
     // robotStateSubsystem.setAllianceColor(Alliance.Blue);
@@ -162,10 +161,10 @@ public class RobotContainer {
   private void configureOperatorBindings() {
     // Open Loop Wrist
     new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.1))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.2))
         .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
     new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.1))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.2))
         .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
 
     // Open Loop Elbow
@@ -178,10 +177,10 @@ public class RobotContainer {
 
     // Open Loop Magazine
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, MagazineConstants.kEmptyingSpeed))
+        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, -.2))
         .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, -MagazineConstants.kEmptyingSpeed))
+        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
         .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
     //   // Amp Command
