@@ -1,0 +1,24 @@
+[Unit]
+Description=Deadeye
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+Environment="DOCKER_COMPOSE_FILE=/home/orangepi/deadeye/docker-compose.yml"
+Environment="CAMERA_PATH=/dev/v4l/by-id/usb-Microsoft_Microsoft®_LifeCam_HD-3000-video-index0"
+
+ExecStart=/bin/bash -c '\
+  CAMERA_DEV=$(readlink --canonicalize --no-newline ${CAMERA_PATH}) \
+  docker compose -f "${DOCKER_COMPOSE_FILE}" up --detach \
+  '
+
+ExecStop=/bin/bash -c '\
+  CAMERA_DEV=$(readlink --canonicalize --no-newline ${CAMERA_PATH}) \
+  docker compose -f "${DOCKER_COMPOSE_FILE}" stop \
+  '
+
+[Install]
+WantedBy=multi-user.target
