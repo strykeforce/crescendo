@@ -129,7 +129,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
 
-    org.littletonrobotics.junction.Logger.recordOutput("State", curState.name());
+    org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/State", curState.name());
 
     // cam.getEnabled();
 
