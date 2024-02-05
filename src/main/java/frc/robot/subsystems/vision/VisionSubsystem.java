@@ -198,7 +198,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
       Translation3d centerPose =
           cameraPose
               .getTranslation()
-              .plus(offsets[idx].rotateBy(cameraPose.getRotation().minus(rotsOff[idx])));
+              .minus(offsets[idx].rotateBy(cameraPose.getRotation().minus(rotsOff[idx])));
 
       // If updating with vision go into state machine to update
       if (visionUpdates) {
