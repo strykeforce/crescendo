@@ -175,7 +175,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
       for (int i = 0; i < 2; ++i) {
         double estimatedWeight =
             VisionConstants.kVisionMeasurementStdDevs.get(i, 0)
-                - VisionConstants.kStdDevDecayCoeff
+                + VisionConstants.kStdDevDecayCoeff
                     * (getSeconds() - timeLastVision - VisionConstants.kTimeToDecayDev);
         adaptiveVisionMatrix.set(
             i,
@@ -207,22 +207,22 @@ public class VisionSubsystem extends MeasurableSubsystem {
             // Uses wheels to act as a filter for the cameras
           case TRUSTWHEELS:
             if (isPoseValidWithWheels(result, centerPose)) {
-              String outputAccept =
-                  "VisionSubsystem/AcceptedCam" + res.getSecond().toString() + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
+              String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
+              org.littletonrobotics.junction.Logger.recordOutput(
+                  outputAccept, new Pose2d(centerPose.toTranslation2d(), new Rotation2d()));
 
               driveSubsystem.addVisionMeasurement(
                   new Pose2d(centerPose.toTranslation2d(), new Rotation2d()),
-                  result.getTimeStamp() / 1000000);
+                  result.getTimeStamp() / 1000000,
+                  adaptiveVisionMatrix);
 
-              offWheels--;
+              if (offWheels > 0) offWheels--;
 
             } else {
-
-              String output =
-                  "VisionSubsystem/NotAcceptedCam" + res.getSecond().toString() + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(output, centerPose);
-              offWheels = offWheels < 0 ? 1 : offWheels++;
+              String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
+              org.littletonrobotics.junction.Logger.recordOutput(
+                  output, new Pose2d(centerPose.toTranslation2d(), new Rotation2d()));
+              offWheels++;
               if (offWheels >= VisionConstants.kMaxTimesOffWheels) {
                 logger.info("{} -> TRUSTVISION", curState);
                 curState = VisionStates.TRUSTVISION;
@@ -233,19 +233,20 @@ public class VisionSubsystem extends MeasurableSubsystem {
             // Purely trust vision
           case TRUSTVISION:
             if (isPoseValidWithoutWheels(result)) {
-              String outputAccept =
-                  "VisionSubsystem/AcceptedCam" + res.getSecond().toString() + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(outputAccept, centerPose);
+              String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
+              org.littletonrobotics.junction.Logger.recordOutput(
+                  outputAccept, new Pose2d(centerPose.toTranslation2d(), new Rotation2d()));
               updatesToWheels++;
 
               driveSubsystem.addVisionMeasurement(
                   new Pose2d(centerPose.toTranslation2d(), new Rotation2d()),
-                  result.getTimeStamp() / 1000000);
+                  result.getTimeStamp() / 1000000,
+                  adaptiveVisionMatrix);
 
             } else {
-              String output =
-                  "VisionSubsystem/NotAcceptedCam" + res.getSecond().toString() + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(output, centerPose);
+              String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
+              org.littletonrobotics.junction.Logger.recordOutput(
+                  output, new Pose2d(centerPose.toTranslation2d(), new Rotation2d()));
             }
 
             break;
@@ -257,7 +258,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("State", () -> curState.ordinal()));
+    return Set.of(
+        new Measure("State", () -> curState.ordinal()),
+        new Measure("OffWheels", () -> offWheels),
+        new Measure("Updates To Wheels", () -> updatesToWheels),
+        new Measure("Adaptive Vision Matrix", () -> adaptiveVisionMatrix.get(0, 0)));
   }
 
   @Override
