@@ -73,7 +73,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   // Helper Methods
   public void toIntaking() {
     wristSubsystem.resetFwdBeamCounts();
-    setSpeed(MagazineConstants.kIntakingSpeed);
     setState(MagazineStates.INTAKING);
   }
 
@@ -142,9 +141,20 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
+        if (wristSubsystem.isRevBeamBroken()) {
+          setSpeed(MagazineConstants.kIntakingSpeed);
+        }
         if (wristSubsystem.isFwdBeamBroken()) {
           setSpeed(0.0);
+          setState(MagazineStates.REVERSING);
+        }
+        break;
+      case REVERSING:
+        if(wristSubsystem.isFwdBeamOpen()) {
+          setSpeed(0.0);
           setState(MagazineStates.FULL);
+        } else {
+          setSpeed(MagazineConstants.kReversingSpeed);
         }
         break;
       case EMPTYING:
@@ -185,6 +195,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     EMPTY,
     FULL,
     INTAKING,
+    REVERSING,
     EMPTYING,
     SPEEDUP,
     PREP_PODIUM,

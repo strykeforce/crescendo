@@ -12,6 +12,7 @@ public final class MagazineConstants {
   public static final int kMinBeamBreaks = 3;
   public static final double kIntakingSpeed = -0.5;
   public static final double kEmptyingSpeed = -0.75;
+  public static final double kReversingSpeed = 0.05; //TODO do testing to determine correct speed
 
   public static final double kPodiumPrepareSpeed = 0.1;
 
