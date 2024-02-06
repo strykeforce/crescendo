@@ -7,6 +7,7 @@ import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
@@ -137,7 +138,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.setIsAligningShot(false);
     superStructure.intake();
     intakeSubsystem.toIntaking();
-    magazineSubsystem.toIntaking();
+    // magazineSubsystem.toIntaking();
 
     setState(RobotStates.TO_INTAKING);
   }
@@ -212,8 +213,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case INTAKING:
-        if (intakeSubsystem.isBeamBroken()
-            && magazineSubsystem.getState() != MagazineStates.INTAKING) {
+        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
+            && (magazineSubsystem.getState() != MagazineStates.INTAKING
+                && magazineSubsystem.getState() != MagazineStates.REVERSING)) {
           magazineSubsystem.toIntaking();
         }
         if (magazineSubsystem.hasPiece()) {
@@ -275,6 +277,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           superStructure.stopShoot();
           toIntake();
+          magazineSubsystem.setEmpty();
         }
 
         break;

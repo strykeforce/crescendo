@@ -61,7 +61,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     return curState;
   }
 
-  public void setState(MagazineStates state) {
+  private void setState(MagazineStates state) {
     logger.info("{} -> {}", curState, state);
     curState = state;
   }
@@ -74,6 +74,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   public void toIntaking() {
     wristSubsystem.resetFwdBeamCounts();
     setState(MagazineStates.INTAKING);
+    setSpeed(MagazineConstants.kIntakingSpeed);
   }
 
   public void toEmptying() {
@@ -82,13 +83,19 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.EMPTYING);
   }
 
+  public void setEmpty() {
+    setState(MagazineStates.EMPTY);
+  }
+
   public void preparePodium() {
     setSpeed(MagazineConstants.kPodiumPrepareSpeed);
     setState(MagazineStates.PREP_PODIUM);
   }
 
   public boolean hasPiece() {
-    return curState == MagazineStates.FULL || curState == MagazineStates.EMPTYING;
+    return curState == MagazineStates.FULL
+        || curState == MagazineStates.EMPTYING
+        || curState == MagazineStates.REVERSING;
   }
 
   // public boolean isBeamBroken() {
@@ -141,11 +148,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
-        if (wristSubsystem.isRevBeamBroken()) {
-          setSpeed(MagazineConstants.kIntakingSpeed);
-        }
         if (wristSubsystem.isFwdBeamBroken()) {
-          setSpeed(0.0);
+          setSpeed(MagazineConstants.kReversingSpeed);
           setState(MagazineStates.REVERSING);
         }
         break;
