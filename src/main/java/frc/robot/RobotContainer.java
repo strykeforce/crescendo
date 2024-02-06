@@ -20,9 +20,11 @@ import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
+import frc.robot.commands.robotState.ToggleVirtualSwitchCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
+import frc.robot.subsystems.auto.AutoSwitch;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.Swerve;
@@ -55,6 +57,7 @@ public class RobotContainer {
   private final ElbowSubsystem elbowSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final ClimbSubsystem climbSubsystem;
+  private final AutoSwitch autoSwitch;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -74,6 +77,7 @@ public class RobotContainer {
     climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
+    autoSwitch = new AutoSwitch();
     superStructure =
         new SuperStructure(wristSubsystem, elbowSubsystem, shooterSubsystem, magazineSubsystem);
 
@@ -110,11 +114,26 @@ public class RobotContainer {
             .withProperties(Map.of("colorWhenFalse", "blue"))
             .withSize(2, 2)
             .withPosition(0, 0);
-
     Shuffleboard.getTab("Match")
         .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
         .withSize(1, 1)
         .withPosition(2, 0);
+    Shuffleboard.getTab("Match")
+        .add("VirtualAutonSwitch", autoSwitch.getSendableChooser())
+        .withSize(1, 1)
+        .withPosition(1, 2);
+    Shuffleboard.getTab("Match")
+        .add("ToggleVirtualSwitch", new ToggleVirtualSwitchCommand(autoSwitch))
+        .withSize(1, 1)
+        .withPosition(2, 2);
+    Shuffleboard.getTab("Match")
+        .addBoolean("VirtualSwitchUsed?", () -> autoSwitch.isUseVirtualSwitch())
+        .withSize(1, 1)
+        .withPosition(3, 2);
+    // Shuffleboard.getTab("Match")
+    //     .addString("AutoSwitchPos", () -> autoSwitch.getSwitchPos()) // does not exist yet
+    //     .withSize(1, 1)
+    //     .withPosition(0, 2);
   }
 
   public void configureTelemetry() {

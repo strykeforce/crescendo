@@ -73,12 +73,11 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     logger.info(
-      "Event: {}, Match Type: {}, Match #: {}, Replay #: {}",
-      DriverStation.getEventName(),
-      DriverStation.getMatchType(),
-      DriverStation.getMatchNumber(),
-      DriverStation.getReplayNumber());
-
+        "Event: {}, Match Type: {}, Match #: {}, Replay #: {}",
+        DriverStation.getEventName(),
+        DriverStation.getMatchType(),
+        DriverStation.getMatchNumber(),
+        DriverStation.getReplayNumber());
 
     m_robotContainer = new RobotContainer();
     m_robotContainer.setIsEvent(isEvent);
