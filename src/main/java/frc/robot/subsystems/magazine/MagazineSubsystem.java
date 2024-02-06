@@ -150,7 +150,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         }
         break;
       case REVERSING:
-        if(wristSubsystem.isFwdBeamOpen()) {
+        if (wristSubsystem.isFwdBeamOpen()) {
           setSpeed(0.0);
           setState(MagazineStates.FULL);
         } else {
