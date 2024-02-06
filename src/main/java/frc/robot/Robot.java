@@ -8,8 +8,10 @@ import ch.qos.logback.classic.util.ContextInitializer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.robotState.SetAllianceCommand;
 import frc.robot.constants.BuildConstants;
 import frc.robot.constants.RobotConstants;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -70,12 +72,30 @@ public class Robot extends LoggedRobot {
     }
     Logger.start();
 
+    logger.info(
+      "Event: {}, Match Type: {}, Match #: {}, Replay #: {}",
+      DriverStation.getEventName(),
+      DriverStation.getMatchType(),
+      DriverStation.getMatchNumber(),
+      DriverStation.getReplayNumber());
+
+
     m_robotContainer = new RobotContainer();
     m_robotContainer.setIsEvent(isEvent);
     if (!isEvent) {
       m_robotContainer.configureTelemetry();
       m_robotContainer.configurePitDashboard();
     }
+
+    Shuffleboard.getTab("Match")
+        .add("SetAllianceRed", new SetAllianceCommand(Alliance.Red, m_robotContainer))
+        .withPosition(2, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .add("SetAllianceRed", new SetAllianceCommand(Alliance.Blue, m_robotContainer))
+        .withSize(1, 1)
+        .withPosition(2, 1);
   }
 
   @Override

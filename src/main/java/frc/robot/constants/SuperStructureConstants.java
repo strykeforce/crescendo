@@ -58,4 +58,8 @@ public class SuperStructureConstants {
   public static final double kWristStowSetPoint = 0.0;
   public static final double kElbowStowSetPoint = 0.0;
   public static final double kShooterStowSetPoint = 0.0;
+
+  // CUBE
+  public static final double kWristCubeSetPoint = 0.0;
+  public static final double kElbowCubeSetPoint = 0.0;
 }

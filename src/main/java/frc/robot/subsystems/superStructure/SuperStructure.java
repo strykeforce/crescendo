@@ -239,6 +239,17 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.PODIUM;
   }
 
+  public void cube() {
+    elbowSetpoint = SuperStructureConstants.kElbowCubeSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristCubeSetPoint;
+
+    elbowSubsystem.setPosition(elbowSetpoint);
+    logger.info("{} -> TRANSFER(CUBE)");
+    flipMagazineOut = true;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.CUBE;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -287,6 +298,8 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case SUBWOOFER:
         break;
+      case CUBE:
+        break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState.ordinal());
   }
@@ -315,6 +328,7 @@ public class SuperStructure extends MeasurableSubsystem {
     STOW,
     PODIUM,
     PREP_PODIUM,
-    SUBWOOFER
+    SUBWOOFER,
+    CUBE
   }
 }
