@@ -2,6 +2,8 @@ package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -37,6 +39,21 @@ public final class ElbowConstants {
     config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 24.44;
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -45.15;
+
+    Slot0Configs slot0 = new Slot0Configs();
+    slot0.kP = 0.0;
+    slot0.kI = 0.0;
+    slot0.kD = 0.0;
+    config.Slot0 = slot0;
+
+    MotionMagicConfigs motionMagic =
+        new MotionMagicConfigs()
+            .withMotionMagicAcceleration(0)
+            .withMotionMagicCruiseVelocity(0)
+            .withMotionMagicExpo_kA(0)
+            .withMotionMagicExpo_kV(0)
+            .withMotionMagicJerk(0);
+    config.MotionMagic = motionMagic;
 
     return config;
   }

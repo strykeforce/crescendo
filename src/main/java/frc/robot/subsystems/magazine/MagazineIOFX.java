@@ -54,7 +54,7 @@ public class MagazineIOFX implements MagazineIO {
 
   @Override
   public void setSpeed(double speed) {
-    magazine.setControl(dutyCycleRequest.withOutput(speed));
+    magazine.setControl(velocityRequest.withVelocity(speed));
   }
 
   @Override

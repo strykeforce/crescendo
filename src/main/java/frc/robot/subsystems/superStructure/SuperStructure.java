@@ -84,7 +84,7 @@ public class SuperStructure extends MeasurableSubsystem {
 
     shooterSubsystem.setLeftSpeed(leftShooterSpeed);
     shooterSubsystem.setRightSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(SHOOTING)");
     flipMagazineOut = false;
@@ -99,7 +99,7 @@ public class SuperStructure extends MeasurableSubsystem {
     rightShooterSpeed = SuperStructureConstants.kShooterPreClimbSetPoint;
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(PRE_CLIMB)");
     flipMagazineOut = false;
@@ -114,7 +114,7 @@ public class SuperStructure extends MeasurableSubsystem {
     rightShooterSpeed = SuperStructureConstants.kShooterPostClimbSetPoint;
 
     shooterSubsystem.setSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(POST_CLIMB)");
     flipMagazineOut = false;
@@ -129,7 +129,7 @@ public class SuperStructure extends MeasurableSubsystem {
     rightShooterSpeed = SuperStructureConstants.kShooterAmpSetPoint;
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
-    // elbowSubsystem.setPosition(elbowSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(AMP)");
     flipMagazineOut = true;
@@ -144,7 +144,7 @@ public class SuperStructure extends MeasurableSubsystem {
     rightShooterSpeed = SuperStructureConstants.kShooterTrapSetPoint;
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
-    // elbowSubsystem.setPosition(elbowSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(TRAP)");
     flipMagazineOut = true;
@@ -159,7 +159,7 @@ public class SuperStructure extends MeasurableSubsystem {
     rightShooterSpeed = SuperStructureConstants.kShooterIntakeSetPoint;
 
     shooterSubsystem.setSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(INTAKE)");
     flipMagazineOut = false;
@@ -174,7 +174,7 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed = SuperStructureConstants.kShooterDefenseSetPoint;
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
-    // elbowSubsystem.setPosition(elbowSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(DEFENSE)");
     flipMagazineOut = true;
@@ -189,7 +189,7 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(DEFENSE)");
     flipMagazineOut = false;
@@ -204,7 +204,7 @@ public class SuperStructure extends MeasurableSubsystem {
     rightShooterSpeed = SuperStructureConstants.kShooterSubwooferSetPoint;
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
-    // elbowSubsystem.setPosition(elbowSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     timer.restart();
     timer.start();
@@ -222,7 +222,7 @@ public class SuperStructure extends MeasurableSubsystem {
     rightShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
 
     shooterSubsystem.setSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(PREP_PODIUM)");
     flipMagazineOut = true;
@@ -237,7 +237,7 @@ public class SuperStructure extends MeasurableSubsystem {
     rightShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
 
     shooterSubsystem.setSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(PODIUM)");
     flipMagazineOut = true;

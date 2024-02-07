@@ -36,7 +36,6 @@ public final class WristConstants {
     config.velocityMeasurementWindow = 64;
     config.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
 
-
     return config;
   }
 }

@@ -38,7 +38,7 @@ public final class DriveConstants {
   public static final double kGyroRateStillThreshold = 0.5; // degrees per second
   public static final double kDegreesCloseEnough = 1;
 
-  public static final double kDriveMotorOutputGear = 34; //30
+  public static final double kDriveMotorOutputGear = 34; // 30
   public static final double kDriveInputGear = 42;
   public static final double kBevelInputGear = 15;
   public static final double kBevelOutputGear = 45;

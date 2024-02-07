@@ -60,20 +60,20 @@ public class ShooterIOFX implements ShooterIO {
 
   @Override
   public void setSpeed(double speed) {
-    shooterLeft.setControl(dutyCycleRequest.withOutput(-speed));
+    shooterLeft.setControl(velocityLeftRequest.withVelocity(-speed));
     shooterRight.setControl(
-        dutyCycleRequest.withOutput(
+        velocityRightRequest.withVelocity(
             speed)); // FIXME: figure out which needs to be inverted to shoot = positive
   }
 
   @Override
   public void setLeftSpeed(double speed) {
-    shooterLeft.setControl(dutyCycleRequest.withOutput(speed));
+    shooterLeft.setControl(velocityLeftRequest.withVelocity(speed));
   }
 
   @Override
   public void setRightSpeed(double speed) {
-    shooterRight.setControl(dutyCycleRequest.withOutput(speed));
+    shooterRight.setControl(velocityRightRequest.withVelocity(speed));
   }
 
   @Override
