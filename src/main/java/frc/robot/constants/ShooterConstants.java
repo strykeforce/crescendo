@@ -11,6 +11,7 @@ public final class ShooterConstants {
   public static final double kPodiumSpeed = 0;
 
   public static final TalonFXConfiguration getShooterConfig() {
+    
     return new TalonFXConfiguration();
   }
 

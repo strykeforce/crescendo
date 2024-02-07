@@ -1,6 +1,7 @@
 package frc.robot.constants;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 public final class WristConstants {
   public static final int kWristTalonSrxId = 35;
@@ -22,6 +23,19 @@ public final class WristConstants {
     config.continuousCurrentLimit = 20;
     config.peakCurrentDuration = 20;
     config.peakCurrentLimit = 25;
+
+    config.slot0.kP = 0.0;
+    config.slot0.kI = 0.0;
+    config.slot0.kD = 0.0;
+    config.slot0.kF = 0.0;
+    config.slot0.integralZone = 0;
+    config.slot0.maxIntegralAccumulator = 0;
+    config.slot0.allowableClosedloopError = 0;
+    config.motionCruiseVelocity = 0.0;
+    config.motionAcceleration = 0.0;
+    config.velocityMeasurementWindow = 64;
+    config.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+
 
     return config;
   }
