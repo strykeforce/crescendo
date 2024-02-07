@@ -75,7 +75,7 @@ Install in `/etc/systemd/system/deadeye.service` and reload systemd services:
 systemctl daemon-reload
 ```
 
-## Operation
+## Vision Coprocessor Operation
 
 Start the Deadeye containers with:
 
@@ -118,4 +118,26 @@ Clean up old docker images and containers.
 
 ```sh
 docker system prune
+```
+
+## Client Library Usage
+
+```java
+public class DeadeyeSubsystem extends SubsystemBase {
+
+    Deadeye<TargetListTargetData> deadeye;
+
+    public DeadeyeSubsystem() {
+        deadeye = new Deadeye<>("W0", TargetListTargetData.class);
+    }
+
+    @Override
+    public void periodic() {
+        TargetListTargetData td = deadeye.getTargetData();
+        if (td != null)
+            processTargetData(td);
+        // else target data is stale
+    }
+}
+
 ```
