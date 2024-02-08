@@ -16,11 +16,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -183,6 +185,8 @@ public class RobotContainer {
         .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
         .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
+    new JoystickButton(xboxController, XboxController.Button.kX.value).onTrue(new ClosedLoopWristCommand(wristSubsystem, 0.0/*FIXME */));
+    new JoystickButton(xboxController, XboxController.Button.kY.value).onTrue(new ClosedLoopElbowCommand(elbowSubsystem, 0/*FIXME */));
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
