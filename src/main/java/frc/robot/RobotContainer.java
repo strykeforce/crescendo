@@ -81,7 +81,6 @@ public class RobotContainer {
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
 
-    magazineSubsystem.setWristSubsystem(wristSubsystem);
     intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
 
     superStructure =
