@@ -72,9 +72,9 @@ public class RobotContainer {
   private Boolean isEvent = true;
   public GenericEntry lShooterSpeed;
   public GenericEntry rShooterSpeed;
-  private GenericEntry magazineSpeed;
-  private GenericEntry elbowPos;
-  private GenericEntry duplicateShooters;
+  public GenericEntry magazineSpeed;
+  public GenericEntry elbowPos;
+  public GenericEntry duplicateShooters;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -141,10 +141,8 @@ public class RobotContainer {
         tab.add("left shooter speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     rShooterSpeed =
         tab.add("right shooter speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
-    magazineSpeed =
-        tab.add("Magazine speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
-    elbowPos =
-        tab.add("Elbow Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+    magazineSpeed = tab.add("Magazine speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+    elbowPos = tab.add("Elbow Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     duplicateShooters =
         tab.add("Duplicate Shooters?", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
   }
