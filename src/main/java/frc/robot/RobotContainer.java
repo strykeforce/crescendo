@@ -70,8 +70,11 @@ public class RobotContainer {
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
   private Boolean isEvent = true;
-  public GenericEntry LShooterSpeed;
-  public GenericEntry RShooterSpeed;
+  public GenericEntry lShooterSpeed;
+  public GenericEntry rShooterSpeed;
+  private GenericEntry magazineSpeed;
+  private GenericEntry elbowPos;
+  private GenericEntry duplicateShooters;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -99,6 +102,8 @@ public class RobotContainer {
     configureDriverBindings();
     configureOperatorBindings();
     configureMatchDashboard();
+    configurePitDashboard();
+    configureTuningDashboard();
 
     // robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
@@ -132,12 +137,16 @@ public class RobotContainer {
 
   public void configureTuningDashboard() {
     ShuffleboardTab tab = Shuffleboard.getTab("Tuning");
-    LShooterSpeed =
+    lShooterSpeed =
         tab.add("left shooter speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
-    RShooterSpeed =
+    rShooterSpeed =
         tab.add("right shooter speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
-    // .withSize(1, 1)
-    // .withPosition(0, 0);
+    magazineSpeed =
+        tab.add("Magazine speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+    elbowPos =
+        tab.add("Elbow Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+    duplicateShooters =
+        tab.add("Duplicate Shooters?", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
   }
 
   public void configureTelemetry() {
