@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class RobotConstants {
   private Logger logger = LoggerFactory.getLogger(this.getClass());
-  public static String kProtoSerialNumber = "030dbdd8";
+  public static String kProtoSerialNumber = "032243DF";
   public static boolean isCompBot = (!RobotController.getSerialNumber().equals(kProtoSerialNumber));
 
   public static final int kTalonConfigTimeout = 10; // ms
@@ -38,24 +38,43 @@ public class RobotConstants {
 
   // Constants Different between Comp and Proto
   public static Double kWheelDiameterInches = 3.0;
+  public static Double kElbowZero = 0.11206;
+  public static Double kWristZero = 1132.0;
 
   public RobotConstants() {
+    logger.info("SN: {}, isCompBot: {}", RobotController.getSerialNumber(), isCompBot);
     if (isCompBot) {
       logger.info("Using Comp Robot Constants");
       kWheelDiameterInches = CompConstants.kWheelDiameterInches;
+      kElbowZero = CompConstants.kElbowZero;
+      kWristZero = CompConstants.kWristZero;
     } else {
       logger.info("Using Proto Robot Constants");
       kWheelDiameterInches = ProtoConstants.kWheelDiameterInches;
+      kElbowZero = ProtoConstants.kElbowZero;
+      kWristZero = ProtoConstants.kWristZero;
     }
   }
 
   public static class CompConstants {
     // Drive
     public static final Double kWheelDiameterInches = 3.0;
+
+    // Elbow
+    public static final Double kElbowZero = 0.0;
+
+    // Wrist
+    public static final Double kWristZero = 0.0;
   }
 
   public static class ProtoConstants {
     // Drive
     public static final Double kWheelDiameterInches = 3.0;
+
+    // Elbow
+    public static final Double kElbowZero = 0.11206;
+
+    // Wrist
+    public static final Double kWristZero = 3310.0;
   }
 }

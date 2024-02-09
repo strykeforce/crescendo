@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
+import java.util.function.BooleanSupplier;
 import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
@@ -37,6 +38,8 @@ public class Swerve implements SwerveIO {
   private SF_AHRS ahrs;
 
   private TalonFXConfigurator configurator;
+
+  private BooleanSupplier azimuth1FwdLimitSupplier = () -> false;
 
   public Swerve() {
 
@@ -57,6 +60,10 @@ public class Swerve implements SwerveIO {
       azimuthTalon.enableCurrentLimit(true);
       azimuthTalon.enableVoltageCompensation(true);
       azimuthTalon.setNeutralMode(NeutralMode.Coast);
+
+      if (i == 1)
+        azimuth1FwdLimitSupplier =
+            () -> azimuthTalon.getSensorCollection().isFwdLimitSwitchClosed();
 
       var driveTalon = new TalonFX(i + 10);
       configurator = driveTalon.getConfigurator();
@@ -139,6 +146,10 @@ public class Swerve implements SwerveIO {
 
   public void setGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
+  }
+
+  public BooleanSupplier getAzimuth1FwdLimitSwitch() {
+    return azimuth1FwdLimitSupplier;
   }
 
   public void resetGyro() {

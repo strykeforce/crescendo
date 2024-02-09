@@ -20,8 +20,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   private double setpoint = inputs.velocity;
 
-  private int beamBroken = 0;
-  private int beamOpen = 0;
+  // private int beamBroken = 0;
+  // private int beamOpen = 0;
 
   // Podium Preparation Variables
   private boolean atEdgeOne = false;
@@ -72,13 +72,12 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   // Helper Methods
   public void toIntaking() {
-    beamBroken = 0;
-    setSpeed(MagazineConstants.kIntakingSpeed);
+    wristSubsystem.resetFwdBeamCounts();
     setState(MagazineStates.INTAKING);
   }
 
   public void toEmptying() {
-    beamOpen = 0;
+    wristSubsystem.resetFwdBeamCounts();
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EMPTYING);
   }
@@ -92,30 +91,30 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     return curState == MagazineStates.FULL || curState == MagazineStates.EMPTYING;
   }
 
-  public boolean isBeamBroken() {
-    if (inputs.isFwdLimitSwitchClosed) beamBroken++;
-    else beamBroken = 0;
+  // public boolean isBeamBroken() {
+  //   if (inputs.isFwdLimitSwitchClosed) beamBroken++;
+  //   else beamBroken = 0;
 
-    return beamBroken > MagazineConstants.kMinBeamBreaks;
-  }
+  //   return beamBroken > MagazineConstants.kMinBeamBreaks;
+  // }
 
-  public boolean isBeamOpen() {
-    if (!inputs.isFwdLimitSwitchClosed) beamOpen++;
-    else beamOpen = 0;
+  // public boolean isBeamOpen() {
+  //   if (!inputs.isFwdLimitSwitchClosed) beamOpen++;
+  //   else beamOpen = 0;
 
-    return beamOpen > MagazineConstants.kMinBeamBreaks;
-  }
+  //   return beamOpen > MagazineConstants.kMinBeamBreaks;
+  // }
 
   public boolean isNotePrepped() {
     // If the first edge of the note has been detected, set at edge one to be true
-    if (!atEdgeOne && wristSubsystem.isBeamBroken()) {
+    if (!atEdgeOne && wristSubsystem.isRevBeamBroken()) {
       atEdgeOne = true;
     }
 
     // if the first edge has been detected, and the open space of the note has been
     // detected set
     // past first edge to be true
-    if (atEdgeOne && !pastEdgeOne && wristSubsystem.isBeamOpen()) {
+    if (atEdgeOne && !pastEdgeOne && wristSubsystem.isRevBeamBroken()) {
       pastEdgeOne = true;
     }
 
@@ -123,7 +122,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     // the note has been
     // detected,
     // the note has been prepped.
-    if (atEdgeOne && pastEdgeOne && wristSubsystem.isBeamBroken()) {
+    if (atEdgeOne && pastEdgeOne && wristSubsystem.isRevBeamBroken()) {
       return true;
     } else {
       return false;
@@ -142,16 +141,23 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
-        if (isBeamBroken()) {
+        if (wristSubsystem.isRevBeamBroken()) {
+          setSpeed(MagazineConstants.kIntakingSpeed);
+        }
+        if (wristSubsystem.isFwdBeamBroken()) {
+          setSpeed(0.0);
+          setState(MagazineStates.REVERSING);
+        }
+        break;
+      case REVERSING:
+        if (wristSubsystem.isFwdBeamOpen()) {
           setSpeed(0.0);
           setState(MagazineStates.FULL);
+        } else {
+          setSpeed(MagazineConstants.kReversingSpeed);
         }
         break;
       case EMPTYING:
-        if (isBeamOpen()) {
-          setSpeed(0.0);
-          setState(MagazineStates.EMPTY);
-        }
         break;
       case SPEEDUP:
         if (atShootSpeed()) {
@@ -164,6 +170,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
           setState(MagazineStates.SPEEDUP);
           atEdgeOne = false;
           pastEdgeOne = false;
+          wristSubsystem.resetRevBeamCounts();
         }
         break;
       case SHOOT:
@@ -188,6 +195,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     EMPTY,
     FULL,
     INTAKING,
+    REVERSING,
     EMPTYING,
     SPEEDUP,
     PREP_PODIUM,

@@ -8,6 +8,7 @@ public interface ElbowIO {
   @AutoLog
   public static class ElbowIOInputs {
     public double positionRots = 0.0;
+    public double absRots = 0.0;
   }
 
   public default void updateInputs(ElbowIOInputs inputs) {}

@@ -9,7 +9,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
-public class VisionConstants {
+public final class VisionConstants {
   public static final double kMaxTimeNoVision = 5;
   public static final int kResultsForWheels = 5;
   public static final double kTimeToDecayDev = 3;

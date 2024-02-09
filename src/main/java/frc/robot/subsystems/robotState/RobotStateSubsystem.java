@@ -30,14 +30,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
 
-  private RobotStates curState = RobotStates.STOW;
-  private RobotStates nextState = RobotStates.STOW;
+  private RobotStates curState = RobotStates.IDLE;
+  private RobotStates nextState = RobotStates.IDLE;
 
   private String[][] lookupTable;
 
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
-
   private Timer ampStowTimer = new Timer();
 
   private Alliance allianceColor = Alliance.Blue;
@@ -163,10 +162,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStow() {
     driveSubsystem.setIsAligningShot(false);
-    setState(RobotStates.TO_STOW);
     intakeSubsystem.setPercent(0.0);
     magazineSubsystem.setSpeed(0.0);
     superStructure.stow();
+
+    setState(RobotStates.TO_STOW);
   }
 
   public void toPreparePodium() {
@@ -207,14 +207,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case TO_INTAKING:
         if (superStructure.isFinished()) {
           intakeSubsystem.toIntaking();
-          magazineSubsystem.toIntaking();
           setState(RobotStates.INTAKING);
         }
         break;
 
       case INTAKING:
+        if (intakeSubsystem.isBeamBroken()
+            && magazineSubsystem.getState() != MagazineStates.INTAKING) {
+          magazineSubsystem.toIntaking();
+        }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
+
           intakeSubsystem.setPercent(0);
 
           toStow();
@@ -270,7 +274,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           magazineSubsystem.setSpeed(0);
 
           superStructure.stopShoot();
-          toStow();
+          toIntake();
         }
 
         break;

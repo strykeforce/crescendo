@@ -2,6 +2,12 @@ package frc.robot.constants;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+// import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+// import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+// import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+// import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+// import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+// import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -150,9 +156,4 @@ public final class DriveConstants {
     trajectoryConfig.setEndVelocity(0.0);
     return trajectoryConfig;
   }
-
-  //   // Azimuth Talon Config
-  //   public static SupplyCurrentLimitConfiguration getAzimuthSupplyCurrentLimit() {
-  //     return new SupplyCurrentLimitConfiguration(true, 10, 15, 0.04);
-  //   }
 }
