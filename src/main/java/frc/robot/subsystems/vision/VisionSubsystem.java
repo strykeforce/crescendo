@@ -139,7 +139,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     // If enough time elapses trust vision or if enough time elapses reset the counter
     if ((getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision)
         && (curState != VisionStates.TRUSTVISION)) {
-      logger.info("{} -> TRUSTVISION");
+      //   logger.info("{} -> TRUSTVISION");
       curState = VisionStates.TRUSTVISION;
       adaptiveVisionMatrix.set(0, 0, 0.01);
       adaptiveVisionMatrix.set(1, 0, 0.01);
@@ -156,7 +156,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     // If the counter gets high enough trust wheels
     if ((updatesToWheels >= VisionConstants.kResultsForWheels)
         && curState != VisionStates.TRUSTWHEELS) {
-      logger.info("{} -> TRUSTWHEELS", curState);
+      //   logger.info("{} -> TRUSTWHEELS", curState);
       updatesToWheels = 0;
       offWheels = 0;
       curState = VisionStates.TRUSTWHEELS;

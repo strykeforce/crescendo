@@ -4,7 +4,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.ShooterConstants;
 import org.slf4j.Logger;
@@ -19,10 +19,10 @@ public class ShooterIOFX implements ShooterIO {
   private double setpoint;
 
   TalonFXConfigurator configurator;
-  private VelocityDutyCycle velocityLeftRequest =
-      new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
-  private VelocityDutyCycle velocityRightRequest =
-      new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
+  private MotionMagicVelocityVoltage velocityLeftRequest =
+      new MotionMagicVelocityVoltage(0).withEnableFOC(false).withSlot(0);
+  private MotionMagicVelocityVoltage velocityRightRequest =
+      new MotionMagicVelocityVoltage(0).withEnableFOC(false).withSlot(0);
   private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
   StatusSignal<Double> curLeftVelocity;
   StatusSignal<Double> curRightVelocity;

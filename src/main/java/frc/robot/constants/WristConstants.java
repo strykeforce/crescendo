@@ -11,6 +11,8 @@ public final class WristConstants {
   public static final double kWristZeroTicks = RobotConstants.kWristZero;
   public static final int kMinBeamBreaks = 0;
 
+  public static final double testWristPos = 0.0;
+
   public static TalonSRXConfiguration getSrxConfiguration() {
     TalonSRXConfiguration config = new TalonSRXConfiguration();
 
@@ -20,19 +22,20 @@ public final class WristConstants {
     config.reverseSoftLimitThreshold = -3089.0;
     config.reverseSoftLimitEnable = true;
 
-    config.continuousCurrentLimit = 20;
-    config.peakCurrentDuration = 20;
-    config.peakCurrentLimit = 25;
+    config.continuousCurrentLimit = 10;
+    config.peakCurrentDuration = 40;
+    config.peakCurrentLimit = 15;
 
-    config.slot0.kP = 0.0;
+    config.slot0.kP = 2.0;
     config.slot0.kI = 0.0;
-    config.slot0.kD = 0.0;
-    config.slot0.kF = 0.0;
+    config.slot0.kD = 20.0;
+    config.slot0.kF = 2.0;
     config.slot0.integralZone = 0;
     config.slot0.maxIntegralAccumulator = 0;
     config.slot0.allowableClosedloopError = 0;
-    config.motionCruiseVelocity = 0.0;
-    config.motionAcceleration = 0.0;
+    config.motionCruiseVelocity = 400;
+    config.motionAcceleration = 700;
+    config.neutralDeadband = 0.01;
     config.velocityMeasurementWindow = 64;
     config.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
 

@@ -12,9 +12,9 @@ public final class MagazineConstants {
   // public static final double kFeedingSpeed = 0.5;
   public static final double kShootSpeed = 0;
   public static final int kMinBeamBreaks = 3;
-  public static final double kIntakingSpeed = -0.5;
-  public static final double kEmptyingSpeed = -0.75;
-  public static final double kReversingSpeed = 0.05; // TODO do testing to determine correct speed
+  public static final double kIntakingSpeed = -46;
+  public static final double kEmptyingSpeed = -72;
+  public static final double kReversingSpeed = 4.8; // TODO do testing to determine correct speed
 
   public static final double kPodiumPrepareSpeed = 0.1;
 
@@ -22,18 +22,17 @@ public final class MagazineConstants {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 0.0;
+    slot0.kP = 0.4;
     slot0.kI = 0.0;
     slot0.kD = 0.0;
+    slot0.kS = 0.0;
+    slot0.kV = 0.125;
+    slot0.kA = 0.0;
+    slot0.kG = 0.0;
     config.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(0)
-            .withMotionMagicCruiseVelocity(0)
-            .withMotionMagicExpo_kA(0)
-            .withMotionMagicExpo_kV(0)
-            .withMotionMagicJerk(0);
+        new MotionMagicConfigs().withMotionMagicAcceleration(300).withMotionMagicJerk(5000);
     config.MotionMagic = motionMagic;
 
     return config;
@@ -45,9 +44,9 @@ public final class MagazineConstants {
     config.StatorCurrentLimit = 0.0;
     config.StatorCurrentLimitEnable = false;
 
-    config.SupplyCurrentLimit = 20;
-    config.SupplyCurrentThreshold = 25;
-    config.SupplyTimeThreshold = .02;
+    config.SupplyCurrentLimit = 40;
+    config.SupplyCurrentThreshold = 50;
+    config.SupplyTimeThreshold = 1;
     config.SupplyCurrentLimitEnable = true;
 
     return config;

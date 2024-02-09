@@ -229,7 +229,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_AMP:
         if (superStructure.isFinished()) {
-          magazineSubsystem.toEmptying();
           setState(RobotStates.AMP);
         }
         break;

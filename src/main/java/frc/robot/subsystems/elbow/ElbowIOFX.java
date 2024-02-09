@@ -5,7 +5,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.ElbowConstants;
@@ -25,8 +25,9 @@ public class ElbowIOFX implements ElbowIO {
   private double setpoint;
 
   TalonFXConfigurator configurator;
-  MotionMagicDutyCycle positionRequst =
-      new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
+
+  MotionMagicVoltage positionRequst =
+      new MotionMagicVoltage(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
   StatusSignal<Double> currPosition;
   StatusSignal<Double> currVelocity;
   StatusSignal<Double> absRots;
@@ -66,7 +67,7 @@ public class ElbowIOFX implements ElbowIO {
   public void zero() {
     double absoluteRots = absRots.refresh().getValue();
 
-    relSetpointOffset = absoluteRots - ElbowConstants.kElbowZeroRots;
+    relSetpointOffset = absoluteRots - RobotConstants.kElbowZero;
 
     logger.info("RelSetPoint {}", relSetpointOffset);
     relSetpointOffset =
@@ -79,15 +80,12 @@ public class ElbowIOFX implements ElbowIO {
     elbow.setPosition(relSetpointOffset);
 
     logger.info(
-        "Abs: {}, Zero Pos: {}, Offset: {}",
-        absSensorInitial,
-        RobotConstants.kElbowZero,
-        relSetpointOffset);
+        "Abs: {}, Zero Pos: {}, Offset: {}", absRots, RobotConstants.kElbowZero, relSetpointOffset);
   }
 
   @Override
   public void setPosition(double position) {
-    setpoint = position + relSetpointOffset;
+    setpoint = position;
     elbow.setControl(positionRequst.withPosition(setpoint));
   }
 

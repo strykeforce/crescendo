@@ -4,7 +4,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
@@ -20,8 +20,8 @@ public class MagazineIOFX implements MagazineIO {
   private double setpoint;
 
   private TalonFXConfigurator configurator;
-  private VelocityDutyCycle velocityRequest =
-      new VelocityDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
+  private MotionMagicVelocityVoltage velocityRequest =
+      new MotionMagicVelocityVoltage(0).withEnableFOC(false).withSlot(0);
   private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
   private StatusSignal<Double> currVelocity;
   private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
@@ -54,7 +54,8 @@ public class MagazineIOFX implements MagazineIO {
 
   @Override
   public void setSpeed(double speed) {
-    magazine.setControl(velocityRequest.withVelocity(speed));
+    if (speed == 0.0) magazine.setControl(dutyCycleRequest.withOutput(speed));
+    else magazine.setControl(velocityRequest.withVelocity(speed));
   }
 
   @Override

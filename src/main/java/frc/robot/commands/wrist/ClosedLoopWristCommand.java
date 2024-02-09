@@ -4,23 +4,23 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.wrist.WristSubsystem;
 
 public class ClosedLoopWristCommand extends Command {
-    
-    WristSubsystem wristSubsystem;
-    double setPoint;
 
-    public ClosedLoopWristCommand(WristSubsystem wristSubsystem, double setPoint) {
-        addRequirements(wristSubsystem);
-        this.wristSubsystem = wristSubsystem;
-        this.setPoint = setPoint;
-    }
+  WristSubsystem wristSubsystem;
+  double setPoint;
 
-    @Override
-    public void initialize() {
-        wristSubsystem.setPosition(setPoint);
-    }
+  public ClosedLoopWristCommand(WristSubsystem wristSubsystem, double setPoint) {
+    addRequirements(wristSubsystem);
+    this.wristSubsystem = wristSubsystem;
+    this.setPoint = setPoint;
+  }
 
-    @Override
-    public boolean isFinished() {
-        return wristSubsystem.isFinished();
-    }
+  @Override
+  public void initialize() {
+    wristSubsystem.setPosition(setPoint);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return wristSubsystem.isFinished();
+  }
 }

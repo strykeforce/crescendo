@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 
 public final class ShooterConstants {
   public static final int kLeftShooterTalonID = 40;
@@ -16,18 +17,18 @@ public final class ShooterConstants {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 0.0;
-    slot0.kI = 0.0;
+    slot0.kP = 0.5;
+    slot0.kI = 0.01;
     slot0.kD = 0.0;
+    slot0.kS = 0.0;
+    slot0.kV = 0.110;
+    slot0.kA = 0.0;
+    slot0.kG = 0.0;
+    slot0.GravityType = GravityTypeValue.Elevator_Static;
     config.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(0)
-            .withMotionMagicCruiseVelocity(0)
-            .withMotionMagicExpo_kA(0)
-            .withMotionMagicExpo_kV(0)
-            .withMotionMagicJerk(0);
+        new MotionMagicConfigs().withMotionMagicAcceleration(130).withMotionMagicJerk(1000);
     config.MotionMagic = motionMagic;
 
     return config;
@@ -39,9 +40,9 @@ public final class ShooterConstants {
     config.StatorCurrentLimit = 0.0;
     config.StatorCurrentLimitEnable = false;
 
-    config.SupplyCurrentLimit = 20;
-    config.SupplyCurrentThreshold = 25;
-    config.SupplyTimeThreshold = .02;
+    config.SupplyCurrentLimit = 40;
+    config.SupplyCurrentThreshold = 40;
+    config.SupplyTimeThreshold = 0.5;
     config.SupplyCurrentLimitEnable = true;
 
     return config;

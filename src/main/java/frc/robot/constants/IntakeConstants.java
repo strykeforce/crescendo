@@ -23,7 +23,7 @@ public final class IntakeConstants {
         new CurrentLimitsConfigs()
             .withStatorCurrentLimit(10)
             .withStatorCurrentLimitEnable(false)
-            .withStatorCurrentLimit(20)
+            .withSupplyCurrentLimit(20)
             .withSupplyCurrentThreshold(25)
             .withSupplyCurrentLimitEnable(true)
             .withSupplyTimeThreshold(0.02);
