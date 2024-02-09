@@ -10,7 +10,7 @@ public final class SuperStructureConstants {
 
   // AMP
   public static final double kWristAmpSetPoint = -2469.0;
-  public static final double kElbowAmpSetPoint = -10.35;
+  public static final double kElbowAmpSetPoint = -17.5;
   public static final double kShooterAmpSetPoint = 0.0;
 
   // PRE-CLIMB

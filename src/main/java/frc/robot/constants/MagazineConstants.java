@@ -4,10 +4,11 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 public final class MagazineConstants {
   public static final int kMagazineFalconID = 25;
-  public static final double kCloseEnough = 300;
+  public static final double kCloseEnough = 10;
   public static final double kShootCloseEnough = 500;
   // public static final double kFeedingSpeed = 0.5;
   public static final double kShootSpeed = 0;
@@ -15,6 +16,9 @@ public final class MagazineConstants {
   public static final double kIntakingSpeed = -46;
   public static final double kEmptyingSpeed = -72;
   public static final double kReversingSpeed = 4.8; // TODO do testing to determine correct speed
+  public static final double kReleaseSpeed = 20.0;
+
+  public static final double kReleaseTime = 0.75;
 
   public static final double kPodiumPrepareSpeed = 0.1;
 
@@ -34,6 +38,8 @@ public final class MagazineConstants {
     MotionMagicConfigs motionMagic =
         new MotionMagicConfigs().withMotionMagicAcceleration(300).withMotionMagicJerk(5000);
     config.MotionMagic = motionMagic;
+
+    config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
 
     return config;
   }

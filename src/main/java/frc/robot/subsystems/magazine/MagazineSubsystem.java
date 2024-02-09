@@ -1,8 +1,8 @@
 package frc.robot.subsystems.magazine;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
-import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   private int fwdBeamOpenCount = 0;
   private int revBeamBrokenCount = 0;
   private int revBeamOpenCount = 0;
+
+  private Timer releaseTimer = new Timer();
 
   // Podium Preparation Variables
   private boolean atEdgeOne = false;
@@ -68,22 +70,35 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   // Helper Methods
   public void toIntaking() {
-    resetFwdBeamCounts();
+    resetRevBeamCounts();
+    io.enableRevLimitSwitch(true);
     setState(MagazineStates.INTAKING);
     setSpeed(MagazineConstants.kIntakingSpeed);
   }
 
   public void toEmptying() {
-    resetFwdBeamCounts();
+    resetRevBeamCounts();
+    io.enableRevLimitSwitch(false);
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EMPTYING);
   }
 
+  public void toReleaseGamePiece() {
+    releaseTimer.stop();
+    releaseTimer.reset();
+    releaseTimer.start();
+    setSpeed(MagazineConstants.kReleaseSpeed);
+    setState(MagazineStates.RELEASE);
+  }
+
   public void setEmpty() {
+    io.enableRevLimitSwitch(true);
+    io.setPct(0.0);
     setState(MagazineStates.EMPTY);
   }
 
   public void preparePodium() {
+    io.enableRevLimitSwitch(false);
     setSpeed(MagazineConstants.kPodiumPrepareSpeed);
     setState(MagazineStates.PREP_PODIUM);
   }
@@ -168,13 +183,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
-        if (isFwdBeamBroken()) {
+        if (isRevBeamBroken()) {
           setSpeed(MagazineConstants.kReversingSpeed);
           setState(MagazineStates.REVERSING);
         }
         break;
       case REVERSING:
-        if (isFwdBeamOpen()) {
+        if (isRevBeamOpen()) {
           setSpeed(0.0);
           setState(MagazineStates.FULL);
         } else {
@@ -198,6 +213,11 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         }
         break;
       case SHOOT:
+        break;
+      case RELEASE:
+        if (releaseTimer.hasElapsed(MagazineConstants.kReleaseTime)) {
+          setEmpty();
+        }
         break;
     }
   }
@@ -223,6 +243,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     EMPTYING,
     SPEEDUP,
     PREP_PODIUM,
-    SHOOT
+    SHOOT,
+    RELEASE
   }
 }

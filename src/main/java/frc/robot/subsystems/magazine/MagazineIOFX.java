@@ -44,7 +44,15 @@ public class MagazineIOFX implements MagazineIO {
   public void updateInputs(MagazineIOInputs inputs) {
     inputs.velocity = currVelocity.refresh().getValue();
     inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
-    inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 1;
+    inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 0;
+  }
+
+  @Override
+  public void enableRevLimitSwitch(boolean val) {
+    magazine
+        .getConfigurator()
+        .apply(
+            MagazineConstants.getMagazineConfig().HardwareLimitSwitch.withReverseLimitEnable(val));
   }
 
   @Override

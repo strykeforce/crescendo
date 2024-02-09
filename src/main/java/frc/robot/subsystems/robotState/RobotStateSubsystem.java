@@ -189,7 +189,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // FIXME
   public void releaseGamePiece() {
-    magazineSubsystem.toEmptying();
+    magazineSubsystem.toReleaseGamePiece();
+    setState(RobotStates.RELEASE);
   }
 
   // Periodic
@@ -317,6 +318,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
 
+      case RELEASE:
+        if (magazineSubsystem.getState() != MagazineStates.RELEASE) {
+          toIntake();
+        }
+        break;
+
       default:
         break;
     }
@@ -348,6 +355,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     SHOOTING,
     TO_PODIUM,
     PODIUM_SHOOTING,
-    TO_SUBWOOFER
+    TO_SUBWOOFER,
+    RELEASE
   }
 }

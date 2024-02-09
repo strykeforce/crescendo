@@ -44,8 +44,7 @@ public class SuperStructure extends MeasurableSubsystem {
 
   // Getter/Setter Methods
   public boolean isFinished() {
-    return /*elbowSubsystem.isFinished() && wristSubsystem.isFinished() && */ shooterSubsystem
-        .atSpeed();
+    return elbowSubsystem.isFinished() && wristSubsystem.isFinished() && shooterSubsystem.atSpeed();
   }
 
   public SuperStructureStates getState() {
@@ -193,10 +192,10 @@ public class SuperStructure extends MeasurableSubsystem {
     wristSubsystem.setPosition(wristSetpoint);
     elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
 
-    logger.info("{} -> TRANSFER(DEFENSE)");
+    logger.info("{} -> TRANSFER(STOW)");
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
-    nextState = SuperStructureStates.DEFENSE;
+    nextState = SuperStructureStates.STOW;
   }
 
   public void subwoofer() {
@@ -268,7 +267,7 @@ public class SuperStructure extends MeasurableSubsystem {
         }
 
         // Once all subsystems are at position go into the desired state
-        if (timer.hasElapsed(0.05)) {
+        if (isFinished()) {
           logger.info("TRANSFER -> {}", nextState);
           curState = nextState;
         }

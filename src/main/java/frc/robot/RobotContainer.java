@@ -21,6 +21,7 @@ import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
+import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
@@ -84,7 +85,6 @@ public class RobotContainer {
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
 
-    magazineSubsystem.setWristSubsystem(wristSubsystem);
     intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
 
     superStructure =
@@ -256,10 +256,9 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.M_SWH.id)
         .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
-    //   // Release Game Piece Command
-    //   new JoystickButton(driveJoystick, Button.SWD.id)
-    //       .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure,
-    // magazineSubsystem));
+    // Release Game Piece Command
+    new JoystickButton(driveJoystick, Button.M_SWE.id)
+        .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
   }
 
   public Command getAutonomousCommand() {
