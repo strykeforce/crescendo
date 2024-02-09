@@ -19,5 +19,7 @@ public interface MagazineIO {
 
   public default void setSpeed(double speed) {}
 
+  // public default void setFwdLimitSwitchEnabled(boolean enabled) {}
+
   public default void registerWith(TelemetryService telemetryService) {}
 }

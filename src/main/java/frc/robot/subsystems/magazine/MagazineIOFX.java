@@ -58,6 +58,12 @@ public class MagazineIOFX implements MagazineIO {
     else magazine.setControl(velocityRequest.withVelocity(speed));
   }
 
+  // @Override
+  // public void setFwdLimitSwitchEnabled(boolean enabled) {
+  //     // magazine.setSafetyEnabled(enabled);
+  //     fwdLimitSwitch.
+  // }
+
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(magazine, true);
