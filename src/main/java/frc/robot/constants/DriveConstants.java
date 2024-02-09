@@ -1,12 +1,12 @@
 package frc.robot.constants;
 
-// import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-// import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-// import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-// import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-// import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-// import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -62,60 +62,63 @@ public final class DriveConstants {
     return locs;
   }
 
-  //   public static TalonSRXConfiguration getAzimuthTalonConfig() {
-  //     // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
-  //     TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
+  public static TalonSRXConfiguration getAzimuthTalonConfig() {
+    // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
+    TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
 
-  //     azimuthConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
-  //     azimuthConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+    azimuthConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+    azimuthConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
 
-  //     azimuthConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
-  //     azimuthConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+    azimuthConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+    azimuthConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
 
-  //     azimuthConfig.continuousCurrentLimit = 10;
-  //     azimuthConfig.peakCurrentDuration = 0;
-  //     azimuthConfig.peakCurrentLimit = 0;
+    azimuthConfig.continuousCurrentLimit = 10;
+    azimuthConfig.peakCurrentDuration = 0;
+    azimuthConfig.peakCurrentLimit = 0;
 
-  //     azimuthConfig.slot0.kP = 10.0;
-  //     azimuthConfig.slot0.kI = 0.0;
-  //     azimuthConfig.slot0.kD = 100.0;
-  //     azimuthConfig.slot0.kF = 1.0;
-  //     azimuthConfig.slot0.integralZone = 0;
-  //     azimuthConfig.slot0.allowableClosedloopError = 0;
-  //     azimuthConfig.slot0.maxIntegralAccumulator = 0;
+    azimuthConfig.slot0.kP = 10.0;
+    azimuthConfig.slot0.kI = 0.0;
+    azimuthConfig.slot0.kD = 100.0;
+    azimuthConfig.slot0.kF = 1.0;
+    azimuthConfig.slot0.integralZone = 0;
+    azimuthConfig.slot0.allowableClosedloopError = 0;
+    azimuthConfig.slot0.maxIntegralAccumulator = 0;
 
-  //     azimuthConfig.motionCruiseVelocity = 800;
-  //     azimuthConfig.motionAcceleration = 10_000;
-  //     azimuthConfig.velocityMeasurementWindow = 64;
-  //     azimuthConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
-  //     azimuthConfig.voltageCompSaturation = 12;
-  //     azimuthConfig.voltageMeasurementFilter = 32;
-  //     azimuthConfig.neutralDeadband = 0.04;
-  //     return azimuthConfig;
-  //   }
+    azimuthConfig.motionCruiseVelocity = 800;
+    azimuthConfig.motionAcceleration = 10_000;
+    azimuthConfig.velocityMeasurementWindow = 64;
+    azimuthConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+    azimuthConfig.voltageCompSaturation = 12;
+    azimuthConfig.voltageMeasurementFilter = 32;
+    azimuthConfig.neutralDeadband = 0.04;
+    return azimuthConfig;
+  }
 
-  //   // Drive Falcon Config
-  //   public static TalonFXConfiguration getDriveTalonConfig() {
-  //     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
-  //     driveConfig.supplyCurrLimit.currentLimit = 40;
-  //     driveConfig.supplyCurrLimit.triggerThresholdCurrent = 45;
-  //     driveConfig.supplyCurrLimit.triggerThresholdTime = 1.0;
-  //     driveConfig.supplyCurrLimit.enable = true;
-  //     driveConfig.statorCurrLimit.enable = false;
-  //     driveConfig.slot0.kP = 0.16; // 0.16
-  //     driveConfig.slot0.kI = 0.0002;
-  //     driveConfig.slot0.kD = 0.000;
-  //     driveConfig.slot0.kF = 0.047;
-  //     driveConfig.slot0.integralZone = 500;
-  //     driveConfig.slot0.maxIntegralAccumulator = 150_000;
-  //     driveConfig.slot0.allowableClosedloopError = 0;
-  //     driveConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
-  //     driveConfig.velocityMeasurementWindow = 64;
-  //     driveConfig.voltageCompSaturation = 12;
-  //     driveConfig.neutralDeadband = 0.01;
-  //     driveConfig.voltageMeasurementFilter = 32;
-  //     return driveConfig;
-  //   }
+  // Drive Falcon Config
+  public static TalonFXConfiguration getDriveTalonConfig() {
+    TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+
+    CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
+    currentConfig.SupplyCurrentLimit = 40;
+    currentConfig.SupplyCurrentThreshold = 45;
+    currentConfig.SupplyTimeThreshold = 1.0;
+    currentConfig.SupplyCurrentLimitEnable = true;
+    currentConfig.StatorCurrentLimitEnable = false;
+    driveConfig.CurrentLimits = currentConfig;
+
+    Slot0Configs slot0Config = new Slot0Configs();
+    slot0Config.kP = 0.384375; // 0.16 using phoenix 6 migrate
+    slot0Config.kI = 0.480469; // 0.0002 using phoenix 6 migrate
+    slot0Config.kD = 0.0;
+    slot0Config.kV = 0.112910; // 0.047 using phoenix 6 migrate
+    driveConfig.Slot0 = slot0Config;
+
+    MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
+    motorConfigs.DutyCycleNeutralDeadband = 0.01;
+    driveConfig.MotorOutput = motorConfigs;
+
+    return driveConfig;
+  }
 
   // Holonomic Controller Constants
   public static final double kPHolonomic = 0.25; // 6 0.25
@@ -146,16 +149,6 @@ public final class DriveConstants {
     trajectoryConfig.setStartVelocity(0.0);
     trajectoryConfig.setEndVelocity(0.0);
     return trajectoryConfig;
-  }
-
-  public static TalonSRXConfiguration getAzimuthTalonConfig() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getAzimuthTalonConfig'");
-  }
-
-  public static TalonFXConfiguration getDriveTalonConfig() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getDriveTalonConfig'");
   }
 
   //   // Azimuth Talon Config

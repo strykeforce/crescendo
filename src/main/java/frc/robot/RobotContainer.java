@@ -5,10 +5,13 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -64,6 +67,8 @@ public class RobotContainer {
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
   private Boolean isEvent = true;
+  public GenericEntry LShooterSpeed;
+  public GenericEntry RShooterSpeed;
 
   public RobotContainer() {
     driveSubsystem = new DriveSubsystem(new Swerve());
@@ -115,6 +120,16 @@ public class RobotContainer {
         .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
         .withSize(1, 1)
         .withPosition(2, 0);
+  }
+
+  public void configureTuningDashboard() {
+    ShuffleboardTab tab = Shuffleboard.getTab("Tuning");
+    LShooterSpeed =
+        tab.add("left shooter speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+    RShooterSpeed =
+        tab.add("right shooter speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+    // .withSize(1, 1)
+    // .withPosition(0, 0);
   }
 
   public void configureTelemetry() {
