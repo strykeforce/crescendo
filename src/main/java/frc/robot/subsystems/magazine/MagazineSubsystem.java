@@ -16,12 +16,12 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   private MagazineIOInputsAutoLogged inputs = new MagazineIOInputsAutoLogged();
   private MagazineStates curState = MagazineStates.EMPTY;
   private Logger logger = LoggerFactory.getLogger(MagazineSubsystem.class);
-  private WristSubsystem wristSubsystem;
 
   private double setpoint = inputs.velocity;
-
-  // private int beamBroken = 0;
-  // private int beamOpen = 0;
+  private int fwdBeamBrokenCount = 0;
+  private int fwdBeamOpenCount = 0;
+  private int revBeamBrokenCount = 0;
+  private int revBeamOpenCount = 0;
 
   // Podium Preparation Variables
   private boolean atEdgeOne = false;
@@ -66,19 +66,15 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     curState = state;
   }
 
-  public void setWristSubsystem(WristSubsystem wristSubsystem) {
-    this.wristSubsystem = wristSubsystem;
-  }
-
   // Helper Methods
   public void toIntaking() {
-    wristSubsystem.resetFwdBeamCounts();
+    resetFwdBeamCounts();
     setState(MagazineStates.INTAKING);
     setSpeed(MagazineConstants.kIntakingSpeed);
   }
 
   public void toEmptying() {
-    wristSubsystem.resetFwdBeamCounts();
+    resetFwdBeamCounts();
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EMPTYING);
   }
@@ -98,30 +94,54 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         || curState == MagazineStates.REVERSING;
   }
 
-  // public boolean isBeamBroken() {
-  //   if (inputs.isFwdLimitSwitchClosed) beamBroken++;
-  //   else beamBroken = 0;
+  public boolean isFwdBeamBroken() {
+    if (inputs.isFwdLimitSwitchClosed) fwdBeamBrokenCount++;
+    else fwdBeamBrokenCount = 0;
 
-  //   return beamBroken > MagazineConstants.kMinBeamBreaks;
-  // }
+    return fwdBeamBrokenCount > MagazineConstants.kMinBeamBreaks;
+  }
 
-  // public boolean isBeamOpen() {
-  //   if (!inputs.isFwdLimitSwitchClosed) beamOpen++;
-  //   else beamOpen = 0;
+  public boolean isFwdBeamOpen() {
+    if (!inputs.isFwdLimitSwitchClosed) fwdBeamOpenCount++;
+    else fwdBeamOpenCount = 0;
 
-  //   return beamOpen > MagazineConstants.kMinBeamBreaks;
-  // }
+    return fwdBeamOpenCount > MagazineConstants.kMinBeamBreaks;
+  }
+
+  public void resetFwdBeamCounts() {
+    fwdBeamBrokenCount = 0;
+    fwdBeamOpenCount = 0;
+  }
+
+  public boolean isRevBeamBroken() {
+    if (inputs.isRevLimitSwitchClosed) revBeamBrokenCount++;
+    else revBeamBrokenCount = 0;
+
+    return revBeamBrokenCount > MagazineConstants.kMinBeamBreaks;
+  }
+
+  public boolean isRevBeamOpen() {
+    if (!inputs.isRevLimitSwitchClosed) revBeamOpenCount++;
+    else revBeamOpenCount = 0;
+
+    return revBeamOpenCount > MagazineConstants.kMinBeamBreaks;
+  }
+
+  public void resetRevBeamCounts() {
+    revBeamBrokenCount = 0;
+    revBeamOpenCount = 0;
+  }
 
   public boolean isNotePrepped() {
     // If the first edge of the note has been detected, set at edge one to be true
-    if (!atEdgeOne && wristSubsystem.isRevBeamBroken()) {
+    if (!atEdgeOne && isRevBeamBroken()) {
       atEdgeOne = true;
     }
 
     // if the first edge has been detected, and the open space of the note has been
     // detected set
     // past first edge to be true
-    if (atEdgeOne && !pastEdgeOne && wristSubsystem.isRevBeamBroken()) {
+    if (atEdgeOne && !pastEdgeOne && isRevBeamBroken()) {
       pastEdgeOne = true;
     }
 
@@ -129,7 +149,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     // the note has been
     // detected,
     // the note has been prepped.
-    if (atEdgeOne && pastEdgeOne && wristSubsystem.isRevBeamBroken()) {
+    if (atEdgeOne && pastEdgeOne && isRevBeamBroken()) {
       return true;
     } else {
       return false;
@@ -148,13 +168,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
-        if (wristSubsystem.isFwdBeamBroken()) {
+        if (isFwdBeamBroken()) {
           setSpeed(MagazineConstants.kReversingSpeed);
           setState(MagazineStates.REVERSING);
         }
         break;
       case REVERSING:
-        if (wristSubsystem.isFwdBeamOpen()) {
+        if (isFwdBeamOpen()) {
           setSpeed(0.0);
           setState(MagazineStates.FULL);
         } else {
@@ -174,7 +194,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
           setState(MagazineStates.SPEEDUP);
           atEdgeOne = false;
           pastEdgeOne = false;
-          wristSubsystem.resetRevBeamCounts();
+          resetRevBeamCounts();
         }
         break;
       case SHOOT:
