@@ -7,6 +7,7 @@ import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
@@ -30,14 +31,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
 
-  private RobotStates curState = RobotStates.STOW;
-  private RobotStates nextState = RobotStates.STOW;
+  private RobotStates curState = RobotStates.IDLE;
+  private RobotStates nextState = RobotStates.IDLE;
 
   private String[][] lookupTable;
 
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
-
   private Timer ampStowTimer = new Timer();
 
   private Alliance allianceColor = Alliance.Blue;
@@ -138,7 +138,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.setIsAligningShot(false);
     superStructure.intake();
     intakeSubsystem.toIntaking();
-    magazineSubsystem.toIntaking();
+    // magazineSubsystem.toIntaking();
 
     setState(RobotStates.TO_INTAKING);
   }
@@ -163,10 +163,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStow() {
     driveSubsystem.setIsAligningShot(false);
-    setState(RobotStates.TO_STOW);
     intakeSubsystem.setPercent(0.0);
     magazineSubsystem.setSpeed(0.0);
     superStructure.stow();
+
+    setState(RobotStates.TO_STOW);
   }
 
   public void toPreparePodium() {
@@ -188,7 +189,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // FIXME
   public void releaseGamePiece() {
-    magazineSubsystem.toEmptying();
+    magazineSubsystem.toReleaseGamePiece();
+    setState(RobotStates.RELEASE);
   }
 
   // Periodic
@@ -207,14 +209,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case TO_INTAKING:
         if (superStructure.isFinished()) {
           intakeSubsystem.toIntaking();
-          magazineSubsystem.toIntaking();
           setState(RobotStates.INTAKING);
         }
         break;
 
       case INTAKING:
+        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
+            && (magazineSubsystem.getState() != MagazineStates.INTAKING
+                && magazineSubsystem.getState() != MagazineStates.REVERSING)) {
+          magazineSubsystem.toIntaking();
+        }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
+
           intakeSubsystem.setPercent(0);
 
           toStow();
@@ -223,7 +230,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_AMP:
         if (superStructure.isFinished()) {
-          magazineSubsystem.toEmptying();
           setState(RobotStates.AMP);
         }
         break;
@@ -270,7 +276,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           magazineSubsystem.setSpeed(0);
 
           superStructure.stopShoot();
-          toStow();
+          toIntake();
+          magazineSubsystem.setEmpty();
         }
 
         break;
@@ -311,6 +318,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
 
+      case RELEASE:
+        if (magazineSubsystem.getState() != MagazineStates.RELEASE) {
+          toIntake();
+        }
+        break;
+
       default:
         break;
     }
@@ -342,6 +355,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     SHOOTING,
     TO_PODIUM,
     PODIUM_SHOOTING,
-    TO_SUBWOOFER
+    TO_SUBWOOFER,
+    RELEASE
   }
 }

@@ -13,14 +13,22 @@ import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.intake.OpenLoopIntakeCommand;
+import frc.robot.commands.elbow.ClosedLoopElbowCommand;
+import frc.robot.commands.elbow.OpenLoopElbowCommand;
+import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
-import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.wrist.ClosedLoopWristCommand;
+import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.constants.ElbowConstants;
+import frc.robot.constants.RobotConstants;
+import frc.robot.constants.WristConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -45,6 +53,7 @@ import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
 
+  private final RobotConstants robotConstants;
   private final VisionSubsystem visionSubsystem;
   private final DriveSubsystem driveSubsystem;
   private final SuperStructure superStructure;
@@ -66,6 +75,7 @@ public class RobotContainer {
   private Boolean isEvent = true;
 
   public RobotContainer() {
+    robotConstants = new RobotConstants();
     driveSubsystem = new DriveSubsystem(new Swerve());
     visionSubsystem = new VisionSubsystem(driveSubsystem);
     wristSubsystem = new WristSubsystem(new WristIOSRX());
@@ -74,6 +84,9 @@ public class RobotContainer {
     climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
+
+    intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
+
     superStructure =
         new SuperStructure(wristSubsystem, elbowSubsystem, shooterSubsystem, magazineSubsystem);
 
@@ -87,7 +100,7 @@ public class RobotContainer {
     configureOperatorBindings();
     configureMatchDashboard();
 
-    robotStateSubsystem.setAllianceColor(Alliance.Blue);
+    // robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
     // configureTelemetry();
     // configurePitDashboard();
@@ -124,7 +137,7 @@ public class RobotContainer {
     elbowSubsystem.registerWith(telemetryService);
     shooterSubsystem.registerWith(telemetryService);
     superStructure.registerWith(telemetryService);
-    climbSubsystem.registerWith(telemetryService);
+    // climbSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     robotStateSubsystem.registerWith(telemetryService);
@@ -151,28 +164,55 @@ public class RobotContainer {
   }
 
   private void configureOperatorBindings() {
-    // Amp Command
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    // Open Loop Wrist
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.2))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.2))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
 
-    // Intake Command
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(
-            new IntakeCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // Open Loop Elbow
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, 0.1))
+        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
+        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
 
-    // Open Loop Intake Command
+    // Open Loop Magazine
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
-
+        .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
+        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
+        .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
-    // Stow Command
     new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onTrue(new ClosedLoopWristCommand(wristSubsystem, WristConstants.testWristPos));
+    new JoystickButton(xboxController, XboxController.Button.kY.value)
+        .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, ElbowConstants.kElbowTestPos));
+    //   // Amp Command
+    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+
+    //   // Intake Command
+    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //       .onTrue(
+    //           new IntakeCommand(
+    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    //   // Open Loop Intake Command
+    //   new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
+
+    //   new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
+
+    //   // Stow Command
+    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //       .onTrue(
+    //           new StowCommand(
+    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   private void configureDriverBindings() {
@@ -186,21 +226,38 @@ public class RobotContainer {
             driveSubsystem,
             robotStateSubsystem));
 
-    // Vision Shoot Command
-    new JoystickButton(driveJoystick, Button.SWD.id)
-        .onTrue(new VisionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    //   // Vision Shoot Command
+    //   new JoystickButton(driveJoystick, Button.SWD.id)
+    //       .onTrue(new VisionShootCommand(robotStateSubsystem, superStructure,
+    // magazineSubsystem));
 
-    // Stow Command
+    //   // Stow Command
+    //   new JoystickButton(driveJoystick, Button.SWD.id)
+    //       .onTrue(
+    //           new StowCommand(
+    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    // Reset Gyro Command
+    new JoystickButton(driveJoystick, Button.M_LTRIM_UP.id)
+        .onTrue(new ResetGyroCommand(driveSubsystem));
+
+    // Intake
     new JoystickButton(driveJoystick, Button.SWD.id)
+        .onTrue(
+            new IntakeCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
-    // Reset Gyro Command
-    new JoystickButton(driveJoystick, Button.SWD.id).onTrue(new ResetGyroCommand(driveSubsystem));
+    // Shoot
+    new JoystickButton(driveJoystick, Button.M_SWH.id)
+        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Release Game Piece Command
-    new JoystickButton(driveJoystick, Button.SWD.id)
+    new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
   }
 

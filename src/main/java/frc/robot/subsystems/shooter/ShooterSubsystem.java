@@ -1,6 +1,6 @@
 package frc.robot.subsystems.shooter;
 
-import frc.robot.constants.ShooterConstants;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.standards.*;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -12,13 +12,14 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
 
   // Private Variables
-  ShooterIO io;
-  ShooterStates curState = ShooterStates.IDLE;
+  private ShooterIO io;
+  private ShooterStates curState = ShooterStates.IDLE;
   private double leftSetpoint = 0.0;
   double rightSetpoint = 0.0;
 
   ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
+  Timer timer = new Timer();
 
   // Constructor
   public ShooterSubsystem(ShooterIO io) {
@@ -34,8 +35,7 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   @Override
   public boolean atSpeed() {
-    return Math.abs(inputs.velocityLeft - leftSetpoint) < ShooterConstants.kCloseEnough
-        && Math.abs(inputs.velocityRight - rightSetpoint) < ShooterConstants.kCloseEnough;
+    return timer.hasElapsed(leftSetpoint == 0.0 ? 0.0 : 0.6);
   }
 
   @Override
@@ -43,6 +43,9 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
     leftSetpoint = speed;
     rightSetpoint = -speed; // FIXME: add inversion where appropriate
     io.setSpeed(speed);
+    timer.stop();
+    timer.reset();
+    timer.start();
   }
 
   public void setLeftSpeed(double speed) {

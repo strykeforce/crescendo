@@ -63,17 +63,16 @@ public class DriveTeleopCommand extends Command {
               * yawLimiter.calculate(
                   MathUtil.applyDeadband(
                       yawStick.getAsDouble(), DriveConstants.kDeadbandAllStick)));
-    } else if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
+
+    } else {
       driveSubsystem.drive(
-          -DriveConstants.kMaxSpeedMetersPerSecond
+          DriveConstants.kMaxSpeedMetersPerSecond
               * fwdLimiter.calculate(
-                  MathUtil.applyDeadband(
-                      -fwdStick.getAsDouble(), DriveConstants.kDeadbandAllStick)),
-          -DriveConstants.kMaxSpeedMetersPerSecond
+                  MathUtil.applyDeadband(fwdStick.getAsDouble(), DriveConstants.kDeadbandAllStick)),
+          DriveConstants.kMaxSpeedMetersPerSecond
               * strLimiter.calculate(
-                  MathUtil.applyDeadband(
-                      -strStick.getAsDouble(), DriveConstants.kDeadbandAllStick)),
-          -DriveConstants.kMaxOmega
+                  MathUtil.applyDeadband(strStick.getAsDouble(), DriveConstants.kDeadbandAllStick)),
+          -DriveConstants.kMaxAccelOmega
               * yawLimiter.calculate(
                   MathUtil.applyDeadband(
                       yawStick.getAsDouble(), DriveConstants.kDeadbandAllStick)));

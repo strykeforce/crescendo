@@ -1,9 +1,9 @@
 package frc.robot.commands.elbow;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 
-public class OpenLoopElbowCommand extends Command {
+public class OpenLoopElbowCommand extends InstantCommand {
   private final ElbowSubsystem elbowSubsystem;
   private double percentOutput;
 

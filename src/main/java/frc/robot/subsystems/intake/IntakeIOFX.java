@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.IntakeConstants;
+import java.util.function.BooleanSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -18,6 +19,7 @@ public class IntakeIOFX implements IntakeIO {
   TalonFXConfigurator configurator;
   private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
   StatusSignal<Double> currVelocity;
+  BooleanSupplier fwdLimitSupplier = () -> false;
 
   public IntakeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -36,8 +38,14 @@ public class IntakeIOFX implements IntakeIO {
   }
 
   @Override
+  public void setFwdLimitSwitchSupplier(BooleanSupplier fwdLimitSupplier) {
+    this.fwdLimitSupplier = fwdLimitSupplier;
+  }
+
+  @Override
   public void updateInputs(IntakeIOInputs inputs) {
     inputs.velocity = currVelocity.refresh().getValue();
+    inputs.isFwdLimitSwitchClosed = fwdLimitSupplier.getAsBoolean();
   }
 
   @Override
