@@ -147,6 +147,19 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     revBeamOpenCount = 0;
   }
 
+  public void enableFwdLimitSwitch(boolean enabled) {
+    io.enableFwdLimitSwitch(enabled);
+  }
+
+  public void enableRevLimitSwitch(boolean enabled) {
+    io.enableRevLimitSwitch(enabled);
+  }
+
+  public void enableLimitSwitches(boolean enabled) {
+    io.enableFwdLimitSwitch(enabled);
+    io.enableRevLimitSwitch(enabled);
+  }
+
   public boolean isNotePrepped() {
     // If the first edge of the note has been detected, set at edge one to be true
     if (!atEdgeOne && isRevBeamBroken()) {

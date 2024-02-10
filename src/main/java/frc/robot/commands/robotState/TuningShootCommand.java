@@ -6,6 +6,7 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.wrist.WristSubsystem;
 
 public class TuningShootCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
@@ -27,6 +28,8 @@ public class TuningShootCommand extends Command {
 
   @Override
   public void initialize() {
+    magazineSubsystem.enableLimitSwitches(false);
+    magazineSubsystem.setSpeed(robotContainer.magazineSpeed.getDouble(0.0));
     superStructure.shoot(
         robotContainer.lShooterSpeed.getDouble(0.0),
         robotContainer.duplicateShooters.getBoolean(true)

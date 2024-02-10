@@ -23,5 +23,7 @@ public interface MagazineIO {
 
   public default void registerWith(TelemetryService telemetryService) {}
 
-  public default void enableRevLimitSwitch(boolean val) {}
+  public default void enableFwdLimitSwitch(boolean enabled) {}
+
+  public default void enableRevLimitSwitch(boolean enabled) {}
 }
