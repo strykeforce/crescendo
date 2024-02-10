@@ -5,7 +5,7 @@ import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 public final class WristConstants {
   public static final int kWristTalonSrxId = 35;
-  public static final double kCloseEnoughTicks = 11.4;
+  public static final double kCloseEnoughTicks = 20.0;
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
   public static final double kWristZeroTicks = RobotConstants.kWristZero;

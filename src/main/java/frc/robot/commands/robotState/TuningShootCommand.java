@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
-import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class TuningShootCommand extends Command {
@@ -46,7 +45,7 @@ public class TuningShootCommand extends Command {
     magazineSubsystem.setSpeed(magazineSpeed);
     intakeSubsystem.toIntaking();
     superStructure.shoot(
-        lShooterSpeed, duplicateShooters ? lShooterSpeed : rShooterSpeed, elbowPos);
+        -lShooterSpeed, duplicateShooters ? lShooterSpeed : rShooterSpeed, elbowPos);
   }
 
   @Override

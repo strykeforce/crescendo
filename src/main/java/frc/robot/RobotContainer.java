@@ -167,10 +167,7 @@ public class RobotContainer {
     tab.add(
         "stop",
         new TuningOffCommand(
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem));
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void configureTelemetry() {
