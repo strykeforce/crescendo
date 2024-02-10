@@ -1,32 +1,34 @@
 package frc.robot.commands.robotState;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
-public class TuningShootCommand extends Command {
+public class TuningShootCommand extends InstantCommand {
   RobotStateSubsystem robotStateSubsystem;
   SuperStructure superStructure;
   MagazineSubsystem magazineSubsystem;
   IntakeSubsystem intakeSubsystem;
-  double lShooterSpeed;
-  double rShooterSpeed;
-  double magazineSpeed;
-  double elbowPos;
-  boolean duplicateShooters;
+  DoubleSupplier lShooterSpeed;
+  DoubleSupplier rShooterSpeed;
+  DoubleSupplier magazineSpeed;
+  DoubleSupplier elbowPos;
+  BooleanSupplier duplicateShooters;
 
   public TuningShootCommand(
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
-      double lShooterSpeed,
-      double rShooterSpeed,
-      double magazineSpeed,
-      double elbowPos,
-      boolean duplicateShooters) {
+      DoubleSupplier lShooterSpeed,
+      DoubleSupplier rShooterSpeed,
+      DoubleSupplier magazineSpeed,
+      DoubleSupplier elbowPos,
+      BooleanSupplier duplicateShooters) {
     addRequirements(superStructure, magazineSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
     this.superStructure = superStructure;
@@ -41,15 +43,12 @@ public class TuningShootCommand extends Command {
 
   @Override
   public void initialize() {
-    magazineSubsystem.enableLimitSwitches(false);
-    magazineSubsystem.setSpeed(magazineSpeed);
-    intakeSubsystem.toIntaking();
-    superStructure.shoot(
-        -lShooterSpeed, duplicateShooters ? lShooterSpeed : rShooterSpeed, elbowPos);
-  }
-
-  @Override
-  public boolean isFinished() {
-    return (superStructure.isFinished());
+    superStructure.saveSetpoint(
+        -lShooterSpeed.getAsDouble(),
+        duplicateShooters.getAsBoolean()
+            ? lShooterSpeed.getAsDouble()
+            : rShooterSpeed.getAsDouble(),
+        elbowPos.getAsDouble());
+    robotStateSubsystem.setMagazineTune(magazineSpeed.getAsDouble());
   }
 }

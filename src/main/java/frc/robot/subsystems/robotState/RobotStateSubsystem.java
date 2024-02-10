@@ -42,6 +42,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private Alliance allianceColor = Alliance.Blue;
 
+  private double magazineTuneSpeed = 0.0;
+
   // Constructor
   public RobotStateSubsystem(
       VisionSubsystem visionSubsystem,
@@ -133,6 +135,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return shootSolution;
   }
 
+  public void setMagazineTune(double speed) {
+    magazineTuneSpeed = speed;
+  }
+
   // Control Methods
   public void toIntake() {
     driveSubsystem.setIsAligningShot(false);
@@ -191,6 +197,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void releaseGamePiece() {
     magazineSubsystem.toReleaseGamePiece();
     setState(RobotStates.RELEASE);
+  }
+
+  public void toTune() {
+    setState(RobotStates.TO_TUNE);
+    superStructure.shootTune();
   }
 
   // Periodic
@@ -323,7 +334,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toIntake();
         }
         break;
+      case TO_TUNE:
+        if (superStructure.isFinished()) {
+          magazineSubsystem.toEmptying(magazineTuneSpeed);
 
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+
+          setState(RobotStates.SHOOTING);
+        }
+        break;
       default:
         break;
     }
@@ -356,6 +377,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_PODIUM,
     PODIUM_SHOOTING,
     TO_SUBWOOFER,
-    RELEASE
+    RELEASE,
+    TO_TUNE
   }
 }

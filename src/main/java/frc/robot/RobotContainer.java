@@ -21,12 +21,12 @@ import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
-import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
@@ -159,11 +159,11 @@ public class RobotContainer {
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
-            lShooterSpeed.getDouble(0.0),
-            rShooterSpeed.getDouble(0.0),
-            magazineSpeed.getDouble(0.0),
-            elbowPos.getDouble(0.0),
-            duplicateShooters.getBoolean(true)));
+            () -> lShooterSpeed.getDouble(0.0),
+            () -> rShooterSpeed.getDouble(0.0),
+            () -> magazineSpeed.getDouble(0.0),
+            () -> elbowPos.getDouble(0.0),
+            () -> duplicateShooters.getBoolean(true)));
     tab.add(
         "stop",
         new TuningOffCommand(
@@ -224,8 +224,7 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kA.value)
         .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
-        .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
+        .onTrue(new TunedShotCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(new ClosedLoopWristCommand(wristSubsystem, WristConstants.testWristPos));

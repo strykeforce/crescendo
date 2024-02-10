@@ -83,6 +83,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.EMPTYING);
   }
 
+  public void toEmptying(double speed) {
+    resetRevBeamCounts();
+    io.enableRevLimitSwitch(false);
+    setSpeed(speed);
+    setState(MagazineStates.EMPTYING);
+  }
+
   public void toReleaseGamePiece() {
     releaseTimer.stop();
     releaseTimer.reset();

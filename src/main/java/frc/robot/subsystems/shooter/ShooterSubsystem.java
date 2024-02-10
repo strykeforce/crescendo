@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.ShooterConstants;
 import frc.robot.standards.*;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -35,7 +36,8 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   @Override
   public boolean atSpeed() {
-    return timer.hasElapsed(leftSetpoint == 0.0 ? 0.0 : 0.6);
+    return Math.abs(inputs.velocityLeft - leftSetpoint) < ShooterConstants.kCloseEnough
+        && Math.abs(inputs.velocityRight - rightSetpoint) < ShooterConstants.kCloseEnough;
   }
 
   @Override
