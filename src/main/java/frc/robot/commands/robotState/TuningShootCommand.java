@@ -1,5 +1,6 @@
 package frc.robot.commands.robotState;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -7,40 +8,52 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
-import frc.robot.subsystems.wrist.WristSubsystem;
 
 public class TuningShootCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
   SuperStructure superStructure;
   MagazineSubsystem magazineSubsystem;
-  RobotContainer robotContainer;
   IntakeSubsystem intakeSubsystem;
+  double lShooterSpeed;
+  double rShooterSpeed;
+  double magazineSpeed;
+  double elbowPos;
+  boolean duplicateShooters;
 
   public TuningShootCommand(
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
-      RobotContainer robotContainer,
-      IntakeSubsystem intakeSubsystem) {
+      IntakeSubsystem intakeSubsystem,
+      double lShooterSpeed,
+      double rShooterSpeed,
+      double magazineSpeed,
+      double elbowPos,
+      boolean duplicateShooters) {
     addRequirements(superStructure, magazineSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
     this.superStructure = superStructure;
     this.magazineSubsystem = magazineSubsystem;
-    this.robotContainer = robotContainer;
     this.intakeSubsystem = intakeSubsystem;
+    this.lShooterSpeed = lShooterSpeed;
+    this.rShooterSpeed = rShooterSpeed;
+    this.magazineSpeed = magazineSpeed;
+    this.elbowPos = elbowPos;
+    this.duplicateShooters = duplicateShooters;
+
   }
 
   @Override
   public void initialize() {
     magazineSubsystem.enableLimitSwitches(false);
-    magazineSubsystem.setSpeed(robotContainer.magazineSpeed.getDouble(0.0));
+    magazineSubsystem.setSpeed(magazineSpeed);
     intakeSubsystem.toIntaking();
     superStructure.shoot(
-        robotContainer.lShooterSpeed.getDouble(0.0),
-        robotContainer.duplicateShooters.getBoolean(true)
-            ? robotContainer.lShooterSpeed.getDouble(0.0)
-            : robotContainer.rShooterSpeed.getDouble(0.0),
-        robotContainer.elbowPos.getDouble(0.0));
+        lShooterSpeed,
+        duplicateShooters
+            ? lShooterSpeed
+            : rShooterSpeed,
+        elbowPos);
   }
 
   @Override

@@ -16,7 +16,7 @@ public final class ElbowConstants {
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
 
-  public static final double kAbsEncoderToMechRatio = 68.0/38.0;
+  public static final double kAbsEncoderToMechRatio = 68.0 / 38.0;
   public static final double kFxGearbox = 50;
   public static final double kFxPulley = 2;
   public static final double kFxChain = 50.0 / 24.0;

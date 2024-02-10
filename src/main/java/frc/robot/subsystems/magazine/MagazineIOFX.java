@@ -52,7 +52,9 @@ public class MagazineIOFX implements MagazineIO {
     magazine
         .getConfigurator()
         .apply(
-            MagazineConstants.getMagazineConfig().HardwareLimitSwitch.withForwardLimitEnable(enabled));
+            MagazineConstants.getMagazineConfig()
+                .HardwareLimitSwitch
+                .withForwardLimitEnable(enabled));
   }
 
   @Override
@@ -60,7 +62,9 @@ public class MagazineIOFX implements MagazineIO {
     magazine
         .getConfigurator()
         .apply(
-            MagazineConstants.getMagazineConfig().HardwareLimitSwitch.withReverseLimitEnable(enabled));
+            MagazineConstants.getMagazineConfig()
+                .HardwareLimitSwitch
+                .withReverseLimitEnable(enabled));
   }
 
   @Override
