@@ -151,7 +151,18 @@ public class RobotContainer {
     elbowPos = tab.add("Elbow Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     duplicateShooters =
         tab.add("Duplicate Shooters?", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-    tab.add("shoot", new TuningShootCommand(robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, lShooterSpeed.getDouble(0.0), rShooterSpeed.getDouble(0.0), magazineSpeed.getDouble(0.0), elbowPos.getDouble(0.0), duplicateShooters.getBoolean(true)));
+    tab.add(
+        "shoot",
+        new TuningShootCommand(
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            lShooterSpeed.getDouble(0.0),
+            rShooterSpeed.getDouble(0.0),
+            magazineSpeed.getDouble(0.0),
+            elbowPos.getDouble(0.0),
+            duplicateShooters.getBoolean(true)));
   }
 
   public void configureTelemetry() {
