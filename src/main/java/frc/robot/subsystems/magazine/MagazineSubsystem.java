@@ -107,7 +107,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   public boolean hasPiece() {
     return curState == MagazineStates.FULL
         || curState == MagazineStates.EMPTYING
-        || curState == MagazineStates.REVERSING;
+        || curState == MagazineStates.REVERSING
+        || curState == MagazineStates.RELEASE;
   }
 
   public boolean isFwdBeamBroken() {

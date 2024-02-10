@@ -179,7 +179,9 @@ public class RobotContainer {
 
     // Open Loop Magazine
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+        .onTrue(
+            new AmpCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kB.value)
         .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
         .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));

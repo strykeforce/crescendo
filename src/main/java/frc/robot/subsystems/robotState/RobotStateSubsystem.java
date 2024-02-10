@@ -42,6 +42,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private Alliance allianceColor = Alliance.Blue;
 
+  private boolean safeStow = false;
+
   // Constructor
   public RobotStateSubsystem(
       VisionSubsystem visionSubsystem,
@@ -134,10 +136,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Control Methods
+
+  public void toSafeIntake() {
+    driveSubsystem.setIsAligningShot(false);
+    superStructure.safeIntake();
+    // magazineSubsystem.toIntaking();
+    magazineSubsystem.setEmpty();
+    setState(RobotStates.TO_INTAKING);
+  }
+
   public void toIntake() {
     driveSubsystem.setIsAligningShot(false);
     superStructure.intake();
-    intakeSubsystem.toIntaking();
     // magazineSubsystem.toIntaking();
     magazineSubsystem.setEmpty();
     setState(RobotStates.TO_INTAKING);
@@ -146,6 +156,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toAmp() {
     driveSubsystem.setIsAligningShot(false);
     superStructure.amp();
+    intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_AMP);
   }
@@ -159,6 +170,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
     setState(RobotStates.TO_SHOOT);
+  }
+
+  public void toStowSafe() {
+    driveSubsystem.setIsAligningShot(false);
+    intakeSubsystem.setPercent(0.0);
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.safeStow();
+
+    setState(RobotStates.TO_STOW);
   }
 
   public void toStow() {
@@ -183,16 +203,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.setIsAligningShot(false);
     intakeSubsystem.setPercent(0.0);
     superStructure.subwoofer();
+    intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_SUBWOOFER);
   }
 
   // FIXME
   public void releaseGamePiece() {
-    if (curState == RobotStates.AMP) {
-      magazineSubsystem.toReleaseGamePiece();
-      setState(RobotStates.RELEASE);
-    }
     if (curState == RobotStates.TO_PODIUM) {
       superStructure.podiumShoot();
 
@@ -201,6 +218,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineShootDelayTimer.start();
 
       setState(RobotStates.PODIUM_SHOOTING);
+    } else {
+      safeStow = curState == RobotStates.AMP;
+      magazineSubsystem.toReleaseGamePiece();
+      setState(RobotStates.RELEASE);
     }
   }
 
@@ -258,7 +279,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           ampStowTimer.reset();
           ampStowTimer.start();
 
-          toStow(); // FIXME: call stow() and possibly wait for timeout
+          toStowSafe(); // FIXME: call stow() and possibly wait for timeout
         }
         break;
 
@@ -332,7 +353,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case RELEASE:
         if (magazineSubsystem.getState() != MagazineStates.RELEASE) {
-          toIntake();
+          if (safeStow) toSafeIntake();
+          else toIntake();
+          safeStow = false;
         }
         break;
 
