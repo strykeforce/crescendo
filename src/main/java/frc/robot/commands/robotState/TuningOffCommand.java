@@ -7,46 +7,30 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class TuningShootCommand extends Command {
+public class TuningOffCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
   SuperStructure superStructure;
   MagazineSubsystem magazineSubsystem;
   IntakeSubsystem intakeSubsystem;
-  double lShooterSpeed;
-  double rShooterSpeed;
-  double magazineSpeed;
-  double elbowPos;
-  boolean duplicateShooters;
 
-  public TuningShootCommand(
+  public TuningOffCommand(
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
-      IntakeSubsystem intakeSubsystem,
-      double lShooterSpeed,
-      double rShooterSpeed,
-      double magazineSpeed,
-      double elbowPos,
-      boolean duplicateShooters) {
+      IntakeSubsystem intakeSubsystem) {
     addRequirements(superStructure, magazineSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
     this.superStructure = superStructure;
     this.magazineSubsystem = magazineSubsystem;
     this.intakeSubsystem = intakeSubsystem;
-    this.lShooterSpeed = lShooterSpeed;
-    this.rShooterSpeed = rShooterSpeed;
-    this.magazineSpeed = magazineSpeed;
-    this.elbowPos = elbowPos;
-    this.duplicateShooters = duplicateShooters;
   }
 
   @Override
   public void initialize() {
-    magazineSubsystem.enableLimitSwitches(false);
-    magazineSubsystem.setSpeed(magazineSpeed);
-    intakeSubsystem.toIntaking();
-    superStructure.shoot(
-        lShooterSpeed, duplicateShooters ? lShooterSpeed : rShooterSpeed, elbowPos);
+    magazineSubsystem.enableLimitSwitches(true);
+    magazineSubsystem.setSpeed(0.0);
+    intakeSubsystem.stopIntaking();
+    superStructure.stopShoot();
   }
 
   @Override

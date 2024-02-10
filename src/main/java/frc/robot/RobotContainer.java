@@ -150,7 +150,7 @@ public class RobotContainer {
     magazineSpeed = tab.add("Magazine speed", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     elbowPos = tab.add("Elbow Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     duplicateShooters =
-        tab.add("Duplicate Shooters?", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+        tab.add("Duplicate Shooters?", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     tab.add(
         "shoot",
         new TuningShootCommand(
