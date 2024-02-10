@@ -67,6 +67,10 @@ public class SuperStructure extends MeasurableSubsystem {
     shooterSubsystem.setSpeed(0.0);
   }
 
+  public void slowWheelSpin() {
+    shooterSubsystem.setSpeed(-0.5);
+  }
+
   public void stopPodiumShoot() {
     logger.info("Stop Magazine Belts");
     magazineSubsystem.setSpeed(0.0);
@@ -223,11 +227,12 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
     rightShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
 
-    // shooterSubsystem.setSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    shooterSubsystem.setSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(PREP_PODIUM)");
-    flipMagazineOut = true;
+    flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.PREP_PODIUM;
   }
@@ -238,11 +243,12 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
     rightShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
 
-    // shooterSubsystem.setSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    shooterSubsystem.setSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(PODIUM)");
-    flipMagazineOut = true;
+    flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.PODIUM;
   }

@@ -139,7 +139,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.intake();
     intakeSubsystem.toIntaking();
     // magazineSubsystem.toIntaking();
-
+    magazineSubsystem.setEmpty();
     setState(RobotStates.TO_INTAKING);
   }
 
@@ -189,8 +189,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // FIXME
   public void releaseGamePiece() {
-    magazineSubsystem.toReleaseGamePiece();
-    setState(RobotStates.RELEASE);
+    if (curState == RobotStates.AMP) {
+      magazineSubsystem.toReleaseGamePiece();
+      setState(RobotStates.RELEASE);
+    }
+    if (curState == RobotStates.TO_PODIUM) {
+      superStructure.podiumShoot();
+
+      magazineShootDelayTimer.stop();
+      magazineShootDelayTimer.reset();
+      magazineShootDelayTimer.start();
+
+      setState(RobotStates.PODIUM_SHOOTING);
+    }
   }
 
   // Periodic
@@ -284,17 +295,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_PODIUM:
         if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
-          superStructure.stopShoot();
+          superStructure.slowWheelSpin();
         }
-        if (superStructure.isFinished() && magazineSubsystem.getState() == MagazineStates.SHOOT) {
-          superStructure.podiumShoot();
+        // if (superStructure.isFinished() && magazineSubsystem.getState() == MagazineStates.SHOOT)
+        // {
+        //   superStructure.podiumShoot();
 
-          magazineShootDelayTimer.stop();
-          magazineShootDelayTimer.reset();
-          magazineShootDelayTimer.start();
+        //   magazineShootDelayTimer.stop();
+        //   magazineShootDelayTimer.reset();
+        //   magazineShootDelayTimer.start();
 
-          setState(RobotStates.PODIUM_SHOOTING);
-        }
+        //   setState(RobotStates.PODIUM_SHOOTING);
+        // }
         break;
 
       case PODIUM_SHOOTING:

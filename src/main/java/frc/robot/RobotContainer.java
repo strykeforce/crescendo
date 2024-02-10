@@ -16,19 +16,16 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
+import frc.robot.commands.robotState.PodiumCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
-import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
-import frc.robot.constants.ElbowConstants;
 import frc.robot.constants.RobotConstants;
-import frc.robot.constants.WristConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -187,10 +184,18 @@ public class RobotContainer {
         .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
         .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(new ClosedLoopWristCommand(wristSubsystem, WristConstants.testWristPos));
+    // new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //     .onTrue(new ClosedLoopWristCommand(wristSubsystem, WristConstants.testWristPos));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, ElbowConstants.kElbowTestPos));
+        .onTrue(
+            new PodiumCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    // Stow
+    new JoystickButton(xboxController, XboxController.Button.kBack.value)
+        .onTrue(
+            new StowCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
