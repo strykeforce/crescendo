@@ -27,6 +27,7 @@ import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
@@ -163,6 +164,13 @@ public class RobotContainer {
             magazineSpeed.getDouble(0.0),
             elbowPos.getDouble(0.0),
             duplicateShooters.getBoolean(true)));
+    tab.add(
+        "stop",
+        new TuningOffCommand(
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem));
   }
 
   public void configureTelemetry() {
