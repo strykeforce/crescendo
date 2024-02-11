@@ -10,7 +10,7 @@ public final class SuperStructureConstants {
 
   // AMP
   public static final double kWristAmpSetPoint = -2469.0;
-  public static final double kElbowAmpSetPoint = -17.5;
+  public static final double kElbowAmpSetPoint = -13.5;
   public static final double kShooterAmpSetPoint = 0.0;
 
   // PRE-CLIMB
@@ -39,14 +39,14 @@ public final class SuperStructureConstants {
   public static final double kShooterDefenseSetPoint = 0.0;
 
   // PODIUM PREP
-  public static final double kWristPodiumPrepSetPoint = 0.0;
-  public static final double kElbowPodiumPrepSetPoint = 0.0;
-  public static final double kShooterPodiumPrepSetPoint = 0.0;
+  public static final double kWristPodiumPrepSetPoint = kWristIntakeSetPoint;
+  public static final double kElbowPodiumPrepSetPoint = -23.2;
+  public static final double kShooterPodiumPrepSetPoint = 1;
 
   // PODIUM
-  public static final double kWristPodiumSetPoint = 0.0;
-  public static final double kElbowPodiumSetPoint = 0.0;
-  public static final double kShooterPodiumSetPoint = 0.0;
+  public static final double kWristPodiumSetPoint = kWristIntakeSetPoint;
+  public static final double kElbowPodiumSetPoint = kElbowPodiumPrepSetPoint;
+  public static final double kShooterPodiumSetPoint = -30;
 
   // SUBWOOFER
   public static final double kWristSubwooferSetPoint = kWristIntakeSetPoint;
@@ -55,6 +55,6 @@ public final class SuperStructureConstants {
 
   // STOW
   public static final double kWristStowSetPoint = -3102.0;
-  public static final double kElbowStowSetPoint = 34;
+  public static final double kElbowStowSetPoint = 34.0;
   public static final double kShooterStowSetPoint = 0.0;
 }

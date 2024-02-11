@@ -8,5 +8,7 @@ public final class RobotStateConstants {
 
   public static final double kSpeakerY = 5.547868; // m
 
+  public static final double kPodiumReleaseTime = 1.0;
+
   public static final double kTimeToStowPostAmp = 0.1;
 }

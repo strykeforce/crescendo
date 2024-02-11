@@ -67,6 +67,10 @@ public class SuperStructure extends MeasurableSubsystem {
     shooterSubsystem.setSpeed(0.0);
   }
 
+  public void slowWheelSpin() {
+    shooterSubsystem.setSpeed(-0.5);
+  }
+
   public void stopPodiumShoot() {
     logger.info("Stop Magazine Belts");
     magazineSubsystem.setSpeed(0.0);
@@ -151,6 +155,21 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.TRAP;
   }
 
+  public void safeIntake() {
+    elbowSetpoint = SuperStructureConstants.kElbowIntakeSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristIntakeSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterIntakeSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterIntakeSetPoint;
+
+    shooterSubsystem.setSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> TRANSFER(INTAKE)");
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.INTAKE;
+  }
+
   public void intake() {
     elbowSetpoint = SuperStructureConstants.kElbowIntakeSetPoint;
     wristSetpoint = SuperStructureConstants.kWristIntakeSetPoint;
@@ -180,6 +199,21 @@ public class SuperStructure extends MeasurableSubsystem {
     flipMagazineOut = true;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.DEFENSE;
+  }
+
+  public void safeStow() {
+    elbowSetpoint = SuperStructureConstants.kElbowStowSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristStowSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> TRANSFER(STOW)");
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.STOW;
   }
 
   public void stow() {
@@ -223,11 +257,12 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
     rightShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
 
-    // shooterSubsystem.setSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    shooterSubsystem.setSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(PREP_PODIUM)");
-    flipMagazineOut = true;
+    flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.PREP_PODIUM;
   }
@@ -238,11 +273,12 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
     rightShooterSpeed = SuperStructureConstants.kShooterPodiumSetPoint;
 
-    // shooterSubsystem.setSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    shooterSubsystem.setSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(PODIUM)");
-    flipMagazineOut = true;
+    flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.PODIUM;
   }
