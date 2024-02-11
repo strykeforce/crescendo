@@ -121,9 +121,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           distance,
           RobotStateConstants.kLookupMaxDistance);
     } else {
+      index = (int) ((distance - RobotStateConstants.kLookupMinDistance)/ RobotStateConstants.kDistanceIncrement + 1.0);
+      logger.info("Distance: {}", Double.parseDouble(lookupTable[index][0]));
+      /*
       index =
           (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
-              / RobotStateConstants.kDistanceIncrement;
+              / RobotStateConstants.kDistanceIncrement;*/
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
