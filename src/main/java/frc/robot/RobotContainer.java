@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
@@ -24,6 +25,7 @@ import frc.robot.commands.robotState.PodiumCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -71,6 +73,8 @@ public class RobotContainer {
   private SuppliedValueWidget<Boolean> allianceColor;
   private Boolean isEvent = true;
 
+  private DriveAutonCommand testAutonPath;
+
   public RobotContainer() {
     robotConstants = new RobotConstants();
     driveSubsystem = new DriveSubsystem(new Swerve());
@@ -93,10 +97,13 @@ public class RobotContainer {
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
+    // visionSubsystem.setVisionUpdates(false);
+    // testAutonPath = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
+    // testAutonPath.generateTrajectory();
+
     configureDriverBindings();
     configureOperatorBindings();
     configureMatchDashboard();
-
     // robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
     // configureTelemetry();
@@ -186,8 +193,8 @@ public class RobotContainer {
         .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
         .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
-    // new JoystickButton(xboxController, XboxController.Button.kX.value)
-    //     .onTrue(new ClosedLoopWristCommand(wristSubsystem, WristConstants.testWristPos));
+    // new JoystickButton(xboxController, XboxController.Button.kX.value).onTrue(testAutonPath);
+
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .onTrue(
             new PodiumCommand(
@@ -266,6 +273,23 @@ public class RobotContainer {
     // Release Game Piece Command
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+
+    new JoystickButton(driveJoystick, Button.SWG_UP.id)
+        .onTrue(
+            new VisionShootCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWG_UP.id)
+        .onFalse(
+            new VisionShootCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWG_DWN.id)
+        .onTrue(
+            new VisionShootCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWG_DWN.id)
+        .onTrue(
+            new VisionShootCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public Command getAutonomousCommand() {

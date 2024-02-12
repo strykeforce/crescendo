@@ -497,6 +497,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Wheel 3 Speed", () -> io.getSwerveModuleStates()[3].speedMetersPerSecond),
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
-        new Measure("YAW Vel", () -> lastVelocity[2]));
+        new Measure("YAW Vel", () -> lastVelocity[2]),
+        new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()));
   }
 }

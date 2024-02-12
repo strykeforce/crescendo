@@ -69,7 +69,7 @@ public class RobotConstants {
 
   public static class ProtoConstants {
     // Drive
-    public static final Double kWheelDiameterInches = 3.0;
+    public static final Double kWheelDiameterInches = 3.0 * 503.5 / 500.0;
 
     // Elbow
     public static final Double kElbowZero = -0.05688;

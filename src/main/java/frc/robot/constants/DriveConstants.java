@@ -45,7 +45,7 @@ public final class DriveConstants {
 
   public static final double kDriveGearRatio =
       (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
-  public static final double kWheelDiameterInches = 3.0 * 506.0 / 500.0;
+  //   public static final double kWheelDiameterInches = 3.0 * 506.0 / 500.0;
   public static final double kMaxSpeedMetersPerSecond = 6.495;
 
   public static final double kMaxOmega =
@@ -82,9 +82,9 @@ public final class DriveConstants {
     azimuthConfig.peakCurrentDuration = 0;
     azimuthConfig.peakCurrentLimit = 0;
 
-    azimuthConfig.slot0.kP = 10.0;
+    azimuthConfig.slot0.kP = 15.0;
     azimuthConfig.slot0.kI = 0.0;
-    azimuthConfig.slot0.kD = 100.0;
+    azimuthConfig.slot0.kD = 150.0;
     azimuthConfig.slot0.kF = 1.0;
     azimuthConfig.slot0.integralZone = 0;
     azimuthConfig.slot0.allowableClosedloopError = 0;
@@ -113,10 +113,10 @@ public final class DriveConstants {
     driveConfig.CurrentLimits = currentConfig;
 
     Slot0Configs slot0Config = new Slot0Configs();
-    slot0Config.kP = 0.384375; // 0.16 using phoenix 6 migrate
-    slot0Config.kI = 0.480469; // 0.0002 using phoenix 6 migrate
+    slot0Config.kP = 0.5; // 0.16 using phoenix 6 migrate
+    slot0Config.kI = 0.5; // 0.0002 using phoenix 6 migrate
     slot0Config.kD = 0.0;
-    slot0Config.kV = 0.112910; // 0.047 using phoenix 6 migrate
+    slot0Config.kV = 0.12; // 0.047 using phoenix 6 migrate
     driveConfig.Slot0 = slot0Config;
 
     MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
