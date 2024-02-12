@@ -14,7 +14,11 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(WristSubsystem.class);
   private double setpoint = 0;
-  private WristStates curState;
+  private int revBeamBrokenCount = 0;
+  private int revBeamOpenCount = 0;
+  private int fwdBeamBrokenCount = 0;
+  private int fwdBeamOpenCount = 0;
+  private WristStates curState = WristStates.IDLE;
 
   public WristSubsystem(WristIO io) {
     this.io = io;
@@ -28,6 +32,11 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     curState = WristStates.MOVING;
 
     logger.info("Wrist moving to {} ticks", setpoint);
+  }
+
+  public void setPct(double pct) {
+    io.setPct(pct);
+    logger.info("Wrist open loop moving at {}", pct);
   }
 
   public double getPosition() {
@@ -44,6 +53,48 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void setState(WristStates state) {
     curState = state;
+  }
+
+  public boolean getIsRevLimitSwitch() {
+    return inputs.isRevLimitSwitch;
+  }
+
+  public boolean isRevBeamBroken() {
+    if (inputs.isRevLimitSwitch) revBeamBrokenCount++;
+    else revBeamBrokenCount = 0;
+
+    return revBeamBrokenCount > WristConstants.kMinBeamBreaks;
+  }
+
+  public boolean isRevBeamOpen() {
+    if (!inputs.isRevLimitSwitch) revBeamOpenCount++;
+    else revBeamOpenCount = 0;
+
+    return revBeamOpenCount > WristConstants.kMinBeamBreaks;
+  }
+
+  public void resetRevBeamCounts() {
+    revBeamBrokenCount = 0;
+    revBeamOpenCount = 0;
+  }
+
+  public boolean isFwdBeamBroken() {
+    if (inputs.isFwdLimitSwitchClosed) fwdBeamBrokenCount++;
+    else fwdBeamBrokenCount = 0;
+
+    return fwdBeamBrokenCount > WristConstants.kMinBeamBreaks;
+  }
+
+  public boolean isFwdBeamOpen() {
+    if (!inputs.isFwdLimitSwitchClosed) fwdBeamOpenCount++;
+    else fwdBeamOpenCount = 0;
+
+    return fwdBeamOpenCount > WristConstants.kMinBeamBreaks;
+  }
+
+  public void resetFwdBeamCounts() {
+    fwdBeamBrokenCount = 0;
+    fwdBeamOpenCount = 0;
   }
 
   public boolean isFinished() {
@@ -75,7 +126,10 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("state", () -> curState.ordinal()));
+    return Set.of(
+        new Measure("state", () -> curState.ordinal()),
+        new Measure("Fwd Beam Broken", () -> isFwdBeamBroken() ? 1.0 : 0.0),
+        new Measure("Rev Beam Broken", () -> isRevBeamBroken() ? 1.0 : 0.0));
   }
 
   @Override

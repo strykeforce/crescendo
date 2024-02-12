@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.BuildConstants;
 import frc.robot.constants.RobotConstants;
+import java.util.NoSuchElementException;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -50,11 +51,12 @@ public class Robot extends LoggedRobot {
           Logger.recordMetadata("GitDirty", "Unknown");
           break;
       }
+      // /media/sda1/logs
       Logger.addDataReceiver(new WPILOGWriter());
 
       // Comp robot conditions or not
       eventFlag = new DigitalInput(RobotConstants.kEventInterlockID);
-      isEvent = eventFlag.get();
+      isEvent = false; // eventFlag.get();
       if (isEvent) {
         System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
         System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");
@@ -74,7 +76,7 @@ public class Robot extends LoggedRobot {
     m_robotContainer.setIsEvent(isEvent);
     if (!isEvent) {
       m_robotContainer.configureTelemetry();
-      m_robotContainer.configurePitDashboard();
+      // m_robotContainer.configurePitDashboard();
     }
   }
 
@@ -82,11 +84,15 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     if (!hasAlliance) {
-      Alliance alliance = DriverStation.getAlliance().get();
-      if (alliance == Alliance.Blue || alliance == Alliance.Red) {
-        hasAlliance = true;
-        m_robotContainer.setAllianceColor(alliance);
-        logger.info("Set Alliance to {}", alliance);
+      try {
+        Alliance alliance = DriverStation.getAlliance().get();
+        if (alliance == Alliance.Blue || alliance == Alliance.Red) {
+          hasAlliance = true;
+          m_robotContainer.setAllianceColor(alliance);
+          logger.info("Set Alliance to {}", alliance);
+        }
+      } catch (NoSuchElementException error) {
+        // logger.info("Error: {}", error.toString());
       }
     }
   }

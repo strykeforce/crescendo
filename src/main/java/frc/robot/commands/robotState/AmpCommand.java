@@ -1,6 +1,7 @@
 package frc.robot.commands.robotState;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
@@ -12,8 +13,9 @@ public class AmpCommand extends Command {
   public AmpCommand(
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
-      MagazineSubsystem magazineSubsystem) {
-    addRequirements(superStructure, magazineSubsystem);
+      MagazineSubsystem magazineSubsystem,
+      IntakeSubsystem intakeSubsystem) {
+    addRequirements(superStructure, magazineSubsystem, intakeSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
   }
 

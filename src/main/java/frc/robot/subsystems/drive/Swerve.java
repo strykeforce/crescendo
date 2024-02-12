@@ -20,11 +20,13 @@ import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
+import java.util.function.BooleanSupplier;
 import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.swerve.V6TalonSwerveModule;
+import org.strykeforce.swerve.V6TalonSwerveModule.ClosedLoopUnits;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class Swerve implements SwerveIO {
@@ -38,12 +40,14 @@ public class Swerve implements SwerveIO {
 
   private TalonFXConfigurator configurator;
 
+  private BooleanSupplier azimuth1FwdLimitSupplier = () -> false;
+
   public Swerve() {
 
     var moduleBuilder =
         new V6TalonSwerveModule.V6Builder()
             .driveGearRatio(DriveConstants.kDriveGearRatio)
-            .wheelDiameterInches(DriveConstants.kWheelDiameterInches)
+            .wheelDiameterInches(RobotConstants.kWheelDiameterInches)
             .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond);
 
     V6TalonSwerveModule[] swerveModules = new V6TalonSwerveModule[4];
@@ -58,6 +62,10 @@ public class Swerve implements SwerveIO {
       azimuthTalon.enableVoltageCompensation(true);
       azimuthTalon.setNeutralMode(NeutralMode.Coast);
 
+      if (i == 1)
+        azimuth1FwdLimitSupplier =
+            () -> azimuthTalon.getSensorCollection().isFwdLimitSwitchClosed();
+
       var driveTalon = new TalonFX(i + 10);
       configurator = driveTalon.getConfigurator();
       configurator.apply(new TalonFXConfiguration()); // factory default
@@ -68,6 +76,7 @@ public class Swerve implements SwerveIO {
               .azimuthTalon(azimuthTalon)
               .driveTalon(driveTalon)
               .wheelLocationMeters(wheelLocations[i])
+              .closedLoopUnits(ClosedLoopUnits.VOLTAGE)
               .build();
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
@@ -139,6 +148,10 @@ public class Swerve implements SwerveIO {
 
   public void setGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
+  }
+
+  public BooleanSupplier getAzimuth1FwdLimitSwitch() {
+    return azimuth1FwdLimitSupplier;
   }
 
   public void resetGyro() {

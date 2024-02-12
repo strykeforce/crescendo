@@ -10,6 +10,7 @@ public interface MagazineIO {
     public double velocity = 0.0;
     public boolean isFwdLimitSwitchClosed = false;
     public boolean isRevLimitSwitchClosed = false;
+    public boolean isSecondFwdLimitSwitchClosed = false;
   }
 
   public default void updateInputs(MagazineIOInputs inputs) {}
@@ -18,5 +19,9 @@ public interface MagazineIO {
 
   public default void setSpeed(double speed) {}
 
+  // public default void setFwdLimitSwitchEnabled(boolean enabled) {}
+
   public default void registerWith(TelemetryService telemetryService) {}
+
+  public default void enableRevLimitSwitch(boolean val) {}
 }
