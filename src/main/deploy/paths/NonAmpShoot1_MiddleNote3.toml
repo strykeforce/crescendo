@@ -12,5 +12,9 @@ target_yaw = 0.0 #degrees
     dataPoint = "M3"
 
 [[internal_points]]
-    x = 5.821
+    x = 5.221 
     y = 3.567
+
+[[internal_points]]
+    x = 3.233
+    y = 3.19
