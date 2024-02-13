@@ -12,7 +12,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 public final class ElbowConstants {
   public static final int kElbowTalonFxId = 30;
   public static final int kRemoteEncoderID = 31;
-  public static final double kCloseEnoughTicks = 1.0;
+  public static final double kCloseEnoughRots = 0.35;
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
 

@@ -44,6 +44,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private boolean safeStow = false;
 
+  private double magazineTuneSpeed = 0.0;
+
   // Constructor
   public RobotStateSubsystem(
       VisionSubsystem visionSubsystem,
@@ -143,6 +145,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return shootSolution;
   }
 
+  public void setMagazineTune(double speed) {
+    magazineTuneSpeed = speed;
+  }
+
   // Control Methods
 
   public void toSafeIntake() {
@@ -231,6 +237,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
     }
+  }
+
+  public void toTune() {
+    setState(RobotStates.TO_TUNE);
+    superStructure.shootTune();
   }
 
   // Periodic
@@ -366,7 +377,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           safeStow = false;
         }
         break;
+      case TO_TUNE:
+        if (superStructure.isFinished()) {
+          magazineSubsystem.toEmptying(magazineTuneSpeed);
 
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+
+          setState(RobotStates.SHOOTING);
+        }
+        break;
       default:
         break;
     }
@@ -399,6 +420,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_PODIUM,
     PODIUM_SHOOTING,
     TO_SUBWOOFER,
-    RELEASE
+    RELEASE,
+    TO_TUNE
   }
 }

@@ -29,6 +29,11 @@ public class SuperStructure extends MeasurableSubsystem {
   private boolean flipMagazineOut = false;
   private Timer timer = new Timer();
 
+  // Tuning
+  private double elbowTunePoint = SuperStructureConstants.kElbowIntakeSetPoint;
+  private double leftTunePoint = 0.0;
+  private double rightTunePoint = 0.0;
+
   // Constructor
   public SuperStructure(
       WristSubsystem wristSubsystem,
@@ -74,6 +79,27 @@ public class SuperStructure extends MeasurableSubsystem {
   public void stopPodiumShoot() {
     logger.info("Stop Magazine Belts");
     magazineSubsystem.setSpeed(0.0);
+  }
+
+  public void saveSetpoint(
+      double leftShooterSpeed, double rightShooterSpeed, double elbowSetpoint) {
+    leftTunePoint = leftShooterSpeed;
+    rightTunePoint = rightShooterSpeed;
+    elbowTunePoint = elbowSetpoint;
+  }
+
+  public void shootTune() {
+    wristSubsystem.setPosition(SuperStructureConstants.kWristIntakeSetPoint);
+    elbowSubsystem.setPosition(elbowTunePoint);
+    shooterSubsystem.setLeftSpeed(leftTunePoint);
+    shooterSubsystem.setRightSpeed(rightTunePoint);
+
+    elbowSetpoint = elbowTunePoint;
+
+    logger.info("{} -> TRANSFER(SHOOTING)");
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.SHOOTING;
   }
 
   // Basic methods to go to each position

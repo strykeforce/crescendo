@@ -83,6 +83,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.EMPTYING);
   }
 
+  public void toEmptying(double speed) {
+    resetRevBeamCounts();
+    io.enableRevLimitSwitch(false);
+    setSpeed(speed);
+    setState(MagazineStates.EMPTYING);
+  }
+
   public void toReleaseGamePiece() {
     releaseTimer.stop();
     releaseTimer.reset();
@@ -147,6 +154,19 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   public void resetRevBeamCounts() {
     revBeamBrokenCount = 0;
     revBeamOpenCount = 0;
+  }
+
+  public void enableFwdLimitSwitch(boolean enabled) {
+    io.enableFwdLimitSwitch(enabled);
+  }
+
+  public void enableRevLimitSwitch(boolean enabled) {
+    io.enableRevLimitSwitch(enabled);
+  }
+
+  public void enableLimitSwitches(boolean enabled) {
+    io.enableFwdLimitSwitch(enabled);
+    io.enableRevLimitSwitch(enabled);
   }
 
   public boolean isNotePrepped() {

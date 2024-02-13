@@ -48,11 +48,23 @@ public class MagazineIOFX implements MagazineIO {
   }
 
   @Override
-  public void enableRevLimitSwitch(boolean val) {
+  public void enableFwdLimitSwitch(boolean enabled) {
     magazine
         .getConfigurator()
         .apply(
-            MagazineConstants.getMagazineConfig().HardwareLimitSwitch.withReverseLimitEnable(val));
+            MagazineConstants.getMagazineConfig()
+                .HardwareLimitSwitch
+                .withForwardLimitEnable(enabled));
+  }
+
+  @Override
+  public void enableRevLimitSwitch(boolean enabled) {
+    magazine
+        .getConfigurator()
+        .apply(
+            MagazineConstants.getMagazineConfig()
+                .HardwareLimitSwitch
+                .withReverseLimitEnable(enabled));
   }
 
   @Override
@@ -65,12 +77,6 @@ public class MagazineIOFX implements MagazineIO {
     if (speed == 0.0) magazine.setControl(dutyCycleRequest.withOutput(speed));
     else magazine.setControl(velocityRequest.withVelocity(speed));
   }
-
-  // @Override
-  // public void setFwdLimitSwitchEnabled(boolean enabled) {
-  //     // magazine.setSafetyEnabled(enabled);
-  //     fwdLimitSwitch.
-  // }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {

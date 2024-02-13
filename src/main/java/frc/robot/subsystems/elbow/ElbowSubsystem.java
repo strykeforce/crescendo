@@ -54,7 +54,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isFinished() {
-    return Math.abs(inputs.positionRots - setpoint) <= ElbowConstants.kCloseEnoughTicks;
+    return Math.abs(inputs.positionRots - setpoint) <= ElbowConstants.kCloseEnoughRots;
   }
 
   public void zero() {
