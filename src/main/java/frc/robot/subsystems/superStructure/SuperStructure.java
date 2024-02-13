@@ -29,6 +29,11 @@ public class SuperStructure extends MeasurableSubsystem {
   private boolean flipMagazineOut = false;
   private Timer timer = new Timer();
 
+  // Tuning
+  private double elbowTunePoint = SuperStructureConstants.kElbowIntakeSetPoint;
+  private double leftTunePoint = 0.0;
+  private double rightTunePoint = 0.0;
+
   // Constructor
   public SuperStructure(
       WristSubsystem wristSubsystem,
@@ -76,6 +81,27 @@ public class SuperStructure extends MeasurableSubsystem {
     magazineSubsystem.setSpeed(0.0);
   }
 
+  public void saveSetpoint(
+      double leftShooterSpeed, double rightShooterSpeed, double elbowSetpoint) {
+    leftTunePoint = leftShooterSpeed;
+    rightTunePoint = rightShooterSpeed;
+    elbowTunePoint = elbowSetpoint;
+  }
+
+  public void shootTune() {
+    wristSubsystem.setPosition(SuperStructureConstants.kWristIntakeSetPoint);
+    elbowSubsystem.setPosition(elbowTunePoint);
+    shooterSubsystem.setLeftSpeed(leftTunePoint);
+    shooterSubsystem.setRightSpeed(rightTunePoint);
+
+    elbowSetpoint = elbowTunePoint;
+
+    logger.info("{} -> TRANSFER(SHOOTING)");
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.SHOOTING;
+  }
+
   // Basic methods to go to each position
   //    Works by setting each axes' setpoint and starting intial movement
   //      Then determines if elbow or wrist go first by flipMagazineOut boolean
@@ -85,9 +111,9 @@ public class SuperStructure extends MeasurableSubsystem {
     this.rightShooterSpeed = rightShooterSpeed;
     wristSetpoint = SuperStructureConstants.kWristShootSetPoint;
 
-    // shooterSubsystem.setLeftSpeed(leftShooterSpeed);
-    // shooterSubsystem.setRightSpeed(rightShooterSpeed);
-    // wristSubsystem.setPosition(wristSetpoint);
+    shooterSubsystem.setLeftSpeed(-leftShooterSpeed);
+    shooterSubsystem.setRightSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(SHOOTING)");
     flipMagazineOut = false;
@@ -242,9 +268,6 @@ public class SuperStructure extends MeasurableSubsystem {
     wristSubsystem.setPosition(wristSetpoint);
     elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
 
-    timer.restart();
-    timer.start();
-
     logger.info("{} -> TRANSFER(SUBWOOFER)");
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
@@ -301,7 +324,6 @@ public class SuperStructure extends MeasurableSubsystem {
             elbowSubsystem.setPosition(elbowSetpoint);
           }
         }
-
         // Once all subsystems are at position go into the desired state
         if (isFinished()) {
           logger.info("TRANSFER -> {}", nextState);

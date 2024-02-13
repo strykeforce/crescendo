@@ -44,6 +44,11 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     setState(IntakeState.INTAKING);
   }
 
+  public void stopIntaking() {
+    setPercent(0.0);
+    setState(IntakeState.NONE);
+  }
+
   public void setFwdLimitSwitchSupplier(BooleanSupplier fwdLimitSupplier) {
     io.setFwdLimitSwitchSupplier(fwdLimitSupplier);
   }

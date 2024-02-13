@@ -44,6 +44,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private boolean safeStow = false;
 
+  private double magazineTuneSpeed = 0.0;
+
   // Constructor
   public RobotStateSubsystem(
       VisionSubsystem visionSubsystem,
@@ -128,7 +130,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
               ((distance - RobotStateConstants.kLookupMinDistance)
                       / RobotStateConstants.kDistanceIncrement
                   + 1.0);
-      logger.info("Distance: {}", Double.parseDouble(lookupTable[index][0]));
+      logger.info(
+          "Distance: {} | Measured {}", Double.parseDouble(lookupTable[index][0]), distance);
       /*
       index =
           (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
@@ -140,6 +143,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     shootSolution[2] = Double.parseDouble(lookupTable[index][3]); // Elbow
 
     return shootSolution;
+  }
+
+  public void setMagazineTune(double speed) {
+    magazineTuneSpeed = speed;
   }
 
   // Control Methods
@@ -230,6 +237,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
     }
+  }
+
+  public void toTune() {
+    setState(RobotStates.TO_TUNE);
+    superStructure.shootTune();
   }
 
   // Periodic
@@ -365,7 +377,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           safeStow = false;
         }
         break;
+      case TO_TUNE:
+        if (superStructure.isFinished()) {
+          magazineSubsystem.toEmptying(magazineTuneSpeed);
 
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+
+          setState(RobotStates.SHOOTING);
+        }
+        break;
       default:
         break;
     }
@@ -398,6 +420,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_PODIUM,
     PODIUM_SHOOTING,
     TO_SUBWOOFER,
-    RELEASE
+    RELEASE,
+    TO_TUNE
   }
 }
