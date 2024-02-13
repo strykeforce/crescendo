@@ -79,5 +79,6 @@ public class ShooterIOFX implements ShooterIO {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(shooterLeft, true);
+    telemetryService.register(shooterRight, true);
   }
 }
