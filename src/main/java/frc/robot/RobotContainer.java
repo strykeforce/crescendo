@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
-import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.PodiumCommand;
@@ -189,9 +189,9 @@ public class RobotContainer {
         .onTrue(
             new AmpCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
-        .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
+    //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
     // new JoystickButton(xboxController, XboxController.Button.kX.value).onTrue(testAutonPath);
 
@@ -199,6 +199,10 @@ public class RobotContainer {
         .onTrue(
             new PodiumCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    // SubWoofer
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
+        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -251,18 +255,29 @@ public class RobotContainer {
     //           new StowCommand(
     //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
-    // Reset Gyro Command
-    new JoystickButton(driveJoystick, Button.M_LTRIM_UP.id)
-        .onTrue(new ResetGyroCommand(driveSubsystem));
-
     // Intake
-    new JoystickButton(driveJoystick, Button.SWD.id)
+    new JoystickButton(driveJoystick, Button.SWB_DWN.id)
+        .onTrue(
+            new IntakeCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWB_UP.id)
         .onTrue(
             new IntakeCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
+    // Reset Gyro Command
+    new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
+
+    // XLock
+    new JoystickButton(driveJoystick, Button.SWD.id)
+        .onTrue(new XLockCommand(driveSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
+
     new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(
+            new StowCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
+        .onFalse(
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
@@ -287,7 +302,7 @@ public class RobotContainer {
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
-        .onTrue(
+        .onFalse(
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }

@@ -36,7 +36,7 @@ public final class DriveConstants {
 
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 0.5; // degrees per second
-  public static final double kDegreesCloseEnough = 1;
+  public static final double kDegreesCloseEnough = 3;
 
   public static final double kDriveMotorOutputGear = 34; // 30
   public static final double kDriveInputGear = 42;
@@ -133,9 +133,9 @@ public final class DriveConstants {
   public static final double kIMin = 0.0;
   public static final double kIMax = 0.0;
 
-  public static final double kPOmega = 4.5;
+  public static final double kPOmega = 9.0; // 4.5
   public static final double kIOmega = 0.0;
-  public static final double kDOmega = 0.0;
+  public static final double kDOmega = 0.01; // 0.001
   //    public static final double kMaxVelOmega = kMaxOmega / 2.0;
   public static final double kMaxAccelOmega = 5.0; // 3.14
 

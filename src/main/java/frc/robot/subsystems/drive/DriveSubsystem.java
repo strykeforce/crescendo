@@ -498,6 +498,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
-        new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()));
+        new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()),
+        new Measure("Distance to goal", () -> getDistanceToSpeaker()));
   }
 }

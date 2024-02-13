@@ -128,7 +128,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
               ((distance - RobotStateConstants.kLookupMinDistance)
                       / RobotStateConstants.kDistanceIncrement
                   + 1.0);
-      logger.info("Distance: {}", Double.parseDouble(lookupTable[index][0]));
+      logger.info(
+          "Distance: {} | Measured {}", Double.parseDouble(lookupTable[index][0]), distance);
       /*
       index =
           (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
