@@ -7,8 +7,8 @@ public class XLockCommand extends InstantCommand {
   DriveSubsystem driveSubsystem;
 
   public XLockCommand(DriveSubsystem driveSubsystem) {
-    addRequirements(driveSubsystem);
     this.driveSubsystem = driveSubsystem;
+    addRequirements(driveSubsystem);
   }
 
   @Override

@@ -26,6 +26,7 @@ import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.swerve.V6TalonSwerveModule;
+import org.strykeforce.swerve.V6TalonSwerveModule.ClosedLoopUnits;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class Swerve implements SwerveIO {
@@ -46,7 +47,7 @@ public class Swerve implements SwerveIO {
     var moduleBuilder =
         new V6TalonSwerveModule.V6Builder()
             .driveGearRatio(DriveConstants.kDriveGearRatio)
-            .wheelDiameterInches(DriveConstants.kWheelDiameterInches)
+            .wheelDiameterInches(RobotConstants.kWheelDiameterInches)
             .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond);
 
     V6TalonSwerveModule[] swerveModules = new V6TalonSwerveModule[4];
@@ -75,6 +76,7 @@ public class Swerve implements SwerveIO {
               .azimuthTalon(azimuthTalon)
               .driveTalon(driveTalon)
               .wheelLocationMeters(wheelLocations[i])
+              .closedLoopUnits(ClosedLoopUnits.VOLTAGE)
               .build();
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }

@@ -106,6 +106,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   public void preparePodium() {
     io.enableRevLimitSwitch(false);
+    resetRevBeamCounts();
     setSpeed(MagazineConstants.kPodiumPrepareSpeed);
     setState(MagazineStates.PREP_PODIUM);
   }
@@ -113,7 +114,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   public boolean hasPiece() {
     return curState == MagazineStates.FULL
         || curState == MagazineStates.EMPTYING
-        || curState == MagazineStates.REVERSING;
+        || curState == MagazineStates.REVERSING
+        || curState == MagazineStates.RELEASE;
   }
 
   public boolean isFwdBeamBroken() {
@@ -173,22 +175,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       atEdgeOne = true;
     }
 
-    // if the first edge has been detected, and the open space of the note has been
-    // detected set
-    // past first edge to be true
-    if (atEdgeOne && !pastEdgeOne && isRevBeamBroken()) {
-      pastEdgeOne = true;
-    }
-
-    // if the first edge, the open space has been detected, and the second edge of
-    // the note has been
-    // detected,
-    // the note has been prepped.
-    if (atEdgeOne && pastEdgeOne && isRevBeamBroken()) {
-      return true;
-    } else {
-      return false;
-    }
+    return atEdgeOne && isRevBeamOpen();
   }
 
   // Periodic
