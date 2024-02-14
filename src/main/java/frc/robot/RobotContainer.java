@@ -19,7 +19,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.robotState.AmpCommand;
@@ -31,6 +33,7 @@ import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.commands.vision.ToggleVisionUpdatesCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -108,8 +111,8 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
-    // testAutonPath = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
-    // testAutonPath.generateTrajectory();
+    testAutonPath = new DriveAutonCommand(driveSubsystem, "NonAmpInitial1_MiddleNote5", true, true);
+    testAutonPath.generateTrajectory();
 
     configureDriverBindings();
     configureOperatorBindings();
@@ -130,6 +133,20 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
         .withSize(1, 1)
         .withPosition(0, 0);
+    Shuffleboard.getTab("Pit")
+        .add("Lock Wheels Zero", new LockZeroCommand(driveSubsystem))
+        .withSize(1, 1)
+        .withPosition(1, 0);
+    Shuffleboard.getTab("Pit")
+        .add("Vision off", new ToggleVisionUpdatesCommand(visionSubsystem, false))
+        .withSize(1, 1)
+        .withPosition(2, 0);
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Set Gyro offset -60",
+            new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-60)))
+        .withSize(1, 1)
+        .withPosition(3, 0);
   }
 
   private void configureMatchDashboard() {
@@ -233,7 +250,7 @@ public class RobotContainer {
     //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
     //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
-    // new JoystickButton(xboxController, XboxController.Button.kX.value).onTrue(testAutonPath);
+    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(testAutonPath);
 
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .onTrue(
