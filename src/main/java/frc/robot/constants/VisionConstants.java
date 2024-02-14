@@ -39,11 +39,11 @@ public final class VisionConstants {
   // Poses
   public static final Pose3d kCam1Pose =
       new Pose3d(
-          new Translation3d(-0.2, 0.30, 0.58),
+          new Translation3d(-0.2, 0.34, 0.58),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(180.0)));
   public static final Pose3d kCam2Pose =
       new Pose3d(
-          new Translation3d(-0.25, -0.34, 0.44),
+          new Translation3d(-0.18, -0.34, 0.44),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(15.0)));
 
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is

@@ -8,10 +8,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveAutonCommand;
@@ -121,6 +123,12 @@ public class RobotContainer {
   }
 
   private void configureMatchDashboard() {
+    Shuffleboard.getTab("Match")
+        .add(
+            new RunCommand(
+                () -> driveSubsystem.enableVisionUpdates(!driveSubsystem.usingVisionUpdates())))
+        .withWidget(BuiltInWidgets.kToggleButton);
+
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
