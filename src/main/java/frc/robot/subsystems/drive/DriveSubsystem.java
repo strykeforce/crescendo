@@ -57,6 +57,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
 
+  private boolean updateVision = true;
+
   public DriveSubsystem(SwerveIO io) {
     this.io = io;
 
@@ -123,12 +125,20 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("reset odometry with: {}", pose);
   }
 
+  public boolean usingVisionUpdates() {
+    return updateVision;
+  }
+
+  public void enableVisionUpdates(boolean val) {
+    updateVision = val;
+  }
+
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
-    io.addVisionMeasurement(pose, timestamp);
+    if (updateVision) io.addVisionMeasurement(pose, timestamp);
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
-    io.addVisionMeasurement(pose, timestamp, stdDevvs);
+    if (updateVision) io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController() {
