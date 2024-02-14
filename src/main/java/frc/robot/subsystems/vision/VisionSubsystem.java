@@ -14,7 +14,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -209,7 +208,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
               .minus(offsets[idx].rotateBy(cameraPose.getRotation().minus(rotsOff[idx])));
 
       Pose3d logPose = new Pose3d(centerPose, cameraPose.getRotation().minus(rotsOff[idx]));
-      logger.info("{}", (RobotController.getFPGATime() - result.getTimeStamp()) / 1000000.0);
+      logger.info(
+          "{}, {}, {}",
+          RobotController.getFPGATime(),
+          result.getTimeStamp(),
+          (RobotController.getFPGATime() - result.getTimeStamp()) / 1000000.0);
 
       // If updating with vision go into state machine to update
       if (visionUpdates) {

@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveAutonCommand;
@@ -23,6 +22,7 @@ import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
+import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.robotState.AmpCommand;
@@ -34,7 +34,6 @@ import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
-import frc.robot.commands.vision.ToggleVisionUpdatesCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -112,7 +111,7 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
-    testAutonPath = new DriveAutonCommand(driveSubsystem, "NonAmpInitial1_MiddleNote5", true, true);
+    testAutonPath = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot1", true, true);
     testAutonPath.generateTrajectory();
 
     configureDriverBindings();
@@ -139,10 +138,6 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(1, 0);
     Shuffleboard.getTab("Pit")
-        .add("Vision off", new ToggleVisionUpdatesCommand(visionSubsystem, false))
-        .withSize(1, 1)
-        .withPosition(2, 0);
-    Shuffleboard.getTab("Pit")
         .add(
             "Set Gyro offset -60",
             new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-60)))
@@ -152,17 +147,20 @@ public class RobotContainer {
 
   private void configureMatchDashboard() {
     Shuffleboard.getTab("Match")
-        .add(
-            new RunCommand(
-                () -> driveSubsystem.enableVisionUpdates(!driveSubsystem.usingVisionUpdates())))
-        .withWidget(BuiltInWidgets.kToggleButton);
+        .add(new ToggleVisionUpdatesCommand(driveSubsystem))
+        .withWidget(BuiltInWidgets.kToggleButton)
+        .withPosition(0, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
+        .withSize(1, 1)
+        .withPosition(3, 0);
 
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
             .withProperties(Map.of("colorWhenFalse", "blue"))
             .withSize(2, 2)
-            .withPosition(0, 0);
+            .withPosition(1, 0);
 
     Shuffleboard.getTab("Match")
         .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
