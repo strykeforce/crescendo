@@ -8,11 +8,14 @@ public interface ElbowIO {
   @AutoLog
   public static class ElbowIOInputs {
     public double positionRots = 0.0;
+    public double absRots = 0.0;
   }
 
   public default void updateInputs(ElbowIOInputs inputs) {}
 
   public default void setPosition(double position) {}
+
+  public default void setPct(double percentOutput) {}
 
   public default void zero() {}
 

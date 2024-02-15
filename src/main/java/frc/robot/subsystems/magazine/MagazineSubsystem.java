@@ -1,8 +1,8 @@
 package frc.robot.subsystems.magazine;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
-import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +16,14 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   private MagazineIOInputsAutoLogged inputs = new MagazineIOInputsAutoLogged();
   private MagazineStates curState = MagazineStates.EMPTY;
   private Logger logger = LoggerFactory.getLogger(MagazineSubsystem.class);
-  private WristSubsystem wristSubsystem;
 
   private double setpoint = inputs.velocity;
+  private int fwdBeamBrokenCount = 0;
+  private int fwdBeamOpenCount = 0;
+  private int revBeamBrokenCount = 0;
+  private int revBeamOpenCount = 0;
 
-  private int beamBroken = 0;
-  private int beamOpen = 0;
+  private Timer releaseTimer = new Timer();
 
   // Podium Preparation Variables
   private boolean atEdgeOne = false;
@@ -61,73 +63,119 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     return curState;
   }
 
-  public void setState(MagazineStates state) {
+  private void setState(MagazineStates state) {
     logger.info("{} -> {}", curState, state);
     curState = state;
   }
 
-  public void setWristSubsystem(WristSubsystem wristSubsystem) {
-    this.wristSubsystem = wristSubsystem;
-  }
-
   // Helper Methods
   public void toIntaking() {
-    beamBroken = 0;
-    setSpeed(MagazineConstants.kIntakingSpeed);
+    resetRevBeamCounts();
+    io.enableRevLimitSwitch(true);
     setState(MagazineStates.INTAKING);
+    setSpeed(MagazineConstants.kIntakingSpeed);
   }
 
   public void toEmptying() {
-    beamOpen = 0;
+    resetRevBeamCounts();
+    io.enableRevLimitSwitch(false);
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EMPTYING);
   }
 
+  public void toEmptying(double speed) {
+    resetRevBeamCounts();
+    io.enableRevLimitSwitch(false);
+    setSpeed(speed);
+    setState(MagazineStates.EMPTYING);
+  }
+
+  public void toReleaseGamePiece() {
+    releaseTimer.stop();
+    releaseTimer.reset();
+    releaseTimer.start();
+    setSpeed(MagazineConstants.kReleaseSpeed);
+    setState(MagazineStates.RELEASE);
+  }
+
+  public void setEmpty() {
+    io.enableRevLimitSwitch(true);
+    io.setPct(0.0);
+    setState(MagazineStates.EMPTY);
+  }
+
   public void preparePodium() {
+    io.enableRevLimitSwitch(false);
+    resetRevBeamCounts();
     setSpeed(MagazineConstants.kPodiumPrepareSpeed);
     setState(MagazineStates.PREP_PODIUM);
   }
 
   public boolean hasPiece() {
-    return curState == MagazineStates.FULL || curState == MagazineStates.EMPTYING;
+    return curState == MagazineStates.FULL
+        || curState == MagazineStates.EMPTYING
+        || curState == MagazineStates.REVERSING
+        || curState == MagazineStates.RELEASE;
   }
 
-  public boolean isBeamBroken() {
-    if (inputs.isFwdLimitSwitchClosed) beamBroken++;
-    else beamBroken = 0;
+  public boolean isFwdBeamBroken() {
+    if (inputs.isFwdLimitSwitchClosed) fwdBeamBrokenCount++;
+    else fwdBeamBrokenCount = 0;
 
-    return beamBroken > MagazineConstants.kMinBeamBreaks;
+    return fwdBeamBrokenCount > MagazineConstants.kMinBeamBreaks;
   }
 
-  public boolean isBeamOpen() {
-    if (!inputs.isFwdLimitSwitchClosed) beamOpen++;
-    else beamOpen = 0;
+  public boolean isFwdBeamOpen() {
+    if (!inputs.isFwdLimitSwitchClosed) fwdBeamOpenCount++;
+    else fwdBeamOpenCount = 0;
 
-    return beamOpen > MagazineConstants.kMinBeamBreaks;
+    return fwdBeamOpenCount > MagazineConstants.kMinBeamBreaks;
+  }
+
+  public void resetFwdBeamCounts() {
+    fwdBeamBrokenCount = 0;
+    fwdBeamOpenCount = 0;
+  }
+
+  public boolean isRevBeamBroken() {
+    if (inputs.isRevLimitSwitchClosed) revBeamBrokenCount++;
+    else revBeamBrokenCount = 0;
+
+    return revBeamBrokenCount > MagazineConstants.kMinBeamBreaks;
+  }
+
+  public boolean isRevBeamOpen() {
+    if (!inputs.isRevLimitSwitchClosed) revBeamOpenCount++;
+    else revBeamOpenCount = 0;
+
+    return revBeamOpenCount > MagazineConstants.kMinBeamBreaks;
+  }
+
+  public void resetRevBeamCounts() {
+    revBeamBrokenCount = 0;
+    revBeamOpenCount = 0;
+  }
+
+  public void enableFwdLimitSwitch(boolean enabled) {
+    io.enableFwdLimitSwitch(enabled);
+  }
+
+  public void enableRevLimitSwitch(boolean enabled) {
+    io.enableRevLimitSwitch(enabled);
+  }
+
+  public void enableLimitSwitches(boolean enabled) {
+    io.enableFwdLimitSwitch(enabled);
+    io.enableRevLimitSwitch(enabled);
   }
 
   public boolean isNotePrepped() {
     // If the first edge of the note has been detected, set at edge one to be true
-    if (!atEdgeOne && wristSubsystem.isBeamBroken()) {
+    if (!atEdgeOne && isRevBeamBroken()) {
       atEdgeOne = true;
     }
 
-    // if the first edge has been detected, and the open space of the note has been
-    // detected set
-    // past first edge to be true
-    if (atEdgeOne && !pastEdgeOne && wristSubsystem.isBeamOpen()) {
-      pastEdgeOne = true;
-    }
-
-    // if the first edge, the open space has been detected, and the second edge of
-    // the note has been
-    // detected,
-    // the note has been prepped.
-    if (atEdgeOne && pastEdgeOne && wristSubsystem.isBeamBroken()) {
-      return true;
-    } else {
-      return false;
-    }
+    return atEdgeOne && isRevBeamOpen();
   }
 
   // Periodic
@@ -142,16 +190,20 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case FULL:
         break;
       case INTAKING:
-        if (isBeamBroken()) {
+        if (isRevBeamBroken()) {
+          setSpeed(MagazineConstants.kReversingSpeed);
+          setState(MagazineStates.REVERSING);
+        }
+        break;
+      case REVERSING:
+        if (isRevBeamOpen()) {
           setSpeed(0.0);
           setState(MagazineStates.FULL);
+        } else {
+          setSpeed(MagazineConstants.kReversingSpeed);
         }
         break;
       case EMPTYING:
-        if (isBeamOpen()) {
-          setSpeed(0.0);
-          setState(MagazineStates.EMPTY);
-        }
         break;
       case SPEEDUP:
         if (atShootSpeed()) {
@@ -164,9 +216,15 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
           setState(MagazineStates.SPEEDUP);
           atEdgeOne = false;
           pastEdgeOne = false;
+          resetRevBeamCounts();
         }
         break;
       case SHOOT:
+        break;
+      case RELEASE:
+        if (releaseTimer.hasElapsed(MagazineConstants.kReleaseTime)) {
+          setEmpty();
+        }
         break;
     }
   }
@@ -188,9 +246,11 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     EMPTY,
     FULL,
     INTAKING,
+    REVERSING,
     EMPTYING,
     SPEEDUP,
     PREP_PODIUM,
-    SHOOT
+    SHOOT,
+    RELEASE
   }
 }

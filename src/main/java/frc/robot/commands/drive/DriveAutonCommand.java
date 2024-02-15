@@ -4,13 +4,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.PathData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DriveAutonCommand extends CommandBase {
+public class DriveAutonCommand extends Command {
   private final DriveSubsystem driveSubsystem;
   private Trajectory trajectory;
   private final Timer timer = new Timer();

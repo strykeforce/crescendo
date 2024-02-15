@@ -32,6 +32,11 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     logger.info("Elbow moving to {} rotations", setpoint);
   }
 
+  public void setPct(double pct) {
+    io.setPct(pct);
+    logger.info("Elbow open loop moving at {}", pct);
+  }
+
   public double getPosition() {
     return inputs.positionRots;
   }
@@ -49,7 +54,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isFinished() {
-    return Math.abs(inputs.positionRots - setpoint) <= ElbowConstants.kCloseEnoughTicks;
+    return Math.abs(inputs.positionRots - setpoint) <= ElbowConstants.kCloseEnoughRots;
   }
 
   public void zero() {

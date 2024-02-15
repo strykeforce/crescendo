@@ -7,10 +7,10 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class VisionShootCommand extends Command {
+public class PodiumCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
 
-  public VisionShootCommand(
+  public PodiumCommand(
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
@@ -21,13 +21,12 @@ public class VisionShootCommand extends Command {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.startShoot();
+    robotStateSubsystem.toPreparePodium();
   }
 
   @Override
   public boolean isFinished() {
-    RobotStates curState = robotStateSubsystem.getState();
-
-    return (curState != RobotStates.SHOOTING || curState != RobotStates.TO_SHOOT);
+    return robotStateSubsystem.getState() != RobotStates.TO_PODIUM
+        || robotStateSubsystem.getState() != RobotStates.PODIUM_SHOOTING;
   }
 }
