@@ -19,7 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.SetGyroOffsetCommand;
+import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
@@ -112,8 +115,8 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
-    // testAutonPath = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
-    // testAutonPath.generateTrajectory();
+    testAutonPath = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot1", true, true);
+    testAutonPath.generateTrajectory();
 
     configureDriverBindings();
     configureOperatorBindings();
@@ -139,15 +142,36 @@ public class RobotContainer {
         .add("gyro to 60", new setAngleOffsetCommand(driveSubsystem, 60))
         .withSize(1, 1)
         .withPosition(0, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Lock Wheels Zero", new LockZeroCommand(driveSubsystem))
+        .withSize(1, 1)
+        .withPosition(1, 0);
+        
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Set Gyro offset -60",
+            new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-60)))
+        .withSize(1, 1)
+        .withPosition(3, 0);
   }
 
   private void configureMatchDashboard() {
+    Shuffleboard.getTab("Match")
+        .add(new ToggleVisionUpdatesCommand(driveSubsystem))
+        .withWidget(BuiltInWidgets.kToggleButton)
+        .withPosition(0, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
+        .withSize(1, 1)
+        .withPosition(3, 0);
+
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
             .withProperties(Map.of("colorWhenFalse", "blue"))
             .withSize(2, 2)
-            .withPosition(0, 0);
+            .withPosition(1, 0);
 
     Shuffleboard.getTab("Match")
         .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
@@ -244,7 +268,7 @@ public class RobotContainer {
     //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
     //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
-    // new JoystickButton(xboxController, XboxController.Button.kX.value).onTrue(testAutonPath);
+    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(testAutonPath);
 
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .onTrue(

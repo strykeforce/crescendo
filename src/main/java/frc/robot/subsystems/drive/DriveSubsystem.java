@@ -57,6 +57,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
 
+  private boolean updateVision = true;
+
   public DriveSubsystem(SwerveIO io) {
     this.io = io;
 
@@ -123,12 +125,20 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("reset odometry with: {}", pose);
   }
 
+  public boolean usingVisionUpdates() {
+    return updateVision;
+  }
+
+  public void enableVisionUpdates(boolean val) {
+    updateVision = val;
+  }
+
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
-    io.addVisionMeasurement(pose, timestamp);
+    if (updateVision) io.addVisionMeasurement(pose, timestamp);
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
-    io.addVisionMeasurement(pose, timestamp, stdDevvs);
+    if (updateVision) io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController() {
@@ -371,6 +381,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "MI1":
           pose = Setpoints.MI1;
           break;
+        case "NAI1":
+          pose = Setpoints.NAI1;
+          break;
 
           // Wing Notes
         case "W1":
@@ -418,9 +431,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
       if (table.contains("angle")) {
         pose =
-            new Pose2d(pose.getX(), pose.getX(), Rotation2d.fromDegrees(table.getDouble("angle")));
+            new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(table.getDouble("angle")));
       }
-
       return pose;
     } else {
       return new Pose2d(
