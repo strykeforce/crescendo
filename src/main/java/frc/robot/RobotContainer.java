@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
@@ -88,7 +89,7 @@ public class RobotContainer {
   public GenericEntry magazineSpeed;
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
-  private DriveAutonCommand testPath;
+  private AmpInitial_WingNotes_ACommand testPath;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -100,8 +101,6 @@ public class RobotContainer {
     climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
-
-    testPath = new DriveAutonCommand(driveSubsystem, "AmpInitial1_WingNote1", true, true);
 
     intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
 
@@ -117,6 +116,14 @@ public class RobotContainer {
     // visionSubsystem.setVisionUpdates(false);
     testAutonPath = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot1", true, true);
     testAutonPath.generateTrajectory();
+
+    testPath =
+        new AmpInitial_WingNotes_ACommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            "AmpInitial1_WingNote1",
+            "WingNote1_WingNote2_A",
+            "WingNote2_WingNote3_A");
 
     configureDriverBindings();
     configureOperatorBindings();
@@ -147,7 +154,7 @@ public class RobotContainer {
         .add("Lock Wheels Zero", new LockZeroCommand(driveSubsystem))
         .withSize(1, 1)
         .withPosition(1, 0);
-        
+
     Shuffleboard.getTab("Pit")
         .add(
             "Set Gyro offset -60",
@@ -268,7 +275,7 @@ public class RobotContainer {
     //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
     //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
-    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(testAutonPath);
+    // new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(testAutonPath);
 
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .onTrue(

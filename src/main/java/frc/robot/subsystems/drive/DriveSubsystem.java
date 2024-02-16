@@ -384,6 +384,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "NAI1":
           pose = Setpoints.NAI1;
           break;
+        case "AI1":
+          pose = Setpoints.AI1;
+          break;
 
           // Wing Notes
         case "W1":
@@ -429,10 +432,26 @@ public class DriveSubsystem extends MeasurableSubsystem {
           return new Pose2d();
       }
 
+      double angle = pose.getRotation().getDegrees();
+      double X = pose.getX();
+      double Y = pose.getY();
+
       if (table.contains("angle")) {
-        pose =
-            new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(table.getDouble("angle")));
+        angle = table.getDouble("angle");
+        logger.info("Changing angle to {}", angle);
       }
+
+      if (table.contains("dX")) {
+        X = X + table.getDouble("dX");
+        logger.info("Changing X to {}", X);
+      }
+
+      if (table.contains("dY")) {
+        Y = Y + table.getDouble("dY");
+        logger.info("Changing Y to {}", Y);
+      }
+      pose = new Pose2d(X, Y, Rotation2d.fromDegrees(angle));
+
       return pose;
     } else {
       return new Pose2d(

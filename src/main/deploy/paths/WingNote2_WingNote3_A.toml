@@ -6,12 +6,11 @@ is_reversed = false
 target_yaw = -30.0 #degrees
 
 [start_pose]
-    x = 2.59
-    y = 5.55
-    angle = 0.0
+    dataPoint "W2"
 [end_pose]
-    x = 2.59
-    y = 4.25
+    dataPoint "W3"
+    dX = -0.1
+    dY = 0.3
     angle = -30.0
 
 [[internal_points]]
