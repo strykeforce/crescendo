@@ -8,7 +8,7 @@ import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 
-public class AmpInitial_WingNotes_B extends SequentialCommandGroup{
+public class AmpInitial_WingNotes_BCommand extends SequentialCommandGroup {
 
   DriveAutonCommand firstPath;
   DriveAutonCommand secondPath;
@@ -21,7 +21,7 @@ public class AmpInitial_WingNotes_B extends SequentialCommandGroup{
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
 
-  public AmpInitial_WingNotes_B(
+  public AmpInitial_WingNotes_BCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       String pathOne,

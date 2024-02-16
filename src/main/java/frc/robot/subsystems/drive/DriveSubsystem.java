@@ -417,7 +417,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
       }
 
       if (table.contains("angle")) {
-        pose = new Pose2d(pose.getX(), pose.getX(), Rotation2d.fromDegrees(table.getDouble("angle")));
+        pose =
+            new Pose2d(pose.getX(), pose.getX(), Rotation2d.fromDegrees(table.getDouble("angle")));
       }
 
       return pose;

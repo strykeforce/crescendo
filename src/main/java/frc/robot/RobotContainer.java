@@ -21,6 +21,7 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.XLockCommand;
+import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
@@ -84,6 +85,7 @@ public class RobotContainer {
   public GenericEntry magazineSpeed;
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
+  private DriveAutonCommand testPath;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -95,6 +97,8 @@ public class RobotContainer {
     climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
+
+    testPath = new DriveAutonCommand(driveSubsystem, "AmpInitial1_WingNote1", true, true);
 
     intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
 
@@ -130,6 +134,11 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
         .withSize(1, 1)
         .withPosition(0, 0);
+
+    Shuffleboard.getTab("Pit")
+        .add("gyro to 60", new setAngleOffsetCommand(driveSubsystem, 60))
+        .withSize(1, 1)
+        .withPosition(0, 1);
   }
 
   private void configureMatchDashboard() {
@@ -201,6 +210,8 @@ public class RobotContainer {
     } else {
       driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
     }
+
+    testPath.generateTrajectory();
   }
 
   public void setIsEvent(boolean isEvent) {
@@ -249,6 +260,9 @@ public class RobotContainer {
         .onTrue(
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    // Run auton
+    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(testPath);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
