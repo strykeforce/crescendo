@@ -208,11 +208,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
               .minus(offsets[idx].rotateBy(cameraPose.getRotation().minus(rotsOff[idx])));
 
       Pose3d logPose = new Pose3d(centerPose, cameraPose.getRotation().minus(rotsOff[idx]));
-      logger.info(
-          "{}, {}, {}",
-          RobotController.getFPGATime(),
-          result.getTimeStamp(),
-          (RobotController.getFPGATime() - result.getTimeStamp()) / 1000000.0);
+      //   logger.info(
+      //       "{}, {}, {}",
+      //       RobotController.getFPGATime(),
+      //       result.getTimeStamp(),
+      //       (RobotController.getFPGATime() - result.getTimeStamp()) / 1000000.0);
 
       // If updating with vision go into state machine to update
       if (visionUpdates) {
