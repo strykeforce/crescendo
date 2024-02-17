@@ -26,6 +26,7 @@ import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
+import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
@@ -121,6 +122,9 @@ public class RobotContainer {
         new AmpInitial_WingNotes_ACommand(
             driveSubsystem,
             robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
             "AmpInitial1_WingNote1",
             "WingNote1_WingNote2_A",
             "WingNote2_WingNote3_A");
@@ -161,6 +165,11 @@ public class RobotContainer {
             new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-60)))
         .withSize(1, 1)
         .withPosition(3, 0);
+
+    Shuffleboard.getTab("Pit")
+        .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))
+        .withSize(1, 1)
+        .withPosition(2, 0);
   }
 
   private void configureMatchDashboard() {

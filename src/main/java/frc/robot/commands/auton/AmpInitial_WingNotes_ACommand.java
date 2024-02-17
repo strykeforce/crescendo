@@ -5,8 +5,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
+import frc.robot.commands.robotState.DistanceShootCommand;
+import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
 
@@ -23,6 +29,9 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
   public AmpInitial_WingNotes_ACommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
+      SuperStructure superStructure,
+      MagazineSubsystem magazineSubsystem,
+      IntakeSubsystem intakeSubsystem,
       String pathOne,
       String pathTwo,
       String pathThree) {
@@ -34,9 +43,21 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
     addCommands(
         new ResetGyroCommand(driveSubsystem),
         new setAngleOffsetCommand(driveSubsystem, 60.0),
+        new DistanceShootCommand(
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            AutonConstants.kAI1ToSpeakerDist),
         firstPath,
+        new VisionShootCommand(
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         secondPath,
-        thirdPath);
+        new VisionShootCommand(
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+        thirdPath,
+        new VisionShootCommand(
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void generateTrajectory() {

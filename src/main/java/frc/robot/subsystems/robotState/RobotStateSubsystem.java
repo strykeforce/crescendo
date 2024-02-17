@@ -46,6 +46,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private double magazineTuneSpeed = 0.0;
 
+  private boolean turnToGoal = true;
+
   // Constructor
   public RobotStateSubsystem(
       VisionSubsystem visionSubsystem,
@@ -176,9 +178,21 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void startShoot() {
+    turnToGoal = true;
     driveSubsystem.setIsAligningShot(true);
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+    setState(RobotStates.TO_SHOOT);
+  }
+
+  public void startShootDistance(double distance) {
+    turnToGoal = false;
+
+    double[] shootSolution = getShootSolution(distance);
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -307,7 +321,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
         if (driveSubsystem.isDriveStill()
-            && driveSubsystem.isPointingAtGoal()
+            && (turnToGoal ? driveSubsystem.isPointingAtGoal() : true)
             && superStructure.isFinished()) {
 
           magazineSubsystem.toEmptying();
