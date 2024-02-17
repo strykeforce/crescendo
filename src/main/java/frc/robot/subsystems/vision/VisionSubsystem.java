@@ -50,6 +50,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   DriveSubsystem driveSubsystem;
   int offWheels = 0;
   Logger logger;
+  int minTagsNeeded = 2;
 
   // Deadeye<TargetListTargetData> cam = new Deadeye<TargetListTargetData>("A0",
   // TargetListTargetData.class, NetworkTableInstance.getDefault(), null);
@@ -74,6 +75,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Getter/Setter Methods
   public void setVisionUpdates(boolean visionUpdates) {
     this.visionUpdates = visionUpdates;
+  }
+
+  public void setMinTagsNeeded(int num) {
+    minTagsNeeded = num;
   }
 
   public boolean isVisionUpdatingDrive() {
@@ -114,16 +119,18 @@ public class VisionSubsystem extends MeasurableSubsystem {
       double magnitudeDisp = Math.sqrt(Math.pow(disp.getX(), 2) + Math.pow(disp.getY(), 2));
 
       // Test to see if the displacement falls beneath a line based on velocity
-      return (magnitudeDisp
-          < ((magnitudeVel * VisionConstants.kLinearCoeffOnVelFilter)
-              + VisionConstants.kOffsetOnVelFilter
-              + Math.pow((magnitudeVel * VisionConstants.kSquaredCoeffOnVelFilter), 2)));
+      return test.getNumTags() > minTagsNeeded
+          && (magnitudeDisp
+              < ((magnitudeVel * VisionConstants.kLinearCoeffOnVelFilter)
+                  + VisionConstants.kOffsetOnVelFilter
+                  + Math.pow((magnitudeVel * VisionConstants.kSquaredCoeffOnVelFilter), 2)));
     }
     return false;
   }
 
   private boolean isPoseValidWithoutWheels(WallEyeResult test, Translation3d location) {
-    return (test.getNumTags() >= 2 || test.getAmbiguity() <= VisionConstants.kMaxAmbig)
+    return test.getNumTags() > minTagsNeeded
+        && (test.getNumTags() >= 2 || test.getAmbiguity() <= VisionConstants.kMaxAmbig)
         && (location.getX() <= DriveConstants.kFieldMaxX)
         && (location.getY() <= DriveConstants.kFieldMaxY);
   }
