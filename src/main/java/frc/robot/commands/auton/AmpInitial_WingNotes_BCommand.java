@@ -26,28 +26,24 @@ public class AmpInitial_WingNotes_BCommand extends SequentialCommandGroup {
       RobotStateSubsystem robotStateSubsystem,
       String pathOne,
       String pathTwo,
-      String pathThree,
-      String pathFour) {
+      String pathThree) {
     firstPath = new DriveAutonCommand(driveSubsystem, pathOne, true, true);
     secondPath = new DriveAutonCommand(driveSubsystem, pathTwo, false, false);
     thirdPath = new DriveAutonCommand(driveSubsystem, pathThree, false, false);
-    fourthPath = new DriveAutonCommand(driveSubsystem, pathFour, false, false);
     this.robotStateSubsystem = robotStateSubsystem;
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
         new setAngleOffsetCommand(driveSubsystem, 60.0),
-        firstPath,
-        secondPath,
-        thirdPath,
-        fourthPath);
+        firstPath);
+    // secondPath,
+    // thirdPath);
   }
 
   public void generateTrajectory() {
     firstPath.generateTrajectory();
     secondPath.generateTrajectory();
     thirdPath.generateTrajectory();
-    fourthPath.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }
