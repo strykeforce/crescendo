@@ -17,11 +17,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.climb.JogClimbClosedLoopCommand;
+import frc.robot.commands.climb.ToggleRatchetCommand;
+import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
+import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.PodiumCommand;
@@ -35,7 +39,10 @@ import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
+import frc.robot.subsystems.climb.ClimbIOFX;
+import frc.robot.subsystems.climb.ClimbRatchetIOServo;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.TrapBarIOServo;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.elbow.ElbowIOFX;
@@ -92,7 +99,8 @@ public class RobotContainer {
     wristSubsystem = new WristSubsystem(new WristIOSRX());
     elbowSubsystem = new ElbowSubsystem(new ElbowIOFX());
     shooterSubsystem = new ShooterSubsystem(new ShooterIOFX());
-    climbSubsystem = new ClimbSubsystem();
+    climbSubsystem =
+        new ClimbSubsystem(new ClimbIOFX(), new ClimbRatchetIOServo(), new TrapBarIOServo());
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
 
@@ -112,7 +120,8 @@ public class RobotContainer {
     // testAutonPath.generateTrajectory();
 
     configureDriverBindings();
-    configureOperatorBindings();
+    // configureOperatorBindings();
+    configureClimbTestBindings();
     configureMatchDashboard();
     configurePitDashboard();
     configureTuningDashboard();
@@ -181,7 +190,7 @@ public class RobotContainer {
     elbowSubsystem.registerWith(telemetryService);
     shooterSubsystem.registerWith(telemetryService);
     superStructure.registerWith(telemetryService);
-    // climbSubsystem.registerWith(telemetryService);
+    climbSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     robotStateSubsystem.registerWith(telemetryService);
@@ -345,6 +354,43 @@ public class RobotContainer {
         .onFalse(
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+  }
+
+  public void configureClimbTestBindings() {
+    // Open Loop Wrist
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.2))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.2))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+
+    // Open Loop Elbow
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, 0.1))
+        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
+        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+
+    // Climb Jog
+    new Trigger((() -> xboxController.getLeftTriggerAxis() > RobotConstants.kJoystickDeadband))
+        .onTrue(new JogClimbClosedLoopCommand(0.5, climbSubsystem));
+    new Trigger((() -> xboxController.getRightTriggerAxis() > RobotConstants.kJoystickDeadband))
+        .onTrue(new JogClimbClosedLoopCommand(-0.5, climbSubsystem));
+
+    // Trap Bar
+    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+        .onTrue(new ToggleTrapBarPosCommand(climbSubsystem));
+
+    // Ratchet
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .onTrue(new ToggleRatchetCommand(climbSubsystem));
+
+    // Eject Trap
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
+        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, -0.2))
+        .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0.0));
   }
 
   public Command getAutonomousCommand() {

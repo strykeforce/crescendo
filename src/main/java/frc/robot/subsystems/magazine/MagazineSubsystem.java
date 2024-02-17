@@ -94,7 +94,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     releaseTimer.stop();
     releaseTimer.reset();
     releaseTimer.start();
-    setSpeed(MagazineConstants.kReleaseSpeed);
+    setSpeed(MagazineConstants.kAmpReleaseSpeed);
     setState(MagazineStates.RELEASE);
   }
 
@@ -212,7 +212,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case PREP_PODIUM:
         if (isNotePrepped()) {
-          setSpeed(MagazineConstants.kShootSpeed);
+          setSpeed(MagazineConstants.kPodiumShootSpeed);
           setState(MagazineStates.SPEEDUP);
           atEdgeOne = false;
           pastEdgeOne = false;

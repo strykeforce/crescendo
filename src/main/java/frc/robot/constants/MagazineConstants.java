@@ -11,16 +11,16 @@ public final class MagazineConstants {
   public static final double kCloseEnough = 10;
   public static final double kShootCloseEnough = 10;
   // public static final double kFeedingSpeed = 0.5;
-  public static final double kShootSpeed = 90; // FIXME
   public static final int kMinBeamBreaks = 3;
   public static final double kIntakingSpeed = -46;
-  public static final double kEmptyingSpeed = -72;
+  public static final double kEmptyingSpeed = -90; // -72
   public static final double kReversingSpeed = 4.8; // TODO do testing to determine correct speed
-  public static final double kReleaseSpeed = 20.0;
 
   public static final double kReleaseTime = 0.75;
-
   public static final double kPodiumPrepareSpeed = -10;
+  public static final double kPodiumShootSpeed = 90; // FIXME
+  public static final double kTrapReleaseSpeed = -20.0;
+  public static final double kAmpReleaseSpeed = 20.0;
 
   public static final TalonFXConfiguration getMagazineConfig() {
     TalonFXConfiguration config = new TalonFXConfiguration();

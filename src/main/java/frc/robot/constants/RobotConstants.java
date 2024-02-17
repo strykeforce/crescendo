@@ -41,6 +41,16 @@ public class RobotConstants {
   public static Double kElbowZero = 0.11206;
   public static Double kWristZero = 1132.0;
 
+  // Climb Servos
+  public static Double kLeftTrapBarExtend = 0.0;
+  public static Double kLeftTrapBarRetract = 0.0;
+  public static Double kRightTrapBarExtend = 0.0;
+  public static Double kRightTrapBarRetract = 0.0;
+  public static Double kLeftRatchetOn = 0.0;
+  public static Double kLeftRatchetOff = 0.0;
+  public static double kRightRatchetOn = 0.0;
+  public static double kRightRatchetOff = 0.0;
+
   public RobotConstants() {
     logger.info("SN: {}, isCompBot: {}", RobotController.getSerialNumber(), isCompBot);
     if (isCompBot) {
@@ -48,11 +58,27 @@ public class RobotConstants {
       kWheelDiameterInches = CompConstants.kWheelDiameterInches;
       kElbowZero = CompConstants.kElbowZero;
       kWristZero = CompConstants.kWristZero;
+      kLeftTrapBarExtend = CompConstants.kLeftTrapBarExtend;
+      kRightTrapBarExtend = CompConstants.kRightTrapBarExtend;
+      kLeftTrapBarRetract = CompConstants.kLeftTrapBarRetract;
+      kRightTrapBarRetract = CompConstants.kRightTrapBarRetract;
+      kLeftRatchetOff = CompConstants.kLeftRatchetOff;
+      kRightRatchetOff = CompConstants.kRightRatchetOff;
+      kLeftRatchetOn = CompConstants.kLeftRatchetOn;
+      kRightRatchetOn = CompConstants.kRightRatchetOn;
     } else {
       logger.info("Using Proto Robot Constants");
       kWheelDiameterInches = ProtoConstants.kWheelDiameterInches;
       kElbowZero = ProtoConstants.kElbowZero;
       kWristZero = ProtoConstants.kWristZero;
+      kLeftTrapBarExtend = ProtoConstants.kLeftTrapBarExtend;
+      kRightTrapBarExtend = ProtoConstants.kRightTrapBarExtend;
+      kLeftTrapBarRetract = ProtoConstants.kLeftTrapBarRetract;
+      kRightTrapBarRetract = ProtoConstants.kRightTrapBarRetract;
+      kLeftRatchetOff = ProtoConstants.kLeftRatchetOff;
+      kRightRatchetOff = ProtoConstants.kRightRatchetOff;
+      kLeftRatchetOn = ProtoConstants.kLeftRatchetOn;
+      kRightRatchetOn = ProtoConstants.kRightRatchetOn;
     }
   }
 
@@ -65,6 +91,16 @@ public class RobotConstants {
 
     // Wrist
     public static final Double kWristZero = 0.0;
+
+    // Climb
+    public static final Double kLeftTrapBarExtend = 0.0;
+    public static final Double kLeftTrapBarRetract = 0.0;
+    public static final Double kRightTrapBarExtend = 0.0;
+    public static final Double kRightTrapBarRetract = 0.0;
+    public static final Double kLeftRatchetOn = 0.0;
+    public static final Double kLeftRatchetOff = 0.0;
+    public static final double kRightRatchetOn = 0.0;
+    public static final double kRightRatchetOff = 0.0;
   }
 
   public static class ProtoConstants {
@@ -76,5 +112,15 @@ public class RobotConstants {
 
     // Wrist
     public static final Double kWristZero = 3293.0; // 3310
+
+    // Climb
+    public static final Double kLeftTrapBarExtend = 0.0;
+    public static final Double kLeftTrapBarRetract = 0.0;
+    public static final Double kRightTrapBarExtend = 0.0;
+    public static final Double kRightTrapBarRetract = 0.0;
+    public static final Double kLeftRatchetOn = 0.0;
+    public static final Double kLeftRatchetOff = 0.0;
+    public static final double kRightRatchetOn = 0.0;
+    public static final double kRightRatchetOff = 0.0;
   }
 }
