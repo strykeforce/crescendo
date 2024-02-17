@@ -70,6 +70,7 @@ public class Swerve implements SwerveIO {
       configurator = driveTalon.getConfigurator();
       configurator.apply(new TalonFXConfiguration()); // factory default
       configurator.apply(DriveConstants.getDriveTalonConfig());
+      driveTalon.getClosedLoopReference().setUpdateFrequency(100);
 
       swerveModules[i] =
           moduleBuilder

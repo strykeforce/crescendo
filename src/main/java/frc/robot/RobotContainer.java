@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.HoloContTuningCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
@@ -81,7 +81,8 @@ public class RobotContainer {
   private SuppliedValueWidget<Boolean> allianceColor;
   private Boolean isEvent = true;
 
-  private DriveAutonCommand testAutonPath;
+  //   private DriveAutonCommand testAutonPath;
+  private HoloContTuningCommand holoContTuningCommand;
   public GenericEntry lShooterSpeed;
   public GenericEntry rShooterSpeed;
   public GenericEntry magazineSpeed;
@@ -111,8 +112,11 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
-    testAutonPath = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot1", true, true);
-    testAutonPath.generateTrajectory();
+    // testAutonPath = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
+    // testAutonPath.generateTrajectory();
+
+    holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
+    holoContTuningCommand.generateTrajectory();
 
     configureDriverBindings();
     configureOperatorBindings();
@@ -255,7 +259,8 @@ public class RobotContainer {
     //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
     //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
 
-    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(testAutonPath);
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(holoContTuningCommand);
 
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .onTrue(
