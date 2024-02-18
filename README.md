@@ -22,7 +22,7 @@
 | Drive     | FX       | drive      | 11  |  1       | 1         | kraken |         |
 | Drive     | FX       | drive      | 12  |  19      | 19        | kraken |         |
 | Drive     | FX       | drive      | 13  |  0       | 0         | kraken |         |
-| Intake    | FX       | intake     | 20  |  4       | 3         | falcon |         |
+| Intake    | FX       | intake     | 20  |  5       | 3         | falcon |         |
 | Magazine  | FX       | magazine   | 25  |  10      | 13        | falcon |         |
 | Elbow     | FX       | elbow      | 30  |  6       | 5         | falcon |         |
 | Elbow     | CANcoder | cancoder   | 31  |          |           | -      |         |
@@ -30,7 +30,7 @@
 | Shooter   | FX       | leftShoot  | 40  |  12      | 12        | falcon |         |
 | Shooter   | FX       | rightShoot | 41  |  13      | 10        | falcon |         |
 | Climb     | FX       | leftClimb  | 50  |  15      |           | falcon |         |
-| Climb     | FX       | rightClimb | 51  |  5       |           | falcon |         |
+| Climb     | FX       | rightClimb | 51  |  4       |           | falcon |         |
 | -         | rio      | -          | -   | 20       |           |        |         |
 | coder/sw  | vrm      | top        | -   | 21       |           |        |         |
 | radio     | vrm      | bottom     | -   | 22       |           |        |         |
