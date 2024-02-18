@@ -23,10 +23,10 @@
 | Drive     | FX       | drive      | 12  |  19      | 19        | kraken |         |
 | Drive     | FX       | drive      | 13  |  0       | 0         | kraken |         |
 | Intake    | FX       | intake     | 20  |  4       | 3         | falcon |         |
-| Magazine  | FX       | magazine   | 25  |          | 13        | falcon |         |
+| Magazine  | FX       | magazine   | 25  |  10      | 13        | falcon |         |
 | Elbow     | FX       | elbow      | 30  |  6       | 5         | falcon |         |
 | Elbow     | CANcoder | cancoder   | 31  |          |           | -      |         |
-| Wrist     | SRX      | wrist      | 35  |          | 11        | 9015   |         |
+| Wrist     | SRX      | wrist      | 35  |  11      | 11        | 9015   |         |
 | Shooter   | FX       | leftShoot  | 40  |          | 12        | falcon |         |
 | Shooter   | FX       | rightShoot | 41  |          | 10        | falcon |         |
 | Climb     | FX       | leftClimb  | 50  |  15      |           | falcon |         |
