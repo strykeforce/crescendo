@@ -57,6 +57,20 @@
 |           |                | 8   |
 |           |                | 9   |
 
+## PWM
+| Subsystem | name         | ID  |
+| --------- | ------------ | --- |
+| Climb     | leftRatchet  | 0   |
+| Climb     | rightRatchet | 1   |
+| Climb     | leftTrapBar  | 2   |
+| Climb     | rightTrapBar | 3   |
+|           |              | 4   |
+|           |              | 5   |
+|           |              | 6   |
+|           |              | 7   |
+|           |              | 8   |
+|           |              | 9 |
+
 ## MXP
 | Subsystem | name   | ID |
 | --------- | ------ | -- |

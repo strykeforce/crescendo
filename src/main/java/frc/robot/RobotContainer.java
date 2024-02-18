@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
 import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
+import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
@@ -391,6 +392,10 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kA.value)
         .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, -0.2))
         .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0.0));
+
+    // Zero
+    new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .onTrue(new ZeroClimbCommand(climbSubsystem));
   }
 
   public Command getAutonomousCommand() {

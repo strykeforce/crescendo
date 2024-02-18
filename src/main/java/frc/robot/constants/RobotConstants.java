@@ -93,12 +93,13 @@ public class RobotConstants {
     public static final Double kWristZero = 0.0;
 
     // Climb
-    public static final Double kLeftTrapBarExtend = 0.0;
-    public static final Double kLeftTrapBarRetract = 0.0;
-    public static final Double kRightTrapBarExtend = 0.0;
-    public static final Double kRightTrapBarRetract = 0.0;
+    public static final Double kLeftTrapBarExtend = 0.8;
+    public static final Double kLeftTrapBarRetract = 0.36;
+    public static final Double kRightTrapBarExtend = 0.18;
+    public static final Double kRightTrapBarRetract = 0.6;
     public static final Double kLeftRatchetOn = 0.0;
     public static final Double kLeftRatchetOff = 0.0;
+    
     public static final double kRightRatchetOn = 0.0;
     public static final double kRightRatchetOff = 0.0;
   }
