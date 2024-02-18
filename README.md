@@ -27,8 +27,8 @@
 | Elbow     | FX       | elbow      | 30  |  6       | 5         | falcon |         |
 | Elbow     | CANcoder | cancoder   | 31  |          |           | -      |         |
 | Wrist     | SRX      | wrist      | 35  |  11      | 11        | 9015   |         |
-| Shooter   | FX       | leftShoot  | 40  |          | 12        | falcon |         |
-| Shooter   | FX       | rightShoot | 41  |          | 10        | falcon |         |
+| Shooter   | FX       | leftShoot  | 40  |  12      | 12        | falcon |         |
+| Shooter   | FX       | rightShoot | 41  |  13      | 10        | falcon |         |
 | Climb     | FX       | leftClimb  | 50  |  15      |           | falcon |         |
 | Climb     | FX       | rightClimb | 51  |  5       |           | falcon |         |
 | -         | rio      | -          | -   | 20       |           |        |         |
