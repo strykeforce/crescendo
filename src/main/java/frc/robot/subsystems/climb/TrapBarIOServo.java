@@ -10,7 +10,7 @@ public class TrapBarIOServo implements TrapBarIO {
   private Servo rightTrap;
 
   public TrapBarIOServo() {
-    leftTrap = new Servo(ClimbConstants.kLeftRatchetId);
+    leftTrap = new Servo(ClimbConstants.kLeftTrapBarId);
     rightTrap = new Servo(ClimbConstants.kRightTrapBarId);
   }
 

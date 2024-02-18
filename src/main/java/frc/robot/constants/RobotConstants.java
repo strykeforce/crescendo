@@ -99,7 +99,7 @@ public class RobotConstants {
     public static final Double kRightTrapBarRetract = 0.6;
     public static final Double kLeftRatchetOn = 0.0;
     public static final Double kLeftRatchetOff = 0.0;
-    
+
     public static final double kRightRatchetOn = 0.0;
     public static final double kRightRatchetOff = 0.0;
   }

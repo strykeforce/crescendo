@@ -20,6 +20,6 @@ public class JogClimbClosedLoopCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return climbSubsystem.isFinished();
   }
 }

@@ -86,6 +86,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   @Override
   public void zero() {
     climbIO.zero();
+    logger.info("Zeroed Climb");
   }
 
   @Override
@@ -97,11 +98,12 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   @Override
   public Set<Measure> getMeasures() {
     // TODO Auto-generated method stub
-    return null;
+    return Set.of();
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
+    climbIO.registerWith(telemetryService);
   }
 }
