@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
+import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
@@ -29,6 +30,7 @@ import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.robotState.AmpCommand;
+import frc.robot.commands.robotState.DistanceShootCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.PodiumCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
@@ -38,6 +40,7 @@ import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -170,6 +173,28 @@ public class RobotContainer {
         .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))
         .withSize(1, 1)
         .withPosition(2, 0);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "DistanceShoot",
+            new DistanceShootCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                AutonConstants.kAI1ToSpeakerDist))
+        .withSize(1, 1)
+        .withPosition(4, 0);
+
+    Shuffleboard.getTab("Pit")
+        .add("Toggle isAuto", new ToggleIsAutoCommand(robotStateSubsystem))
+        .withSize(1, 1)
+        .withPosition(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .addBoolean("isAuto", () -> robotStateSubsystem.getIsAuto())
+        .withSize(1, 1)
+        .withPosition(2, 1);
   }
 
   private void configureMatchDashboard() {

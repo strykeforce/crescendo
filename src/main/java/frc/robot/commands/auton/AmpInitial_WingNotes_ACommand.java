@@ -2,6 +2,7 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
@@ -42,7 +43,7 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
-        new setAngleOffsetCommand(driveSubsystem, 60.0),
+        new setAngleOffsetCommand(driveSubsystem, 50.0),
         new DistanceShootCommand(
             robotStateSubsystem,
             superStructure,
@@ -50,12 +51,15 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
             intakeSubsystem,
             AutonConstants.kAI1ToSpeakerDist),
         firstPath,
+        new WaitCommand(0.1),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         secondPath,
+        new WaitCommand(0.1),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         thirdPath,
+        new WaitCommand(0.2),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }

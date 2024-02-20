@@ -9,9 +9,9 @@ target_yaw = 30.0 #degrees
     dataPoint = "AI1"
 [end_pose]
     dataPoint = "W1"
-    angle = 30
+    angle = 30.0
     dY = -0.1
 
 [[internal_points]]
-    x = 1.74
+    x = 1.99
     y = 6.72

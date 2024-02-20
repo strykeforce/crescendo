@@ -237,7 +237,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
               org.littletonrobotics.junction.Logger.recordOutput(output, logPose.toPose2d());
               offWheels++;
               if (offWheels >= VisionConstants.kMaxTimesOffWheels) {
-                logger.info("{} -> TRUSTVISION", curState);
+                // logger.info("{} -> TRUSTVISION", curState);
                 curState = VisionStates.TRUSTVISION;
               }
             }

@@ -31,6 +31,6 @@ public class DistanceShootCommand extends Command {
   public boolean isFinished() {
     RobotStates curState = robotStateSubsystem.getState();
 
-    return (curState != RobotStates.SHOOTING || curState != RobotStates.TO_SHOOT);
+    return (curState != RobotStates.SHOOTING && curState != RobotStates.TO_SHOOT);
   }
 }

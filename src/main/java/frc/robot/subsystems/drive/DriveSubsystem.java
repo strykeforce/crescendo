@@ -92,13 +92,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (!isAligningShot) {
       io.drive(vXmps, vYmps, vOmegaRadps, true);
     } else {
-      double vOmegaRadpsNew =
-          omegaController.calculate(
-              getPoseMeters().getRotation().getRadians(),
-              getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
-
+      double vOmegaRadpsNew = getvOmegaToGoal();
       io.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
+  }
+
+  public double getvOmegaToGoal() {
+    return omegaController.calculate(
+        getPoseMeters().getRotation().getRadians(),
+        getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
   }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
