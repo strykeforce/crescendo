@@ -16,6 +16,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private Logger logger = LoggerFactory.getLogger(ElbowSubsystem.class);
   private double setpoint = 0;
   private ElbowStates curState = ElbowStates.IDLE;
+  private int zeroStable = 0;
 
   public ElbowSubsystem(ElbowIO io) {
     this.io = io;
@@ -58,9 +59,13 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public void zero() {
-    io.zero();
+    // io.setCurrentLimit(ElbowConstants.getZeroCurrentLimitConfig());
+    // io.setPct(ElbowConstants.kZeroVelocity);
+    // setState(ElbowStates.ZEROING);
+    // zeroStable = 0;
 
-    logger.info("Elbow zeroed");
+    io.zero();
+    logger.info("Elbow starting zeroing");
   }
 
   @Override
@@ -76,6 +81,19 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         if (isFinished()) {
           curState = ElbowStates.IDLE;
         }
+        break;
+      case ZEROING:
+        if (inputs.velocity <= ElbowConstants.kMinVelocityZeroing) zeroStable++;
+        else zeroStable = 0;
+        if (zeroStable > ElbowConstants.kMinStableZeroCounts) {
+          setState(ElbowStates.ZEROED);
+          io.zero();
+          io.setPct(0.0);
+          io.setCurrentLimit(ElbowConstants.getCurrentLimitConfig());
+        }
+
+        break;
+      case ZEROED:
         break;
     }
   }
@@ -93,6 +111,8 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public enum ElbowStates {
     IDLE,
-    MOVING
+    MOVING,
+    ZEROING,
+    ZEROED
   }
 }

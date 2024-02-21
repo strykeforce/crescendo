@@ -12,7 +12,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 public final class ElbowConstants {
   public static final int kElbowTalonFxId = 30;
   public static final int kRemoteEncoderID = 31;
-  public static final double kCloseEnoughRots = 0.35;
+  public static final double kCloseEnoughRots = 0.75;
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
 
@@ -22,6 +22,10 @@ public final class ElbowConstants {
   public static final double kFxChain = 50.0 / 24.0;
 
   public static final double kElbowTestPos = 0.0;
+
+  public static final double kMinVelocityZeroing = 1;
+  public static final int kMinStableZeroCounts = 10;
+  public static final double kZeroVelocity = 0.07;
 
   public static CANcoderConfiguration getCanCoderConfig() {
     CANcoderConfiguration config = new CANcoderConfiguration();
@@ -72,6 +76,20 @@ public final class ElbowConstants {
     config.SupplyCurrentLimit = 20;
     config.SupplyCurrentThreshold = 20;
     config.SupplyTimeThreshold = .02;
+    config.SupplyCurrentLimitEnable = true;
+
+    return config;
+  }
+
+  public static CurrentLimitsConfigs getZeroCurrentLimitConfig() {
+    CurrentLimitsConfigs config = new CurrentLimitsConfigs();
+
+    config.StatorCurrentLimit = 10.0;
+    config.StatorCurrentLimitEnable = true;
+
+    config.SupplyCurrentLimit = 10;
+    config.SupplyCurrentThreshold = 10;
+    config.SupplyTimeThreshold = 0.1;
     config.SupplyCurrentLimitEnable = true;
 
     return config;

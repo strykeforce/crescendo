@@ -21,7 +21,9 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.XLockCommand;
+import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
+import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.PodiumCommand;
@@ -130,6 +132,14 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
         .withSize(1, 1)
         .withPosition(0, 0);
+    Shuffleboard.getTab("Pit")
+        .add("Elbow Zero Position", new ClosedLoopElbowCommand(elbowSubsystem, 0.0))
+        .withSize(1, 1)
+        .withPosition(1, 0);
+    Shuffleboard.getTab("Pit")
+        .add("Zero Elbow", new ZeroElbowCommand(elbowSubsystem))
+        .withSize(1, 1)
+        .withPosition(2, 0);
   }
 
   private void configureMatchDashboard() {

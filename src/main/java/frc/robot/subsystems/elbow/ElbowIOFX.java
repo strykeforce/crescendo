@@ -3,6 +3,7 @@ package frc.robot.subsystems.elbow;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -98,11 +99,18 @@ public class ElbowIOFX implements ElbowIO {
   public void updateInputs(ElbowIOInputs inputs) {
     inputs.positionRots = currPosition.refresh().getValue();
     inputs.absRots = absRots.refresh().getValue();
+    inputs.velocity = currVelocity.refresh().getValue();
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(elbow, true);
     telemetryService.register(new CancoderMeasureable(remoteEncoder));
+  }
+
+  @Override
+  public void setCurrentLimit(CurrentLimitsConfigs config) {
+    configurator = elbow.getConfigurator();
+    configurator.apply(config);
   }
 }
