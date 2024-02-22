@@ -22,6 +22,7 @@ import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
+import frc.robot.commands.elbow.DynamicZeroPosCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.robotState.AmpCommand;
@@ -140,6 +141,10 @@ public class RobotContainer {
         .add("Zero Elbow", new ZeroElbowCommand(elbowSubsystem))
         .withSize(1, 1)
         .withPosition(2, 0);
+    Shuffleboard.getTab("Pit")
+        .add("ShootingZeroTest", new DynamicZeroPosCommand(elbowSubsystem, 25.0))
+        .withSize(1, 1)
+        .withPosition(3, 0);
   }
 
   private void configureMatchDashboard() {

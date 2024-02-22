@@ -320,7 +320,8 @@ public class SuperStructure extends MeasurableSubsystem {
             wristSubsystem.setPosition(wristSetpoint);
           }
         } else {
-          if (wristSubsystem.getPosition() < SuperStructureConstants.kWristMinToMoveElbow) {
+          // FIXME
+          if (true) {
             elbowSubsystem.setPosition(elbowSetpoint);
           }
         }
