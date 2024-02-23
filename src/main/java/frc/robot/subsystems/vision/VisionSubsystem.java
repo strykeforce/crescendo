@@ -202,6 +202,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     // Go through results
     for (Pair<WallEyeResult, Integer> res : validResults) {
+      adaptiveVisionMatrix.set(0, 0, .1);
+      adaptiveVisionMatrix.set(1, 0, .1);
 
       // Take out data from pair
       WallEyeResult result = res.getFirst();

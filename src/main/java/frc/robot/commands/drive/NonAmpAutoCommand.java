@@ -7,6 +7,7 @@ public class NonAmpAutoCommand extends SequentialCommandGroup {
   private DriveAutonCommand initialToNote5;
   private DriveAutonCommand note5ToShoot;
   private DriveAutonCommand shootToNote4;
+  private DriveAutonCommand note4ToShoot;
   private boolean hasGenerated = false;
 
   public NonAmpAutoCommand(DriveSubsystem driveSubsystem) {
@@ -14,12 +15,13 @@ public class NonAmpAutoCommand extends SequentialCommandGroup {
         new DriveAutonCommand(driveSubsystem, "NonAmpInitial1_MiddleNote5", true, true);
     note5ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot1", true, false);
     shootToNote4 = new DriveAutonCommand(driveSubsystem, "NonAmpShoot1_MiddleNote4", true, false);
+    note4ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote4_NonAmpShoot1", true, false);
 
     addCommands(
         new SequentialCommandGroup(
             // new ToggleVisionUpdatesCommand(driveSubsystem),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-60)),
-            initialToNote5, note5ToShoot, shootToNote4
+            initialToNote5, note5ToShoot, shootToNote4, note4ToShoot
             // new ToggleVisionUpdatesCommand(driveSubsystem)
             ));
   }
@@ -28,6 +30,7 @@ public class NonAmpAutoCommand extends SequentialCommandGroup {
     initialToNote5.generateTrajectory();
     note5ToShoot.generateTrajectory();
     shootToNote4.generateTrajectory();
+    note4ToShoot.generateTrajectory();
     hasGenerated = true;
   }
 
