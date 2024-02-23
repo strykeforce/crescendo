@@ -29,5 +29,5 @@ public final class AutonConstants {
     public static final Pose2d NAS1 = new Pose2d(2.81, 4.0, Rotation2d.fromDegrees(0.0));
   }
   // distances to speaker
-  public static final double kAI1ToSpeakerDist = 1.77;
+  public static final double kAI1ToSpeakerDist = 1.2;
 }

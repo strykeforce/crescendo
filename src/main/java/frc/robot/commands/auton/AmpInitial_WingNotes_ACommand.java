@@ -52,14 +52,17 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
             AutonConstants.kAI1ToSpeakerDist),
         firstPath,
         new WaitCommand(0.1),
+        new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         secondPath,
         new WaitCommand(0.1),
+        new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         thirdPath,
         new WaitCommand(0.2),
+        new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
