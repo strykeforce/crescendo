@@ -103,6 +103,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
         getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
   }
 
+  public double getvOmegaToTarget(Rotation2d target) {
+    return omegaController.calculate(
+        getPoseMeters().getRotation().getRadians(),
+        target);
+  }
+
   // Closed-Loop (Velocity Controlled) Swerve Movement
   public void move(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);

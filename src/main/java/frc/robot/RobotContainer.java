@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
+import frc.robot.commands.auton.AmpInitial_WingNotesCommand_A;
+import frc.robot.commands.auton.AmpInitial_WingNotesCommand_B;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
-import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
@@ -86,14 +86,12 @@ public class RobotContainer {
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
   private Boolean isEvent = true;
-
-  private DriveAutonCommand testAutonPath;
   public GenericEntry lShooterSpeed;
   public GenericEntry rShooterSpeed;
   public GenericEntry magazineSpeed;
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
-  private AmpInitial_WingNotes_ACommand testPath;
+  private AmpInitial_WingNotesCommand_B testPath;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -118,19 +116,17 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
-    testAutonPath = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot1", true, true);
-    testAutonPath.generateTrajectory();
 
     testPath =
-        new AmpInitial_WingNotes_ACommand(
+        new AmpInitial_WingNotesCommand_B(
             driveSubsystem,
             robotStateSubsystem,
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
             "AmpInitial1_WingNote1",
-            "WingNote1_WingNote2_A",
-            "WingNote2_WingNote3_A");
+            "WingNote1_WingNote2_B",
+            "WingNote2_WingNote3_B");
 
     configureDriverBindings();
     configureOperatorBindings();
