@@ -30,4 +30,5 @@ public final class AutonConstants {
   }
   // distances to speaker
   public static final double kAI1ToSpeakerDist = 1.2;
+  public static final double kNAI1ToSpeakerDist = 1.2;
 }

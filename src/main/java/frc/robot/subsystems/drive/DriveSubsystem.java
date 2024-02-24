@@ -44,6 +44,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private RobotStateSubsystem robotStateSubsystem;
 
   private final ProfiledPIDController omegaController;
+  private final ProfiledPIDController omegaSpinController;
   private final PIDController xController;
   private final PIDController yController;
 
@@ -62,6 +63,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public DriveSubsystem(SwerveIO io) {
     this.io = io;
 
+    // Setup omega Controller
+    omegaSpinController =
+        new ProfiledPIDController(
+            DriveConstants.kPOmega,
+            DriveConstants.kIOmega,
+            DriveConstants.kDOmega,
+            new TrapezoidProfile.Constraints(
+                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaSpin));
+    omegaSpinController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
+
     // Setup Holonomic Controller
     omegaController =
         new ProfiledPIDController(
@@ -69,7 +80,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmega));
+                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaPath));
     omegaController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     xController =
@@ -98,15 +109,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public double getvOmegaToGoal() {
-    return omegaController.calculate(
+    return omegaSpinController.calculate(
         getPoseMeters().getRotation().getRadians(),
         getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
   }
 
   public double getvOmegaToTarget(Rotation2d target) {
-    return omegaController.calculate(
-        getPoseMeters().getRotation().getRadians(),
-        target);
+    holoContAngle = target;
+    return omegaSpinController.calculate(
+        getPoseMeters().getRotation().getRadians(), target.getRadians());
   }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
@@ -153,10 +164,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
     xController.reset();
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
+    omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
   }
 
   public void resetOmegaController() {
     omegaController.reset(inputs.gyroRotation2d.getRadians());
+    omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
   }
 
   // Getters/Setters
@@ -552,6 +565,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
         new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()),
-        new Measure("Distance to goal", () -> getDistanceToSpeaker()));
+        new Measure("Distance to goal", () -> getDistanceToSpeaker()),
+        new Measure("Target Angle", () -> omegaController.getGoal().position),
+        new Measure("Target Angle2", () -> holoContAngle.getDegrees()));
   }
 }

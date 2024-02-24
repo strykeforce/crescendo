@@ -176,6 +176,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.safeIntake();
     // magazineSubsystem.toIntaking();
     magazineSubsystem.setEmpty();
+    intakeSubsystem.setEmpty();
     setState(RobotStates.TO_INTAKING);
   }
 
@@ -184,6 +185,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.intake();
     // magazineSubsystem.toIntaking();
     magazineSubsystem.setEmpty();
+    intakeSubsystem.setEmpty();
     setState(RobotStates.TO_INTAKING);
   }
 
@@ -201,7 +203,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
 
-    magazineSubsystem.setSpeed(0.0);
+    magazineSubsystem.setPercent(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
     setState(RobotStates.TO_SHOOT);

@@ -71,21 +71,21 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   // Helper Methods
   public void toIntaking() {
     resetRevBeamCounts();
-    io.enableRevLimitSwitch(true);
+    enableRevLimitSwitch(true);
     setState(MagazineStates.INTAKING);
     setSpeed(MagazineConstants.kIntakingSpeed);
   }
 
   public void toEmptying() {
     resetRevBeamCounts();
-    io.enableRevLimitSwitch(false);
+    enableRevLimitSwitch(false);
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EMPTYING);
   }
 
   public void toEmptying(double speed) {
     resetRevBeamCounts();
-    io.enableRevLimitSwitch(false);
+    enableRevLimitSwitch(false);
     setSpeed(speed);
     setState(MagazineStates.EMPTYING);
   }
@@ -99,13 +99,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   public void setEmpty() {
-    io.enableRevLimitSwitch(true);
+    enableRevLimitSwitch(true);
     io.setPct(0.0);
     setState(MagazineStates.EMPTY);
   }
 
   public void preparePodium() {
-    io.enableRevLimitSwitch(false);
+    enableRevLimitSwitch(false);
     resetRevBeamCounts();
     setSpeed(MagazineConstants.kPodiumPrepareSpeed);
     setState(MagazineStates.PREP_PODIUM);
@@ -161,6 +161,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   public void enableRevLimitSwitch(boolean enabled) {
+    logger.info("enable Magazine Beam: {}", enabled);
     io.enableRevLimitSwitch(enabled);
   }
 
@@ -227,6 +228,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         }
         break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("Magazine State", curState.ordinal());
   }
 
   // Grapher

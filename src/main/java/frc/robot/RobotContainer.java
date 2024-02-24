@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.auton.AmpInitial_WingNotesCommand_A;
 import frc.robot.commands.auton.AmpInitial_WingNotesCommand_B;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;

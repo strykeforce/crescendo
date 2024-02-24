@@ -1,7 +1,6 @@
 package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -58,7 +57,7 @@ public class AmpInitial_WingNotesCommand_B extends SequentialCommandGroup {
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-        new TurnToAngleCommand(driveSubsystem, new Rotation2d(0.0)),
+        new TurnToAngleCommand(driveSubsystem, Rotation2d.fromDegrees(-90.0)),
         secondPath,
         new WaitCommand(0.1),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
