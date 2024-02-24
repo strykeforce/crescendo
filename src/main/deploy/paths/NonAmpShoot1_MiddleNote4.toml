@@ -7,7 +7,7 @@ target_yaw = 0.0 #degrees
 
 [start_pose]
     dataPoint = "NAS1"
-    angle = 33.2
+    angle = -60.0
 
 [end_pose]
     dataPoint = "M4"
@@ -15,8 +15,4 @@ target_yaw = 0.0 #degrees
 
 [[internal_points]]
     x = 5.021
-    y = 1.45
-
-[[internal_points]]
-    x = 5.821
-    y = 1.45
+    y = 1.8
