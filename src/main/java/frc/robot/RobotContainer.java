@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
+import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.NonAmpAutoCommand;
@@ -24,8 +26,11 @@ import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
 import frc.robot.commands.drive.XLockCommand;
+import frc.robot.commands.drive.setAngleOffsetCommand;
+import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.robotState.AmpCommand;
+import frc.robot.commands.robotState.DistanceShootCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.PodiumCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
@@ -35,6 +40,7 @@ import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -88,6 +94,7 @@ public class RobotContainer {
   public GenericEntry magazineSpeed;
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
+  private AmpInitial_WingNotes_ACommand testPath;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -118,6 +125,7 @@ public class RobotContainer {
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
 
+
     configureDriverBindings();
     configureOperatorBindings();
     configureMatchDashboard();
@@ -137,16 +145,50 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
         .withSize(1, 1)
         .withPosition(0, 0);
+
+    Shuffleboard.getTab("Pit")
+        .add("gyro to 60", new setAngleOffsetCommand(driveSubsystem, 60))
+        .withSize(1, 1)
+        .withPosition(0, 1);
+
     Shuffleboard.getTab("Pit")
         .add("Lock Wheels Zero", new LockZeroCommand(driveSubsystem))
         .withSize(1, 1)
         .withPosition(1, 0);
+
     Shuffleboard.getTab("Pit")
         .add(
             "Set Gyro offset -60",
             new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-60)))
         .withSize(1, 1)
         .withPosition(3, 0);
+
+    Shuffleboard.getTab("Pit")
+        .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))
+        .withSize(1, 1)
+        .withPosition(2, 0);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "DistanceShoot",
+            new DistanceShootCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                AutonConstants.kAI1ToSpeakerDist))
+        .withSize(1, 1)
+        .withPosition(4, 0);
+
+    Shuffleboard.getTab("Pit")
+        .add("Toggle isAuto", new ToggleIsAutoCommand(robotStateSubsystem))
+        .withSize(1, 1)
+        .withPosition(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .addBoolean("isAuto", () -> robotStateSubsystem.getIsAuto())
+        .withSize(1, 1)
+        .withPosition(2, 1);
   }
 
   private void configureMatchDashboard() {
@@ -227,6 +269,8 @@ public class RobotContainer {
     } else {
       driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
     }
+
+    testPath.generateTrajectory();
   }
 
   public void setIsEvent(boolean isEvent) {
@@ -275,6 +319,9 @@ public class RobotContainer {
         .onTrue(
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    // Run auton
+    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(testPath);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));

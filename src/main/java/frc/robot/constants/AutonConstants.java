@@ -7,7 +7,7 @@ public final class AutonConstants {
   public final class Setpoints {
     // Starting Positions
     public static final Pose2d MI1 = new Pose2d(1.34, 5.55, Rotation2d.fromDegrees(0.0));
-    public static final Pose2d AI1 = new Pose2d(0.89, 6.58, Rotation2d.fromDegrees(60));
+    public static final Pose2d AI1 = new Pose2d(1.09, 6.94, Rotation2d.fromDegrees(50));
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
     public static final Pose2d NAI1 = new Pose2d(0.96, 4.21, Rotation2d.fromDegrees(-60));
 
@@ -28,4 +28,6 @@ public final class AutonConstants {
     public static final Pose2d MS1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
     public static final Pose2d NAS1 = new Pose2d(4.2, 2.8, Rotation2d.fromDegrees(-33.2));
   }
+  // distances to speaker
+  public static final double kAI1ToSpeakerDist = 1.2;
 }
