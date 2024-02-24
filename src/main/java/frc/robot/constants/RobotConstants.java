@@ -87,7 +87,7 @@ public class RobotConstants {
     public static final Double kWheelDiameterInches = 3.0;
 
     // Elbow
-    public static final Double kElbowZero = 0.0;
+    public static final Double kElbowZero = 0.23291;
 
     // Wrist
     public static final Double kWristZero = 0.0;
@@ -97,11 +97,11 @@ public class RobotConstants {
     public static final Double kLeftTrapBarRetract = 0.36;
     public static final Double kRightTrapBarExtend = 0.18;
     public static final Double kRightTrapBarRetract = 0.6;
-    public static final Double kLeftRatchetOn = 0.0;
-    public static final Double kLeftRatchetOff = 0.0;
 
-    public static final double kRightRatchetOn = 0.0;
-    public static final double kRightRatchetOff = 0.0;
+    public static final Double kLeftRatchetOn = 0.2;
+    public static final Double kLeftRatchetOff = 0.8;
+    public static final double kRightRatchetOn = 0.4;
+    public static final double kRightRatchetOff = 1.0;
   }
 
   public static class ProtoConstants {

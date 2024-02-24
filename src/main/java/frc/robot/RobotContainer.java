@@ -19,7 +19,8 @@ import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
-import frc.robot.commands.elbow.OpenLoopElbowCommand;
+import frc.robot.commands.elbow.HoldElbowCommand;
+import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
@@ -337,19 +338,19 @@ public class RobotContainer {
   public void configureClimbTestBindings() {
     // Open Loop Wrist
     new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.2))
-        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
-    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
         .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.2))
         .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.2))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
 
-    // Open Loop Elbow
+    // Closed Loop Elbow
     new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, 0.1))
-        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+        .onTrue(new JogElbowClosedLoopCommand(0.25, elbowSubsystem))
+        .onFalse(new HoldElbowCommand(elbowSubsystem));
     new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
-        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+        .onTrue(new JogElbowClosedLoopCommand(-0.25, elbowSubsystem))
+        .onFalse(new HoldElbowCommand(elbowSubsystem));
 
     // Climb Jog
     new Trigger((() -> xboxController.getLeftTriggerAxis() > RobotConstants.kJoystickDeadband))

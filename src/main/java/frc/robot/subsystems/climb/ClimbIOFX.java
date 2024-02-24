@@ -25,11 +25,14 @@ public class ClimbIOFX implements ClimbIO {
 
   MotionMagicVoltage leftPosRequest = new MotionMagicVoltage(0).withEnableFOC(false).withSlot(0);
   MotionMagicVoltage rightPosRequest = new MotionMagicVoltage(0).withEnableFOC(false).withSlot(0);
+
   DutyCycleOut leftPctRequest = new DutyCycleOut(0.0);
   DutyCycleOut rightPctRequest = new DutyCycleOut(0.0);
 
   StatusSignal<Double> leftPos;
   StatusSignal<Double> rightPos;
+  StatusSignal<Double> leftVel;
+  StatusSignal<Double> rightVel;
 
   public ClimbIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -47,12 +50,16 @@ public class ClimbIOFX implements ClimbIO {
 
     leftPos = leftClimb.getPosition().refresh();
     rightPos = rightClimb.getPosition().refresh();
+    leftVel = leftClimb.getVelocity().refresh();
+    rightVel = rightClimb.getVelocity().refresh();
   }
 
   @Override
   public void updateInputs(ClimbIOInputs inputs) {
     inputs.leftPosRots = leftPos.refresh().getValue();
     inputs.rightPosRots = rightPos.refresh().getValue();
+    inputs.leftVelocity = leftVel.refresh().getValue();
+    inputs.rightVelocity = rightVel.refresh().getValue();
   }
 
   @Override
@@ -80,6 +87,21 @@ public class ClimbIOFX implements ClimbIO {
   public void zero() {
     rightClimb.setPosition(0.0);
     leftClimb.setPosition(0.0);
+  }
+
+  @Override
+  public void setSoftLimitsEnabled(boolean enable) {
+    logger.info("Set climb soft limits: {}", enable);
+    leftConfig.apply(
+        ClimbConstants.getLeftConfig()
+            .SoftwareLimitSwitch
+            .withForwardSoftLimitEnable(enable)
+            .withReverseSoftLimitEnable(enable));
+    rightConfig.apply(
+        ClimbConstants.getRightConfig()
+            .SoftwareLimitSwitch
+            .withForwardSoftLimitEnable(enable)
+            .withReverseSoftLimitEnable(enable));
   }
 
   @Override

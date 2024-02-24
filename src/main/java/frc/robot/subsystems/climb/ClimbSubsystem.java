@@ -25,11 +25,17 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double rightSetpoint = 0.0;
   private boolean isTrapBarExtended = false;
   private boolean isRatchetOn = false;
+  private int climbZeroStableCounts = 0;
+
+  private ClimbStates curState = ClimbStates.IDLE;
 
   public ClimbSubsystem(ClimbIO climbIO, ClimbRatchetIO ratchetIO, TrapBarIO trapIO) {
     this.climbIO = climbIO;
     this.ratchetIO = ratchetIO;
     this.trapIO = trapIO;
+
+    enableRatchet(false);
+    retractTrapBar();
   }
 
   @Override
@@ -45,15 +51,15 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     else extendTrapBar();
   }
 
-  public void extendTrapBar() {
+  public void retractTrapBar() {
     trapIO.setPosition(RobotConstants.kLeftTrapBarRetract, RobotConstants.kRightTrapBarRetract);
-    logger.info("Extending Trap Bar");
+    logger.info("Retracting Trap Bar");
     isTrapBarExtended = false;
   }
 
-  public void retractTrapBar() {
+  public void extendTrapBar() {
     trapIO.setPosition(RobotConstants.kLeftTrapBarExtend, RobotConstants.kRightTrapBarExtend);
-    logger.info("Retracting Trap Bar");
+    logger.info("Extending Trap Bar");
     isTrapBarExtended = true;
   }
 
@@ -83,16 +89,59 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return leftSetpoint;
   }
 
+  public ClimbStates getState() {
+    return curState;
+  }
+
   @Override
   public void zero() {
-    climbIO.zero();
-    logger.info("Zeroed Climb");
+    // climbIO.zero();
+    logger.info("{} -> ZEROING", curState);
+    curState = ClimbStates.ZEROING;
+    enableRatchet(false);
+    climbIO.setCurrentLimit(ClimbConstants.getZeroCurrentLimit());
+    climbIO.setSoftLimitsEnabled(false);
+    climbIO.setPct(ClimbConstants.kZeroPct);
   }
 
   @Override
   public boolean isFinished() {
     return (Math.abs(leftSetpoint - climbInputs.leftPosRots) <= ClimbConstants.kCloseEnoughRots
         && Math.abs(rightSetpoint - climbInputs.rightPosRots) <= ClimbConstants.kCloseEnoughRots);
+  }
+
+  @Override
+  public void periodic() {
+    climbIO.updateInputs(climbInputs);
+    ratchetIO.updateInputs(ratchetInputs);
+    trapIO.updateInputs(trapInputs);
+    org.littletonrobotics.junction.Logger.processInputs("Climb Fx", climbInputs);
+    org.littletonrobotics.junction.Logger.processInputs("Climb Ratchet", ratchetInputs);
+    org.littletonrobotics.junction.Logger.processInputs("Trap Bar", trapInputs);
+
+    switch (curState) {
+      case IDLE:
+        break;
+      case ZEROING:
+        if (Math.abs(climbInputs.leftVelocity) < ClimbConstants.kZeroSpeedThreshold
+            && Math.abs(climbInputs.rightVelocity) < ClimbConstants.kZeroSpeedThreshold) {
+          climbZeroStableCounts++;
+        } else {
+          climbZeroStableCounts = 0;
+        }
+
+        if (climbZeroStableCounts > ClimbConstants.kZeroStableCounts) {
+          climbIO.zero();
+          climbIO.setPct(0);
+          climbIO.setCurrentLimit(ClimbConstants.getRunCurrentLimit());
+          climbIO.setSoftLimitsEnabled(true);
+          logger.info("{} -> ZEROED", curState);
+          curState = ClimbStates.ZEROED;
+        }
+        break;
+      case ZEROED:
+        break;
+    }
   }
 
   @Override
@@ -105,5 +154,11 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
     climbIO.registerWith(telemetryService);
+  }
+
+  public enum ClimbStates {
+    IDLE,
+    ZEROING,
+    ZEROED
   }
 }

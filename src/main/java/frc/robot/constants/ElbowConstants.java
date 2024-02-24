@@ -37,9 +37,9 @@ public final class ElbowConstants {
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = false; // FIXME
+    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 34;
-    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = false; // FIMXE
+    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -45.15;
 
     Slot0Configs slot0 = new Slot0Configs();

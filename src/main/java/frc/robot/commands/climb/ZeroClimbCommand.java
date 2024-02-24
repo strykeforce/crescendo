@@ -1,9 +1,10 @@
 package frc.robot.commands.climb;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem.ClimbStates;
 
-public class ZeroClimbCommand extends InstantCommand {
+public class ZeroClimbCommand extends Command {
   private ClimbSubsystem climbSubsystem;
 
   public ZeroClimbCommand(ClimbSubsystem climbSubsystem) {
@@ -15,5 +16,10 @@ public class ZeroClimbCommand extends InstantCommand {
   @Override
   public void initialize() {
     climbSubsystem.zero();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return climbSubsystem.getState() == ClimbStates.ZEROED;
   }
 }
