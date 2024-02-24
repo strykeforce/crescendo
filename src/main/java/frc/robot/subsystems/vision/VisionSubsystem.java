@@ -2,6 +2,8 @@ package frc.robot.subsystems.vision;
 
 import WallEye.WallEyeCam;
 import WallEye.WallEyeResult;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,8 +19,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
+import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -51,10 +55,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
   int offWheels = 0;
   Logger logger;
 
+  AprilTagFieldLayout field;
+
   // Deadeye<TargetListTargetData> cam = new Deadeye<TargetListTargetData>("A0",
   // TargetListTargetData.class, NetworkTableInstance.getDefault(), null);
 
   private Matrix<N3, N1> adaptiveVisionMatrix;
+  private Matrix<N3, N1> scaledStdDev;
+
+  private double fedStdDevs = 0.0;
 
   // Constructor
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
@@ -64,6 +73,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     cams = new WallEyeCam[VisionConstants.kNumCams];
     adaptiveVisionMatrix = VisionConstants.kVisionMeasurementStdDevs.copy();
+    scaledStdDev = adaptiveVisionMatrix.copy();
+    try {
+      field = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+    } catch (IOException e) {
+      logger.error("COULD NOT PARSE APRILTAG LAYOUT");
+    }
 
     // Initialize all walleyecams
     for (int i = 0; i < VisionConstants.kNumCams; ++i) {
@@ -124,8 +139,47 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   private boolean isPoseValidWithoutWheels(WallEyeResult test, Translation3d location) {
     return (test.getNumTags() >= 2 || test.getAmbiguity() <= VisionConstants.kMaxAmbig)
-        && (location.getX() <= DriveConstants.kFieldMaxX)
-        && (location.getY() <= DriveConstants.kFieldMaxY);
+        && (location.getX() < DriveConstants.kFieldMaxX && location.getX() > 0)
+        && (location.getY() < DriveConstants.kFieldMaxY && location.getY() > 0);
+  }
+
+  private double minTagDistance(WallEyeResult rst) {
+    Translation2d loc = rst.getCameraPose().getTranslation().toTranslation2d();
+    int[] ids = rst.getTagIDs();
+    double minDistance = 2767;
+    for (int id : ids) {
+      Translation2d tagLoc = field.getTagPose(id).get().getTranslation().toTranslation2d();
+      double dist = loc.getDistance(tagLoc);
+      if (dist < minDistance) {
+        minDistance = dist;
+      }
+    }
+    return minDistance;
+  }
+
+  private double avgTagDistance(WallEyeResult rst) {
+    Translation2d loc = rst.getCameraPose().getTranslation().toTranslation2d();
+    int[] ids = rst.getTagIDs();
+    double avg = 0.0;
+    int n = ids.length;
+    for (int id : ids) {
+      Translation2d tagLoc = field.getTagPose(id).get().getTranslation().toTranslation2d();
+      double dist = loc.getDistance(tagLoc);
+      avg += dist * 1.0 / n;
+    }
+    return avg;
+  }
+
+  private double getStdDevFactor(double distance, int numTags) {
+    if (numTags == 1)
+      return 1
+          / FastMath.pow(
+              VisionConstants.baseNumber,
+              FastMath.pow(VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber));
+    return 1
+        / FastMath.pow(
+            VisionConstants.baseNumber,
+            FastMath.pow(VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
   }
 
   // Periodic
@@ -134,20 +188,20 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/State", curState.name());
 
+    scaledStdDev = adaptiveVisionMatrix.copy();
     // cam.getEnabled();
-
     // If enough time elapses trust vision or if enough time elapses reset the counter
     if ((getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision)
         && (curState != VisionStates.TRUSTVISION)) {
       //   logger.info("{} -> TRUSTVISION");
       curState = VisionStates.TRUSTVISION;
-      adaptiveVisionMatrix.set(0, 0, 0.01);
-      adaptiveVisionMatrix.set(1, 0, 0.01);
+      adaptiveVisionMatrix.set(0, 0, VisionConstants.kMinStdDev);
+      adaptiveVisionMatrix.set(1, 0, VisionConstants.kMinStdDev);
       updatesToWheels = 0;
     }
 
     // If enough time elapses between camera updates - reset count of updates to 0
-    if ((getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision)
+    if ((getSeconds() - timeLastVision > VisionConstants.kTimeToResetWheelCount)
         && updatesToWheels >= 1) {
       logger.info("Reset # of Vision updates to 0");
       updatesToWheels = 0;
@@ -200,13 +254,23 @@ public class VisionSubsystem extends MeasurableSubsystem {
       WallEyeResult result = res.getFirst();
       int idx = res.getSecond();
 
+      for (int i = 0; i < 2; ++i)
+        if (result.getNumTags() > 0)
+          scaledStdDev.set(
+              i,
+              0,
+              adaptiveVisionMatrix.get(0, 0)
+                  / getStdDevFactor(
+                      result.getNumTags() == 1 ? minTagDistance(result) : avgTagDistance(result),
+                      result.getNumTags()));
+
       // Get center of Robot pose
       Pose3d cameraPose = result.getCameraPose();
       Translation3d centerPose =
           cameraPose
               .getTranslation()
               .minus(offsets[idx].rotateBy(cameraPose.getRotation().minus(rotsOff[idx])));
-
+      Rotation2d cameraRot = cameraPose.getRotation().minus(rotsOff[idx]).toRotation2d();
       // If updating with vision go into state machine to update
       if (visionUpdates) {
         switch (curState) {
@@ -216,19 +280,20 @@ public class VisionSubsystem extends MeasurableSubsystem {
             if (isPoseValidWithWheels(result, centerPose)) {
               String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
-                  outputAccept, new Pose2d(centerPose.toTranslation2d(), new Rotation2d()));
+                  outputAccept, new Pose2d(centerPose.toTranslation2d(), cameraRot));
 
+              fedStdDevs = scaledStdDev.get(0, 0);
               driveSubsystem.addVisionMeasurement(
-                  new Pose2d(centerPose.toTranslation2d(), new Rotation2d()),
-                  result.getTimeStamp() / 1000000,
-                  adaptiveVisionMatrix);
+                  new Pose2d(centerPose.toTranslation2d(), cameraRot),
+                  result.getTimeStamp() / 1000000 + VisionConstants.kTimeStampOffset,
+                  scaledStdDev);
 
-              if (offWheels > 0) offWheels--;
+              offWheels = 0;
 
             } else {
               String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
-                  output, new Pose2d(centerPose.toTranslation2d(), new Rotation2d()));
+                  output, new Pose2d(centerPose.toTranslation2d(), cameraRot));
               offWheels++;
               if (offWheels >= VisionConstants.kMaxTimesOffWheels) {
                 logger.info("{} -> TRUSTVISION", curState);
@@ -239,23 +304,22 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
             // Purely trust vision
           case TRUSTVISION:
-            adaptiveVisionMatrix.set(0, 0, 0.01);
-            adaptiveVisionMatrix.set(1, 0, 0.01);
             if (isPoseValidWithoutWheels(result, centerPose)) {
               String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
-                  outputAccept, new Pose2d(centerPose.toTranslation2d(), new Rotation2d()));
+                  outputAccept, new Pose2d(centerPose.toTranslation2d(), cameraRot));
               updatesToWheels++;
 
+              fedStdDevs = scaledStdDev.get(0, 0);
               driveSubsystem.addVisionMeasurement(
-                  new Pose2d(centerPose.toTranslation2d(), new Rotation2d()),
-                  result.getTimeStamp() / 1000000,
-                  adaptiveVisionMatrix);
+                  new Pose2d(centerPose.toTranslation2d(), cameraRot),
+                  result.getTimeStamp() / 1000000 + VisionConstants.kTimeStampOffset,
+                  scaledStdDev);
 
             } else {
               String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
-                  output, new Pose2d(centerPose.toTranslation2d(), new Rotation2d()));
+                  output, new Pose2d(centerPose.toTranslation2d(), cameraRot));
             }
 
             break;
@@ -271,7 +335,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
         new Measure("State", () -> curState.ordinal()),
         new Measure("OffWheels", () -> offWheels),
         new Measure("Updates To Wheels", () -> updatesToWheels),
-        new Measure("Adaptive Vision Matrix", () -> adaptiveVisionMatrix.get(0, 0)));
+        new Measure("Adaptive Vision Matrix", () -> adaptiveVisionMatrix.get(0, 0)),
+        new Measure("fedStdDevs", () -> fedStdDevs));
   }
 
   @Override
