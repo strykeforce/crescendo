@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
@@ -94,7 +93,6 @@ public class RobotContainer {
   public GenericEntry magazineSpeed;
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
-  private AmpInitial_WingNotes_ACommand testPath;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -124,7 +122,6 @@ public class RobotContainer {
 
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
-
 
     configureDriverBindings();
     configureOperatorBindings();
@@ -269,8 +266,6 @@ public class RobotContainer {
     } else {
       driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
     }
-
-    testPath.generateTrajectory();
   }
 
   public void setIsEvent(boolean isEvent) {
@@ -321,7 +316,7 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Run auton
-    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(testPath);
+    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(nonAmpAutonPath);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
