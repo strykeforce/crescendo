@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
-import frc.robot.commands.drive.NonAmpAutoCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
@@ -117,7 +117,13 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
-    nonAmpAutonPath = new NonAmpAutoCommand(driveSubsystem);
+    nonAmpAutonPath =
+        new NonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem);
     nonAmpAutonPath.generateTrajectory();
 
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
@@ -155,8 +161,8 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Pit")
         .add(
-            "Set Gyro offset -60",
-            new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-60)))
+            "Set Gyro offset -50",
+            new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-50)))
         .withSize(1, 1)
         .withPosition(3, 0);
 

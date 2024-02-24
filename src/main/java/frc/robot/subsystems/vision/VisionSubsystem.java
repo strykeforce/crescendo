@@ -119,7 +119,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
       double magnitudeDisp = Math.sqrt(Math.pow(disp.getX(), 2) + Math.pow(disp.getY(), 2));
 
       // Test to see if the displacement falls beneath a line based on velocity
-      return test.getNumTags() > minTagsNeeded
+      return test.getNumTags() >= minTagsNeeded
           && (magnitudeDisp
               < ((magnitudeVel * VisionConstants.kLinearCoeffOnVelFilter)
                   + VisionConstants.kOffsetOnVelFilter
@@ -129,7 +129,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private boolean isPoseValidWithoutWheels(WallEyeResult test, Translation3d location) {
-    return test.getNumTags() > minTagsNeeded
+    return test.getNumTags() >= minTagsNeeded
         && (test.getNumTags() >= 2 || test.getAmbiguity() <= VisionConstants.kMaxAmbig)
         && (location.getX() <= DriveConstants.kFieldMaxX)
         && (location.getY() <= DriveConstants.kFieldMaxY);

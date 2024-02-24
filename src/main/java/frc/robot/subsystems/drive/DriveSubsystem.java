@@ -74,11 +74,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     xController =
         new PIDController(
-            DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
+            DriveConstants.kXPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
     // xController.setIntegratorRange(DriveConstants.kIMin, DriveConstants.kIMax);
     yController =
         new PIDController(
-            DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
+            DriveConstants.kYPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
     // yController.setIntegratorRange(DriveConstants.kIMin, DriveConstants.kIMax);
     holonomicController = new HolonomicDriveController(xController, yController, omegaController);
     // Disabling the holonomic controller makes the robot directly follow the
