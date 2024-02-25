@@ -115,6 +115,18 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
         .withSize(1, 1)
         .withPosition(0, 0);
+    Shuffleboard.getTab("Pit")
+        .add("Elbow Zero Position", new ClosedLoopElbowCommand(elbowSubsystem, 0.0))
+        .withSize(1, 1)
+        .withPosition(1, 0);
+    Shuffleboard.getTab("Pit")
+        .add("Zero Elbow", new ZeroElbowCommand(elbowSubsystem))
+        .withSize(1, 1)
+        .withPosition(2, 0);
+    Shuffleboard.getTab("Pit")
+        .add("ShootingZeroTest", new DynamicZeroPosCommand(elbowSubsystem, 25.0))
+        .withSize(1, 1)
+        .withPosition(3, 0);
   }
 
   private void configureMatchDashboard() {

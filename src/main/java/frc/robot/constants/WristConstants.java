@@ -5,7 +5,7 @@ import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 public final class WristConstants {
   public static final int kWristTalonSrxId = 35;
-  public static final double kCloseEnoughTicks = 20;
+  public static final double kCloseEnoughTicks = 50;
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
   public static final double kWristZeroTicks = RobotConstants.kWristZero;
@@ -23,18 +23,18 @@ public final class WristConstants {
     config.reverseSoftLimitEnable = false; // fixme
 
     config.continuousCurrentLimit = 10;
-    config.peakCurrentDuration = 40;
     config.peakCurrentLimit = 15;
+    config.peakCurrentDuration = 40;
 
-    config.slot0.kP = 2.0;
+    config.slot0.kP = 1.5;
     config.slot0.kI = 0.0;
-    config.slot0.kD = 20.0;
-    config.slot0.kF = 2.0;
+    config.slot0.kD = 10.0;
+    config.slot0.kF = 0.95;
     config.slot0.integralZone = 0;
     config.slot0.maxIntegralAccumulator = 0;
     config.slot0.allowableClosedloopError = 0;
-    config.motionCruiseVelocity = 400;
-    config.motionAcceleration = 700;
+    config.motionCruiseVelocity = 600;
+    config.motionAcceleration = 2000;
     config.neutralDeadband = 0.01;
     config.velocityMeasurementWindow = 64;
     config.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;

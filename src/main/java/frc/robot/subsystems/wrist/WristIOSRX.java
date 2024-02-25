@@ -36,7 +36,8 @@ public class WristIOSRX implements WristIO {
 
   @Override
   public void setPosition(double position) {
-    wrist.set(TalonSRXControlMode.MotionMagic, position);
+    // FIXME
+    // wrist.set(TalonSRXControlMode.MotionMagic, position);
   }
 
   @Override

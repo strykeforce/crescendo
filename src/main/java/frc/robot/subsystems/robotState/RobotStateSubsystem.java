@@ -113,7 +113,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     int index;
 
     if (distance < RobotStateConstants.kLookupMinDistance) {
-      index = 0;
+      index = 1;
       logger.warn(
           "Distance {} is less than min distance in table {}",
           distance,
