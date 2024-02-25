@@ -50,6 +50,8 @@ public class DriveAutonWithHeadingCommand extends Command {
     PathData pathdata = driveSubsystem.generateTrajectory(trajectoryName);
     trajectory = pathdata.trajectory;
     robotHeading = pathdata.targetYaw;
+    startHeading = driveSubsystem.apply(startHeading);
+
     logger.info("trajectory generated");
     trajectoryGenerated = true;
   }
@@ -70,10 +72,19 @@ public class DriveAutonWithHeadingCommand extends Command {
 
       double currX = driveSubsystem.getPoseMeters().getX();
 
-      if (currX < xThreshold && towardsPosX || currX > xThreshold && !towardsPosX) {
-        driveSubsystem.calculateController(desiredState, startHeading);
+      if (driveSubsystem.shouldFlip()) {
+        if (currX > xThreshold && towardsPosX || currX < xThreshold && !towardsPosX) {
+          driveSubsystem.calculateController(desiredState, startHeading);
+        } else {
+          driveSubsystem.calculateController(desiredState, robotHeading);
+        }
+
       } else {
-        driveSubsystem.calculateController(desiredState, robotHeading);
+        if (currX < xThreshold && towardsPosX || currX > xThreshold && !towardsPosX) {
+          driveSubsystem.calculateController(desiredState, startHeading);
+        } else {
+          driveSubsystem.calculateController(desiredState, robotHeading);
+        }
       }
     }
   }
@@ -84,10 +95,19 @@ public class DriveAutonWithHeadingCommand extends Command {
       Trajectory.State desiredState = trajectory.sample(timer.get());
       double currX = driveSubsystem.getPoseMeters().getX();
 
-      if (currX < xThreshold && towardsPosX || currX > xThreshold && !towardsPosX) {
-        driveSubsystem.calculateController(desiredState, startHeading);
+      if (driveSubsystem.shouldFlip()) {
+        if (currX > xThreshold && towardsPosX || currX < xThreshold && !towardsPosX) {
+          driveSubsystem.calculateController(desiredState, startHeading);
+        } else {
+          driveSubsystem.calculateController(desiredState, robotHeading);
+        }
+
       } else {
-        driveSubsystem.calculateController(desiredState, robotHeading);
+        if (currX < xThreshold && towardsPosX || currX > xThreshold && !towardsPosX) {
+          driveSubsystem.calculateController(desiredState, startHeading);
+        } else {
+          driveSubsystem.calculateController(desiredState, robotHeading);
+        }
       }
     } else logger.error("trajectory not generated");
   }

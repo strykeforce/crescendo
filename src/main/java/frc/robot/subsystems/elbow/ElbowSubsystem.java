@@ -26,10 +26,11 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void setPosition(double position) {
     io.setPosition(position);
+
+    if (setpoint != position) logger.info("Elbow moving to {} rotations", setpoint);
+
     setpoint = position;
     curState = ElbowStates.MOVING;
-
-    logger.info("Elbow moving to {} rotations", setpoint);
   }
 
   public void setPct(double pct) {

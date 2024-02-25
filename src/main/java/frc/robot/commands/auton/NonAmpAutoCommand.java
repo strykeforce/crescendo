@@ -33,7 +33,7 @@ public class NonAmpAutoCommand extends SequentialCommandGroup {
             true,
             true,
             Rotation2d.fromDegrees(-33.2),
-            3.0,
+            0.0,
             true);
     note5ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot1", true, false);
     shootToNote4 = new DriveAutonCommand(driveSubsystem, "NonAmpShoot1_MiddleNote4", true, false);

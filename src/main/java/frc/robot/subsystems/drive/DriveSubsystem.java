@@ -227,7 +227,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void setGyroOffset(Rotation2d rotation) {
-    io.setGyroOffset(rotation);
+    io.setGyroOffset(apply(rotation));
   }
 
   public void setEnableHolo(boolean enabled) {
@@ -265,7 +265,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   // Field flipping stuff
-  private boolean shouldFlip() {
+  public boolean shouldFlip() {
     return robotStateSubsystem.getAllianceColor() == Alliance.Red;
   }
 
@@ -294,6 +294,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (shouldFlip()) {
       return new Rotation2d(-rotation.getCos(), rotation.getSin());
     } else return rotation;
+  }
+
+  public double apply(double x) {
+    logger.info("initial x: {}", x);
+    if (shouldFlip()) {
+      return DriveConstants.kFieldMaxX - x;
+    } else return x;
   }
 
   // Trajectory TOML Parsing

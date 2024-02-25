@@ -35,6 +35,7 @@ import frc.robot.commands.robotState.PodiumCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
@@ -195,21 +196,26 @@ public class RobotContainer {
   }
 
   private void configureMatchDashboard() {
-    Shuffleboard.getTab("Match")
-        .add(new ToggleVisionUpdatesCommand(driveSubsystem))
-        .withWidget(BuiltInWidgets.kToggleButton)
-        .withPosition(0, 0);
+    // Shuffleboard.getTab("Match")
+    //     .add(new ToggleVisionUpdatesCommand(driveSubsystem))
+    //     .withWidget(BuiltInWidgets.kToggleButton)
+    //     .withPosition(0, 0);
     Shuffleboard.getTab("Match")
         .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
         .withSize(1, 1)
-        .withPosition(3, 0);
+        .withPosition(4, 0);
 
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
-            .withProperties(Map.of("colorWhenFalse", "blue"))
+            .withProperties(Map.of("colorWhenFalse", "blue", "colorWhenTrue", "red"))
             .withSize(2, 2)
             .withPosition(1, 0);
+
+    Shuffleboard.getTab("Match")
+        .add(new ToggleAllianceColorCommand(robotStateSubsystem))
+        .withSize(1, 1)
+        .withPosition(3, 0);
 
     Shuffleboard.getTab("Match")
         .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
@@ -263,7 +269,7 @@ public class RobotContainer {
     this.alliance = alliance;
     allianceColor.withProperties(
         Map.of(
-            "colorWhenTrue", alliance == Alliance.Red ? "red" : "blue", "colorWhenFalse", "black"));
+            "colorWhenTrue", "red", "colorWhenFalse", "blue"));
     robotStateSubsystem.setAllianceColor(alliance);
 
     // Flips gyro angle if alliance is red team
