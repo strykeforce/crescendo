@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -16,6 +18,8 @@ public final class ClimbConstants {
   public static final int kRightRatchetId = 1;
   public static final int kLeftTrapBarId = 2;
   public static final int kRightTrapBarId = 3;
+  public static final int kLeftForkSRXId = 52;
+  public static final int kRightForkSRXId = 53;
 
   public static final double kCloseEnoughRots = 0.5;
   public static final double kMaxRots = 100.0;
@@ -23,6 +27,14 @@ public final class ClimbConstants {
   public static final double kZeroPct = -0.1;
   public static final double kZeroStableCounts = 3;
   public static final double kZeroSpeedThreshold = 1;
+
+  public static final double kLeftForkZero = 0.0;
+  public static final double kRightForkZero = 0.0;
+  public static final double kCloseEnoughForks = 100;
+  public static final double kLeftExtendPos = 100;
+  public static final double kRightExtendPos = 100;
+  public static final double kLeftRetractPos = 0.0;
+  public static final double kRightRetractPos = 0.0;
 
   public static TalonFXConfiguration getLeftConfig() {
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -118,6 +130,35 @@ public final class ClimbConstants {
     config.SupplyCurrentThreshold = 25;
     config.SupplyTimeThreshold = 0.5;
     config.SupplyCurrentLimitEnable = true;
+
+    return config;
+  }
+
+  public static TalonSRXConfiguration getForkConfiguration() {
+    TalonSRXConfiguration config = new TalonSRXConfiguration();
+
+    config.forwardSoftLimitThreshold = 0;
+    config.forwardSoftLimitEnable = false; // fixme
+
+    config.reverseSoftLimitThreshold = 0.0;
+    config.reverseSoftLimitEnable = false; // fixme
+
+    config.continuousCurrentLimit = 10;
+    config.peakCurrentLimit = 15;
+    config.peakCurrentDuration = 40;
+
+    config.slot0.kP = 0.0;
+    config.slot0.kI = 0.0;
+    config.slot0.kD = 0.0;
+    config.slot0.kF = 0.0;
+    config.slot0.integralZone = 0;
+    config.slot0.maxIntegralAccumulator = 0;
+    config.slot0.allowableClosedloopError = 0;
+    config.motionCruiseVelocity = 0;
+    config.motionAcceleration = 0;
+    config.neutralDeadband = 0.01;
+    config.velocityMeasurementWindow = 64;
+    config.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
 
     return config;
   }

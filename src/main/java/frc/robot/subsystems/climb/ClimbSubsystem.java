@@ -14,10 +14,12 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private ClimbIO climbIO;
   private ClimbRatchetIO ratchetIO;
   private TrapBarIO trapIO;
+  private ForkIO forkIO;
 
   private final ClimbIOInputsAutoLogged climbInputs = new ClimbIOInputsAutoLogged();
   private final ClimbRatchetIOInputsAutoLogged ratchetInputs = new ClimbRatchetIOInputsAutoLogged();
   private final TrapBarIOInputsAutoLogged trapInputs = new TrapBarIOInputsAutoLogged();
+  private final ForkIOInputsAutoLogged forkInputs = new ForkIOInputsAutoLogged();
 
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -25,14 +27,19 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double rightSetpoint = 0.0;
   private boolean isTrapBarExtended = false;
   private boolean isRatchetOn = false;
+  private boolean isForkExtended = false;
   private int climbZeroStableCounts = 0;
+  private double leftForkSetpoint = 0.0;
+  private double rightForkSetpoint = 0.0;
 
   private ClimbStates curState = ClimbStates.IDLE;
 
-  public ClimbSubsystem(ClimbIO climbIO, ClimbRatchetIO ratchetIO, TrapBarIO trapIO) {
+  public ClimbSubsystem(
+      ClimbIO climbIO, ClimbRatchetIO ratchetIO, TrapBarIO trapIO, ForkIO forkIO) {
     this.climbIO = climbIO;
     this.ratchetIO = ratchetIO;
     this.trapIO = trapIO;
+    this.forkIO = forkIO;
 
     enableRatchet(false);
     retractTrapBar();
@@ -80,6 +87,31 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     }
   }
 
+  public void toggleForks() {
+    if (isForkExtended) retractForks();
+    else extendForks();
+  }
+
+  public void extendForks() {
+    isForkExtended = true;
+    forkIO.setLeftPos(ClimbConstants.kLeftExtendPos);
+    forkIO.setRightPos(ClimbConstants.kRightExtendPos);
+    leftForkSetpoint = ClimbConstants.kLeftExtendPos;
+    rightForkSetpoint = ClimbConstants.kRightExtendPos;
+  }
+
+  public void retractForks() {
+    isForkExtended = false;
+    forkIO.setLeftPos(ClimbConstants.kLeftRetractPos);
+    forkIO.setRightPos(ClimbConstants.kRightRetractPos);
+    leftForkSetpoint = ClimbConstants.kLeftRetractPos;
+    rightForkSetpoint = ClimbConstants.kRightRetractPos;
+  }
+
+  public void setForkPercent(double percent) {
+    forkIO.setPct(percent);
+  }
+
   @Override
   public double getPosition() {
     return climbInputs.leftPosRots;
@@ -110,14 +142,22 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         && Math.abs(rightSetpoint - climbInputs.rightPosRots) <= ClimbConstants.kCloseEnoughRots);
   }
 
+  public boolean isForkFinished() {
+    return Math.abs(leftForkSetpoint - forkInputs.leftPosTicks) <= ClimbConstants.kCloseEnoughForks
+        && Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
+            <= ClimbConstants.kCloseEnoughForks;
+  }
+
   @Override
   public void periodic() {
     climbIO.updateInputs(climbInputs);
     ratchetIO.updateInputs(ratchetInputs);
     trapIO.updateInputs(trapInputs);
+    forkIO.updateInputs(forkInputs);
     org.littletonrobotics.junction.Logger.processInputs("Climb Fx", climbInputs);
     org.littletonrobotics.junction.Logger.processInputs("Climb Ratchet", ratchetInputs);
     org.littletonrobotics.junction.Logger.processInputs("Trap Bar", trapInputs);
+    org.littletonrobotics.junction.Logger.processInputs("Forks", forkInputs);
 
     switch (curState) {
       case IDLE:
@@ -154,6 +194,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
     climbIO.registerWith(telemetryService);
+    forkIO.registerWith(telemetryService);
   }
 
   public enum ClimbStates {

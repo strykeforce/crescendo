@@ -13,25 +13,40 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
 import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
+import frc.robot.controllers.FlyskyJoystick;
+import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.climb.ClimbIOFX;
 import frc.robot.subsystems.climb.ClimbRatchetIOServo;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ForkIOSRX;
 import frc.robot.subsystems.climb.TrapBarIOServo;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.elbow.ElbowIOFX;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
+import frc.robot.subsystems.intake.IntakeIOFX;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineIOFX;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.shooter.ShooterIOFX;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
@@ -40,15 +55,15 @@ import org.strykeforce.telemetry.TelemetryService;
 public class RobotContainer {
 
   private final RobotConstants robotConstants;
-  //   private final VisionSubsystem visionSubsystem;
-  //   private final DriveSubsystem driveSubsystem;
-  //   private final SuperStructure superStructure;
-  //   private final RobotStateSubsystem robotStateSubsystem;
+  private final VisionSubsystem visionSubsystem;
+  private final DriveSubsystem driveSubsystem;
+  private final SuperStructure superStructure;
+  private final RobotStateSubsystem robotStateSubsystem;
   private final MagazineSubsystem magazineSubsystem;
-  //   private final IntakeSubsystem intakeSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
   private final WristSubsystem wristSubsystem;
   private final ElbowSubsystem elbowSubsystem;
-  //   private final ShooterSubsystem shooterSubsystem;
+  private final ShooterSubsystem shooterSubsystem;
   private final ClimbSubsystem climbSubsystem;
 
   private final XboxController xboxController = new XboxController(1);
@@ -69,32 +84,33 @@ public class RobotContainer {
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
-    // driveSubsystem = new DriveSubsystem(new Swerve());
-    // visionSubsystem = new VisionSubsystem(driveSubsystem);
+    driveSubsystem = new DriveSubsystem(new Swerve());
+    visionSubsystem = new VisionSubsystem(driveSubsystem);
     wristSubsystem = new WristSubsystem(new WristIOSRX());
     elbowSubsystem = new ElbowSubsystem(new ElbowIOFX());
-    // shooterSubsystem = new ShooterSubsystem(new ShooterIOFX());
-    // intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
+    shooterSubsystem = new ShooterSubsystem(new ShooterIOFX());
+    intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
     climbSubsystem =
-        new ClimbSubsystem(new ClimbIOFX(), new ClimbRatchetIOServo(), new TrapBarIOServo());
+        new ClimbSubsystem(
+            new ClimbIOFX(), new ClimbRatchetIOServo(), new TrapBarIOServo(), new ForkIOSRX());
 
-    // intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
+    intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
 
-    // superStructure =
-    //     new SuperStructure(wristSubsystem, elbowSubsystem, shooterSubsystem, magazineSubsystem);
+    superStructure =
+        new SuperStructure(wristSubsystem, elbowSubsystem, shooterSubsystem, magazineSubsystem);
 
-    // robotStateSubsystem =
-    //     new RobotStateSubsystem(
-    //         visionSubsystem, driveSubsystem, intakeSubsystem, magazineSubsystem, superStructure);
+    robotStateSubsystem =
+        new RobotStateSubsystem(
+            visionSubsystem, driveSubsystem, intakeSubsystem, magazineSubsystem, superStructure);
 
-    // driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
+    driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
     // testAutonPath = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
     // testAutonPath.generateTrajectory();
 
-    // configureDriverBindings();
+    configureDriverBindings();
     // configureOperatorBindings();
     configureClimbTestBindings();
     // configureMatchDashboard();
@@ -272,6 +288,8 @@ public class RobotContainer {
     //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
+  */
+
   private void configureDriverBindings() {
     FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
 
@@ -294,6 +312,10 @@ public class RobotContainer {
     //           new StowCommand(
     //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
+    // Reset Gyro Command
+    new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
+
+    /*
     // Intake
     new JoystickButton(driveJoystick, Button.SWB_DWN.id)
         .onTrue(
@@ -303,10 +325,6 @@ public class RobotContainer {
         .onTrue(
             new IntakeCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-
-    // Reset Gyro Command
-    new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
-
     // XLock
     new JoystickButton(driveJoystick, Button.SWD.id)
         .onTrue(new XLockCommand(driveSubsystem))
@@ -344,8 +362,8 @@ public class RobotContainer {
         .onFalse(
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    */
   }
-  */
 
   public void configureClimbTestBindings() {
     // Open Loop Wrist
@@ -386,8 +404,16 @@ public class RobotContainer {
         .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0.0));
 
     // Zero
-    new JoystickButton(xboxController, XboxController.Button.kB.value)
+    new JoystickButton(xboxController, XboxController.Button.kY.value)
         .onTrue(new ZeroClimbCommand(climbSubsystem));
+
+    // Open Loop Forks
+    new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .onTrue(new ForkOpenLoopCommand(climbSubsystem, 0.1))
+        .onFalse(new ForkOpenLoopCommand(climbSubsystem, 0.0));
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
+        .onTrue(new ForkOpenLoopCommand(climbSubsystem, -0.1))
+        .onFalse(new ForkOpenLoopCommand(climbSubsystem, 0.0));
   }
 
   public Command getAutonomousCommand() {
