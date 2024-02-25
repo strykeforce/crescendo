@@ -17,11 +17,11 @@ public final class ShooterConstants {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 0.5;
-    slot0.kI = 0.01;
+    slot0.kP = 0.6;
+    slot0.kI = 0.1;
     slot0.kD = 0.0;
     slot0.kS = 0.0;
-    slot0.kV = 0.110;
+    slot0.kV = 0.120;
     slot0.kA = 0.0;
     slot0.kG = 0.0;
     slot0.GravityType = GravityTypeValue.Elevator_Static;
@@ -30,6 +30,8 @@ public final class ShooterConstants {
     MotionMagicConfigs motionMagic =
         new MotionMagicConfigs().withMotionMagicAcceleration(130).withMotionMagicJerk(1000);
     config.MotionMagic = motionMagic;
+
+    config.CurrentLimits = getShooterSupplyLimitConfig();
 
     return config;
   }
@@ -44,6 +46,27 @@ public final class ShooterConstants {
     config.SupplyCurrentThreshold = 40;
     config.SupplyTimeThreshold = 0.5;
     config.SupplyCurrentLimitEnable = true;
+
+    return config;
+  }
+
+  public static final TalonFXConfiguration getSideBySideShooterConfig() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+
+    Slot0Configs slot0 = new Slot0Configs();
+    slot0.kP = 0.5;
+    slot0.kI = 0.01;
+    slot0.kD = 0.0;
+    slot0.kS = 0.0;
+    slot0.kV = 0.110;
+    slot0.kA = 0.0;
+    slot0.kG = 0.0;
+    slot0.GravityType = GravityTypeValue.Elevator_Static;
+    config.Slot0 = slot0;
+
+    MotionMagicConfigs motionMagic =
+        new MotionMagicConfigs().withMotionMagicAcceleration(130).withMotionMagicJerk(1000);
+    config.MotionMagic = motionMagic;
 
     return config;
   }

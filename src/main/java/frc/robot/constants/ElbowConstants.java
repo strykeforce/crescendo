@@ -48,8 +48,8 @@ public final class ElbowConstants {
     config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -45.15;
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 0.4;
-    slot0.kI = 0.0;
+    slot0.kP = 1.2;
+    slot0.kI = 2.0;
     slot0.kD = 0.2;
     slot0.kS = 0.0;
     slot0.kV = 0.110;
