@@ -285,7 +285,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
               fedStdDevs = scaledStdDev.get(0, 0);
               driveSubsystem.addVisionMeasurement(
                   new Pose2d(centerPose.toTranslation2d(), cameraRot),
-                  result.getTimeStamp() / 1000000 + VisionConstants.kTimeStampOffset,
+                  result.getTimeStamp() / 1000000,
                   scaledStdDev);
 
               offWheels = 0;
@@ -313,7 +313,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
               fedStdDevs = scaledStdDev.get(0, 0);
               driveSubsystem.addVisionMeasurement(
                   new Pose2d(centerPose.toTranslation2d(), cameraRot),
-                  result.getTimeStamp() / 1000000 + VisionConstants.kTimeStampOffset,
+                  result.getTimeStamp() / 1000000,
                   scaledStdDev);
 
             } else {

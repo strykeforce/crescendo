@@ -26,7 +26,7 @@ public final class VisionConstants {
 
   public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(0));
 
-  public static final double kTimeStampOffset = 0.14;
+  public static final double kTimeStampOffset = 0.0;
 
   // StdDev scaling
   public static final double singleTagCoeff = 25.0 / 100.0;
