@@ -10,20 +10,29 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
 public final class VisionConstants {
-  public static final double kMaxTimeNoVision = 5;
+  public static final double kMaxTimeNoVision = 20;
+  public static final double kTimeToResetWheelCount = 5;
   public static final int kResultsForWheels = 5;
-  public static final double kTimeToDecayDev = 3;
+  public static final double kTimeToDecayDev = 10;
   public static final double kStdDevDecayCoeff = -0.005;
   public static final double kMinStdDev = 0.01;
-  public static final double kMaxAmbig = 0.15;
+  public static final double kMaxAmbig = 0.5;
   public static final int kMaxTimesOffWheels = 5;
 
   // Velocity Filter
   public static final double kLinearCoeffOnVelFilter = 0.1;
-  public static final double kOffsetOnVelFilter = 0.2;
-  public static final double kSquaredCoeffOnVelFilter = 0.2;
+  public static final double kOffsetOnVelFilter = 0.05;
+  public static final double kSquaredCoeffOnVelFilter = 0.1;
 
   public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(0));
+
+  public static final double kTimeStampOffset = 0.0;
+
+  // StdDev scaling
+  public static final double singleTagCoeff = 25.0 / 100.0;
+  public static final double multiTagCoeff = 18.0 / 100.0;
+  public static final double baseNumber = Math.E;
+  public static final int powerNumber = 4;
 
   // Constants for cameras
   public static final int kNumCams = 2;
@@ -55,5 +64,5 @@ public final class VisionConstants {
   // form [x, y, theta]ᵀ, with units in meters and radians.
   // Vision Odometry Standard devs
   public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5000));
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(360));
 }
