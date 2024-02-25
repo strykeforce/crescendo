@@ -143,9 +143,9 @@ public final class ClimbConstants {
     config.reverseSoftLimitThreshold = 0.0;
     config.reverseSoftLimitEnable = false; // fixme
 
-    config.continuousCurrentLimit = 10;
-    config.peakCurrentLimit = 15;
-    config.peakCurrentDuration = 40;
+    config.continuousCurrentLimit = 2;
+    config.peakCurrentLimit = 2;
+    config.peakCurrentDuration = 100;
 
     config.slot0.kP = 0.0;
     config.slot0.kI = 0.0;
