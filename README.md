@@ -32,7 +32,7 @@
 | Climb     | FX       | leftClimb  | 50  |  15      |           | falcon |         |
 | Climb     | FX       | rightClimb | 51  |  4       |           | falcon |         |
 | Climb     | SRX      | leftFork   | 52  | 7        |           | johnson |        |
-| Climb     | SRX      | rightFork  | 53  |          |           | johnson |        |
+| Climb     | SRX      | rightFork  | 53  | 8        |           | johnson |        |
 | -         | rio      | -          | -   | 20       |           |        |         |
 | coder/sw  | vrm      | top        | -   | 21       |           |        |         |
 | radio     | vrm      | bottom     | -   | 22       |           |        |         |
