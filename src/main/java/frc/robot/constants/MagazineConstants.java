@@ -1,21 +1,60 @@
 package frc.robot.constants;
 
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
-public class MagazineConstants {
+public final class MagazineConstants {
   public static final int kMagazineFalconID = 25;
-  public static final double kCloseEnough = 300;
-  public static final double kFeedingSpeed = 0;
+  public static final double kCloseEnough = 10;
+  public static final double kShootCloseEnough = 10;
+  // public static final double kFeedingSpeed = 0.5;
+  public static final double kShootSpeed = 90; // FIXME
   public static final int kMinBeamBreaks = 3;
-  public static double kIntakingSpeed;
-  public static double kEmptyingSpeed;
+  public static final double kIntakingSpeed = -46;
+  public static final double kEmptyingSpeed = -72;
+  public static final double kReversingSpeed = 4.8; // TODO do testing to determine correct speed
+  public static final double kReleaseSpeed = 20.0;
+
+  public static final double kReleaseTime = 0.75;
+
+  public static final double kPodiumPrepareSpeed = -10;
 
   public static final TalonFXConfiguration getMagazineConfig() {
-    return new TalonFXConfiguration();
+    TalonFXConfiguration config = new TalonFXConfiguration();
+
+    Slot0Configs slot0 = new Slot0Configs();
+    slot0.kP = 0.4;
+    slot0.kI = 0.0;
+    slot0.kD = 0.0;
+    slot0.kS = 0.0;
+    slot0.kV = 0.125;
+    slot0.kA = 0.0;
+    slot0.kG = 0.0;
+    config.Slot0 = slot0;
+
+    MotionMagicConfigs motionMagic =
+        new MotionMagicConfigs().withMotionMagicAcceleration(300).withMotionMagicJerk(5000);
+    config.MotionMagic = motionMagic;
+
+    config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
+
+    return config;
   }
 
-  public static final SupplyCurrentLimitConfiguration getMagazineSupplyLimitConfig() {
-    return new SupplyCurrentLimitConfiguration();
+  public static final CurrentLimitsConfigs getMagazineSupplyLimitConfig() {
+    CurrentLimitsConfigs config = new CurrentLimitsConfigs();
+
+    config.StatorCurrentLimit = 0.0;
+    config.StatorCurrentLimitEnable = false;
+
+    config.SupplyCurrentLimit = 40;
+    config.SupplyCurrentThreshold = 50;
+    config.SupplyTimeThreshold = 1;
+    config.SupplyCurrentLimitEnable = true;
+
+    return config;
   }
 }

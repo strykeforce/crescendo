@@ -4,30 +4,36 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
-import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class VisionShootCommand extends Command {
+public class TuningOffCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
+  SuperStructure superStructure;
+  MagazineSubsystem magazineSubsystem;
+  IntakeSubsystem intakeSubsystem;
 
-  public VisionShootCommand(
+  public TuningOffCommand(
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem) {
-    addRequirements(superStructure, magazineSubsystem, intakeSubsystem);
+    addRequirements(superStructure, magazineSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
+    this.superStructure = superStructure;
+    this.magazineSubsystem = magazineSubsystem;
+    this.intakeSubsystem = intakeSubsystem;
   }
 
   @Override
   public void initialize() {
-    robotStateSubsystem.startShoot();
+    magazineSubsystem.enableLimitSwitches(true);
+    magazineSubsystem.setSpeed(0.0);
+    intakeSubsystem.stopIntaking();
+    superStructure.stopShoot();
   }
 
   @Override
   public boolean isFinished() {
-    RobotStates curState = robotStateSubsystem.getState();
-
-    return (curState != RobotStates.SHOOTING || curState != RobotStates.TO_SHOOT);
+    return (superStructure.isFinished());
   }
 }

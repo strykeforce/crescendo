@@ -11,10 +11,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
-public class IntakeConstants {
-  public static double kIntakePercentOutput;
-  public static int kIntakeFxId = 20;
-  public static int kBeamBreakStableCounts = 2;
+public final class IntakeConstants {
+  public static final double kIntakePercentOutput = -0.5;
+  public static final int kIntakeFxId = 20;
+  public static final int kBeamBreakStableCounts = 2;
 
   public static TalonFXConfiguration getFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();
@@ -23,7 +23,7 @@ public class IntakeConstants {
         new CurrentLimitsConfigs()
             .withStatorCurrentLimit(10)
             .withStatorCurrentLimitEnable(false)
-            .withStatorCurrentLimit(20)
+            .withSupplyCurrentLimit(20)
             .withSupplyCurrentThreshold(25)
             .withSupplyCurrentLimitEnable(true)
             .withSupplyTimeThreshold(0.02);

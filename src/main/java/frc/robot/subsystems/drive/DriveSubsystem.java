@@ -23,6 +23,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseResult;
@@ -184,6 +185,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public DriveStates getDriveState() {
     return currDriveState;
+  }
+
+  public BooleanSupplier getAzimuth1FwdLimitSupplier() {
+    return io.getAzimuth1FwdLimitSwitch();
   }
 
   public boolean isPointingAtGoal() {
@@ -492,6 +497,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Wheel 3 Speed", () -> io.getSwerveModuleStates()[3].speedMetersPerSecond),
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
-        new Measure("YAW Vel", () -> lastVelocity[2]));
+        new Measure("YAW Vel", () -> lastVelocity[2]),
+        new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()),
+        new Measure("Distance to goal", () -> getDistanceToSpeaker()));
   }
 }
