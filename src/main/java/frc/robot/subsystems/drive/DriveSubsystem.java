@@ -360,60 +360,73 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
-  private Pose2d parseEndPoint(TomlParseResult parseResult, String pose) {
-    TomlTable table = parseResult.getTable(pose);
+  private Pose2d parseEndPoint(TomlParseResult parseResult, String poseName) {
+    TomlTable table = parseResult.getTable(poseName);
 
     if (table.contains("dataPoint")) {
+      Pose2d pose;
+
       switch (table.getString("dataPoint")) {
           // Starting Positions
         case "MI1":
-          return Setpoints.MI1;
+          pose = Setpoints.MI1;
+          break;
 
           // Wing Notes
         case "W1":
-          return Setpoints.W1;
+          pose = Setpoints.W1;
+          break;
         case "W2":
-          return Setpoints.W2;
+          pose = Setpoints.W2;
+          break;
         case "W3":
-          return Setpoints.W3;
+          pose = Setpoints.W3;
+          break;
 
           // Middle Notes
         case "M1":
-          return Setpoints.M1;
+          pose = Setpoints.M1;
+          break;
         case "M2":
-          return Setpoints.M2;
+          pose = Setpoints.M2;
+          break;
         case "M3":
-          return Setpoints.M3;
+          pose = Setpoints.M3;
+          break;
         case "M4":
-          return Setpoints.M4;
+          pose = Setpoints.M4;
+          break;
         case "M5":
-          return Setpoints.M5;
+          pose = Setpoints.M5;
+          break;
 
           // Shooting Positions
         case "AS1":
-          return Setpoints.AS1;
+          pose = Setpoints.AS1;
+          break;
         case "MS1":
-          return Setpoints.MS1;
+          pose = Setpoints.MS1;
+          break;
         case "NAS1":
-          return Setpoints.NAS1;
+          pose = Setpoints.NAS1;
+          break;
 
         default:
           logger.warn("Bad data point {}", table.getString("dataPoint"));
           return new Pose2d();
       }
+
+      if (table.contains("angle")) {
+        pose = new Pose2d(pose.getX(), pose.getX(), Rotation2d.fromDegrees(table.getDouble("angle")));
+      }
+
+      return pose;
     } else {
       return new Pose2d(
           table.getDouble("x"),
           table.getDouble("y"),
           Rotation2d.fromDegrees(table.getDouble("angle")));
     }
-  }
-
-  private Pose2d parsePose2d(TomlParseResult parseResult, String pose) {
-    return new Pose2d(
-        parseResult.getTable(pose).getDouble("x"),
-        parseResult.getTable(pose).getDouble("y"),
-        Rotation2d.fromDegrees(parseResult.getTable(pose).getDouble("angle")));
   }
 
   // Control Methods
