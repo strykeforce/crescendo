@@ -16,7 +16,7 @@ public class JogElbowClosedLoopCommand extends Command {
 
   @Override
   public void execute() {
-    elbowSubsystem.setPosition(elbowSubsystem.getSetpoint() + jogRots);
+    elbowSubsystem.setPosition(elbowSubsystem.getPosition() + jogRots);
   }
 
   @Override

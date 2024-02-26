@@ -22,6 +22,7 @@ import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
@@ -189,7 +190,7 @@ public class RobotContainer {
   */
 
   public void configureTelemetry() {
-    // driveSubsystem.registerWith(telemetryService);
+    driveSubsystem.registerWith(telemetryService);
     // visionSubsystem.registerWith(telemetryService);
     // wristSubsystem.registerWith(telemetryService);
     // elbowSubsystem.registerWith(telemetryService);
@@ -391,6 +392,7 @@ public class RobotContainer {
         .onFalse(new HoldClimbCommand(climbSubsystem));
 
     // Trap Bar
+
     new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
         .onTrue(new ToggleTrapBarPosCommand(climbSubsystem));
 
@@ -409,11 +411,15 @@ public class RobotContainer {
 
     // Open Loop Forks
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new ForkOpenLoopCommand(climbSubsystem, 0.1))
+        .onTrue(new ForkOpenLoopCommand(climbSubsystem, 0.3))
         .onFalse(new ForkOpenLoopCommand(climbSubsystem, 0.0));
     new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(new ForkOpenLoopCommand(climbSubsystem, -0.1))
+        .onTrue(new ForkOpenLoopCommand(climbSubsystem, -0.3))
         .onFalse(new ForkOpenLoopCommand(climbSubsystem, 0.0));
+
+    // Elbow at zero
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, 0.0));
   }
 
   public Command getAutonomousCommand() {
