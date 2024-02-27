@@ -7,6 +7,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 public class setAngleOffsetCommand extends InstantCommand {
   private final DriveSubsystem driveSubsystem;
   private double rotation;
+  private Rotation2d fixedRotation;
 
   public setAngleOffsetCommand(DriveSubsystem driveSubsystem, double rotation) {
     addRequirements(driveSubsystem);
@@ -14,9 +15,14 @@ public class setAngleOffsetCommand extends InstantCommand {
     this.rotation = rotation;
   }
 
+  public Rotation2d fixedRotation() {
+    fixedRotation = driveSubsystem.apply(Rotation2d.fromDegrees(rotation));
+    return fixedRotation;
+  }
+
   @Override
   public void initialize() {
-    driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(rotation));
+    driveSubsystem.setGyroOffset(fixedRotation());
     ;
   }
 }
