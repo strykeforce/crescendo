@@ -333,28 +333,22 @@ public class RobotContainer {
 
     // Shoot
     new JoystickButton(driveJoystick, Button.M_SWH.id)
-        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+        .onTrue(
+            new VisionShootCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Release Game Piece Command
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     new JoystickButton(driveJoystick, Button.SWG_UP.id)
-        .onTrue(
-            new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_UP.id)
-        .onFalse(
-            new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
-        .onTrue(
-            new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
-        .onFalse(
-            new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
   }
 
   public Command getAutonomousCommand() {
