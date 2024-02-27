@@ -360,7 +360,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case SHOOTING:
-        if (shootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
+        if (shootDelayTimer.hasElapsed(ShooterConstants.kTeleopShootTime)) {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
@@ -389,7 +389,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case PODIUM_SHOOTING:
-        if (magazineShootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
+        if (isAuto && magazineShootDelayTimer.hasElapsed(ShooterConstants.kAutonShootTime) || magazineShootDelayTimer.hasElapsed(ShooterConstants.kTeleopShootTime)) {
           magazineShootDelayTimer.stop();
 
           superStructure.stopPodiumShoot();

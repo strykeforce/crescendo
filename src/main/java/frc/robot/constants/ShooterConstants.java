@@ -10,7 +10,8 @@ public final class ShooterConstants {
   public static final int kLeftShooterTalonID = 40;
   public static final int kRightShooterTalonID = 41;
   public static final double kCloseEnough = 0.5;
-  public static final double kShootTime = 1.0;
+  public static final double kTeleopShootTime = 1.0;
+  public static final double kAutonShootTime = 0.25;
   public static final double kPodiumSpeed = 0;
 
   public static final TalonFXConfiguration getShooterConfig() {
