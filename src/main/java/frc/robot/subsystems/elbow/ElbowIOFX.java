@@ -68,7 +68,7 @@ public class ElbowIOFX implements ElbowIO {
   public void zero() {
     double absoluteRots = absRots.refresh().getValue();
 
-    relSetpointOffset = absoluteRots - RobotConstants.kElbowZero;
+    relSetpointOffset = absoluteRots - RobotConstants.kElbowZero + ElbowConstants.kZeroOffset;
 
     logger.info("RelSetPoint {}", relSetpointOffset);
     relSetpointOffset =

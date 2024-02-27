@@ -44,7 +44,7 @@ public class TuningShootCommand extends InstantCommand {
   @Override
   public void initialize() {
     superStructure.saveSetpoint(
-        -lShooterSpeed.getAsDouble(),
+        lShooterSpeed.getAsDouble(),
         duplicateShooters.getAsBoolean()
             ? lShooterSpeed.getAsDouble()
             : rShooterSpeed.getAsDouble(),

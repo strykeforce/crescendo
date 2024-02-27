@@ -69,7 +69,8 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     // io.setPct(ElbowConstants.kZeroVelocity);
     setState(ElbowStates.ZEROING);
     // zeroStable = 0;
-    setPosition(ElbowConstants.kZeroPos);
+    io.setPosition(ElbowConstants.kZeroPos);
+    setpoint = ElbowConstants.kZeroPos;
 
     // io.zero();
     logger.info("Elbow starting zeroing");
@@ -99,6 +100,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         //   io.setCurrentLimit(ElbowConstants.getCurrentLimitConfig());
         // }
         if (isFinished()) {
+          logger.info("Zeroed");
           io.zero();
           setState(ElbowStates.ZEROED);
         }

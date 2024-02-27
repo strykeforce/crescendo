@@ -34,11 +34,11 @@ public class ShooterIOFX implements ShooterIO {
 
     configurator = shooterLeft.getConfigurator();
     configurator.apply(new TalonFXConfiguration()); // factory default
-    configurator.apply(ShooterConstants.getShooterConfig());
+    configurator.apply(ShooterConstants.getLeftShooterConfig());
 
     configurator = shooterRight.getConfigurator();
     configurator.apply(new TalonFXConfiguration()); // factory default
-    configurator.apply(ShooterConstants.getShooterConfig());
+    configurator.apply(ShooterConstants.getRightShooterConfig());
 
     curLeftVelocity = shooterLeft.getVelocity();
     curRightVelocity = shooterRight.getVelocity();
@@ -52,7 +52,7 @@ public class ShooterIOFX implements ShooterIO {
 
   @Override
   public void setPct(double percentOutput) {
-    shooterLeft.setControl(dutyCycleRequest.withOutput(-percentOutput));
+    shooterLeft.setControl(dutyCycleRequest.withOutput(percentOutput));
     shooterRight.setControl(
         dutyCycleRequest.withOutput(
             percentOutput)); // FIXME: figure out which needs to be inverted to shoot = positive
@@ -60,7 +60,7 @@ public class ShooterIOFX implements ShooterIO {
 
   @Override
   public void setSpeed(double speed) {
-    shooterLeft.setControl(velocityLeftRequest.withVelocity(-speed));
+    shooterLeft.setControl(velocityLeftRequest.withVelocity(speed));
     shooterRight.setControl(
         velocityRightRequest.withVelocity(
             speed)); // FIXME: figure out which needs to be inverted to shoot = positive

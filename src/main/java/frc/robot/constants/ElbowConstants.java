@@ -27,6 +27,7 @@ public final class ElbowConstants {
   public static final int kMinStableZeroCounts = 5;
   public static final double kZeroVelocity = 0.05;
   public static final double kZeroPos = 25.0;
+  public static final double kZeroOffset = 0.00276; // 1 degree = 0.00276
 
   public static CANcoderConfiguration getCanCoderConfig() {
     CANcoderConfiguration config = new CANcoderConfiguration();
