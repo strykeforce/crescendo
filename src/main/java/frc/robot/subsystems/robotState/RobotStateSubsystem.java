@@ -388,6 +388,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           setState(RobotStates.SHOOTING);
         }
         break;
+        case PREPPING_CLIMB:
+          break;
+        case CLIMB_PREPPED:
+          break;
+        case TO_TRAP:
+          break;
+        case TRAP:
+          break;
+        case FOLDING:
+          break;
+        case DESCENDING:
+          break;
+        case POST_CLIMB:
+          break;
       default:
         break;
     }
@@ -421,6 +435,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     PODIUM_SHOOTING,
     TO_SUBWOOFER,
     RELEASE,
-    TO_TUNE
+    TO_TUNE,
+    PREPPING_CLIMB,
+    CLIMB_PREPPED,
+    TO_TRAP,
+    TRAP,
+    FOLDING,
+    DESCENDING,
+    POST_CLIMB
   }
 }

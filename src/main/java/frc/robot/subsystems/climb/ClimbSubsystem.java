@@ -10,11 +10,14 @@ import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
+import edu.wpi.first.wpilibj.Timer;
+
 public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
   private ClimbIO climbIO;
   private ClimbRatchetIO ratchetIO;
   private TrapBarIO trapIO;
   private ForkIO forkIO;
+  private boolean proceedToClimb = false;
 
   private final ClimbIOInputsAutoLogged climbInputs = new ClimbIOInputsAutoLogged();
   private final ClimbRatchetIOInputsAutoLogged ratchetInputs = new ClimbRatchetIOInputsAutoLogged();
@@ -33,6 +36,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double rightForkSetpoint = 0.0;
 
   private ClimbStates curState = ClimbStates.IDLE;
+  private Timer forkTimer = new Timer();
 
   public ClimbSubsystem(
       ClimbIO climbIO, ClimbRatchetIO ratchetIO, TrapBarIO trapIO, ForkIO forkIO) {
@@ -94,18 +98,22 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void extendForks() {
     isForkExtended = true;
-    forkIO.setLeftPos(ClimbConstants.kLeftExtendPos);
-    forkIO.setRightPos(ClimbConstants.kRightExtendPos);
-    leftForkSetpoint = ClimbConstants.kLeftExtendPos;
-    rightForkSetpoint = ClimbConstants.kRightExtendPos;
+    // forkIO.setLeftPos(ClimbConstants.kLeftExtendPos);
+    // forkIO.setRightPos(ClimbConstants.kRightExtendPos);
+    // leftForkSetpoint = ClimbConstants.kLeftExtendPos;
+    // rightForkSetpoint = ClimbConstants.kRightExtendPos;
+    forkIO.setPct(0.3);
   }
 
   public void retractForks() {
     isForkExtended = false;
-    forkIO.setLeftPos(ClimbConstants.kLeftRetractPos);
-    forkIO.setRightPos(ClimbConstants.kRightRetractPos);
-    leftForkSetpoint = ClimbConstants.kLeftRetractPos;
-    rightForkSetpoint = ClimbConstants.kRightRetractPos;
+    // forkIO.setLeftPos(ClimbConstants.kLeftRetractPos);
+    // forkIO.setRightPos(ClimbConstants.kRightRetractPos);
+    // leftForkSetpoint = ClimbConstants.kLeftRetractPos;
+    // rightForkSetpoint = ClimbConstants.kRightRetractPos;
+    forkTimer.reset();
+    forkTimer.start();
+    forkIO.setPct(-0.3);
   }
 
   public void setForkPercent(double percent) {
@@ -127,6 +135,11 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   @Override
   public void zero() {
+    zero(false);
+  }
+
+  public void zero(boolean proceedToClimb) {
+    this.proceedToClimb = proceedToClimb;
     // climbIO.zero();
     logger.info("{} -> ZEROING", curState);
     curState = ClimbStates.ZEROING;
@@ -143,9 +156,30 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isForkFinished() {
-    return Math.abs(leftForkSetpoint - forkInputs.leftPosTicks) <= ClimbConstants.kCloseEnoughForks
-        && Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
-            <= ClimbConstants.kCloseEnoughForks;
+    // return Math.abs(leftForkSetpoint - forkInputs.leftPosTicks) <= ClimbConstants.kCloseEnoughForks
+    //     && Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
+    //         <= ClimbConstants.kCloseEnoughForks;
+    return true;
+  }
+
+  public void prepClimb() {
+    proceedToClimb = true;
+    zero(true);
+  }
+
+  public void trapClimb() {
+    setPosition(ClimbConstants.kLeftClimbTrapPos);
+    curState = ClimbStates.CLIMBING;
+  }
+
+  public void descend() {
+    setPosition(ClimbConstants.kLeftClimbPrepPos);
+    curState = ClimbStates.DESCENDING;
+  }
+
+  public void stow() {
+    setPosition(ClimbConstants.kLeftStowPos);
+    
   }
 
   @Override
@@ -180,6 +214,51 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         }
         break;
       case ZEROED:
+        if (proceedToClimb) {
+          logger.info("ZEROED -> PREPPING");
+          curState = ClimbStates.PREPPING;
+          extendForks();
+          setPosition(ClimbConstants.kLeftClimbPrepPos);
+        }
+        break;
+      case PREPPING:
+        if (isFinished() && isForkFinished()) {
+          logger.info("PREPPING -> PREPPED");
+          curState = ClimbStates.PREPPED;
+          forkIO.setPct(0.0);
+        }
+        break;
+      case PREPPED:
+        break;
+      case CLIMBING:
+        if (isFinished()) {
+          logger.info("CLIMBING -> CLIMBED");
+          curState = ClimbStates.CLIMBED;
+        }
+        break;
+      case CLIMBED:
+        break;
+      case DESCENDING:
+        if (isFinished()) {
+          logger.info("DESCENDING -> DOWN");
+          curState = ClimbStates.DOWN;
+        }
+        break;
+      case DOWN:
+        break;
+      case STOWING:
+        if (forkTimer.hasElapsed(0.5)) {
+          forkIO.setPct(0.0);
+        }
+        if (isFinished()) {
+          logger.info("STOWING -> STOWED");
+          curState = ClimbStates.STOWED;
+          forkIO.setPct(0.0);
+        }
+        break;
+      case STOWED:
+        break;
+      default:
         break;
     }
   }
@@ -200,6 +279,14 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public enum ClimbStates {
     IDLE,
     ZEROING,
-    ZEROED
+    ZEROED,
+    PREPPING,
+    PREPPED,
+    CLIMBING,
+    CLIMBED,
+    DESCENDING,
+    DOWN,
+    STOWING,
+    STOWED
   }
 }

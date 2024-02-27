@@ -290,6 +290,19 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.PREP_PODIUM;
   }
 
+  public void prepClimb() {
+    elbowSetpoint = SuperStructureConstants.kElbowPreClimbSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristPreClimbSetPoint;
+
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
+
+    logger.info("{} -> TRANSFER(PREP_PODIUM)");
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.PREP_PODIUM;
+  }
+
   public void podiumShoot() {
     elbowSetpoint = SuperStructureConstants.kElbowPodiumSetPoint;
     wristSetpoint = SuperStructureConstants.kWristPodiumSetPoint;
@@ -336,12 +349,6 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case AMP:
         break;
-      case PRE_CLIMB:
-        break;
-      case TRAP:
-        break;
-      case POST_CLIMB:
-        break;
       case INTAKE:
         break;
       case DEFENSE:
@@ -353,6 +360,15 @@ public class SuperStructure extends MeasurableSubsystem {
       case PODIUM:
         break;
       case SUBWOOFER:
+        break;
+      case PREP_CLIMB:
+        break;
+      case TRAP:
+        break;
+      case FOLDED:
+        
+        break;
+      case POST_CLIMB:
         break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState.ordinal());
@@ -373,8 +389,9 @@ public class SuperStructure extends MeasurableSubsystem {
     IDLE,
     SHOOTING,
     AMP,
-    PRE_CLIMB,
+    PREP_CLIMB,
     TRAP,
+    FOLDED,
     POST_CLIMB,
     TRANSFER,
     INTAKE,
