@@ -90,7 +90,7 @@ public class RobotConstants {
     public static final Double kElbowZero = 0.0105; // 0.23291
 
     // Wrist
-    public static final Double kWristZero = 0.0;
+    public static final Double kWristZero = 2603.0;
 
     // Climb
     public static final Double kLeftTrapBarExtend = 0.8;

@@ -17,7 +17,7 @@ public final class ShooterConstants {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 0.6;
+    slot0.kP = 0.4;
     slot0.kI = 0.1;
     slot0.kD = 0.0;
     slot0.kS = 0.0;

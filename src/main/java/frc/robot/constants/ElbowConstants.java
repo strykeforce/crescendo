@@ -26,7 +26,7 @@ public final class ElbowConstants {
   public static final double kMinVelocityZeroing = 1;
   public static final int kMinStableZeroCounts = 5;
   public static final double kZeroVelocity = 0.05;
-  public static final double kZeroPos = 32.5;
+  public static final double kZeroPos = 25.0;
 
   public static CANcoderConfiguration getCanCoderConfig() {
     CANcoderConfiguration config = new CANcoderConfiguration();

@@ -111,6 +111,11 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.PREP_PODIUM);
   }
 
+  public void trap() {
+    setSpeed(MagazineConstants.kTrapReleaseSpeed);
+    setState(MagazineStates.TRAP);
+  }
+
   public boolean hasPiece() {
     return curState == MagazineStates.FULL
         || curState == MagazineStates.EMPTYING
@@ -226,6 +231,11 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
           setEmpty();
         }
         break;
+      case TRAP:
+        if (releaseTimer.hasElapsed(MagazineConstants.kTrapReleaseTime)) {
+          setEmpty();
+        }
+        break;
     }
   }
 
@@ -251,6 +261,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     SPEEDUP,
     PREP_PODIUM,
     SHOOT,
-    RELEASE
+    RELEASE,
+    TRAP
   }
 }

@@ -23,7 +23,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     // this.encoderIo = encoderIo;
     setpoint = inputs.positionRots;
 
-    zero();
+    // zero();
   }
 
   public void setPosition(double position) {
@@ -65,10 +65,11 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public void zero() {
-    io.setCurrentLimit(ElbowConstants.getZeroCurrentLimitConfig());
-    io.setPct(ElbowConstants.kZeroVelocity);
+    // io.setCurrentLimit(ElbowConstants.getZeroCurrentLimitConfig());
+    // io.setPct(ElbowConstants.kZeroVelocity);
     setState(ElbowStates.ZEROING);
-    zeroStable = 0;
+    // zeroStable = 0;
+    setPosition(ElbowConstants.kZeroPos);
 
     // io.zero();
     logger.info("Elbow starting zeroing");
@@ -89,13 +90,17 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         }
         break;
       case ZEROING:
-        if (inputs.velocity <= ElbowConstants.kMinVelocityZeroing) zeroStable++;
-        else zeroStable = 0;
-        if (zeroStable > ElbowConstants.kMinStableZeroCounts) {
-          setState(ElbowStates.ZEROED);
+        // if (inputs.velocity <= ElbowConstants.kMinVelocityZeroing) zeroStable++;
+        // else zeroStable = 0;
+        // if (zeroStable > ElbowConstants.kMinStableZeroCounts) {
+        //   setState(ElbowStates.ZEROED);
+        //   io.zero();
+        //   io.setPct(0.0);
+        //   io.setCurrentLimit(ElbowConstants.getCurrentLimitConfig());
+        // }
+        if (isFinished()) {
           io.zero();
-          io.setPct(0.0);
-          io.setCurrentLimit(ElbowConstants.getCurrentLimitConfig());
+          setState(ElbowStates.ZEROED);
         }
 
         break;

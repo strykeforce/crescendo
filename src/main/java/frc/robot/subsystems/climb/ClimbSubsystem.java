@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climb;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
@@ -9,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
-
-import edu.wpi.first.wpilibj.Timer;
 
 public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
   private ClimbIO climbIO;
@@ -156,7 +155,8 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isForkFinished() {
-    // return Math.abs(leftForkSetpoint - forkInputs.leftPosTicks) <= ClimbConstants.kCloseEnoughForks
+    // return Math.abs(leftForkSetpoint - forkInputs.leftPosTicks) <=
+    // ClimbConstants.kCloseEnoughForks
     //     && Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
     //         <= ClimbConstants.kCloseEnoughForks;
     return true;
@@ -179,7 +179,6 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void stow() {
     setPosition(ClimbConstants.kLeftStowPos);
-    
   }
 
   @Override

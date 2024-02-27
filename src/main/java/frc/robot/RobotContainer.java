@@ -8,6 +8,9 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,7 +28,11 @@ import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
+import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
+import frc.robot.commands.robotState.StowCommand;
+import frc.robot.commands.robotState.TuningOffCommand;
+import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -115,15 +122,14 @@ public class RobotContainer {
     // configureOperatorBindings();
     configureClimbTestBindings();
     // configureMatchDashboard();
-    // configurePitDashboard();
-    // configureTuningDashboard();
+    configurePitDashboard();
+    configureTuningDashboard();
     // robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
     // configureTelemetry();
     // configurePitDashboard();
   }
 
-  /*
   public void configurePitDashboard() {
     Shuffleboard.getTab("Pit")
         .add(
@@ -140,26 +146,22 @@ public class RobotContainer {
         .add("Zero Elbow", new ZeroElbowCommand(elbowSubsystem))
         .withSize(1, 1)
         .withPosition(2, 0);
-    Shuffleboard.getTab("Pit")
-        .add("ShootingZeroTest", new DynamicZeroPosCommand(elbowSubsystem, 25.0))
-        .withSize(1, 1)
-        .withPosition(3, 0);
   }
+  /*
+    private void configureMatchDashboard() {
+      allianceColor =
+          Shuffleboard.getTab("Match")
+              .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
+              .withProperties(Map.of("colorWhenFalse", "blue"))
+              .withSize(2, 2)
+              .withPosition(0, 0);
 
-  private void configureMatchDashboard() {
-    allianceColor =
-        Shuffleboard.getTab("Match")
-            .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
-            .withProperties(Map.of("colorWhenFalse", "blue"))
-            .withSize(2, 2)
-            .withPosition(0, 0);
-
-    Shuffleboard.getTab("Match")
-        .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
-        .withSize(1, 1)
-        .withPosition(2, 0);
-  }
-
+      Shuffleboard.getTab("Match")
+          .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
+          .withSize(1, 1)
+          .withPosition(2, 0);
+    }
+  */
   public void configureTuningDashboard() {
     ShuffleboardTab tab = Shuffleboard.getTab("Tuning");
     lShooterSpeed =
@@ -187,19 +189,18 @@ public class RobotContainer {
         new TuningOffCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
-  */
 
   public void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
-    // visionSubsystem.registerWith(telemetryService);
-    // wristSubsystem.registerWith(telemetryService);
-    // elbowSubsystem.registerWith(telemetryService);
-    // shooterSubsystem.registerWith(telemetryService);
-    // superStructure.registerWith(telemetryService);
+    visionSubsystem.registerWith(telemetryService);
+    wristSubsystem.registerWith(telemetryService);
+    elbowSubsystem.registerWith(telemetryService);
+    shooterSubsystem.registerWith(telemetryService);
+    superStructure.registerWith(telemetryService);
     climbSubsystem.registerWith(telemetryService);
-    // intakeSubsystem.registerWith(telemetryService);
-    // magazineSubsystem.registerWith(telemetryService);
-    // robotStateSubsystem.registerWith(telemetryService);
+    intakeSubsystem.registerWith(telemetryService);
+    magazineSubsystem.registerWith(telemetryService);
+    robotStateSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
   /*

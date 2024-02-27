@@ -20,6 +20,7 @@ public final class MagazineConstants {
   public static final double kPodiumPrepareSpeed = -10;
   public static final double kPodiumShootSpeed = 90; // FIXME
   public static final double kTrapReleaseSpeed = -20.0;
+  public static final double kTrapReleaseTime = 0.75;
   public static final double kAmpReleaseSpeed = 20.0;
 
   public static final TalonFXConfiguration getMagazineConfig() {
