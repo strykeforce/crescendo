@@ -121,36 +121,6 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.SHOOTING;
   }
 
-  public void preClimb() {
-    elbowSetpoint = SuperStructureConstants.kElbowPreClimbSetPoint;
-    wristSetpoint = SuperStructureConstants.kWristPreClimbSetPoint;
-    leftShooterSpeed = SuperStructureConstants.kShooterPreClimbSetPoint;
-    rightShooterSpeed = SuperStructureConstants.kShooterPreClimbSetPoint;
-
-    shooterSubsystem.setSpeed(leftShooterSpeed);
-    wristSubsystem.setPosition(wristSetpoint);
-
-    logger.info("{} -> TRANSFER(PREP_CLIMB)", curState);
-    flipMagazineOut = false;
-    curState = SuperStructureStates.TRANSFER;
-    nextState = SuperStructureStates.PREP_CLIMB;
-  }
-
-  public void postClimb() {
-    elbowSetpoint = SuperStructureConstants.kElbowPostClimbSetPoint;
-    wristSetpoint = SuperStructureConstants.kWristPostClimbSetPoint;
-    leftShooterSpeed = SuperStructureConstants.kShooterPostClimbSetPoint;
-    rightShooterSpeed = SuperStructureConstants.kShooterPostClimbSetPoint;
-
-    shooterSubsystem.setSpeed(rightShooterSpeed);
-    wristSubsystem.setPosition(wristSetpoint);
-
-    logger.info("{} -> TRANSFER(POST_CLIMB)", curState);
-    flipMagazineOut = false;
-    curState = SuperStructureStates.TRANSFER;
-    nextState = SuperStructureStates.POST_CLIMB;
-  }
-
   public void amp() {
     elbowSetpoint = SuperStructureConstants.kElbowAmpSetPoint;
     wristSetpoint = SuperStructureConstants.kWristAmpSetPoint;
@@ -164,21 +134,6 @@ public class SuperStructure extends MeasurableSubsystem {
     flipMagazineOut = true;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.AMP;
-  }
-
-  public void trap() {
-    elbowSetpoint = SuperStructureConstants.kElbowTrapSetPoint;
-    wristSetpoint = SuperStructureConstants.kWristTrapSetPoint;
-    leftShooterSpeed = SuperStructureConstants.kShooterTrapSetPoint;
-    rightShooterSpeed = SuperStructureConstants.kShooterTrapSetPoint;
-
-    // shooterSubsystem.setSpeed(leftShooterSpeed);
-    // elbowSubsystem.setPosition(elbowSetpoint);
-
-    logger.info("{} -> TRANSFER(TRAP)", curState);
-    flipMagazineOut = true;
-    curState = SuperStructureStates.TRANSFER;
-    nextState = SuperStructureStates.TRAP;
   }
 
   public void safeIntake() {
@@ -290,20 +245,22 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.PREP_PODIUM;
   }
 
-  public void toPrep() {
+  public void toPrepClimb() {
     elbowSetpoint = SuperStructureConstants.kElbowPreClimbSetPoint;
     wristSetpoint = SuperStructureConstants.kWristPreClimbSetPoint;
+    leftShooterSpeed = rightShooterSpeed = SuperStructureConstants.kShooterPreClimbSetPoint;
 
+    shooterSubsystem.setSpeed(rightShooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
     elbowSubsystem.setPosition(elbowSetpoint);
 
-    logger.info("{} -> TRANSFER(PREP_PODIUM)", curState);
+    logger.info("{} -> TRANSFER(PREP_CLIMB)", curState);
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
-    nextState = SuperStructureStates.PREP_PODIUM;
+    nextState = SuperStructureStates.PREP_CLIMB;
   }
 
-  public void ToFold() {
+  public void toFold() {
     elbowSetpoint = SuperStructureConstants.kElbowFoldedSetPoint;
     wristSetpoint = SuperStructureConstants.kWristFoldedSetPoint;
 
@@ -316,14 +273,14 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.FOLDED;
   }
 
-  public void ToTrap() {
+  public void toTrap() {
     elbowSetpoint = SuperStructureConstants.kElbowTrapSetPoint;
     wristSetpoint = SuperStructureConstants.kWristTrapSetPoint;
 
     wristSubsystem.setPosition(wristSetpoint);
     elbowSubsystem.setPosition(elbowSetpoint);
 
-    logger.info("{} -> TRANSFER(FOLDING)", curState);
+    logger.info("{} -> TRANSFER(TRAP)", curState);
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.TRAP;
@@ -389,9 +346,9 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case PREP_CLIMB:
         break;
-      case TRAP:
-        break;
       case FOLDED:
+        break;
+      case TRAP:
         break;
       case POST_CLIMB:
         break;

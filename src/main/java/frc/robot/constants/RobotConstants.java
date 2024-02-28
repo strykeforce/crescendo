@@ -37,17 +37,17 @@ public class RobotConstants {
   public static final Rotation2d kShooterHeading = Rotation2d.fromDegrees(180);
 
   // Constants Different between Comp and Proto
-  public static Double kWheelDiameterInches = 3.0;
-  public static Double kElbowZero = 0.11206;
-  public static Double kWristZero = 1132.0;
+  public static double kWheelDiameterInches = 3.0;
+  public static double kElbowZero = 0.11206;
+  public static double kWristZero = 1132.0;
 
   // Climb Servos
-  public static Double kLeftTrapBarExtend = 0.0;
-  public static Double kLeftTrapBarRetract = 0.0;
-  public static Double kRightTrapBarExtend = 0.0;
-  public static Double kRightTrapBarRetract = 0.0;
-  public static Double kLeftRatchetOn = 0.0;
-  public static Double kLeftRatchetOff = 0.0;
+  public static double kLeftTrapBarExtend = 0.0;
+  public static double kLeftTrapBarRetract = 0.0;
+  public static double kRightTrapBarExtend = 0.0;
+  public static double kRightTrapBarRetract = 0.0;
+  public static double kLeftRatchetOn = 0.0;
+  public static double kLeftRatchetOff = 0.0;
   public static double kRightRatchetOn = 0.0;
   public static double kRightRatchetOff = 0.0;
 

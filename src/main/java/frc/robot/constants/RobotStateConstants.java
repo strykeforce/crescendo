@@ -12,5 +12,5 @@ public final class RobotStateConstants {
 
   public static final double kTimeToStowPostAmp = 0.1;
 
-  public static final double kClimbMoveElbowPos = 0.0;
+  public static final double kClimbMoveElbowPos = 33.0;
 }

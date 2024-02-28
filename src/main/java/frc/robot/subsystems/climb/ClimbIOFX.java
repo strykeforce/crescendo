@@ -20,19 +20,21 @@ public class ClimbIOFX implements ClimbIO {
   private double leftSetpoint;
   private double rightSetpoint;
 
-  TalonFXConfigurator leftConfig;
-  TalonFXConfigurator rightConfig;
+  private TalonFXConfigurator leftConfig;
+  private TalonFXConfigurator rightConfig;
 
-  MotionMagicVoltage leftPosRequest = new MotionMagicVoltage(0).withEnableFOC(false).withSlot(0);
-  MotionMagicVoltage rightPosRequest = new MotionMagicVoltage(0).withEnableFOC(false).withSlot(0);
+  private MotionMagicVoltage leftPosRequest =
+      new MotionMagicVoltage(0).withEnableFOC(false).withSlot(0);
+  private MotionMagicVoltage rightPosRequest =
+      new MotionMagicVoltage(0).withEnableFOC(false).withSlot(0);
 
-  DutyCycleOut leftPctRequest = new DutyCycleOut(0.0);
-  DutyCycleOut rightPctRequest = new DutyCycleOut(0.0);
+  private DutyCycleOut leftPctRequest = new DutyCycleOut(0.0);
+  private DutyCycleOut rightPctRequest = new DutyCycleOut(0.0);
 
-  StatusSignal<Double> leftPos;
-  StatusSignal<Double> rightPos;
-  StatusSignal<Double> leftVel;
-  StatusSignal<Double> rightVel;
+  private StatusSignal<Double> leftPos;
+  private StatusSignal<Double> rightPos;
+  private StatusSignal<Double> leftVel;
+  private StatusSignal<Double> rightVel;
 
   public ClimbIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
