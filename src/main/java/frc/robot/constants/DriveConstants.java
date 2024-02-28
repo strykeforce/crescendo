@@ -107,7 +107,7 @@ public final class DriveConstants {
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
     currentConfig.SupplyCurrentLimit = 40;
     currentConfig.SupplyCurrentThreshold = 45;
-    currentConfig.SupplyTimeThreshold = 1.0;
+    currentConfig.SupplyTimeThreshold = 0.0;
     currentConfig.SupplyCurrentLimitEnable = true;
     currentConfig.StatorCurrentLimitEnable = false;
     driveConfig.CurrentLimits = currentConfig;
