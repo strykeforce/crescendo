@@ -39,6 +39,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
   private Timer ampStowTimer = new Timer();
+  private Timer startShootDelay = new Timer();
+  private boolean hasDelayed = false;
+  private double shootDelay = 0.0;
 
   private Alliance allianceColor = Alliance.Blue;
 
@@ -242,6 +245,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toTune() {
     setState(RobotStates.TO_TUNE);
     superStructure.shootTune();
+    hasDelayed = false;
+  }
+
+  public void setShootDelay(double delay) {
+    shootDelay = delay;
   }
 
   // Periodic
@@ -378,7 +386,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case TO_TUNE:
-        if (superStructure.isFinished()) {
+        if (superStructure.isFinished() && !hasDelayed) {
+          startShootDelay.reset();
+          startShootDelay.start();
+          hasDelayed = true;
+        }
+        if (startShootDelay.hasElapsed(shootDelay) && hasDelayed) {
           magazineSubsystem.toEmptying(magazineTuneSpeed);
 
           shootDelayTimer.stop();
@@ -386,6 +399,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.start();
 
           setState(RobotStates.SHOOTING);
+          hasDelayed = false;
         }
         break;
       case PREPPING_CLIMB:

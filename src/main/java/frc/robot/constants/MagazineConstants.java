@@ -2,8 +2,10 @@ package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 public final class MagazineConstants {
@@ -41,6 +43,9 @@ public final class MagazineConstants {
     config.MotionMagic = motionMagic;
 
     config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
+
+    MotorOutputConfigs motorConfig = new MotorOutputConfigs();
+    motorConfig.NeutralMode = NeutralModeValue.Brake;
 
     return config;
   }

@@ -90,6 +90,7 @@ public class RobotContainer {
   public GenericEntry magazineSpeed;
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
+  public GenericEntry shootDelay;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -173,6 +174,7 @@ public class RobotContainer {
     elbowPos = tab.add("Elbow Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     duplicateShooters =
         tab.add("Duplicate Shooters?", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+    shootDelay = tab.add("Shoot Delay", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     tab.add(
         "shoot",
         new TuningShootCommand(
@@ -184,7 +186,8 @@ public class RobotContainer {
             () -> rShooterSpeed.getDouble(0.0),
             () -> magazineSpeed.getDouble(0.0),
             () -> elbowPos.getDouble(0.0),
-            () -> duplicateShooters.getBoolean(true)));
+            () -> duplicateShooters.getBoolean(true),
+            () -> shootDelay.getDouble(0.0)));
     tab.add(
         "stop",
         new TuningOffCommand(
