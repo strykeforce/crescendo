@@ -72,7 +72,7 @@ public class RobotConstants {
     public static final Double kWheelDiameterInches = 3.0 * 503.5 / 500.0;
 
     // Elbow
-    public static final Double kElbowZero = -0.31152;
+    public static final Double kElbowZero =  0.08838;
 
     // Wrist
     public static final Double kWristZero = 3293.0; // 3310
