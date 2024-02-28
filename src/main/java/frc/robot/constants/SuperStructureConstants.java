@@ -17,19 +17,19 @@ public final class SuperStructureConstants {
 
   // PRE-CLIMB
   public static final double kWristPreClimbSetPoint = kWristStowSetPoint;
-  public static final double kElbowPreClimbSetPoint = 0.0;
+  public static final double kElbowPreClimbSetPoint = -30.0;
   public static final double kShooterPreClimbSetPoint = 0.0;
 
   // TRAP
   public static final double kElbowFoldedSetPoint = 0.0;
   public static final double kWristFoldedSetPoint = kWristStowSetPoint;
   public static final double kWristTrapSetPoint = 0.0;
-  public static final double kElbowTrapSetPoint = 0.0;
+  public static final double kElbowTrapSetPoint = kElbowFoldedSetPoint;
   public static final double kShooterTrapSetPoint = 0.0;
 
   // POST-CLIMB
   public static final double kWristPostClimbSetPoint = kWristStowSetPoint;
-  public static final double kElbowPostClimbSetPoint = 0.0;
+  public static final double kElbowPostClimbSetPoint = kElbowFoldedSetPoint;
   public static final double kShooterPostClimbSetPoint = 0.0;
 
   // INTAKE

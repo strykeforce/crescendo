@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
@@ -30,6 +31,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private IntakeSubsystem intakeSubsystem;
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
+  private ClimbSubsystem climbSubsystem;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
@@ -43,6 +45,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Alliance allianceColor = Alliance.Blue;
 
   private boolean safeStow = false;
+  private boolean decendClimbAfterTrap;
 
   private double magazineTuneSpeed = 0.0;
 
@@ -52,12 +55,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       DriveSubsystem driveSubsystem,
       IntakeSubsystem intakeSubsystem,
       MagazineSubsystem magazineSubsystem,
-      SuperStructure superStructure) {
+      SuperStructure superStructure,
+      ClimbSubsystem climbSubsystem) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
+    this.climbSubsystem = climbSubsystem;
 
     parseLookupTable();
   }
@@ -133,9 +138,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       logger.info(
           "Distance: {} | Measured {}", Double.parseDouble(lookupTable[index][0]), distance);
       /*
-      index =
-          (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
-              / RobotStateConstants.kDistanceIncrement;*/
+       * index =
+       * (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
+       * / RobotStateConstants.kDistanceIncrement;
+       */
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
@@ -220,6 +226,45 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_SUBWOOFER);
+  }
+
+  public void prepareClimb() {
+    climbSubsystem.zero(true);
+    climbSubsystem.extendForks();
+    superStructure.toPrepClimb();
+
+    setState(RobotStates.PREPPING_CLIMB);
+  }
+
+  public void climb() {
+    climbSubsystem.trapClimb();
+
+    setState(RobotStates.CLIMBING);
+  }
+
+  public void toTrap() {
+    superStructure.toFold();
+
+    setState(RobotStates.FOLDING_OUT);
+  }
+
+  public void scoreTrap(boolean decend) {
+    magazineSubsystem.trap();
+    this.decendClimbAfterTrap = decend;
+  }
+
+  public void decendClimb() {
+    superStructure.toPrepClimb();
+
+    setState(RobotStates.PREPPING_DECEND);
+  }
+
+  public void postClimbStow() {
+    toStow();
+    climbSubsystem.retractForks();
+    climbSubsystem.stow();
+
+    setState(RobotStates.TO_STOW);
   }
 
   // FIXME
@@ -337,15 +382,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
           superStructure.slowWheelSpin();
         }
-        // if (superStructure.isFinished() && magazineSubsystem.getState() == MagazineStates.SHOOT)
+        // if (superStructure.isFinished() && magazineSubsystem.getState() ==
+        // MagazineStates.SHOOT)
         // {
-        //   superStructure.podiumShoot();
+        // superStructure.podiumShoot();
 
-        //   magazineShootDelayTimer.stop();
-        //   magazineShootDelayTimer.reset();
-        //   magazineShootDelayTimer.start();
+        // magazineShootDelayTimer.stop();
+        // magazineShootDelayTimer.reset();
+        // magazineShootDelayTimer.start();
 
-        //   setState(RobotStates.PODIUM_SHOOTING);
+        // setState(RobotStates.PODIUM_SHOOTING);
         // }
         break;
 
@@ -389,16 +435,60 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case PREPPING_CLIMB:
+        if (climbSubsystem.isFinished() && superStructure.isFinished()) {
+          setState(RobotStates.CLIMB_PREPPED);
+        }
         break;
       case CLIMB_PREPPED:
         break;
+
+      case CLIMBING:
+        if (climbSubsystem.isFinished()) {
+          setState(RobotStates.CLIMBED);
+        }
+        break;
+      case CLIMBED:
+        break;
+      case FOLDING_OUT:
+        if (superStructure.isFinished()) {
+          superStructure.toTrap();
+          climbSubsystem.extendTrapBar();
+
+          setState(RobotStates.TO_TRAP);
+        }
+        break;
       case TO_TRAP:
+        if (superStructure.isFinished()) {
+          setState(RobotStates.TRAP);
+        }
         break;
       case TRAP:
+        if (!magazineSubsystem.hasPiece()) {
+          climbSubsystem.retractTrapBar();
+          superStructure.toFold();
+          setState(RobotStates.FOLDING_IN);
+        }
         break;
-      case FOLDING:
+      case FOLDING_IN:
+        if (superStructure.isFinished()) {
+          superStructure.toPrepClimb();
+
+          if (decendClimbAfterTrap) {
+            setState(RobotStates.PREPPING_DECEND);
+          }
+        }
+        break;
+      case PREPPING_DECEND:
+        if (superStructure.isFinished()) {
+          climbSubsystem.descend();
+
+          setState(RobotStates.DESCENDING);
+        }
         break;
       case DESCENDING:
+        if (climbSubsystem.isFinished()) {
+          setState(RobotStates.POST_CLIMB);
+        }
         break;
       case POST_CLIMB:
         break;
@@ -440,8 +530,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     CLIMB_PREPPED,
     TO_TRAP,
     TRAP,
-    FOLDING,
+    FOLDING_OUT,
+    FOLDING_IN,
     DESCENDING,
-    POST_CLIMB
+    POST_CLIMB,
+    PREPPING_DECEND,
+    CLIMBING,
+    CLIMBED
   }
 }

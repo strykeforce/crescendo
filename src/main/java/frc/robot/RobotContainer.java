@@ -30,7 +30,13 @@ import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
+import frc.robot.commands.robotState.ClimbCommand;
+import frc.robot.commands.robotState.DecendCommand;
+import frc.robot.commands.robotState.PostClimbStowCommand;
+import frc.robot.commands.robotState.PrepClimbCommand;
+import frc.robot.commands.robotState.ScoreTrapCommand;
 import frc.robot.commands.robotState.StowCommand;
+import frc.robot.commands.robotState.TrapCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -111,7 +117,12 @@ public class RobotContainer {
 
     robotStateSubsystem =
         new RobotStateSubsystem(
-            visionSubsystem, driveSubsystem, intakeSubsystem, magazineSubsystem, superStructure);
+            visionSubsystem,
+            driveSubsystem,
+            intakeSubsystem,
+            magazineSubsystem,
+            superStructure,
+            climbSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
@@ -147,6 +158,55 @@ public class RobotContainer {
         .add("Zero Elbow", new ZeroElbowCommand(elbowSubsystem))
         .withSize(1, 1)
         .withPosition(2, 0);
+
+    // Climb buttons
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Prep Climb", new PrepClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(0, 2);
+    Shuffleboard.getTab("Pit")
+        .add("Climb", new ClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(1, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add("To Trap", new TrapCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(2, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Score Trap (DECEND)",
+            new ScoreTrapCommand(
+                robotStateSubsystem, climbSubsystem, superStructure, magazineSubsystem, true))
+        .withSize(1, 1)
+        .withPosition(3, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Score Trap (STAY)",
+            new ScoreTrapCommand(
+                robotStateSubsystem, climbSubsystem, superStructure, magazineSubsystem, false))
+        .withSize(1, 1)
+        .withPosition(4, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add("Decend", new DecendCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(5, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Post Climb Stow",
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem))
+        .withSize(1, 1)
+        .withPosition(6, 2);
   }
   /*
     private void configureMatchDashboard() {
