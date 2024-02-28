@@ -20,7 +20,7 @@ public class NonAmpInitial_WingNotes_BCommand extends SequentialCommandGroup {
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
-  
+
   public NonAmpInitial_WingNotes_BCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,

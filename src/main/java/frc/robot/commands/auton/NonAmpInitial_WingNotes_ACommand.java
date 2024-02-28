@@ -26,6 +26,8 @@ public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
+  private setAngleOffsetCommand angleOffsetCommand;
+  private double rotation = -50;
 
   public NonAmpInitial_WingNotes_ACommand(
       DriveSubsystem driveSubsystem,
@@ -39,11 +41,12 @@ public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
     firstPath = new DriveAutonCommand(driveSubsystem, pathOne, true, true);
     secondPath = new DriveAutonCommand(driveSubsystem, pathTwo, true, false);
     thirdPath = new DriveAutonCommand(driveSubsystem, pathThree, true, false);
+    angleOffsetCommand = new setAngleOffsetCommand(driveSubsystem, rotation);
     this.robotStateSubsystem = robotStateSubsystem;
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
-        new setAngleOffsetCommand(driveSubsystem, -50.0),
+        new setAngleOffsetCommand(driveSubsystem, rotation),
         new DistanceShootCommand(
             robotStateSubsystem,
             superStructure,
@@ -73,6 +76,7 @@ public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
     thirdPath.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
+    rotation = angleOffsetCommand.fixedRotation(rotation);
   }
 
   public boolean hasGenerated() {
