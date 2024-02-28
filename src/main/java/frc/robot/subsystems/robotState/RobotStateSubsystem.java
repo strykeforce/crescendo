@@ -24,7 +24,7 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   // Private Variables
-  private Logger logger = LoggerFactory.getLogger(IntakeSubsystem.class);
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private VisionSubsystem visionSubsystem;
   private DriveSubsystem driveSubsystem;
@@ -42,6 +42,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Timer magazineShootDelayTimer = new Timer();
   private Timer ampStowTimer = new Timer();
   private Timer startShootDelay = new Timer();
+  private Timer scoreTrapTimer = new Timer();
   private boolean hasDelayed = false;
   private double shootDelay = 0.0;
 
@@ -246,15 +247,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toTrap() {
-    climbSubsystem.extendTrapBar();
+    // climbSubsystem.extendTrapBar();
     superStructure.toTrap();
 
     setState(RobotStates.TO_TRAP);
   }
 
   public void scoreTrap(boolean decend) {
+    scoreTrapTimer.reset();
+    scoreTrapTimer.start();
     magazineSubsystem.trap();
     this.decendClimbAfterTrap = decend;
+    setState(RobotStates.SCORE_TRAP);
   }
 
   public void decendClimb() {
@@ -458,16 +462,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case CLIMBING:
-        if (climbSubsystem.getPosition() > RobotStateConstants.kClimbMoveElbowPos) {
+        if (climbSubsystem.getPosition() <= RobotStateConstants.kClimbMoveElbowPos) {
           superStructure.toFold();
-        }
-        if (climbSubsystem.isFinished()) {
           setState(RobotStates.FOLDING_OUT);
         }
+        // if (climbSubsystem.isFinished()) {
+        //   setState(RobotStates.FOLDING_OUT);
+        // }
         break;
 
       case FOLDING_OUT:
-        if (superStructure.isFinished()) {
+        if (superStructure.isFinished() && climbSubsystem.isFinished()) {
           setState(RobotStates.CLIMBED);
         }
         break;
@@ -476,23 +481,43 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case TO_TRAP:
+        logger.info(
+            "Wrist Pos: {}, greater than: {}",
+            superStructure.getWristPos(),
+            superStructure.getWristPos() >= RobotStateConstants.kMaxWristToMoveTrapBar);
+        if (superStructure.getWristPos() >= RobotStateConstants.kMinWristToMoveTrapBar) {
+          climbSubsystem.extendTrapBar();
+        }
         if (superStructure.isFinished()) {
+          // climbSubsystem.extendTrapBar();
           setState(RobotStates.TRAP);
         }
         break;
       case TRAP:
-        if (!magazineSubsystem.hasPiece()) {
-          climbSubsystem.retractTrapBar();
+        // if (!magazineSubsystem.hasPiece()) {
+        //   climbSubsystem.retractTrapBar();
+        //   superStructure.toFold();
+        //   setState(RobotStates.FOLDING_IN);
+        // }
+        break;
+      case SCORE_TRAP:
+        if (scoreTrapTimer.hasElapsed(RobotStateConstants.kTrapTimer)) {
           superStructure.toFold();
+          magazineSubsystem.setSpeed(0.0);
           setState(RobotStates.FOLDING_IN);
         }
         break;
       case FOLDING_IN:
+        if (superStructure.getWristPos() <= RobotStateConstants.kMaxWristToMoveTrapBar) {
+          climbSubsystem.retractTrapBar();
+        }
         if (superStructure.isFinished()) {
           superStructure.toPrepClimb();
 
           if (decendClimbAfterTrap) {
             setState(RobotStates.PREPPING_DECEND);
+          } else {
+            setState(RobotStates.CLIMBED);
           }
         }
         break;
@@ -548,6 +573,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     CLIMB_PREPPED,
     TO_TRAP,
     TRAP,
+    SCORE_TRAP,
     FOLDING_OUT,
     FOLDING_IN,
     DESCENDING,

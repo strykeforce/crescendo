@@ -56,6 +56,10 @@ public class SuperStructure extends MeasurableSubsystem {
     return curState;
   }
 
+  public double getWristPos() {
+    return wristSubsystem.getPosition();
+  }
+
   // public void setState(SuperStructureStates state) {
   //   if (state != SuperStructureStates.IDLE) {
   //     curState = SuperStructureStates.TRANSFER;

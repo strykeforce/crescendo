@@ -105,7 +105,7 @@ public final class ClimbConstants {
 
     MotionMagicConfigs motionMagic = new MotionMagicConfigs();
     motionMagic.MotionMagicAcceleration = 80;
-    motionMagic.MotionMagicCruiseVelocity = 700;
+    motionMagic.MotionMagicCruiseVelocity = 350; // 700
     motionMagic.MotionMagicJerk = 3000;
     config.MotionMagic = motionMagic;
 

@@ -20,7 +20,7 @@ public class ClimbCommand extends Command {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.prepareClimb();
+    robotStateSubsystem.climb();
   }
 
   @Override

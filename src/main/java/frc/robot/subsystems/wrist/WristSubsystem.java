@@ -98,9 +98,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isFinished() {
-    // FIXME
-    // return Math.abs(inputs.position - setpoint) <= WristConstants.kCloseEnoughTicks;
-    return true;
+    return Math.abs(inputs.position - setpoint) <= WristConstants.kCloseEnoughTicks;
   }
 
   public void zero() {
