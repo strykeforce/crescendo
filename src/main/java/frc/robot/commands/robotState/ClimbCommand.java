@@ -25,6 +25,7 @@ public class ClimbCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return robotStateSubsystem.getState() != RobotStates.CLIMBING;
+    return robotStateSubsystem.getState() != RobotStates.CLIMBING
+        && robotStateSubsystem.getState() != RobotStates.FOLDING_OUT;
   }
 }

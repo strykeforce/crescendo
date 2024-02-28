@@ -243,9 +243,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toTrap() {
-    superStructure.toFold();
+    climbSubsystem.extendTrapBar();
+    superStructure.toTrap();
 
-    setState(RobotStates.FOLDING_OUT);
+    setState(RobotStates.TO_TRAP);
   }
 
   public void scoreTrap(boolean decend) {
@@ -443,20 +444,23 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case CLIMBING:
+        if (climbSubsystem.getPosition() > RobotStateConstants.kClimbMoveElbowPos) {
+          superStructure.toFold();
+        }
         if (climbSubsystem.isFinished()) {
+          setState(RobotStates.FOLDING_OUT);
+        }
+        break;
+
+      case FOLDING_OUT:
+        if (superStructure.isFinished()) {
           setState(RobotStates.CLIMBED);
         }
         break;
+
       case CLIMBED:
         break;
-      case FOLDING_OUT:
-        if (superStructure.isFinished()) {
-          superStructure.toTrap();
-          climbSubsystem.extendTrapBar();
 
-          setState(RobotStates.TO_TRAP);
-        }
-        break;
       case TO_TRAP:
         if (superStructure.isFinished()) {
           setState(RobotStates.TRAP);
