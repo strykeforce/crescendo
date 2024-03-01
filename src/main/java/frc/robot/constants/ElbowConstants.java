@@ -22,12 +22,15 @@ public final class ElbowConstants {
   public static final double kFxChain = 50.0 / 24.0;
 
   public static final double kElbowTestPos = 0.0;
-
-  public static final double kMinVelocityZeroing = 1;
-  public static final int kMinStableZeroCounts = 5;
-  public static final double kZeroVelocity = 0.05;
   public static final double kZeroPos = 25.0;
   public static final double kZeroOffset = 0.00276; // 1 degree = 0.00276
+
+  // Zero Recovery Constants
+  public static final double kZeroVelocity = 0.05;
+  public static final double kMinVelocityZeroing = 1;
+  public static final int kMinStableZeroCounts = 5;
+  public static final int kStableCountsAbsEncoder = 3;
+  public static final double kCloseEnoughAbs = 0.0001;
 
   public static CANcoderConfiguration getCanCoderConfig() {
     CANcoderConfiguration config = new CANcoderConfiguration();
@@ -46,10 +49,10 @@ public final class ElbowConstants {
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 34;
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -60;
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -100;
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 1.2;
+    slot0.kP = 2.0; // 1.2
     slot0.kI = 2.0;
     slot0.kD = 0.2;
     slot0.kS = 0.0;

@@ -237,6 +237,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         }
         break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("Magazine State", curState);
   }
 
   // Grapher

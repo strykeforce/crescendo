@@ -17,12 +17,16 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double setpoint = 0;
   private ElbowStates curState = ElbowStates.IDLE;
   private int zeroStable = 0;
+  private boolean hasZeroed = false;
+  private int numRecoveryZeros = 0;
+  private int recoveryZeroStableCounts = 0;
+  private double prevRecoveryAbs = 0.0;
 
   public ElbowSubsystem(ElbowIO io) {
     this.io = io;
     // this.encoderIo = encoderIo;
     setpoint = inputs.positionRots;
-    io.zero();
+    io.zeroBlind();
 
     // zero();
   }
@@ -31,8 +35,9 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     io.setPosition(position);
     setpoint = position;
     curState = ElbowStates.MOVING;
-
-    logger.info("Elbow moving to {} rotations", setpoint);
+    if (position != setpoint) {
+      logger.info("Elbow moving to {} rotations", setpoint);
+    }
   }
 
   public void setPct(double pct) {
@@ -61,20 +66,28 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return Math.abs(inputs.positionRots - setpoint) <= ElbowConstants.kCloseEnoughRots;
   }
 
+  public boolean hasZeroed() {
+    return hasZeroed;
+  }
+
   public void zeroNoState() {
-    io.zero();
+    io.zeroBlind();
   }
 
   public void zero() {
-    // io.setCurrentLimit(ElbowConstants.getZeroCurrentLimitConfig());
-    // io.setPct(ElbowConstants.kZeroVelocity);
-    setState(ElbowStates.ZEROING);
-    // zeroStable = 0;
-    io.setPosition(ElbowConstants.kZeroPos);
-    setpoint = ElbowConstants.kZeroPos;
+    io.zeroBlind();
+    hasZeroed = true;
+    setState(ElbowStates.ZEROED);
+  }
 
-    // io.zero();
-    logger.info("Elbow starting zeroing");
+  public void zeroRecovery() {
+    io.zeroRecovery();
+    setState(ElbowStates.ZEROING);
+    io.setPosition(0.0);
+    setpoint = 0.0;
+    numRecoveryZeros = 1;
+
+    logger.info("Recovery Zero Initial");
   }
 
   @Override
@@ -100,9 +113,13 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         //   io.setPct(0.0);
         //   io.setCurrentLimit(ElbowConstants.getCurrentLimitConfig());
         // }
-        if (isFinished()) {
+        if (Math.abs(inputs.absRots - prevRecoveryAbs) <= ElbowConstants.kCloseEnoughAbs)
+          recoveryZeroStableCounts++;
+        else recoveryZeroStableCounts = 0;
+
+        if (recoveryZeroStableCounts > ElbowConstants.kStableCountsAbsEncoder) {
+          io.zeroRecovery();
           logger.info("Zeroed");
-          io.zero();
           setState(ElbowStates.ZEROED);
         }
 

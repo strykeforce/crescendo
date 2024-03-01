@@ -108,6 +108,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    if (!m_robotContainer.hasElbowZeroed()) m_robotContainer.zeroElbow();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -125,6 +126,9 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+    }
+    if (!m_robotContainer.hasElbowZeroed()) {
+      m_robotContainer.zeroElbow();
     }
   }
 

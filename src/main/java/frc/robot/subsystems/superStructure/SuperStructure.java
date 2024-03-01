@@ -52,6 +52,10 @@ public class SuperStructure extends MeasurableSubsystem {
     return elbowSubsystem.isFinished() && wristSubsystem.isFinished() && shooterSubsystem.atSpeed();
   }
 
+  public boolean isElbowZeroed() {
+    return elbowSubsystem.hasZeroed();
+  }
+
   public SuperStructureStates getState() {
     return curState;
   }
@@ -70,6 +74,9 @@ public class SuperStructure extends MeasurableSubsystem {
   // }
 
   // Helper Methods
+  public void zeroElbow() {
+    elbowSubsystem.zero();
+  }
 
   public void stopShoot() {
     logger.info("Stop Shooter Wheels");
@@ -357,7 +364,13 @@ public class SuperStructure extends MeasurableSubsystem {
       case POST_CLIMB:
         break;
     }
-    org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState.ordinal());
+    org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Elbow Finished", elbowSubsystem.isFinished());
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Wrist Finished", wristSubsystem.isFinished());
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Shooter Finished", shooterSubsystem.atSpeed());
   }
   // Grapher
   @Override

@@ -35,34 +35,33 @@ public class ForkIOSRX implements ForkIO {
   public void updateInputs(ForkIOInputs inputs) {
     inputs.leftPosTicks = leftFork.getSelectedSensorPosition();
     inputs.rightPosTicks = rightFork.getSelectedSensorPosition();
+    inputs.leftVelTicks = leftFork.getSelectedSensorVelocity();
+    inputs.rightVelTicks = rightFork.getSelectedSensorVelocity();
   }
 
   @Override
-  public void zero() {
-    double leftAbs = leftFork.getSensorCollection().getPulseWidthPosition() & 0XFFF;
-    double rightAbs = rightFork.getSensorCollection().getPulseWidthPosition() & 0xFFF;
+  public void zeroLeft() {
+    leftFork.setSelectedSensorPosition(0);
+  }
 
-    double leftOffset = leftAbs - ClimbConstants.kLeftForkZero;
-    double rightOffset = rightAbs - ClimbConstants.kRightForkZero;
-
-    leftFork.setSelectedSensorPosition(leftOffset);
-    rightFork.setSelectedSensorPosition(rightOffset);
-
-    logger.info(
-        "Left Fork: Abs: {}, Zero Pos: {}, Offset: {}",
-        leftAbs,
-        ClimbConstants.kLeftForkZero,
-        leftOffset);
-    logger.info(
-        "Right Fork: Abs: {}, Zero Pos: {}, Offset: {}",
-        rightAbs,
-        ClimbConstants.kRightForkZero,
-        rightOffset);
+  @Override
+  public void zeroRight() {
+    rightFork.setSelectedSensorPosition(0);
   }
 
   @Override
   public void setPct(double percent) {
     leftFork.set(ControlMode.PercentOutput, percent);
+    rightFork.set(ControlMode.PercentOutput, percent);
+  }
+
+  @Override
+  public void setLeftPct(double percent) {
+    leftFork.set(ControlMode.PercentOutput, percent);
+  }
+
+  @Override
+  public void setRightPct(double percent) {
     rightFork.set(ControlMode.PercentOutput, percent);
   }
 
@@ -80,6 +79,15 @@ public class ForkIOSRX implements ForkIO {
   @Override
   public void setRightPos(double position) {
     rightFork.set(ControlMode.MotionMagic, position);
+  }
+
+  @Override
+  public void enableSoftLimits(boolean enable) {
+    logger.info("Setting soft limits: {}", enable);
+    leftFork.configForwardSoftLimitEnable(enable);
+    leftFork.configReverseSoftLimitEnable(enable);
+    rightFork.configForwardSoftLimitEnable(enable);
+    rightFork.configReverseSoftLimitEnable(enable);
   }
 
   @Override

@@ -6,26 +6,24 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class ClimbCommand extends Command {
+public class FullTrapClimbCommand extends Command {
   private RobotStateSubsystem robotStateSubsystem;
 
-  public ClimbCommand(
+  public FullTrapClimbCommand(
       RobotStateSubsystem robotStateSubsystem,
       ClimbSubsystem climbSubsystem,
       SuperStructure superStructure) {
     this.robotStateSubsystem = robotStateSubsystem;
-
-    addRequirements(superStructure, climbSubsystem);
+    addRequirements(climbSubsystem, superStructure);
   }
 
   @Override
   public void initialize() {
-    robotStateSubsystem.climb(false);
+    robotStateSubsystem.climb(true);
   }
 
   @Override
   public boolean isFinished() {
-    return robotStateSubsystem.getState() != RobotStates.CLIMBING
-        && robotStateSubsystem.getState() != RobotStates.FOLDING_OUT;
+    return robotStateSubsystem.getState() == RobotStates.TRAP;
   }
 }

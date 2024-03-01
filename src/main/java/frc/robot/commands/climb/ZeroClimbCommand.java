@@ -15,7 +15,7 @@ public class ZeroClimbCommand extends Command {
 
   @Override
   public void initialize() {
-    climbSubsystem.zero();
+    climbSubsystem.zeroAll();
   }
 
   @Override

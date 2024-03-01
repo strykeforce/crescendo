@@ -49,7 +49,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Alliance allianceColor = Alliance.Blue;
 
   private boolean safeStow = false;
-  private boolean decendClimbAfterTrap;
+  private boolean decendClimbAfterTrap = false;
+  ;
+  private boolean continueToTrap = false;
 
   private double magazineTuneSpeed = 0.0;
 
@@ -240,8 +242,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.PREPPING_CLIMB);
   }
 
-  public void climb() {
+  public void climb(boolean continueToTrap) {
     climbSubsystem.trapClimb();
+    this.continueToTrap = continueToTrap;
 
     setState(RobotStates.CLIMBING);
   }
@@ -473,7 +476,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case FOLDING_OUT:
         if (superStructure.isFinished() && climbSubsystem.isFinished()) {
-          setState(RobotStates.CLIMBED);
+          if (continueToTrap) toTrap();
+          else setState(RobotStates.CLIMBED);
         }
         break;
 
@@ -539,7 +543,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
     }
 
-    org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState.ordinal());
+    org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState);
   }
 
   // Grapher

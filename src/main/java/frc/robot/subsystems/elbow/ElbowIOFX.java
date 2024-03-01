@@ -23,6 +23,7 @@ public class ElbowIOFX implements ElbowIO {
 
   private double absSensorInitial;
   private double relSetpointOffset;
+  private double setpointOffset;
   private double setpoint;
 
   TalonFXConfigurator configurator;
@@ -66,9 +67,42 @@ public class ElbowIOFX implements ElbowIO {
 
   @Override
   public void zero() {
-    double absoluteRots = absRots.refresh().getValue();
+    absSensorInitial = elbow.getPosition().getValue();
 
-    relSetpointOffset = absoluteRots - RobotConstants.kElbowZero + ElbowConstants.kZeroOffset;
+    relSetpointOffset = absSensorInitial - RobotConstants.kElbowZero;
+    setpointOffset =
+        RobotConstants.kElbowZeroPos - RobotConstants.kElbowZeroPos - relSetpointOffset;
+    logger.info("REAL ZERO");
+    logger.info(
+        "Abs: {}, Zero Pos: {}, Offset: {}, setpointOffset: {}",
+        absSensorInitial,
+        RobotConstants.kElbowZero,
+        relSetpointOffset,
+        setpointOffset);
+  }
+
+  @Override
+  public void zeroBlind() {
+    absSensorInitial = elbow.getPosition().getValue();
+
+    relSetpointOffset = 0.0;
+    setpointOffset = absSensorInitial - RobotConstants.kElbowZeroPos - relSetpointOffset;
+    logger.info("BLIND ZERO");
+    logger.info(
+        "Abs: {}, Zero Pos: {}, Offset: {}, setpointOffset: {}",
+        absSensorInitial,
+        RobotConstants.kElbowZero,
+        relSetpointOffset,
+        setpointOffset);
+  }
+
+  @Override
+  public void zeroRecovery() {
+    double absoluteRots = absRots.refresh().getValue();
+    double curPos = elbow.getPosition().getValue();
+
+    relSetpointOffset = absoluteRots - RobotConstants.kElbowRecoveryZero;
+    logger.info("RECOVERY ZERO");
 
     logger.info("RelSetPoint {}", relSetpointOffset);
     relSetpointOffset =
@@ -78,15 +112,20 @@ public class ElbowIOFX implements ElbowIO {
             * ElbowConstants.kFxChain
             * ElbowConstants.kFxPulley;
     logger.info("RelSetPointPostRatio {}", relSetpointOffset);
-    elbow.setPosition(relSetpointOffset);
+    // elbow.setPosition(relSetpointOffset);
+    setpointOffset = -curPos + relSetpointOffset;
 
     logger.info(
-        "Abs: {}, Zero Pos: {}, Offset: {}", absRots, RobotConstants.kElbowZero, relSetpointOffset);
+        "Abs: {}, Zero Pos: {}, Offset: {}, setpointOffset: {}",
+        absRots,
+        RobotConstants.kElbowRecoveryZero,
+        relSetpointOffset,
+        setpointOffset);
   }
 
   @Override
   public void setPosition(double position) {
-    setpoint = position;
+    setpoint = position + setpointOffset;
     elbow.setControl(positionRequst.withPosition(setpoint));
   }
 
@@ -97,7 +136,8 @@ public class ElbowIOFX implements ElbowIO {
 
   @Override
   public void updateInputs(ElbowIOInputs inputs) {
-    inputs.positionRots = currPosition.refresh().getValue();
+    inputs.encoderPosRots = currPosition.refresh().getValue();
+    inputs.positionRots = currPosition.refresh().getValue() - setpointOffset;
     inputs.absRots = absRots.refresh().getValue();
     inputs.velocity = currVelocity.refresh().getValue();
   }

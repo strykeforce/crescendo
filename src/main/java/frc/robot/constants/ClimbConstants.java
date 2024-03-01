@@ -28,13 +28,15 @@ public final class ClimbConstants {
   public static final double kZeroStableCounts = 3;
   public static final double kZeroSpeedThreshold = 1;
 
-  public static final double kLeftForkZero = 0.0;
-  public static final double kRightForkZero = 0.0;
+  // Forks
+  public static final double kZeroForkPct = -0.3;
+  public static final double kZeroForkMaxVel = 1;
+  public static final int kForkZeroStableCounts = 3;
   public static final double kCloseEnoughForks = 100;
-  public static final double kLeftExtendPos = 100;
-  public static final double kRightExtendPos = 100;
-  public static final double kLeftRetractPos = 0.0;
-  public static final double kRightRetractPos = 0.0;
+  public static final double kLeftExtendPos = 500;
+  public static final double kRightExtendPos = 500;
+  public static final double kLeftRetractPos = 10;
+  public static final double kRightRetractPos = 10;
 
   // PRE-CLIMB
   public static final double kLeftClimbPrepPos = 70.0;
@@ -148,25 +150,25 @@ public final class ClimbConstants {
   public static TalonSRXConfiguration getForkConfiguration() {
     TalonSRXConfiguration config = new TalonSRXConfiguration();
 
-    config.forwardSoftLimitThreshold = 0;
-    config.forwardSoftLimitEnable = false; // fixme
+    config.forwardSoftLimitThreshold = 510;
+    config.forwardSoftLimitEnable = true; // fixme
 
     config.reverseSoftLimitThreshold = 0.0;
-    config.reverseSoftLimitEnable = false; // fixme
+    config.reverseSoftLimitEnable = true; // fixme
 
     config.continuousCurrentLimit = 2;
     config.peakCurrentLimit = 2;
     config.peakCurrentDuration = 100;
 
-    config.slot0.kP = 0.0;
+    config.slot0.kP = 20.0;
     config.slot0.kI = 0.0;
     config.slot0.kD = 0.0;
-    config.slot0.kF = 0.0;
+    config.slot0.kF = 12.0;
     config.slot0.integralZone = 0;
     config.slot0.maxIntegralAccumulator = 0;
     config.slot0.allowableClosedloopError = 0;
-    config.motionCruiseVelocity = 0;
-    config.motionAcceleration = 0;
+    config.motionCruiseVelocity = 75;
+    config.motionAcceleration = 500;
     config.neutralDeadband = 0.01;
     config.velocityMeasurementWindow = 64;
     config.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;

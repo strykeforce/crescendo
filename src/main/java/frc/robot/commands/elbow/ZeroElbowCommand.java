@@ -21,4 +21,9 @@ public class ZeroElbowCommand extends Command {
   public boolean isFinished() {
     return elbowSubsystem.getState() != ElbowStates.ZEROING;
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }

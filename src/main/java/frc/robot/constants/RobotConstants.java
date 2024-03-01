@@ -39,6 +39,8 @@ public class RobotConstants {
   // Constants Different between Comp and Proto
   public static double kWheelDiameterInches = 3.0;
   public static double kElbowZero = 0.11206;
+  public static double kElbowRecoveryZero = 0.11206;
+  public static double kElbowZeroPos = 34.0;
   public static double kWristZero = 1132.0;
 
   // Climb Servos
@@ -57,6 +59,8 @@ public class RobotConstants {
       logger.info("Using Comp Robot Constants");
       kWheelDiameterInches = CompConstants.kWheelDiameterInches;
       kElbowZero = CompConstants.kElbowZero;
+      kElbowRecoveryZero = CompConstants.kElbowRecoveryZero;
+      kElbowZeroPos = CompConstants.kElbowZeroPos;
       kWristZero = CompConstants.kWristZero;
       kLeftTrapBarExtend = CompConstants.kLeftTrapBarExtend;
       kRightTrapBarExtend = CompConstants.kRightTrapBarExtend;
@@ -70,6 +74,8 @@ public class RobotConstants {
       logger.info("Using Proto Robot Constants");
       kWheelDiameterInches = ProtoConstants.kWheelDiameterInches;
       kElbowZero = ProtoConstants.kElbowZero;
+      kElbowRecoveryZero = ProtoConstants.kElbowRecoveryZero;
+      kElbowZeroPos = ProtoConstants.kElbowZeroPos;
       kWristZero = ProtoConstants.kWristZero;
       kLeftTrapBarExtend = ProtoConstants.kLeftTrapBarExtend;
       kRightTrapBarExtend = ProtoConstants.kRightTrapBarExtend;
@@ -88,6 +94,8 @@ public class RobotConstants {
 
     // Elbow
     public static final Double kElbowZero = 0.01465; // 0.0105
+    public static final Double kElbowRecoveryZero = 0.01465;
+    public static final Double kElbowZeroPos = 30.45;
 
     // Wrist
     public static final Double kWristZero = 2603.0;
@@ -110,6 +118,8 @@ public class RobotConstants {
 
     // Elbow
     public static final Double kElbowZero = 0.23291; // -0.11816
+    public static final Double kElbowRecoveryZero = 0.23291;
+    public static final Double kElbowZeroPos = 34.0;
 
     // Wrist
     public static final Double kWristZero = 3293.0; // 3310

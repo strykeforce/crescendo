@@ -33,6 +33,11 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private int climbZeroStableCounts = 0;
   private double leftForkSetpoint = 0.0;
   private double rightForkSetpoint = 0.0;
+  private int leftForkZeroStableCounts = 0;
+  private int rightForkZeroStableCounts = 0;
+  private boolean hasLeftForkZeroed = false;
+  private boolean hasRightForkZeroed = false;
+  private boolean hasClimbZeroed = false;
 
   private ClimbStates curState = ClimbStates.IDLE;
   private Timer forkTimer = new Timer();
@@ -97,22 +102,22 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void extendForks() {
     isForkExtended = true;
-    // forkIO.setLeftPos(ClimbConstants.kLeftExtendPos);
-    // forkIO.setRightPos(ClimbConstants.kRightExtendPos);
-    // leftForkSetpoint = ClimbConstants.kLeftExtendPos;
-    // rightForkSetpoint = ClimbConstants.kRightExtendPos;
-    forkIO.setPct(0.3);
+    forkIO.setLeftPos(ClimbConstants.kLeftExtendPos);
+    forkIO.setRightPos(ClimbConstants.kRightExtendPos);
+    leftForkSetpoint = ClimbConstants.kLeftExtendPos;
+    rightForkSetpoint = ClimbConstants.kRightExtendPos;
+    // forkIO.setPct(0.3);
   }
 
   public void retractForks() {
     isForkExtended = false;
-    // forkIO.setLeftPos(ClimbConstants.kLeftRetractPos);
-    // forkIO.setRightPos(ClimbConstants.kRightRetractPos);
-    // leftForkSetpoint = ClimbConstants.kLeftRetractPos;
-    // rightForkSetpoint = ClimbConstants.kRightRetractPos;
-    forkTimer.reset();
-    forkTimer.start();
-    forkIO.setPct(-0.3);
+    forkIO.setLeftPos(ClimbConstants.kLeftRetractPos);
+    forkIO.setRightPos(ClimbConstants.kRightRetractPos);
+    leftForkSetpoint = ClimbConstants.kLeftRetractPos;
+    rightForkSetpoint = ClimbConstants.kRightRetractPos;
+    // forkTimer.reset();
+    // forkTimer.start();
+    // forkIO.setPct(-0.3);
   }
 
   public void setForkPercent(double percent) {
@@ -142,6 +147,23 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     // climbIO.zero();
     logger.info("{} -> ZEROING", curState);
     curState = ClimbStates.ZEROING;
+    enableRatchet(false);
+    climbIO.setCurrentLimit(ClimbConstants.getZeroCurrentLimit());
+    climbIO.setSoftLimitsEnabled(false);
+    climbIO.setPct(ClimbConstants.kZeroPct);
+  }
+
+  public void zeroAll() {
+    proceedToClimb = false;
+    hasClimbZeroed = false;
+    hasLeftForkZeroed = false;
+    hasRightForkZeroed = false;
+    logger.info("{} -> ZEROING_ALL", curState);
+    curState = ClimbStates.ZEROING_ALL;
+
+    forkIO.enableSoftLimits(false);
+    forkIO.setPct(ClimbConstants.kZeroForkPct);
+
     enableRatchet(false);
     climbIO.setCurrentLimit(ClimbConstants.getZeroCurrentLimit());
     climbIO.setSoftLimitsEnabled(false);
@@ -212,6 +234,56 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
           curState = ClimbStates.ZEROED;
         }
         break;
+      case ZEROING_ALL:
+        if (!hasLeftForkZeroed) {
+          if (Math.abs(forkInputs.leftVelTicks) < ClimbConstants.kZeroForkMaxVel)
+            leftForkZeroStableCounts++;
+          else leftForkZeroStableCounts = 0;
+
+          if (leftForkZeroStableCounts > ClimbConstants.kForkZeroStableCounts) {
+            forkIO.zeroLeft();
+            hasLeftForkZeroed = true;
+            logger.info("Left Fork Zeroed");
+            forkIO.setLeftPct(0.0);
+          }
+        }
+        if (!hasRightForkZeroed) {
+          if (Math.abs(forkInputs.rightVelTicks) < ClimbConstants.kZeroForkMaxVel)
+            rightForkZeroStableCounts++;
+          else rightForkZeroStableCounts = 0;
+
+          if (rightForkZeroStableCounts > ClimbConstants.kForkZeroStableCounts) {
+            forkIO.zeroRight();
+            hasRightForkZeroed = true;
+            forkIO.setRightPct(0.0);
+            logger.info("Right Fork Zeroed");
+          }
+        }
+        if (!hasClimbZeroed) {
+          if (Math.abs(climbInputs.leftVelocity) < ClimbConstants.kZeroSpeedThreshold
+              && Math.abs(climbInputs.rightVelocity) < ClimbConstants.kZeroSpeedThreshold) {
+            climbZeroStableCounts++;
+          } else {
+            climbZeroStableCounts = 0;
+          }
+
+          if (climbZeroStableCounts > ClimbConstants.kZeroStableCounts) {
+            climbIO.zero();
+            climbIO.setPct(0);
+            climbIO.setCurrentLimit(ClimbConstants.getRunCurrentLimit());
+            climbIO.setSoftLimitsEnabled(true);
+            hasClimbZeroed = true;
+            logger.info("Climb Zeroed");
+          }
+        }
+        if (hasClimbZeroed && hasLeftForkZeroed && hasRightForkZeroed) {
+          logger.info("{} -> ZEROED", curState);
+          curState = ClimbStates.ZEROED;
+          forkIO.enableSoftLimits(true);
+          retractForks();
+        }
+
+        break;
       case ZEROED:
         if (proceedToClimb) {
           logger.info("ZEROED -> PREPPING");
@@ -260,12 +332,17 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
       default:
         break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("Climb State", curState);
   }
 
   @Override
   public Set<Measure> getMeasures() {
     // TODO Auto-generated method stub
-    return Set.of();
+    return Set.of(
+        new Measure("Climb State", () -> curState.ordinal()),
+        new Measure("hasClimbZeroed", () -> hasClimbZeroed ? 1.0 : 0.0),
+        new Measure("hasLeftForkZeroed", () -> hasLeftForkZeroed ? 1.0 : 0.0),
+        new Measure("hasRightForkZeroed", () -> hasRightForkZeroed ? 1.0 : 0.0));
   }
 
   @Override
@@ -279,6 +356,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     IDLE,
     ZEROING,
     ZEROED,
+    ZEROING_ALL,
     PREPPING,
     PREPPED,
     CLIMBING,
