@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
@@ -23,13 +24,14 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   // Private Variables
-  private Logger logger = LoggerFactory.getLogger(IntakeSubsystem.class);
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private VisionSubsystem visionSubsystem;
   private DriveSubsystem driveSubsystem;
   private IntakeSubsystem intakeSubsystem;
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
+  private ClimbSubsystem climbSubsystem;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
@@ -39,10 +41,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
   private Timer ampStowTimer = new Timer();
+  private Timer startShootDelay = new Timer();
+  private Timer scoreTrapTimer = new Timer();
+  private boolean hasDelayed = false;
+  private double shootDelay = 0.0;
 
   private Alliance allianceColor = Alliance.Blue;
 
   private boolean safeStow = false;
+  private boolean decendClimbAfterTrap = false;
+  ;
+  private boolean continueToTrap = false;
 
   private double magazineTuneSpeed = 0.0;
 
@@ -52,12 +61,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       DriveSubsystem driveSubsystem,
       IntakeSubsystem intakeSubsystem,
       MagazineSubsystem magazineSubsystem,
-      SuperStructure superStructure) {
+      SuperStructure superStructure,
+      ClimbSubsystem climbSubsystem) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
+    this.climbSubsystem = climbSubsystem;
 
     parseLookupTable();
   }
@@ -113,7 +124,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     int index;
 
     if (distance < RobotStateConstants.kLookupMinDistance) {
-      index = 0;
+      index = 1;
       logger.warn(
           "Distance {} is less than min distance in table {}",
           distance,
@@ -133,9 +144,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       logger.info(
           "Distance: {} | Measured {}", Double.parseDouble(lookupTable[index][0]), distance);
       /*
-      index =
-          (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
-              / RobotStateConstants.kDistanceIncrement;*/
+       * index =
+       * (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
+       * / RobotStateConstants.kDistanceIncrement;
+       */
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
@@ -222,6 +234,50 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_SUBWOOFER);
   }
 
+  public void prepareClimb() {
+    climbSubsystem.zero(true);
+    climbSubsystem.extendForks();
+    superStructure.toPrepClimb();
+
+    setState(RobotStates.PREPPING_CLIMB);
+  }
+
+  public void climb(boolean continueToTrap) {
+    climbSubsystem.trapClimb();
+    this.continueToTrap = continueToTrap;
+
+    setState(RobotStates.CLIMBING);
+  }
+
+  public void toTrap() {
+    // climbSubsystem.extendTrapBar();
+    superStructure.toTrap();
+
+    setState(RobotStates.TO_TRAP);
+  }
+
+  public void scoreTrap(boolean decend) {
+    scoreTrapTimer.reset();
+    scoreTrapTimer.start();
+    magazineSubsystem.trap();
+    this.decendClimbAfterTrap = decend;
+    setState(RobotStates.SCORE_TRAP);
+  }
+
+  public void decendClimb() {
+    superStructure.toPrepClimb();
+
+    setState(RobotStates.PREPPING_DECEND);
+  }
+
+  public void postClimbStow() {
+    toStow();
+    climbSubsystem.retractForks();
+    climbSubsystem.stow();
+
+    setState(RobotStates.TO_STOW);
+  }
+
   // FIXME
   public void releaseGamePiece() {
     if (curState == RobotStates.TO_PODIUM) {
@@ -242,6 +298,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toTune() {
     setState(RobotStates.TO_TUNE);
     superStructure.shootTune();
+    hasDelayed = false;
+  }
+
+  public void setShootDelay(double delay) {
+    shootDelay = delay;
   }
 
   // Periodic
@@ -337,15 +398,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
           superStructure.slowWheelSpin();
         }
-        // if (superStructure.isFinished() && magazineSubsystem.getState() == MagazineStates.SHOOT)
+        // if (superStructure.isFinished() && magazineSubsystem.getState() ==
+        // MagazineStates.SHOOT)
         // {
-        //   superStructure.podiumShoot();
+        // superStructure.podiumShoot();
 
-        //   magazineShootDelayTimer.stop();
-        //   magazineShootDelayTimer.reset();
-        //   magazineShootDelayTimer.start();
+        // magazineShootDelayTimer.stop();
+        // magazineShootDelayTimer.reset();
+        // magazineShootDelayTimer.start();
 
-        //   setState(RobotStates.PODIUM_SHOOTING);
+        // setState(RobotStates.PODIUM_SHOOTING);
         // }
         break;
 
@@ -378,7 +440,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case TO_TUNE:
-        if (superStructure.isFinished()) {
+        if (superStructure.isFinished() && !hasDelayed) {
+          startShootDelay.reset();
+          startShootDelay.start();
+          hasDelayed = true;
+        }
+        if (startShootDelay.hasElapsed(shootDelay) && hasDelayed) {
           magazineSubsystem.toEmptying(magazineTuneSpeed);
 
           shootDelayTimer.stop();
@@ -386,13 +453,97 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.start();
 
           setState(RobotStates.SHOOTING);
+          hasDelayed = false;
         }
+        break;
+      case PREPPING_CLIMB:
+        if (climbSubsystem.isFinished() && superStructure.isFinished()) {
+          setState(RobotStates.CLIMB_PREPPED);
+        }
+        break;
+      case CLIMB_PREPPED:
+        break;
+
+      case CLIMBING:
+        if (climbSubsystem.getPosition() <= RobotStateConstants.kClimbMoveElbowPos) {
+          superStructure.toFold();
+          setState(RobotStates.FOLDING_OUT);
+        }
+        // if (climbSubsystem.isFinished()) {
+        //   setState(RobotStates.FOLDING_OUT);
+        // }
+        break;
+
+      case FOLDING_OUT:
+        if (superStructure.isFinished() && climbSubsystem.isFinished()) {
+          if (continueToTrap) toTrap();
+          else setState(RobotStates.CLIMBED);
+        }
+        break;
+
+      case CLIMBED:
+        break;
+
+      case TO_TRAP:
+        logger.info(
+            "Wrist Pos: {}, greater than: {}",
+            superStructure.getWristPos(),
+            superStructure.getWristPos() >= RobotStateConstants.kMaxWristToMoveTrapBar);
+        if (superStructure.getWristPos() >= RobotStateConstants.kMinWristToMoveTrapBar) {
+          climbSubsystem.extendTrapBar();
+        }
+        if (superStructure.isFinished()) {
+          // climbSubsystem.extendTrapBar();
+          setState(RobotStates.TRAP);
+        }
+        break;
+      case TRAP:
+        // if (!magazineSubsystem.hasPiece()) {
+        //   climbSubsystem.retractTrapBar();
+        //   superStructure.toFold();
+        //   setState(RobotStates.FOLDING_IN);
+        // }
+        break;
+      case SCORE_TRAP:
+        if (scoreTrapTimer.hasElapsed(RobotStateConstants.kTrapTimer)) {
+          superStructure.toFold();
+          magazineSubsystem.setSpeed(0.0);
+          setState(RobotStates.FOLDING_IN);
+        }
+        break;
+      case FOLDING_IN:
+        if (superStructure.getWristPos() <= RobotStateConstants.kMaxWristToMoveTrapBar) {
+          climbSubsystem.retractTrapBar();
+        }
+        if (superStructure.isFinished()) {
+          superStructure.toPrepClimb();
+
+          if (decendClimbAfterTrap) {
+            setState(RobotStates.PREPPING_DECEND);
+          } else {
+            setState(RobotStates.CLIMBED);
+          }
+        }
+        break;
+      case PREPPING_DECEND:
+        if (superStructure.isFinished()) {
+          climbSubsystem.descend();
+
+          setState(RobotStates.DESCENDING);
+        }
+        break;
+      case DESCENDING:
+        if (climbSubsystem.isFinished()) {
+          setState(RobotStates.POST_CLIMB);
+        }
+        break;
+      case POST_CLIMB:
         break;
       default:
         break;
     }
 
-    org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState.ordinal());
+    org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState);
   }
 
   // Grapher
@@ -421,6 +572,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     PODIUM_SHOOTING,
     TO_SUBWOOFER,
     RELEASE,
-    TO_TUNE
+    TO_TUNE,
+    PREPPING_CLIMB,
+    CLIMB_PREPPED,
+    TO_TRAP,
+    TRAP,
+    SCORE_TRAP,
+    FOLDING_OUT,
+    FOLDING_IN,
+    DESCENDING,
+    POST_CLIMB,
+    PREPPING_DECEND,
+    CLIMBING,
+    CLIMBED
   }
 }

@@ -123,7 +123,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private boolean isPoseValidWithoutWheels(WallEyeResult test, Translation3d location) {
-    return (test.getNumTags() >= 2 || test.getAmbiguity() <= VisionConstants.kMaxAmbig)
+    return (test.getNumTags() >= 2 /*|| test.getAmbiguity() <= VisionConstants.kMaxAmbig*/)
         && (location.getX() <= DriveConstants.kFieldMaxX)
         && (location.getY() <= DriveConstants.kFieldMaxY);
   }

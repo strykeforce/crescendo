@@ -17,25 +17,46 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.climb.ForkOpenLoopCommand;
+import frc.robot.commands.climb.HoldClimbCommand;
+import frc.robot.commands.climb.JogClimbClosedLoopCommand;
+import frc.robot.commands.climb.ToggleRatchetCommand;
+import frc.robot.commands.climb.ToggleTrapBarPosCommand;
+import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.XLockCommand;
+import frc.robot.commands.elbow.ClosedLoopElbowCommand;
+import frc.robot.commands.elbow.HoldElbowCommand;
+import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
+import frc.robot.commands.elbow.ZeroElbowCommand;
+import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
+import frc.robot.commands.robotState.ClimbCommand;
+import frc.robot.commands.robotState.DecendCommand;
+import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
-import frc.robot.commands.robotState.PodiumCommand;
+import frc.robot.commands.robotState.PostClimbStowCommand;
+import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
+import frc.robot.commands.robotState.ScoreTrapCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.TrapCommand;
+import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
-import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
+import frc.robot.subsystems.climb.ClimbIOFX;
+import frc.robot.subsystems.climb.ClimbRatchetIOServo;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ForkIOSRX;
+import frc.robot.subsystems.climb.TrapBarIOServo;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.elbow.ElbowIOFX;
@@ -84,6 +105,7 @@ public class RobotContainer {
   public GenericEntry magazineSpeed;
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
+  public GenericEntry shootDelay;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -92,9 +114,11 @@ public class RobotContainer {
     wristSubsystem = new WristSubsystem(new WristIOSRX());
     elbowSubsystem = new ElbowSubsystem(new ElbowIOFX());
     shooterSubsystem = new ShooterSubsystem(new ShooterIOFX());
-    climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
     magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
+    climbSubsystem =
+        new ClimbSubsystem(
+            new ClimbIOFX(), new ClimbRatchetIOServo(), new TrapBarIOServo(), new ForkIOSRX());
 
     intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
 
@@ -103,7 +127,12 @@ public class RobotContainer {
 
     robotStateSubsystem =
         new RobotStateSubsystem(
-            visionSubsystem, driveSubsystem, intakeSubsystem, magazineSubsystem, superStructure);
+            visionSubsystem,
+            driveSubsystem,
+            intakeSubsystem,
+            magazineSubsystem,
+            superStructure,
+            climbSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
@@ -113,13 +142,22 @@ public class RobotContainer {
 
     configureDriverBindings();
     configureOperatorBindings();
-    configureMatchDashboard();
+    // configureClimbTestBindings();
+    // configureMatchDashboard();
     configurePitDashboard();
     configureTuningDashboard();
     // robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
     // configureTelemetry();
     // configurePitDashboard();
+  }
+
+  public boolean hasElbowZeroed() {
+    return elbowSubsystem.hasZeroed();
+  }
+
+  public void zeroElbow() {
+    elbowSubsystem.zero();
   }
 
   public void configurePitDashboard() {
@@ -130,22 +168,91 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
         .withSize(1, 1)
         .withPosition(0, 0);
-  }
-
-  private void configureMatchDashboard() {
-    allianceColor =
-        Shuffleboard.getTab("Match")
-            .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
-            .withProperties(Map.of("colorWhenFalse", "blue"))
-            .withSize(2, 2)
-            .withPosition(0, 0);
-
-    Shuffleboard.getTab("Match")
-        .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
+    Shuffleboard.getTab("Pit")
+        .add("Elbow Zero Position", new ClosedLoopElbowCommand(elbowSubsystem, 0.0))
+        .withSize(1, 1)
+        .withPosition(1, 0);
+    Shuffleboard.getTab("Pit")
+        .add("Zero Elbow", new ZeroElbowCommand(elbowSubsystem))
         .withSize(1, 1)
         .withPosition(2, 0);
-  }
 
+    // Climb buttons
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Prep Climb", new PrepClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(0, 2);
+    Shuffleboard.getTab("Pit")
+        .add("Climb", new ClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(1, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add("To Trap", new TrapCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(2, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Score Trap (DECEND)",
+            new ScoreTrapCommand(
+                robotStateSubsystem, climbSubsystem, superStructure, magazineSubsystem, true))
+        .withSize(1, 1)
+        .withPosition(3, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Score Trap (STAY)",
+            new ScoreTrapCommand(
+                robotStateSubsystem, climbSubsystem, superStructure, magazineSubsystem, false))
+        .withSize(1, 1)
+        .withPosition(4, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add("Decend", new DecendCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(5, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Post Climb Stow",
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem))
+        .withSize(1, 1)
+        .withPosition(6, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Full Trap Sequence",
+            new FullTrapClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(7, 2);
+
+    Shuffleboard.getTab("Pit")
+        .add("Zero Climb", new ZeroClimbCommand(climbSubsystem))
+        .withSize(1, 1)
+        .withPosition(0, 4);
+  }
+  /*
+    private void configureMatchDashboard() {
+      allianceColor =
+          Shuffleboard.getTab("Match")
+              .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
+              .withProperties(Map.of("colorWhenFalse", "blue"))
+              .withSize(2, 2)
+              .withPosition(0, 0);
+
+      Shuffleboard.getTab("Match")
+          .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
+          .withSize(1, 1)
+          .withPosition(2, 0);
+    }
+  */
   public void configureTuningDashboard() {
     ShuffleboardTab tab = Shuffleboard.getTab("Tuning");
     lShooterSpeed =
@@ -156,6 +263,7 @@ public class RobotContainer {
     elbowPos = tab.add("Elbow Position", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     duplicateShooters =
         tab.add("Duplicate Shooters?", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+    shootDelay = tab.add("Shoot Delay", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
     tab.add(
         "shoot",
         new TuningShootCommand(
@@ -167,11 +275,14 @@ public class RobotContainer {
             () -> rShooterSpeed.getDouble(0.0),
             () -> magazineSpeed.getDouble(0.0),
             () -> elbowPos.getDouble(0.0),
-            () -> duplicateShooters.getBoolean(true)));
+            () -> duplicateShooters.getBoolean(true),
+            () -> shootDelay.getDouble(0.0)));
     tab.add(
         "stop",
         new TuningOffCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    tab.add("start", new TunedShotCommand(robotStateSubsystem, superStructure, magazineSubsystem));
   }
 
   public void configureTelemetry() {
@@ -181,7 +292,7 @@ public class RobotContainer {
     elbowSubsystem.registerWith(telemetryService);
     shooterSubsystem.registerWith(telemetryService);
     superStructure.registerWith(telemetryService);
-    // climbSubsystem.registerWith(telemetryService);
+    climbSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     robotStateSubsystem.registerWith(telemetryService);
@@ -224,7 +335,7 @@ public class RobotContainer {
         .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
         .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
 
-    // Open Loop Magazine
+    // Amp Prep
     new JoystickButton(xboxController, XboxController.Button.kA.value)
         .onTrue(
             new AmpCommand(
@@ -235,10 +346,11 @@ public class RobotContainer {
 
     // new JoystickButton(xboxController, XboxController.Button.kX.value).onTrue(testAutonPath);
 
-    new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .onTrue(
-            new PodiumCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // Podium Prep
+    // new JoystickButton(xboxController, XboxController.Button.kY.value)
+    //     .onTrue(
+    //         new PodiumCommand(
+    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // SubWoofer
     new JoystickButton(xboxController, XboxController.Button.kX.value)
@@ -249,28 +361,11 @@ public class RobotContainer {
         .onTrue(
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-    //   // Amp Command
-    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
-    //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
-    //   // Intake Command
-    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
-    //       .onTrue(
-    //           new IntakeCommand(
-    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // // Climb Prep
+    // new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(new
+    // PrepClimbCommand(robotStateSubsystem, climbSubsystem, superStructure));
 
-    //   // Open Loop Intake Command
-    //   new JoystickButton(xboxController, XboxController.Button.kA.value)
-    //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 50));
-
-    //   new JoystickButton(xboxController, XboxController.Button.kB.value)
-    //       .onTrue(new OpenLoopIntakeCommand(intakeSubsystem, 0.0));
-
-    //   // Stow Command
-    //   new JoystickButton(xboxController, XboxController.Button.kX.value)
-    //       .onTrue(
-    //           new StowCommand(
-    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   private void configureDriverBindings() {
@@ -284,16 +379,8 @@ public class RobotContainer {
             driveSubsystem,
             robotStateSubsystem));
 
-    //   // Vision Shoot Command
-    //   new JoystickButton(driveJoystick, Button.SWD.id)
-    //       .onTrue(new VisionShootCommand(robotStateSubsystem, superStructure,
-    // magazineSubsystem));
-
-    //   // Stow Command
-    //   new JoystickButton(driveJoystick, Button.SWD.id)
-    //       .onTrue(
-    //           new StowCommand(
-    //               robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // Reset Gyro Command
+    new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
 
     // Intake
     new JoystickButton(driveJoystick, Button.SWB_DWN.id)
@@ -304,15 +391,12 @@ public class RobotContainer {
         .onTrue(
             new IntakeCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-
-    // Reset Gyro Command
-    new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
-
     // XLock
     new JoystickButton(driveJoystick, Button.SWD.id)
         .onTrue(new XLockCommand(driveSubsystem))
         .onFalse(new XLockCommand(driveSubsystem));
 
+    // Stow Command
     new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(
             new StowCommand(
@@ -321,30 +405,80 @@ public class RobotContainer {
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
-    // Shoot
-    new JoystickButton(driveJoystick, Button.M_SWH.id)
-        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    // // Vision Shoot
+    // new JoystickButton(driveJoystick, Button.M_SWH.id)
+    //     .onTrue(new VisionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem,
+    // intakeSubsystem));
 
     // Release Game Piece Command
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(new ReleaseNoteCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
+    // Subwoofer Shoot
     new JoystickButton(driveJoystick, Button.SWG_UP.id)
-        .onTrue(
-            new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_UP.id)
-        .onFalse(
-            new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
-        .onTrue(
-            new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
-        .onFalse(
-            new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+  }
+
+  public void configureClimbTestBindings() {
+    // Open Loop Wrist
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.2))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.2))
+        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+
+    // Closed Loop Elbow
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
+        .onTrue(new JogElbowClosedLoopCommand(0.25, elbowSubsystem))
+        .onFalse(new HoldElbowCommand(elbowSubsystem));
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
+        .onTrue(new JogElbowClosedLoopCommand(-0.25, elbowSubsystem))
+        .onFalse(new HoldElbowCommand(elbowSubsystem));
+
+    // Climb Jog
+    new Trigger((() -> xboxController.getLeftTriggerAxis() > RobotConstants.kJoystickDeadband))
+        .onTrue(new JogClimbClosedLoopCommand(0.5, climbSubsystem))
+        .onFalse(new HoldClimbCommand(climbSubsystem));
+    new Trigger((() -> xboxController.getRightTriggerAxis() > RobotConstants.kJoystickDeadband))
+        .onTrue(new JogClimbClosedLoopCommand(-0.5, climbSubsystem))
+        .onFalse(new HoldClimbCommand(climbSubsystem));
+
+    // Trap Bar
+
+    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+        .onTrue(new ToggleTrapBarPosCommand(climbSubsystem));
+
+    // Ratchet
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .onTrue(new ToggleRatchetCommand(climbSubsystem));
+
+    // Eject Trap
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
+        .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, -0.2))
+        .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0.0));
+
+    // Zero
+    new JoystickButton(xboxController, XboxController.Button.kY.value)
+        .onTrue(new ZeroClimbCommand(climbSubsystem));
+
+    // Open Loop Forks
+    new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .onTrue(new ForkOpenLoopCommand(climbSubsystem, 0.3))
+        .onFalse(new ForkOpenLoopCommand(climbSubsystem, 0.0));
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
+        .onTrue(new ForkOpenLoopCommand(climbSubsystem, -0.3))
+        .onFalse(new ForkOpenLoopCommand(climbSubsystem, 0.0));
+
+    // Elbow at zero
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, 0.0));
   }
 
   public Command getAutonomousCommand() {

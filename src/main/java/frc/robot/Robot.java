@@ -73,7 +73,7 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     m_robotContainer = new RobotContainer();
-    m_robotContainer.setIsEvent(isEvent);
+    // m_robotContainer.setIsEvent(isEvent);
     if (!isEvent) {
       m_robotContainer.configureTelemetry();
       // m_robotContainer.configurePitDashboard();
@@ -88,7 +88,7 @@ public class Robot extends LoggedRobot {
         Alliance alliance = DriverStation.getAlliance().get();
         if (alliance == Alliance.Blue || alliance == Alliance.Red) {
           hasAlliance = true;
-          m_robotContainer.setAllianceColor(alliance);
+          // m_robotContainer.setAllianceColor(alliance);
           logger.info("Set Alliance to {}", alliance);
         }
       } catch (NoSuchElementException error) {
@@ -108,6 +108,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    if (!m_robotContainer.hasElbowZeroed()) m_robotContainer.zeroElbow();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -125,6 +126,9 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+    }
+    if (!m_robotContainer.hasElbowZeroed()) {
+      m_robotContainer.zeroElbow();
     }
   }
 

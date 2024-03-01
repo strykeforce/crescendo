@@ -14,6 +14,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -107,7 +108,7 @@ public final class DriveConstants {
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
     currentConfig.SupplyCurrentLimit = 40;
     currentConfig.SupplyCurrentThreshold = 45;
-    currentConfig.SupplyTimeThreshold = 1.0;
+    currentConfig.SupplyTimeThreshold = 0.0;
     currentConfig.SupplyCurrentLimitEnable = true;
     currentConfig.StatorCurrentLimitEnable = false;
     driveConfig.CurrentLimits = currentConfig;
@@ -121,6 +122,7 @@ public final class DriveConstants {
 
     MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
     motorConfigs.DutyCycleNeutralDeadband = 0.01;
+    motorConfigs.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput = motorConfigs;
 
     return driveConfig;
@@ -133,9 +135,9 @@ public final class DriveConstants {
   public static final double kIMin = 0.0;
   public static final double kIMax = 0.0;
 
-  public static final double kPOmega = 9.0; // 4.5
+  public static final double kPOmega = 4.5; // 4.5
   public static final double kIOmega = 0.0;
-  public static final double kDOmega = 0.01; // 0.001
+  public static final double kDOmega = 0.0; // 0.001
   //    public static final double kMaxVelOmega = kMaxOmega / 2.0;
   public static final double kMaxAccelOmega = 5.0; // 3.14
 

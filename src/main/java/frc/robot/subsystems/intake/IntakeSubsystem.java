@@ -85,6 +85,8 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
       default:
         break;
     }
+
+    org.littletonrobotics.junction.Logger.recordOutput("Intake State", curState);
   }
 
   public Set<Measure> getMeasures() {

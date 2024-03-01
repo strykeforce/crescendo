@@ -94,7 +94,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     releaseTimer.stop();
     releaseTimer.reset();
     releaseTimer.start();
-    setSpeed(MagazineConstants.kReleaseSpeed);
+    setSpeed(MagazineConstants.kAmpReleaseSpeed);
     setState(MagazineStates.RELEASE);
   }
 
@@ -109,6 +109,11 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     resetRevBeamCounts();
     setSpeed(MagazineConstants.kPodiumPrepareSpeed);
     setState(MagazineStates.PREP_PODIUM);
+  }
+
+  public void trap() {
+    setSpeed(MagazineConstants.kTrapReleaseSpeed);
+    setState(MagazineStates.TRAP);
   }
 
   public boolean hasPiece() {
@@ -212,7 +217,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case PREP_PODIUM:
         if (isNotePrepped()) {
-          setSpeed(MagazineConstants.kShootSpeed);
+          setSpeed(MagazineConstants.kPodiumShootSpeed);
           setState(MagazineStates.SPEEDUP);
           atEdgeOne = false;
           pastEdgeOne = false;
@@ -226,7 +231,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
           setEmpty();
         }
         break;
+      case TRAP:
+        if (releaseTimer.hasElapsed(MagazineConstants.kTrapReleaseTime)) {
+          setEmpty();
+        }
+        break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("Magazine State", curState);
   }
 
   // Grapher
@@ -251,6 +262,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     SPEEDUP,
     PREP_PODIUM,
     SHOOT,
-    RELEASE
+    RELEASE,
+    TRAP
   }
 }
