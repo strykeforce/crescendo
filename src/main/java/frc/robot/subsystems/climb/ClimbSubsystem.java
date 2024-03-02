@@ -146,12 +146,17 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return prepClimbRequestCount;
   }
 
+  public boolean hasClimbZeroed() {
+    return hasClimbZeroed;
+  }
+
   @Override
   public void zero() {
     zero(false);
   }
 
   public void zero(boolean proceedToClimb) {
+    hasClimbZeroed = false;
     this.proceedToClimb = proceedToClimb;
     // climbIO.zero();
     logger.info("{} -> ZEROING", curState);
@@ -248,6 +253,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
           climbIO.setPct(0);
           climbIO.setCurrentLimit(ClimbConstants.getRunCurrentLimit());
           climbIO.setSoftLimitsEnabled(true);
+          hasClimbZeroed = true;
           logger.info("{} -> ZEROED", curState);
           curState = ClimbStates.ZEROED;
         }

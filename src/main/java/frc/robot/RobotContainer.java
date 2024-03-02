@@ -158,8 +158,16 @@ public class RobotContainer {
     return elbowSubsystem.hasZeroed();
   }
 
+  public boolean hasClimbZeroed() {
+    return climbSubsystem.hasClimbZeroed();
+  }
+
   public void zeroElbow() {
     elbowSubsystem.zero();
+  }
+
+  public void zeroClimb() {
+    climbSubsystem.zeroAll();
   }
 
   public void configurePitDashboard() {

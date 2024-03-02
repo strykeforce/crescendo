@@ -468,7 +468,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case PREPPING_CLIMB:
-        if (climbSubsystem.isFinished() && superStructure.isFinished()) {
+        if (climbSubsystem.isFinished()
+            && climbSubsystem.isForkFinished()
+            && climbSubsystem.hasClimbZeroed()
+            && superStructure.isFinished()) {
           setState(RobotStates.CLIMB_PREPPED);
         }
         break;
