@@ -326,17 +326,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case INTAKING:
-        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
-            && (magazineSubsystem.getState() != MagazineStates.INTAKING
-                && magazineSubsystem.getState() != MagazineStates.REVERSING)) {
-          magazineSubsystem.toIntaking();
-        }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
 
           intakeSubsystem.setPercent(0);
 
           toStow();
+        }
+        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
+            && (magazineSubsystem.getState() != MagazineStates.INTAKING)
+            && magazineSubsystem.hasPiece() == false) {
+          magazineSubsystem.toIntaking();
         }
         break;
 

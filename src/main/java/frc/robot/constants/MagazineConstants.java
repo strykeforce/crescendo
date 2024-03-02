@@ -46,6 +46,7 @@ public final class MagazineConstants {
 
     MotorOutputConfigs motorConfig = new MotorOutputConfigs();
     motorConfig.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput = motorConfig;
 
     return config;
   }
