@@ -25,6 +25,7 @@ public class SuperStructure extends MeasurableSubsystem {
   private double leftShooterSpeed = 0.0;
   private double rightShooterSpeed = 0.0;
   private double elbowSetpoint = 0.0;
+  private double nextElbowSetpoint = 0.0;
   private double wristSetpoint = 0.0;
   private boolean flipMagazineOut = false;
   private Timer timer = new Timer();
@@ -65,12 +66,12 @@ public class SuperStructure extends MeasurableSubsystem {
   }
 
   // public void setState(SuperStructureStates state) {
-  //   if (state != SuperStructureStates.IDLE) {
-  //     curState = SuperStructureStates.TRANSFER;
-  //     nextState = state;
-  //   } else {
-  //     curState = state;
-  //   }
+  // if (state != SuperStructureStates.IDLE) {
+  // curState = SuperStructureStates.TRANSFER;
+  // nextState = state;
+  // } else {
+  // curState = state;
+  // }
   // }
 
   // Helper Methods
@@ -114,8 +115,8 @@ public class SuperStructure extends MeasurableSubsystem {
   }
 
   // Basic methods to go to each position
-  //    Works by setting each axes' setpoint and starting intial movement
-  //      Then determines if elbow or wrist go first by flipMagazineOut boolean
+  // Works by setting each axes' setpoint and starting intial movement
+  // Then determines if elbow or wrist go first by flipMagazineOut boolean
   public void shoot(double leftShooterSpeed, double rightShooterSpeed, double elbowSetpoint) {
     this.elbowSetpoint = elbowSetpoint;
     this.leftShooterSpeed = leftShooterSpeed;
@@ -179,18 +180,35 @@ public class SuperStructure extends MeasurableSubsystem {
   }
 
   public void defense() {
-    elbowSetpoint = SuperStructureConstants.kElbowDefenseSetPoint;
+    elbowSetpoint = SuperStructureConstants.kElbowDefenceIntermediateSetPoint;
+    nextElbowSetpoint = SuperStructureConstants.kElbowDefenseFinalSetPoint;
     wristSetpoint = SuperStructureConstants.kWristDefenseSetPoint;
     rightShooterSpeed = SuperStructureConstants.kShooterDefenseSetPoint;
     leftShooterSpeed = SuperStructureConstants.kShooterDefenseSetPoint;
 
-    // shooterSubsystem.setSpeed(leftShooterSpeed);
-    // elbowSubsystem.setPosition(elbowSetpoint);
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
-    logger.info("{} -> TRANSFER(DEFENSE)", curState);
+    logger.info("{} -> SAFE_TRANSFER_ELBOW(DEFENSE)", curState);
     flipMagazineOut = true;
-    curState = SuperStructureStates.TRANSFER;
+    curState = SuperStructureStates.SAFE_TRANSFER_ELBOW;
     nextState = SuperStructureStates.DEFENSE;
+  }
+
+  public void defenceStow() {
+    elbowSetpoint = SuperStructureConstants.kElbowDefenceIntermediateSetPoint;
+    nextElbowSetpoint = SuperStructureConstants.kElbowStowSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristStowSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
+
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    logger.info("{} -> SAFE_TRANSFER_ELBOW(STOW)", curState);
+    flipMagazineOut = false;
+    curState = SuperStructureStates.SAFE_TRANSFER_ELBOW;
+    nextState = SuperStructureStates.STOW;
   }
 
   public void safeStow() {
@@ -320,7 +338,6 @@ public class SuperStructure extends MeasurableSubsystem {
       case IDLE:
         break;
       case TRANSFER:
-
         // Logic to determine how to move axis based on what the final position is
         if (flipMagazineOut) {
           if (elbowSubsystem.getPosition() < SuperStructureConstants.kElbowMinToMoveWrist) {
@@ -336,6 +353,21 @@ public class SuperStructure extends MeasurableSubsystem {
         if (isFinished()) {
           logger.info("TRANSFER -> {}", nextState);
           curState = nextState;
+        }
+        break;
+      case SAFE_TRANSFER_ELBOW:
+        if (isFinished()) {
+          elbowSetpoint = nextElbowSetpoint;
+          wristSubsystem.setPosition(wristSetpoint);
+          curState = SuperStructureStates.SAFE_TRANSFER_WRIST;
+        }
+
+        break;
+
+      case SAFE_TRANSFER_WRIST:
+        if (isFinished()) {
+          flipMagazineOut = false;
+          curState = SuperStructureStates.TRANSFER;
         }
         break;
 
@@ -372,6 +404,7 @@ public class SuperStructure extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput(
         "Shooter Finished", shooterSubsystem.atSpeed());
   }
+
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
@@ -398,6 +431,8 @@ public class SuperStructure extends MeasurableSubsystem {
     STOW,
     PODIUM,
     PREP_PODIUM,
-    SUBWOOFER
+    SUBWOOFER,
+    SAFE_TRANSFER_ELBOW,
+    SAFE_TRANSFER_WRIST
   }
 }

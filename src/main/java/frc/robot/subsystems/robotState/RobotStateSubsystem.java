@@ -12,6 +12,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.superStructure.SuperStructure.SuperStructureStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
 import java.util.List;
@@ -215,6 +216,22 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.stow();
 
     setState(RobotStates.TO_STOW);
+  }
+
+  public void toDefenseStow() {
+    driveSubsystem.setIsAligningShot(false);
+    intakeSubsystem.setPercent(0.0);
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.defenceStow();
+
+    setState(RobotStates.TO_STOW);
+  }
+
+  public void toDefense() {
+    driveSubsystem.setIsAligningShot(false);
+    superStructure.defense();
+
+    setState(RobotStates.TO_DEFENSE);
   }
 
   public void toPreparePodium() {
@@ -471,7 +488,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           setState(RobotStates.FOLDING_OUT);
         }
         // if (climbSubsystem.isFinished()) {
-        //   setState(RobotStates.FOLDING_OUT);
+        // setState(RobotStates.FOLDING_OUT);
         // }
         break;
 
@@ -500,9 +517,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case TRAP:
         // if (!magazineSubsystem.hasPiece()) {
-        //   climbSubsystem.retractTrapBar();
-        //   superStructure.toFold();
-        //   setState(RobotStates.FOLDING_IN);
+        // climbSubsystem.retractTrapBar();
+        // superStructure.toFold();
+        // setState(RobotStates.FOLDING_IN);
         // }
         break;
       case SCORE_TRAP:
@@ -539,6 +556,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case POST_CLIMB:
+        break;
+      case TO_DEFENSE:
+        if (superStructure.isFinished()
+            && superStructure.getState() == SuperStructureStates.DEFENSE) {
+          setState(RobotStates.DEFENSE);
+        }
+        break;
+      case DEFENSE:
         break;
       default:
         break;
@@ -585,6 +610,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     POST_CLIMB,
     PREPPING_DECEND,
     CLIMBING,
-    CLIMBED
+    CLIMBED,
+    TO_DEFENSE,
+    DEFENSE
   }
 }

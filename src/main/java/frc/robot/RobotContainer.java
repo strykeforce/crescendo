@@ -44,6 +44,7 @@ import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.ScoreTrapCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.ToggleDefenseCommand;
 import frc.robot.commands.robotState.TrapCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
@@ -355,6 +356,10 @@ public class RobotContainer {
     // SubWoofer
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+
+    // Defense
+    new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
