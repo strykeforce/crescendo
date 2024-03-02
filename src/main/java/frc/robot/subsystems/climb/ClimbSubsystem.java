@@ -38,6 +38,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private boolean hasLeftForkZeroed = false;
   private boolean hasRightForkZeroed = false;
   private boolean hasClimbZeroed = false;
+  private int prepClimbRequestCount = 0;
 
   private ClimbStates curState = ClimbStates.IDLE;
   private Timer forkTimer = new Timer();
@@ -137,6 +138,14 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return curState;
   }
 
+  public void requestPrepClimb() {
+    prepClimbRequestCount++;
+  }
+
+  public int getClimbRequestCount() {
+    return prepClimbRequestCount;
+  }
+
   @Override
   public void zero() {
     zero(false);
@@ -179,14 +188,22 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public boolean isForkFinished() {
     // return Math.abs(leftForkSetpoint - forkInputs.leftPosTicks) <=
     // ClimbConstants.kCloseEnoughForks
-    //     && Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
-    //         <= ClimbConstants.kCloseEnoughForks;
+    // && Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
+    // <= ClimbConstants.kCloseEnoughForks;
     return true;
   }
 
-  public void prepClimb() {
+  public void prepTrapClimb() {
     proceedToClimb = true;
     zero(true);
+  }
+
+  public void prepHighClimb() {
+    logger.info("{} -> PREPPING", curState);
+
+    extendForks();
+    setPosition(ClimbConstants.kLeftClimbHighPrepPos);
+    curState = ClimbStates.PREPPING;
   }
 
   public void trapClimb() {
@@ -200,6 +217,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public void stow() {
+    prepClimbRequestCount = 0;
     setPosition(ClimbConstants.kLeftStowPos);
   }
 
@@ -294,9 +312,14 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         break;
       case PREPPING:
         if (isFinished() && isForkFinished()) {
-          logger.info("PREPPING -> PREPPED");
-          curState = ClimbStates.PREPPED;
-          forkIO.setPct(0.0);
+          if (prepClimbRequestCount > 1) {
+            prepClimbRequestCount = 0;
+            prepHighClimb();
+          } else {
+            logger.info("PREPPING -> PREPPED");
+            curState = ClimbStates.PREPPED;
+            forkIO.setPct(0.0);
+          }
         }
         break;
       case PREPPED:

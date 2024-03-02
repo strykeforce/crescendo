@@ -19,7 +19,7 @@ public class FullTrapClimbCommand extends Command {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.climb(true);
+    robotStateSubsystem.climb(true, false);
   }
 
   @Override

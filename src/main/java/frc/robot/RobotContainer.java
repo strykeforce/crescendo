@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
+import frc.robot.commands.climb.IncrementRequestPrepClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
 import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
@@ -35,6 +36,7 @@ import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
+import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
@@ -334,6 +336,17 @@ public class RobotContainer {
     new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
         .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
         .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+
+    // Climb
+    new Trigger((() -> xboxController.getLeftTriggerAxis() > 0.5))
+        .onTrue(new ClimbCommand(robotStateSubsystem, climbSubsystem, superStructure));
+    new Trigger((() -> xboxController.getRightTriggerAxis() > 0.5))
+        .onTrue(new FullTrapClimbCommand(robotStateSubsystem, climbSubsystem, superStructure));
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .onTrue(new ClimbTrapDecendCommand(robotStateSubsystem, climbSubsystem, superStructure));
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(new PrepClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .onTrue(new IncrementRequestPrepClimbCommand(climbSubsystem));
 
     // Amp Prep
     new JoystickButton(xboxController, XboxController.Button.kA.value)

@@ -17,4 +17,5 @@ public final class RobotStateConstants {
   public static final double kMinWristToMoveTrapBar = -1550;
   public static final double kMaxWristToMoveTrapBar = 0;
   public static final double kTrapTimer = 1.0;
+  public static final double kClimbTrapTimer = 0.5;
 }
