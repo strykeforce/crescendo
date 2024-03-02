@@ -182,7 +182,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toAmp() {
     driveSubsystem.setIsAligningShot(false);
     superStructure.amp();
-    intakeSubsystem.setPercent(0.0);
+    intakeSubsystem.toEjecting();
+    // intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_AMP);
   }
