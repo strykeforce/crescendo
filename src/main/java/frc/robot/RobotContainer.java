@@ -49,6 +49,7 @@ import frc.robot.commands.robotState.TrapCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
+import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -411,9 +412,10 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // // Vision Shoot
-    // new JoystickButton(driveJoystick, Button.M_SWH.id)
-    //     .onTrue(new VisionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem,
-    // intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.M_SWH.id)
+        .onTrue(
+            new VisionShootCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Release Game Piece Command
     new JoystickButton(driveJoystick, Button.M_SWE.id)

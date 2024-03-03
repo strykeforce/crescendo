@@ -46,6 +46,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Timer scoreTrapTimer = new Timer();
   private boolean hasDelayed = false;
   private double shootDelay = 0.0;
+  private boolean hasShootBeamUnbroken = false;
 
   private Alliance allianceColor = Alliance.Blue;
 
@@ -183,6 +184,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toAmp() {
     driveSubsystem.setIsAligningShot(false);
+    magazineSubsystem.setSpeed(0.0);
     superStructure.amp();
     intakeSubsystem.toEjecting();
     // intakeSubsystem.setPercent(0.0);
@@ -213,7 +215,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toStow() {
     driveSubsystem.setIsAligningShot(false);
     intakeSubsystem.setPercent(0.0);
-    magazineSubsystem.setSpeed(0.0);
+    // magazineSubsystem.setSpeed(0.0);
     superStructure.stow();
 
     setState(RobotStates.TO_STOW);
@@ -256,6 +258,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void prepareClimb() {
+    magazineSubsystem.setSpeed(0.0);
     climbSubsystem.zero(true);
     climbSubsystem.extendForks();
     superStructure.toPrepClimb();
@@ -398,16 +401,21 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           magazineSubsystem.toEmptying();
 
-          shootDelayTimer.stop();
-          shootDelayTimer.reset();
-          shootDelayTimer.start();
+          hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
         }
         break;
 
       case SHOOTING:
-        if (shootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
+        if (!hasShootBeamUnbroken && magazineSubsystem.isRevBeamOpen()) {
+          logger.info("Note out of Magazine");
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+          hasShootBeamUnbroken = true;
+        }
+        if (hasShootBeamUnbroken && shootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
@@ -437,7 +445,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case PODIUM_SHOOTING:
-        if (magazineShootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
+        if (magazineShootDelayTimer.hasElapsed(ShooterConstants.kPodiumShootTime)) {
           magazineShootDelayTimer.stop();
 
           superStructure.stopPodiumShoot();
@@ -452,6 +460,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
           shootDelayTimer.reset();
           shootDelayTimer.start();
+          hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
         }
@@ -476,6 +485,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
           shootDelayTimer.reset();
           shootDelayTimer.start();
+          hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
           hasDelayed = false;

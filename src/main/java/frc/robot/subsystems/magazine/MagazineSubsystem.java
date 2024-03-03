@@ -195,7 +195,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case INTAKING:
         if (isRevBeamBroken()) {
-          setSpeed(0.0);
+          // setSpeed(0.0);
           setState(MagazineStates.FULL);
         }
         break;
