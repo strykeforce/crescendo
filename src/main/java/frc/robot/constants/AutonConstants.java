@@ -4,6 +4,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public final class AutonConstants {
+  public static final int kSwitchStableCounts = 100;
+
   public final class Setpoints {
     // Starting Positions
     public static final Pose2d MI1 = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));

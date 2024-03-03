@@ -88,7 +88,8 @@ public class Robot extends LoggedRobot {
         Alliance alliance = DriverStation.getAlliance().get();
         if (alliance == Alliance.Blue || alliance == Alliance.Red) {
           hasAlliance = true;
-          // m_robotContainer.setAllianceColor(alliance);
+          m_robotContainer.setAllianceColor(alliance);
+          m_robotContainer.getAutoSwitch().getAutoCommand().generateTrajectory();
           logger.info("Set Alliance to {}", alliance);
         }
       } catch (NoSuchElementException error) {
@@ -101,7 +102,9 @@ public class Robot extends LoggedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.getAutoSwitch().checkSwitch();
+  }
 
   @Override
   public void disabledExit() {}

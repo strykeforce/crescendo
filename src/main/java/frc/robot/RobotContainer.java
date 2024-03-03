@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
@@ -54,6 +55,7 @@ import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
+import frc.robot.subsystems.auto.AutoSwitch;
 import frc.robot.subsystems.climb.ClimbIOFX;
 import frc.robot.subsystems.climb.ClimbRatchetIOServo;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -91,6 +93,7 @@ public class RobotContainer {
   private final ElbowSubsystem elbowSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final ClimbSubsystem climbSubsystem;
+  private final AutoSwitch autoSwitch;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -137,6 +140,17 @@ public class RobotContainer {
             climbSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
+    autoSwitch =
+        new AutoSwitch(
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            climbSubsystem,
+            elbowSubsystem,
+            wristSubsystem,
+            shooterSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
     // testAutonPath = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
@@ -145,10 +159,10 @@ public class RobotContainer {
     configureDriverBindings();
     configureOperatorBindings();
     // configureClimbTestBindings();
-    // configureMatchDashboard();
+    configureMatchDashboard();
     configurePitDashboard();
     configureTuningDashboard();
-    // robotStateSubsystem.setAllianceColor(Alliance.Blue);
+    robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
     // configureTelemetry();
     // configurePitDashboard();
@@ -240,21 +254,53 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(0, 4);
   }
-  /*
-    private void configureMatchDashboard() {
-      allianceColor =
-          Shuffleboard.getTab("Match")
-              .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
-              .withProperties(Map.of("colorWhenFalse", "blue"))
-              .withSize(2, 2)
-              .withPosition(0, 0);
 
-      Shuffleboard.getTab("Match")
-          .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
-          .withSize(1, 1)
-          .withPosition(2, 0);
-    }
-  */
+  private void configureMatchDashboard() {
+    allianceColor =
+        Shuffleboard.getTab("Match")
+            .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
+            .withProperties(Map.of("colorWhenFalse", "blue"))
+            .withSize(2, 2)
+            .withPosition(0, 0);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
+        .withSize(1, 1)
+        .withPosition(2, 0);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean(
+            "Cams Connected",
+            () -> visionSubsystem.isCameraConnected(0) && visionSubsystem.isCameraConnected(1))
+        .withSize(1, 1)
+        .withPosition(2, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Is NavX Connected", () -> driveSubsystem.isNavxWorking())
+        .withSize(1, 1)
+        .withPosition(3, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean("Is Traj Generated", () -> autoSwitch.getAutoCommand().hasGenerated())
+        .withSize(1, 1)
+        .withPosition(4, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean("Is VirtualSwitch Used", () -> autoSwitch.isUseVirtualSwitch())
+        .withSize(1, 1)
+        .withPosition(5, 0);
+    Shuffleboard.getTab("Match")
+        .addString("AutoSwitchPos", () -> autoSwitch.getSwitchPos())
+        .withSize(1, 1)
+        .withPosition(3, 1);
+    Shuffleboard.getTab("Match")
+        .add("VirtualAutoSwitch", autoSwitch.getSendableChooser())
+        .withSize(1, 1)
+        .withPosition(4, 1);
+    Shuffleboard.getTab("Match")
+        .add("ToggleVirtualSwitch", new ToggleVirtualSwitchCommand(autoSwitch))
+        .withSize(1, 1)
+        .withPosition(5, 1);
+  }
+
   public void configureTuningDashboard() {
     ShuffleboardTab tab = Shuffleboard.getTab("Tuning");
     lShooterSpeed =
@@ -314,6 +360,10 @@ public class RobotContainer {
     } else {
       driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
     }
+  }
+
+  public AutoSwitch getAutoSwitch() {
+    return this.autoSwitch;
   }
 
   public void setIsEvent(boolean isEvent) {
