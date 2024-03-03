@@ -82,7 +82,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             superStructure,
             magazineSubsystem,
             elbowSubsystem,
-            "5m TestPath");
+            "5mTestPath");
   }
 
   public void checkSwitch() {
@@ -141,7 +141,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             superStructure,
             magazineSubsystem,
             elbowSubsystem,
-            "5m TestPath");
+            "5mTestPath");
     }
   }
 

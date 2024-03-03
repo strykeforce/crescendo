@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
+import frc.robot.commands.auton.NonAmpAutoCommand;
+import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
@@ -25,8 +27,6 @@ import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
-import frc.robot.commands.auton.NonAmpAutoCommand;
-import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
@@ -43,8 +43,8 @@ import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.DecendCommand;
-import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.DistanceShootCommand;
+import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.PostClimbStowCommand;
 import frc.robot.commands.robotState.PrepClimbCommand;
@@ -52,10 +52,10 @@ import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.ScoreTrapCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.commands.robotState.ToggleDefenseCommand;
 import frc.robot.commands.robotState.TrapCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
-import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
@@ -114,7 +114,8 @@ public class RobotContainer {
   private Boolean isEvent = true;
 
   private NonAmpAutoCommand nonAmpAutonPath;
-  //   private HoloContTuningCommand holoContTuningCommand;
+  // private HoloContTuningCommand holoContTuningCommand;
+  private DriveAutonCommand calibrateWheelSize;
   public GenericEntry lShooterSpeed;
   public GenericEntry rShooterSpeed;
   public GenericEntry magazineSpeed;
@@ -174,6 +175,9 @@ public class RobotContainer {
 
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
+
+    // calibrateWheelSize = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
+    // calibrateWheelSize.generateTrajectory();
 
     configureDriverBindings();
     configureOperatorBindings();
@@ -253,7 +257,14 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add(
             "Post Climb Stow",
-            new PostClimbStowCommand()
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem))
+        .withSize(1, 1)
+        .withPosition(6, 2);
 
     Shuffleboard.getTab("Pit")
         .add("gyro to 60", new setAngleOffsetCommand(driveSubsystem, 60))
@@ -285,9 +296,9 @@ public class RobotContainer {
                 superStructure,
                 magazineSubsystem,
                 intakeSubsystem,
-                climbSubsystem))
+                AutonConstants.kAI1ToSpeakerDist))
         .withSize(1, 1)
-        .withPosition(6, 2);
+        .withPosition(4, 0);
 
     Shuffleboard.getTab("Pit")
         .add(
@@ -300,9 +311,6 @@ public class RobotContainer {
         .add("Zero Climb", new ZeroClimbCommand(climbSubsystem))
         .withSize(1, 1)
         .withPosition(0, 4);
-                AutonConstants.kAI1ToSpeakerDist))
-        .withSize(1, 1)
-        .withPosition(4, 0);
 
     Shuffleboard.getTab("Pit")
         .add("Toggle isAuto", new ToggleIsAutoCommand(robotStateSubsystem))
@@ -316,21 +324,23 @@ public class RobotContainer {
   }
 
   private void configureMatchDashboard() {
-    // Shuffleboard.getTab("Match")
-    //     .add(new ToggleVisionUpdatesCommand(driveSubsystem))
-    //     .withWidget(BuiltInWidgets.kToggleButton)
-    //     .withPosition(0, 0);
+
+    Shuffleboard.getTab("Match")
+        .add("ToggleVisionUpdates", new ToggleVisionUpdatesCommand(driveSubsystem))
+        .withSize(1, 1)
+        .withPosition(6, 0);
+
     Shuffleboard.getTab("Match")
         .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
         .withSize(1, 1)
-        .withPosition(4, 0);
+        .withPosition(6, 1);
 
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
             .withProperties(Map.of("colorWhenFalse", "blue", "colorWhenTrue", "red"))
             .withSize(2, 2)
-            .withPosition(1, 0);
+            .withPosition(0, 0);
 
     Shuffleboard.getTab("Match")
         .add(new ToggleAllianceColorCommand(robotStateSubsystem))
@@ -423,9 +433,7 @@ public class RobotContainer {
 
   public void setAllianceColor(Alliance alliance) {
     this.alliance = alliance;
-    allianceColor.withProperties(
-        Map.of(
-            "colorWhenTrue", "red", "colorWhenFalse", "blue"));
+    allianceColor.withProperties(Map.of("colorWhenTrue", "red", "colorWhenFalse", "blue"));
     robotStateSubsystem.setAllianceColor(alliance);
 
     // Flips gyro angle if alliance is red team

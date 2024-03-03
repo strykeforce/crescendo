@@ -19,6 +19,6 @@ public class ToggleAllianceColorCommand extends InstantCommand {
 
   @Override
   public boolean runsWhenDisabled() {
-      return true;
+    return true;
   }
 }
