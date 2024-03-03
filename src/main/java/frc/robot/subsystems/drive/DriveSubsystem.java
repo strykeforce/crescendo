@@ -176,11 +176,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
       return RobotConstants.kBlueSpeakerPos
           .minus(getPoseMeters().getTranslation())
           .getAngle()
-          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
+          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+          .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
     return RobotConstants.kRedSpeakerPos
         .minus(getPoseMeters().getTranslation())
         .getAngle()
-        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
+        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+        .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
   }
 
   public DriveStates getDriveState() {

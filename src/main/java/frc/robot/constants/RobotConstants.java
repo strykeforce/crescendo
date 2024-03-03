@@ -32,6 +32,8 @@ public class RobotConstants {
   public static final Translation2d kBlueSpeakerPos =
       new Translation2d(kBlueSpeakerXPos, kBlueSpeakerYPos);
 
+  public static final double kDegreeShootOffset = -3.5;
+
   // Robot Sizes
   public static final double kShooterOffset = 0.2; // meters
   public static final Rotation2d kShooterHeading = Rotation2d.fromDegrees(180);
