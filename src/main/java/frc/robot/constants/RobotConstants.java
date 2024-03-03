@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class RobotConstants {
   public static final Translation2d kBlueSpeakerPos =
       new Translation2d(kBlueSpeakerXPos, kBlueSpeakerYPos);
 
-  public static final double kDegreeShootOffset = -3.5;
+  public static final double kDegreeShootOffset = Units.degreesToRadians(-3.5);
 
   // Robot Sizes
   public static final double kShooterOffset = 0.2; // meters
