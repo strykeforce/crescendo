@@ -129,7 +129,8 @@ public final class DriveConstants {
   }
 
   // Holonomic Controller Constants
-  public static final double kPHolonomic = 0.25; // 6 0.25
+  public static final double kXPHolonomic = 3.0; // 6 0.25 ---- was 3.0
+  public static final double kYPHolonomic = 3.0; // 6 0.25 ---- was 3.0
   public static final double kIHolonomic = 0.0000;
   public static final double kDHolonomic = 0.00; // kPHolonomic/100
   public static final double kIMin = 0.0;

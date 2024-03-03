@@ -53,6 +53,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean safeStow = false;
   private boolean decendClimbAfterTrap = false;
   private boolean continueToTrap = false;
+  private boolean usingDistance = false;
+  private boolean isAuto = false;
 
   private double magazineTuneSpeed = 0.0;
 
@@ -99,6 +101,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public boolean hasNote() {
     return magazineSubsystem.hasPiece() || intakeSubsystem.isBeamBroken();
+  }
+
+  public boolean intakeHasNote() {
+    return intakeSubsystem.hasNote();
+  }
+
+  public boolean magazineHasNote() {
+    return magazineSubsystem.hasPiece();
   }
 
   // Helper Methods
@@ -153,6 +163,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
        */
     }
 
+    logger.info("Left Shooter: {}", lookupTable[index][1]);
+
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
     shootSolution[1] = Double.parseDouble(lookupTable[index][2]); // Right Shooter
     shootSolution[2] = Double.parseDouble(lookupTable[index][3]); // Elbow
@@ -160,8 +172,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return shootSolution;
   }
 
+  public boolean getIsAuto() {
+    return isAuto;
+  }
+
   public void setMagazineTune(double speed) {
     magazineTuneSpeed = speed;
+  }
+
+  public void setIsAuto(boolean isAuto) {
+    this.isAuto = isAuto;
   }
 
   // Control Methods
@@ -193,9 +213,21 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void startShoot() {
+    usingDistance = false;
     driveSubsystem.setIsAligningShot(true);
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+    setState(RobotStates.TO_SHOOT);
+  }
+
+  public void startShootDistance(double distance) {
+    usingDistance = true;
+
+    double[] shootSolution = getShootSolution(distance);
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -392,11 +424,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case TO_SHOOT:
-        double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
-        superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+        if (!usingDistance) {
+          double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+          superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+        }
+
+        if (isAuto && !usingDistance) {
+          double vomega = driveSubsystem.getvOmegaToGoal();
+          driveSubsystem.move(0, 0, vomega, true);
+        }
 
         if (driveSubsystem.isDriveStill()
-            && driveSubsystem.isPointingAtGoal()
+            && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
 
           magazineSubsystem.toEmptying();
@@ -592,7 +631,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("state", () -> curState.ordinal()));
+    return Set.of(
+        new Measure("state", () -> curState.ordinal()),
+        new Measure("using distance", () -> usingDistance ? 1.0 : 0.0));
   }
 
   @Override

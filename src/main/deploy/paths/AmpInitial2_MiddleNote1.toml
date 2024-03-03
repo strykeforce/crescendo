@@ -1,0 +1,20 @@
+max_velocity = 2.0 #m/s
+max_acceleration = 1.2 #m/s
+start_velocity = 0.0 #m/s
+end_velocity = 0.0 #m/s 
+is_reversed = false
+target_yaw = 30.0 #degrees
+
+[start_pose]
+dataPoint = "AI1"
+
+[end_pose]
+dataPoint = "M1"
+
+[[internal_points]]
+    x = 5.0
+    y = 6.275
+    
+[[internal_points]]
+    x = 6.0
+    y = 7.457694

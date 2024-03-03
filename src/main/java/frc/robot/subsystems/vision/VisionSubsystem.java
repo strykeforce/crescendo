@@ -53,6 +53,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   DriveSubsystem driveSubsystem;
   int offWheels = 0;
   Logger logger;
+  int minTagsNeeded = 2;
 
   AprilTagFieldLayout field;
 
@@ -88,6 +89,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Getter/Setter Methods
   public void setVisionUpdates(boolean visionUpdates) {
     this.visionUpdates = visionUpdates;
+  }
+
+  public void setMinTagsNeeded(int num) {
+    minTagsNeeded = num;
   }
 
   public boolean isVisionUpdatingDrive() {
@@ -128,10 +133,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
       double magnitudeDisp = Math.sqrt(Math.pow(disp.getX(), 2) + Math.pow(disp.getY(), 2));
 
       // Test to see if the displacement falls beneath a line based on velocity
-      return (magnitudeDisp
-          < ((magnitudeVel * VisionConstants.kLinearCoeffOnVelFilter)
-              + VisionConstants.kOffsetOnVelFilter
-              + Math.pow((magnitudeVel * VisionConstants.kSquaredCoeffOnVelFilter), 2)));
+      return test.getNumTags() >= minTagsNeeded
+          && (magnitudeDisp
+              < ((magnitudeVel * VisionConstants.kLinearCoeffOnVelFilter)
+                  + VisionConstants.kOffsetOnVelFilter
+                  + Math.pow((magnitudeVel * VisionConstants.kSquaredCoeffOnVelFilter), 2)));
     }
     return false;
   }
@@ -248,6 +254,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     // Go through results
     for (Pair<WallEyeResult, Integer> res : validResults) {
+      adaptiveVisionMatrix.set(0, 0, .1);
+      adaptiveVisionMatrix.set(1, 0, .1);
 
       // Take out data from pair
       WallEyeResult result = res.getFirst();
@@ -293,6 +301,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
               offWheels = 0;
 
             } else {
+
               String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
                   output, new Pose2d(centerPos, cameraRot));
@@ -303,7 +312,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
               offWheels++;
               if (offWheels >= VisionConstants.kMaxTimesOffWheels) {
-                logger.info("{} -> TRUSTVISION", curState);
+                // logger.info("{} -> TRUSTVISION", curState);
                 curState = VisionStates.TRUSTVISION;
               }
             }
@@ -327,6 +336,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
                   new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);
 
             } else {
+
               String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
                   output, new Pose2d(centerPos, cameraRot));

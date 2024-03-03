@@ -8,6 +8,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
+import edu.wpi.first.networktables.NetworkTableType;
+
 public final class MagazineConstants {
   public static final int kMagazineFalconID = 25;
   public static final double kCloseEnough = 10;
@@ -41,6 +43,8 @@ public final class MagazineConstants {
     MotionMagicConfigs motionMagic =
         new MotionMagicConfigs().withMotionMagicAcceleration(300).withMotionMagicJerk(5000);
     config.MotionMagic = motionMagic;
+
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
 

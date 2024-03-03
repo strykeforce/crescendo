@@ -7,21 +7,24 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class VisionShootCommand extends Command {
+public class DistanceShootCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
+  double distance;
 
-  public VisionShootCommand(
+  public DistanceShootCommand(
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
-      IntakeSubsystem intakeSubsystem) {
+      IntakeSubsystem intakeSubsystem,
+      double distance) {
     addRequirements(superStructure, magazineSubsystem, intakeSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
+    this.distance = distance;
   }
 
   @Override
   public void initialize() {
-    robotStateSubsystem.startShoot();
+    robotStateSubsystem.startShootDistance(distance);
   }
 
   @Override
