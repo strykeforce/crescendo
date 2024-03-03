@@ -203,7 +203,7 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
-    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> SAFE_TRANSFER_ELBOW(STOW)", curState);
     flipMagazineOut = false;

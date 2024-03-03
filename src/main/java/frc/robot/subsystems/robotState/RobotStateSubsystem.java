@@ -51,10 +51,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private boolean safeStow = false;
   private boolean decendClimbAfterTrap = false;
-  ;
   private boolean continueToTrap = false;
 
   private double magazineTuneSpeed = 0.0;
+
+  private RobotStates desiredState = RobotStates.STOW;
 
   // Constructor
   public RobotStateSubsystem(
@@ -224,6 +225,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     magazineSubsystem.setSpeed(0.0);
     superStructure.defenceStow();
 
+    desiredState = RobotStates.INTAKING;
+
     setState(RobotStates.TO_STOW);
   }
 
@@ -329,6 +332,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     switch (curState) {
       case TO_STOW:
         if (superStructure.isFinished()) {
+          if (desiredState == RobotStates.INTAKING) {
+            desiredState = RobotStates.STOW;
+            toIntake();
+          }
           setState(RobotStates.STOW);
         }
         break;

@@ -22,7 +22,7 @@ public class ToggleDefenseCommand extends Command {
   @Override
   public void initialize() {
     if (robotStateSubsystem.getState() == RobotStates.DEFENSE) {
-      desiredState = RobotStates.STOW;
+      desiredState = RobotStates.INTAKING;
       robotStateSubsystem.toDefenseStow();
     } else {
       desiredState = RobotStates.DEFENSE;
