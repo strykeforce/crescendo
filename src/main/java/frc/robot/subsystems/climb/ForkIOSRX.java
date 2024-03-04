@@ -6,11 +6,24 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.constants.ClimbConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.BeforeHealthCheck;
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.Follow;
+import org.strykeforce.healthcheck.HealthCheck;
+import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class ForkIOSRX implements ForkIO {
+public class ForkIOSRX implements ForkIO, Checkable {
   private Logger logger;
+
+  @HealthCheck
+  @Position(
+      percentOutput = {0.3, -0.3},
+      encoderChange = 450)
   private TalonSRX leftFork;
+
+  @HealthCheck
+  @Follow(leader = ClimbConstants.kLeftForkSRXId)
   private TalonSRX rightFork;
 
   public ForkIOSRX() {
@@ -29,6 +42,11 @@ public class ForkIOSRX implements ForkIO {
     rightFork.enableCurrentLimit(true);
     rightFork.setNeutralMode(NeutralMode.Brake);
     rightFork.enableVoltageCompensation(true);
+  }
+
+  @Override
+  public String getName() {
+    return "Forks";
   }
 
   @Override
@@ -94,5 +112,14 @@ public class ForkIOSRX implements ForkIO {
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(leftFork);
     telemetryService.register(rightFork);
+  }
+
+  @BeforeHealthCheck
+  public boolean goToZero() {
+    setPosition(ClimbConstants.kLeftRetractPos);
+    return Math.abs(leftFork.getSelectedSensorPosition() - ClimbConstants.kLeftRetractPos)
+            <= ClimbConstants.kCloseEnoughForks
+        && Math.abs(rightFork.getSelectedSensorPosition() - ClimbConstants.kLeftExtendPos)
+            <= ClimbConstants.kCloseEnoughForks;
   }
 }

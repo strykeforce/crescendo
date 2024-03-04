@@ -8,8 +8,10 @@ import ch.qos.logback.classic.util.ContextInitializer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.constants.BuildConstants;
 import frc.robot.constants.RobotConstants;
 import java.util.NoSuchElementException;
@@ -78,6 +80,10 @@ public class Robot extends LoggedRobot {
       m_robotContainer.configureTelemetry();
       // m_robotContainer.configurePitDashboard();
     }
+    Shuffleboard.getTab("Match")
+        .add(new ToggleAllianceColorCommand(m_robotContainer))
+        .withSize(1, 1)
+        .withPosition(2, 0);
   }
 
   @Override
