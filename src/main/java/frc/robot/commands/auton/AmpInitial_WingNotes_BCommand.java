@@ -17,7 +17,7 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class AmpInitial_WingNotesCommand_B extends SequentialCommandGroup {
+public class AmpInitial_WingNotes_BCommand extends SequentialCommandGroup {
 
   DriveAutonCommand firstPath;
   DriveAutonCommand secondPath;
@@ -29,7 +29,7 @@ public class AmpInitial_WingNotesCommand_B extends SequentialCommandGroup {
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
 
-  public AmpInitial_WingNotesCommand_B(
+  public AmpInitial_WingNotes_BCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,

@@ -634,9 +634,9 @@ public class RobotContainer {
     // Elbow at zero
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, 0.0));
-  }
-
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-  }
+    }
+  
+    public Command getAutonomousCommand() {
+      return Commands.print("No autonomous command configured");
+    }
 }
