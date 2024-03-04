@@ -142,49 +142,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return false;
   }
 
-  private boolean isPoseValidWithoutWheels(WallEyeResult test, Translation2d location) {
-    return (test.getNumTags() >= 2 || test.getAmbiguity() <= VisionConstants.kMaxAmbig)
-        && (location.getX() < DriveConstants.kFieldMaxX && location.getX() > 0)
-        && (location.getY() < DriveConstants.kFieldMaxY && location.getY() > 0);
-  }
-
-  private double minTagDistance(WallEyeResult rst) {
-    Translation2d loc = rst.getCameraPose().getTranslation().toTranslation2d();
-    int[] ids = rst.getTagIDs();
-    double minDistance = 2767;
-    for (int id : ids) {
-      Translation2d tagLoc = field.getTagPose(id).get().getTranslation().toTranslation2d();
-      double dist = loc.getDistance(tagLoc);
-      if (dist < minDistance) {
-        minDistance = dist;
-      }
-    }
-    return minDistance;
-  }
-
-  private double avgTagDistance(WallEyeResult rst) {
-    Translation2d loc = rst.getCameraPose().getTranslation().toTranslation2d();
-    int[] ids = rst.getTagIDs();
-    double avg = 0.0;
-    int n = ids.length;
-    for (int id : ids) {
-      Translation2d tagLoc = field.getTagPose(id).get().getTranslation().toTranslation2d();
-      double dist = loc.getDistance(tagLoc);
-      avg += dist * 1.0 / n;
-    }
-    return avg;
-  }
-
-  private double getStdDevFactor(double distance, int numTags) {
-    if (numTags == 1)
-      return 1
-          / FastMath.pow(
-              VisionConstants.baseNumber,
-              FastMath.pow(VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber));
-    return 1
-        / FastMath.pow(
-            VisionConstants.baseNumber,
-            FastMath.pow(VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
+  private boolean isPoseValidWithoutWheels(WallEyeResult test, Translation3d location) {
+    return (test.getNumTags() >= 2) // || test.getAmbiguity() <= VisionConstants.kMaxAmbig)
+        && (location.getX() <= DriveConstants.kFieldMaxX)
+        && (location.getY() <= DriveConstants.kFieldMaxY);
   }
 
   // Periodic

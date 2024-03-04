@@ -15,7 +15,7 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
+public class AmpInitial_WingNotesCommand_A extends SequentialCommandGroup {
 
   DriveAutonCommand firstPath;
   DriveAutonCommand secondPath;
@@ -26,10 +26,8 @@ public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
-  private setAngleOffsetCommand angleOffsetCommand;
-  private double rotation = -50;
 
-  public NonAmpInitial_WingNotes_ACommand(
+  public AmpInitial_WingNotesCommand_A(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
@@ -41,18 +39,17 @@ public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
     firstPath = new DriveAutonCommand(driveSubsystem, pathOne, true, true);
     secondPath = new DriveAutonCommand(driveSubsystem, pathTwo, true, false);
     thirdPath = new DriveAutonCommand(driveSubsystem, pathThree, true, false);
-    angleOffsetCommand = new setAngleOffsetCommand(driveSubsystem, rotation);
     this.robotStateSubsystem = robotStateSubsystem;
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
-        new setAngleOffsetCommand(driveSubsystem, rotation),
+        new setAngleOffsetCommand(driveSubsystem, 50.0),
         new DistanceShootCommand(
             robotStateSubsystem,
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
-            AutonConstants.kNAI1ToSpeakerDist),
+            AutonConstants.kAI1ToSpeakerDist),
         firstPath,
         new WaitCommand(0.1),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
@@ -76,7 +73,6 @@ public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
     thirdPath.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
-    rotation = angleOffsetCommand.fixedRotation(rotation);
   }
 
   public boolean hasGenerated() {

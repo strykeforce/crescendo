@@ -1,10 +1,12 @@
 package frc.robot.commands.auton;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.TurnToAngleCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.robotState.DistanceShootCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
@@ -15,7 +17,7 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
+public class AmpInitial_WingNotesCommand_B extends SequentialCommandGroup {
 
   DriveAutonCommand firstPath;
   DriveAutonCommand secondPath;
@@ -27,7 +29,7 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
 
-  public AmpInitial_WingNotes_ACommand(
+  public AmpInitial_WingNotesCommand_B(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
@@ -55,6 +57,7 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+        new TurnToAngleCommand(driveSubsystem, Rotation2d.fromDegrees(-90.0)),
         secondPath,
         new WaitCommand(0.1),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
