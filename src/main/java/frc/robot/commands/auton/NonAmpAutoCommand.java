@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveAutonWithHeadingCommand;
 import frc.robot.commands.robotState.DistanceShootCommand;
+import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -32,23 +33,18 @@ public class NonAmpAutoCommand extends SequentialCommandGroup {
             "NonAmpInitial1_MiddleNote5",
             true,
             true,
-            Rotation2d.fromDegrees(-33.2),
+            Rotation2d.fromDegrees(-10.6),
             0.0,
             true);
-    note5ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot1", true, false);
-    shootToNote4 = new DriveAutonCommand(driveSubsystem, "NonAmpShoot1_MiddleNote4", true, false);
-    note4ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote4_NonAmpShoot1", true, false);
+    note5ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot2", true, false);
+    shootToNote4 = new DriveAutonCommand(driveSubsystem, "NonAmpShoot2_MiddleNote4", true, false);
+    note4ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote4_NonAmpShoot2", true, false);
 
     addCommands(
         new SequentialCommandGroup(
             // new ToggleVisionUpdatesCommand(driveSubsystem),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-50)),
-            new DistanceShootCommand(
-                robotStateSubsystem,
-                superStructure,
-                magazineSubsystem,
-                intakeSubsystem,
-                AutonConstants.kNAI1ToSpeakerDist),
+            new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
             initialToNote5,
             note5ToShoot,
             new AutoWaitNoteStagedCommand(robotStateSubsystem),

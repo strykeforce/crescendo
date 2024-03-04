@@ -24,7 +24,7 @@ public class RobotConstants {
 
   // Field Positions
   // FIXME: need to measure or get distance from CAD or something
-  public static final double kRedSpeakerXPos = 0;
+  public static final double kRedSpeakerXPos = 16.540988;
   public static final double kRedSpeakerYPos = 5.547868;
   public static final double kBlueSpeakerXPos = 0;
   public static final double kBlueSpeakerYPos = 5.547868;

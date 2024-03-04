@@ -178,8 +178,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return getShooterPos()
         .getDistance(
             robotStateSubsystem.getAllianceColor() == Alliance.Blue
-                ? RobotConstants.kRedSpeakerPos
-                : RobotConstants.kBlueSpeakerPos);
+                ? RobotConstants.kBlueSpeakerPos
+                : RobotConstants.kRedSpeakerPos);
   }
 
   // FIXME: probably doesn't work with red alliance side
@@ -436,6 +436,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
           break;
         case "NAS1":
           pose = Setpoints.NAS1;
+          break;
+        case "NAS2":
+          pose = Setpoints.NAS2;
           break;
 
         default:
