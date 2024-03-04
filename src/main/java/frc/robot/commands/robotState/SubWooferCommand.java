@@ -26,6 +26,6 @@ public class SubWooferCommand extends Command {
   public boolean isFinished() {
     RobotStates curState = robotStateSubsystem.getState();
 
-    return (curState != RobotStates.TO_SUBWOOFER);
+    return (curState != RobotStates.TO_SUBWOOFER && curState != RobotStates.SHOOTING);
   }
 }
