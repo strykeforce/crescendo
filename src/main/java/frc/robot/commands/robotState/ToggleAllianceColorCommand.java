@@ -2,19 +2,19 @@ package frc.robot.commands.robotState;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
 
 public class ToggleAllianceColorCommand extends InstantCommand {
-  private RobotContainer robotContainer;
+  private RobotStateSubsystem robotStateSubsystem;
 
-  public ToggleAllianceColorCommand(RobotContainer robotContainer) {
-    this.robotContainer = robotContainer;
+  public ToggleAllianceColorCommand(RobotStateSubsystem robotStateSubsystem) {
+    this.robotStateSubsystem = robotStateSubsystem;
   }
 
   @Override
   public void initialize() {
-    robotContainer.setAllianceColor(
-        robotContainer.getAllianceColor() == Alliance.Blue ? Alliance.Red : Alliance.Blue);
+    robotStateSubsystem.setAllianceColor(
+        robotStateSubsystem.getAllianceColor() == Alliance.Blue ? Alliance.Red : Alliance.Blue);
   }
 
   @Override

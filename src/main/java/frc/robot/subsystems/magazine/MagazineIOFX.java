@@ -11,18 +11,10 @@ import com.ctre.phoenix6.signals.ReverseLimitValue;
 import frc.robot.constants.MagazineConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.HealthCheck;
-import org.strykeforce.healthcheck.Timed;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class MagazineIOFX implements MagazineIO, Checkable {
-  @HealthCheck
-  @Timed(
-      percentOutput = {0.2, -0.2, 0.9, -0.9},
-      duration = 3)
+public class MagazineIOFX implements MagazineIO {
   private TalonFX magazine;
-
   private Logger logger;
 
   private double setpoint;
@@ -46,11 +38,6 @@ public class MagazineIOFX implements MagazineIO, Checkable {
     currVelocity = magazine.getVelocity();
     fwdLimitSwitch = magazine.getForwardLimit();
     revLimitSwitch = magazine.getReverseLimit();
-  }
-
-  @Override
-  public String getName() {
-    return "Magazine";
   }
 
   @Override

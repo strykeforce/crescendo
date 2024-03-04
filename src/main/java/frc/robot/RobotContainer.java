@@ -54,6 +54,7 @@ import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.ScoreTrapCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.commands.robotState.ToggleDefenseCommand;
 import frc.robot.commands.robotState.TrapCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
@@ -336,51 +337,6 @@ public class RobotContainer {
   }
 
   private void configureMatchDashboard() {
-    allianceColor =
-        Shuffleboard.getTab("Match")
-            .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
-            .withProperties(Map.of("colorWhenFalse", "blue", "colorWhenTrue", "red"))
-            .withSize(2, 2)
-            .withPosition(0, 0);
-
-    // Alliance color toggle at 2,0 position (robot.java)
-
-    Shuffleboard.getTab("Match")
-        .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
-        .withSize(1, 1)
-        .withPosition(3, 0);
-
-    Shuffleboard.getTab("Match")
-        .addBoolean(
-            "Cams Connected",
-            () -> visionSubsystem.isCameraConnected(0) && visionSubsystem.isCameraConnected(1))
-        .withSize(1, 1)
-        .withPosition(4, 1);
-
-    Shuffleboard.getTab("Match")
-        .addBoolean("Is NavX Connected", () -> driveSubsystem.isNavxWorking())
-        .withSize(1, 1)
-        .withPosition(5, 0);
-    Shuffleboard.getTab("Match")
-        .addBoolean("Is Traj Generated", () -> autoSwitch.getAutoCommand().hasGenerated())
-        .withSize(1, 1)
-        .withPosition(2, 1);
-    Shuffleboard.getTab("Match")
-        .addString("AutoSwitchPos", () -> autoSwitch.getSwitchPos())
-        .withSize(1, 1)
-        .withPosition(3, 1);
-    Shuffleboard.getTab("Match")
-        .add("ToggleVirtualSwitch", new ToggleVirtualSwitchCommand(autoSwitch))
-        .withSize(1, 1)
-        .withPosition(4, 1);
-    Shuffleboard.getTab("Match")
-        .addBoolean("Is VirtualSwitch Used", () -> autoSwitch.isUseVirtualSwitch())
-        .withSize(1, 1)
-        .withPosition(4, 2);
-    Shuffleboard.getTab("Match")
-        .add("VirtualAutoSwitch", autoSwitch.getSendableChooser())
-        .withSize(1, 1)
-        .withPosition(5, 1);
 
     Shuffleboard.getTab("Match")
         .add("ToggleVisionUpdates", new ToggleVisionUpdatesCommand(driveSubsystem))
@@ -391,6 +347,55 @@ public class RobotContainer {
         .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
         .withSize(1, 1)
         .withPosition(6, 1);
+
+    allianceColor =
+        Shuffleboard.getTab("Match")
+            .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
+            .withProperties(Map.of("colorWhenFalse", "blue", "colorWhenTrue", "red"))
+            .withSize(2, 2)
+            .withPosition(0, 0);
+
+    Shuffleboard.getTab("Match")
+        .add(new ToggleAllianceColorCommand(robotStateSubsystem))
+        .withSize(1, 1)
+        .withPosition(3, 0);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Have Note", () -> robotStateSubsystem.hasNote())
+        .withSize(1, 1)
+        .withPosition(2, 0);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean(
+            "Cams Connected",
+            () -> visionSubsystem.isCameraConnected(0) && visionSubsystem.isCameraConnected(1))
+        .withSize(1, 1)
+        .withPosition(2, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Is NavX Connected", () -> driveSubsystem.isNavxWorking())
+        .withSize(1, 1)
+        .withPosition(3, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean("Is Traj Generated", () -> autoSwitch.getAutoCommand().hasGenerated())
+        .withSize(1, 1)
+        .withPosition(4, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean("Is VirtualSwitch Used", () -> autoSwitch.isUseVirtualSwitch())
+        .withSize(1, 1)
+        .withPosition(5, 0);
+    Shuffleboard.getTab("Match")
+        .addString("AutoSwitchPos", () -> autoSwitch.getSwitchPos())
+        .withSize(1, 1)
+        .withPosition(3, 1);
+    Shuffleboard.getTab("Match")
+        .add("VirtualAutoSwitch", autoSwitch.getSendableChooser())
+        .withSize(1, 1)
+        .withPosition(4, 1);
+    Shuffleboard.getTab("Match")
+        .add("ToggleVirtualSwitch", new ToggleVirtualSwitchCommand(autoSwitch))
+        .withSize(1, 1)
+        .withPosition(5, 1);
   }
 
   public void configureTuningDashboard() {
@@ -450,10 +455,6 @@ public class RobotContainer {
     } else {
       driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
     }
-  }
-
-  public Alliance getAllianceColor() {
-    return alliance;
   }
 
   public AutoSwitch getAutoSwitch() {

@@ -13,23 +13,12 @@ import frc.robot.constants.ElbowConstants;
 import frc.robot.constants.RobotConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.healthcheck.AfterHealthCheck;
-import org.strykeforce.healthcheck.BeforeHealthCheck;
-import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.HealthCheck;
-import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.CancoderMeasureable;
 
-public class ElbowIOFX implements ElbowIO, Checkable {
+public class ElbowIOFX implements ElbowIO {
   private Logger logger;
-
-  @HealthCheck
-  @Position(
-      percentOutput = {0.1, -0.1},
-      encoderChange = 25)
   private TalonFX elbow;
-
   private CANcoder remoteEncoder;
 
   private double absSensorInitial;
@@ -63,11 +52,6 @@ public class ElbowIOFX implements ElbowIO, Checkable {
     currPosition = elbow.getPosition();
     currVelocity = elbow.getVelocity();
     absRots = remoteEncoder.getAbsolutePosition();
-  }
-
-  @Override
-  public String getName() {
-    return "Elbow";
   }
 
   //   public int getPulseWidthFor(PWMChannel channel) {
@@ -159,22 +143,14 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   }
 
   @Override
-  public void setCurrentLimit(CurrentLimitsConfigs config) {
-    configurator = elbow.getConfigurator();
-    configurator.apply(config);
-  }
-
-  @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(elbow, true);
     telemetryService.register(new CancoderMeasureable(remoteEncoder));
   }
 
-  @BeforeHealthCheck
-  @AfterHealthCheck
-  public boolean goToZero() {
-    setPosition(0.0);
-    return Math.abs(currPosition.refresh().getValue() - setpointOffset)
-        <= ElbowConstants.kCloseEnoughRots;
+  @Override
+  public void setCurrentLimit(CurrentLimitsConfigs config) {
+    configurator = elbow.getConfigurator();
+    configurator.apply(config);
   }
 }

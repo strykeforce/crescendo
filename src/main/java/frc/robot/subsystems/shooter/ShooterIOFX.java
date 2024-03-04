@@ -9,22 +9,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.ShooterConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.healthcheck.Follow;
-import org.strykeforce.healthcheck.HealthCheck;
-import org.strykeforce.healthcheck.Timed;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class ShooterIOFX implements ShooterIO {
-  @HealthCheck
-  @Timed(
-      percentOutput = {0.2, -0.2, 0.8, -0.8},
-      duration = 3)
   private TalonFX shooterLeft;
-
-  @HealthCheck
-  @Follow(leader = ShooterConstants.kLeftShooterTalonID)
   private TalonFX shooterRight;
-
   private Logger logger;
 
   private double setpoint;

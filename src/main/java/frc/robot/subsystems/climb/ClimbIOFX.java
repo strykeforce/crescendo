@@ -10,24 +10,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.ClimbConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.healthcheck.BeforeHealthCheck;
-import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.Follow;
-import org.strykeforce.healthcheck.HealthCheck;
-import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class ClimbIOFX implements ClimbIO, Checkable {
+public class ClimbIOFX implements ClimbIO {
   private Logger logger;
-
-  @HealthCheck
-  @Position(
-      percentOutput = {0.3, -0.3},
-      encoderChange = 50)
   private TalonFX leftClimb;
-
-  @HealthCheck
-  @Follow(leader = ClimbConstants.kLeftClimbFxId)
   private TalonFX rightClimb;
 
   private double leftSetpoint;
@@ -67,11 +54,6 @@ public class ClimbIOFX implements ClimbIO, Checkable {
     rightPos = rightClimb.getPosition().refresh();
     leftVel = leftClimb.getVelocity().refresh();
     rightVel = rightClimb.getVelocity().refresh();
-  }
-
-  @Override
-  public String getName() {
-    return "Climb";
   }
 
   @Override
@@ -134,12 +116,5 @@ public class ClimbIOFX implements ClimbIO, Checkable {
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(leftClimb, true);
     telemetryService.register(rightClimb, true);
-  }
-
-  @BeforeHealthCheck
-  public boolean goToZero() {
-    setPosition(1);
-    return Math.abs(leftPos.refresh().getValue() - 1) <= ClimbConstants.kCloseEnoughRots
-        && Math.abs(rightPos.refresh().getValue() - 1) <= ClimbConstants.kCloseEnoughRots;
   }
 }

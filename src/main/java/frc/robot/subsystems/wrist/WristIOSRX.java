@@ -7,20 +7,10 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.WristConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.healthcheck.AfterHealthCheck;
-import org.strykeforce.healthcheck.BeforeHealthCheck;
-import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.HealthCheck;
-import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class WristIOSRX implements WristIO, Checkable {
+public class WristIOSRX implements WristIO {
   private Logger logger;
-
-  @HealthCheck
-  @Position(
-      percentOutput = {-0.1, 0.1},
-      encoderChange = 2000)
   private TalonSRX wrist;
 
   public WristIOSRX() {
@@ -33,11 +23,6 @@ public class WristIOSRX implements WristIO, Checkable {
     wrist.enableCurrentLimit(true);
     wrist.setNeutralMode(NeutralMode.Brake);
     wrist.enableVoltageCompensation(true);
-  }
-
-  @Override
-  public String getName() {
-    return "Wrist";
   }
 
   @Override
@@ -69,12 +54,5 @@ public class WristIOSRX implements WristIO, Checkable {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(wrist);
-  }
-
-  @BeforeHealthCheck
-  @AfterHealthCheck
-  public boolean goToZero() {
-    setPosition(0.0);
-    return Math.abs(wrist.getSelectedSensorPosition()) <= WristConstants.kCloseEnoughTicks;
   }
 }

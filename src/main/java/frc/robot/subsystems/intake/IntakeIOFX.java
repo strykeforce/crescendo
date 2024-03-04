@@ -9,19 +9,11 @@ import frc.robot.constants.IntakeConstants;
 import java.util.function.BooleanSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.HealthCheck;
-import org.strykeforce.healthcheck.Timed;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class IntakeIOFX implements IntakeIO, Checkable {
+public class IntakeIOFX implements IntakeIO {
 
   private Logger logger;
-
-  @HealthCheck
-  @Timed(
-      percentOutput = {0.5, -0.5},
-      duration = 3)
   private TalonFX intake;
 
   TalonFXConfigurator configurator;
@@ -38,11 +30,6 @@ public class IntakeIOFX implements IntakeIO, Checkable {
     configurator.apply(IntakeConstants.getFXConfig());
 
     currVelocity = intake.getVelocity();
-  }
-
-  @Override
-  public String getName() {
-    return "Intake";
   }
 
   @Override

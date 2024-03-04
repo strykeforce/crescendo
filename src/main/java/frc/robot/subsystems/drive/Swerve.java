@@ -22,8 +22,6 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import java.util.function.BooleanSupplier;
 import org.strykeforce.gyro.SF_AHRS;
-import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
@@ -31,8 +29,9 @@ import org.strykeforce.swerve.V6TalonSwerveModule;
 import org.strykeforce.swerve.V6TalonSwerveModule.ClosedLoopUnits;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class Swerve implements SwerveIO, Checkable {
-  @HealthCheck private final SwerveDrive swerveDrive;
+public class Swerve implements SwerveIO {
+
+  private final SwerveDrive swerveDrive;
 
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;
@@ -103,11 +102,6 @@ public class Swerve implements SwerveIO, Checkable {
   }
 
   // Getters/Setter
-  @Override
-  public String getName() {
-    return "Swerve";
-  }
-
   public SwerveModule[] getSwerveModules() {
     return swerveDrive.getSwerveModules();
   }
