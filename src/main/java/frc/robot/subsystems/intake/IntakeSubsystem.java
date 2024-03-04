@@ -54,10 +54,6 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     setState(IntakeState.NONE);
   }
 
-  public void setEmpty() {
-    setState(IntakeState.NONE);
-  }
-
   public void setFwdLimitSwitchSupplier(BooleanSupplier fwdLimitSupplier) {
     io.setFwdLimitSwitchSupplier(fwdLimitSupplier);
   }
@@ -96,6 +92,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
       default:
         break;
     }
+
     org.littletonrobotics.junction.Logger.recordOutput("Intake State", curState);
   }
 

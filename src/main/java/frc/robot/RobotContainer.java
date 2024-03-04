@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
-import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
@@ -124,7 +122,6 @@ public class RobotContainer {
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
   public GenericEntry shootDelay;
-  private AmpInitial_WingNotes_BCommand testPath;
 
   public RobotContainer() {
     robotConstants = new RobotConstants();
@@ -181,16 +178,6 @@ public class RobotContainer {
 
     // calibrateWheelSize = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
     // calibrateWheelSize.generateTrajectory();
-    testPath =
-        new AmpInitial_WingNotes_BCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem,
-            "AmpInitial1_WingNote1",
-            "WingNote1_WingNote2_B",
-            "WingNote2_WingNote3_B");
 
     configureDriverBindings();
     configureOperatorBindings();

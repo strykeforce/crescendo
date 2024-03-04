@@ -8,31 +8,36 @@ import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 
-public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
+public class AmpInitial_WingNotes_BCommand extends SequentialCommandGroup {
 
   DriveAutonCommand firstPath;
   DriveAutonCommand secondPath;
   DriveAutonCommand thirdPath;
   DriveAutonCommand fourthPath;
+  DriveAutonCommand fifthPath;
   DriveAutonCommand fallbackPath;
   DriveAutonCommand fallbackPath2;
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
 
-  public NonAmpInitial_WingNotes_ACommand(
-      DriveSubsystem driveSubsystem, String pathOne, String pathTwo, String pathThree) {
+  public AmpInitial_WingNotes_BCommand(
+      DriveSubsystem driveSubsystem,
+      RobotStateSubsystem robotStateSubsystem,
+      String pathOne,
+      String pathTwo,
+      String pathThree) {
     firstPath = new DriveAutonCommand(driveSubsystem, pathOne, true, true);
-    secondPath = new DriveAutonCommand(driveSubsystem, pathTwo, true, false);
-    thirdPath = new DriveAutonCommand(driveSubsystem, pathThree, true, false);
+    secondPath = new DriveAutonCommand(driveSubsystem, pathTwo, false, false);
+    thirdPath = new DriveAutonCommand(driveSubsystem, pathThree, false, false);
     this.robotStateSubsystem = robotStateSubsystem;
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
-        new setAngleOffsetCommand(driveSubsystem, -60.0),
-        firstPath,
-        secondPath,
-        thirdPath);
+        new setAngleOffsetCommand(driveSubsystem, 60.0),
+        firstPath);
+    // secondPath,
+    // thirdPath);
   }
 
   public void generateTrajectory() {
