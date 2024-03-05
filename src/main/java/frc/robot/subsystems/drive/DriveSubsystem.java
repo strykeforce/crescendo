@@ -109,7 +109,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public double getvOmegaToGoal() {
-    return omegaController.calculate(
+    return omegaSpinController.calculate(
         getPoseMeters().getRotation().getRadians(),
         getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
   }
@@ -165,6 +165,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
+  }
+
+  public void setHolonomicControllerTranslationkP(double kP) {
+    xController.setP(kP);
+    yController.setP(kP);
   }
 
   public void resetOmegaController() {

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
+import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
@@ -113,6 +114,7 @@ public class RobotContainer {
   private Boolean isEvent = true;
 
   private AmpInitial_WingNotes_BCommand ampInitial_WingNotes_BCommand;
+  private AmpInitial_WingNotes_ACommand ampInitial_WingNotes_ACommand;
   // private HoloContTuningCommand holoContTuningCommand;
   private DriveAutonCommand calibrateWheelSize;
   public GenericEntry lShooterSpeed;
@@ -174,6 +176,18 @@ public class RobotContainer {
             "WingNote1_WingNote2_B",
             "WingNote2_WingNote3_B");
     ampInitial_WingNotes_BCommand.generateTrajectory();
+
+    ampInitial_WingNotes_ACommand =
+        new AmpInitial_WingNotes_ACommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "AmpInitial1_WingNote1",
+            "WingNote1_WingNote2_A",
+            "WingNote2_WingNote3_A");
+    ampInitial_WingNotes_ACommand.generateTrajectory();
 
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
@@ -502,7 +516,7 @@ public class RobotContainer {
 
     // Run auton
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .onTrue(ampInitial_WingNotes_BCommand);
+        .onTrue(ampInitial_WingNotes_ACommand);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
