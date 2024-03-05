@@ -5,12 +5,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.PathData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DriveAutonCommand extends Command {
+public class DriveAutonCommand extends Command implements AutoCommandInterface {
   private final DriveSubsystem driveSubsystem;
   private Trajectory trajectory;
   private final Timer timer = new Timer();
@@ -42,6 +43,11 @@ public class DriveAutonCommand extends Command {
     robotHeading = pathdata.targetYaw;
     logger.info("trajectory generated");
     trajectoryGenerated = true;
+  }
+
+  @Override
+  public boolean hasGenerated() {
+    return trajectoryGenerated;
   }
 
   @Override

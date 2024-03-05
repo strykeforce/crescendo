@@ -42,10 +42,13 @@ public final class MagazineConstants {
         new MotionMagicConfigs().withMotionMagicAcceleration(300).withMotionMagicJerk(5000);
     config.MotionMagic = motionMagic;
 
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
     config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
 
     MotorOutputConfigs motorConfig = new MotorOutputConfigs();
     motorConfig.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput = motorConfig;
 
     return config;
   }

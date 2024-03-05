@@ -21,7 +21,11 @@ public class StowCommand extends Command {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.toStow();
+    if (robotStateSubsystem.getState() == RobotStates.DEFENSE) {
+      robotStateSubsystem.toDefenseStow();
+    } else {
+      robotStateSubsystem.toStow();
+    }
   }
 
   @Override

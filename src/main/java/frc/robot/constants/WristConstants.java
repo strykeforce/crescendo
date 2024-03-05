@@ -16,7 +16,7 @@ public final class WristConstants {
   public static TalonSRXConfiguration getSrxConfiguration() {
     TalonSRXConfiguration config = new TalonSRXConfiguration();
 
-    config.forwardSoftLimitThreshold = 1100;
+    config.forwardSoftLimitThreshold = 1515;
     config.forwardSoftLimitEnable = true; // fixme
 
     config.reverseSoftLimitThreshold = -2200.0;

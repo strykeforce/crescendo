@@ -129,7 +129,8 @@ public final class DriveConstants {
   }
 
   // Holonomic Controller Constants
-  public static final double kPHolonomic = 0.25; // 6 0.25
+  public static final double kXPHolonomic = 3.0; // 6 0.25 ---- was 3.0
+  public static final double kYPHolonomic = 3.0; // 6 0.25 ---- was 3.0
   public static final double kIHolonomic = 0.0000;
   public static final double kDHolonomic = 0.00; // kPHolonomic/100
   public static final double kIMin = 0.0;
@@ -143,11 +144,11 @@ public final class DriveConstants {
 
   // Default safety path constants
   public static final Pose2d startPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
-  public static final Pose2d endPose2d = new Pose2d(-1, 0, Rotation2d.fromDegrees(0));
+  public static final Pose2d endPose2d = new Pose2d(1, 0, Rotation2d.fromDegrees(0));
 
   public static ArrayList<Translation2d> getDefaultInternalWaypoints() {
     ArrayList<Translation2d> waypoints = new ArrayList<>();
-    waypoints.add(new Translation2d(-0.5, 0));
+    waypoints.add(new Translation2d(0.5, 0));
     return waypoints;
   }
 
