@@ -59,6 +59,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double magazineTuneSpeed = 0.0;
 
   private RobotStates desiredState = RobotStates.STOW;
+  private int curShot = 1;
 
   // Constructor
   public RobotStateSubsystem(
@@ -438,8 +439,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
 
+          org.littletonrobotics.junction.Logger.recordOutput(
+              "ShootingPostion/shot" + Integer.toString(curShot), driveSubsystem.getPoseMeters());
+
           magazineSubsystem.toEmptying();
 
+          curShot += 1;
           hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
