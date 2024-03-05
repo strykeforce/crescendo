@@ -221,6 +221,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void startShootKnownPos(Pose2d pos) {
     shootPos = pos;
     shootKnownPos = true;
+    usingDistance = false;
 
     driveSubsystem.setIsAligningShot(true);
 
@@ -234,6 +235,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void startShoot() {
     usingDistance = false;
+    shootKnownPos = false;
     driveSubsystem.setIsAligningShot(true);
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
@@ -246,6 +248,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void startShootDistance(double distance) {
     usingDistance = true;
+    shootKnownPos = false;
 
     double[] shootSolution = getShootSolution(distance);
 
@@ -465,9 +468,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
 
+        if (!shootKnownPos)
           org.littletonrobotics.junction.Logger.recordOutput(
               "ShootingPostion/shot" + Integer.toString(curShot), driveSubsystem.getPoseMeters());
-
+        else 
+            org.littletonrobotics.junction.Logger.recordOutput(
+              "ShootingPostion/shot" + Integer.toString(curShot), shootKnownPos);
           magazineSubsystem.toEmptying();
 
           curShot += 1;
@@ -478,7 +484,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case SHOOTING:
-        shootKnownPos = false;
+
         if (!hasShootBeamUnbroken && magazineSubsystem.isRevBeamOpen()) {
           logger.info("Note out of Magazine");
           shootDelayTimer.stop();
