@@ -167,7 +167,7 @@ public class RobotContainer {
         new AmpInitial_WingNotes_BCommand(
             driveSubsystem,
             robotStateSubsystem,
-            "AmpInitial1_WingNote1",
+            superStructure, magazineSubsystem, intakeSubsystem, "AmpInitial1_WingNote1",
             "WingNote1_WingNote2_B",
             "WingNote2_WingNote3_B");
     ampInitial_WingNotes_BCommand.generateTrajectory();
