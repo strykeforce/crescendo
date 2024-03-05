@@ -371,6 +371,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             desiredState = RobotStates.STOW;
             toIntake();
           }
+
+          if (magazineSubsystem.hasPiece()) {
+            intakeSubsystem.toReversing();
+          } else if (!magazineSubsystem.hasPiece()) {
+            toIntake();
+            break;
+          }
+
           setState(RobotStates.STOW);
         }
         break;
