@@ -21,6 +21,8 @@ import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.NonAmpInit_TravelNotesCommand;
 import frc.robot.commands.auton.NonAmpInitial_Note3Command;
+import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
+import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
@@ -117,6 +119,8 @@ public class RobotContainer {
   private NonAmpAutoCommand nonAmpAutonPath;
   private NonAmpInitial_Note3Command nonAmpNote3;
   private NonAmpInit_TravelNotesCommand nonAmpTravelNotes;
+  private AmpInitial_WingNotes_BCommand ampInitial_WingNotes_BCommand;
+  private AmpInitial_WingNotes_ACommand ampInitial_WingNotes_ACommand;
   // private HoloContTuningCommand holoContTuningCommand;
   private DriveAutonCommand calibrateWheelSize;
   public GenericEntry lShooterSpeed;
@@ -184,15 +188,6 @@ public class RobotContainer {
     //         magazineSubsystem,
     //         intakeSubsystem);
     // nonAmpNote3.generateTrajectory();
-
-    nonAmpTravelNotes =
-        new NonAmpInit_TravelNotesCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem);
-    nonAmpTravelNotes.generateTrajectory();
 
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
@@ -521,7 +516,7 @@ public class RobotContainer {
 
     // Run auton
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .onTrue(nonAmpTravelNotes);
+        .onTrue(ampInitial_WingNotes_ACommand);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));

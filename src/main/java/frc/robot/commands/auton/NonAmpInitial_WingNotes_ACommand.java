@@ -2,11 +2,18 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
+import frc.robot.commands.robotState.DistanceShootCommand;
+import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
 
@@ -21,7 +28,14 @@ public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
   private RobotStateSubsystem robotStateSubsystem;
 
   public NonAmpInitial_WingNotes_ACommand(
-      DriveSubsystem driveSubsystem, String pathOne, String pathTwo, String pathThree) {
+      DriveSubsystem driveSubsystem,
+      RobotStateSubsystem robotStateSubsystem,
+      SuperStructure superStructure,
+      MagazineSubsystem magazineSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      String pathOne,
+      String pathTwo,
+      String pathThree) {
     firstPath = new DriveAutonCommand(driveSubsystem, pathOne, true, true);
     secondPath = new DriveAutonCommand(driveSubsystem, pathTwo, true, false);
     thirdPath = new DriveAutonCommand(driveSubsystem, pathThree, true, false);
@@ -29,10 +43,28 @@ public class NonAmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
-        new setAngleOffsetCommand(driveSubsystem, -60.0),
+        new setAngleOffsetCommand(driveSubsystem, -50.0),
+        new DistanceShootCommand(
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            AutonConstants.kNAI1ToSpeakerDist),
         firstPath,
+        new WaitCommand(0.1),
+        new AutoWaitNoteStagedCommand(robotStateSubsystem),
+        new VisionShootCommand(
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         secondPath,
-        thirdPath);
+        new WaitCommand(0.1),
+        new AutoWaitNoteStagedCommand(robotStateSubsystem),
+        new VisionShootCommand(
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+        thirdPath,
+        new WaitCommand(0.2),
+        new AutoWaitNoteStagedCommand(robotStateSubsystem),
+        new VisionShootCommand(
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void generateTrajectory() {
