@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
+import frc.robot.commands.auton.NonAmpInit_TravelNotesCommand;
+import frc.robot.commands.auton.NonAmpInitial_Note3Command;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
@@ -113,6 +115,8 @@ public class RobotContainer {
   private Boolean isEvent = true;
 
   private NonAmpAutoCommand nonAmpAutonPath;
+  private NonAmpInitial_Note3Command nonAmpNote3;
+  private NonAmpInit_TravelNotesCommand nonAmpTravelNotes;
   // private HoloContTuningCommand holoContTuningCommand;
   private DriveAutonCommand calibrateWheelSize;
   public GenericEntry lShooterSpeed;
@@ -163,14 +167,32 @@ public class RobotContainer {
             shooterSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
-    nonAmpAutonPath =
-        new NonAmpAutoCommand(
+    // nonAmpAutonPath =
+    //     new NonAmpAutoCommand(
+    //         driveSubsystem,
+    //         robotStateSubsystem,
+    //         superStructure,
+    //         magazineSubsystem,
+    //         intakeSubsystem);
+    // nonAmpAutonPath.generateTrajectory();
+
+    // nonAmpNote3 =
+    //     new NonAmpInitial_Note3Command(
+    //         driveSubsystem,
+    //         robotStateSubsystem,
+    //         superStructure,
+    //         magazineSubsystem,
+    //         intakeSubsystem);
+    // nonAmpNote3.generateTrajectory();
+
+    nonAmpTravelNotes =
+        new NonAmpInit_TravelNotesCommand(
             driveSubsystem,
             robotStateSubsystem,
             superStructure,
             magazineSubsystem,
             intakeSubsystem);
-    nonAmpAutonPath.generateTrajectory();
+    nonAmpTravelNotes.generateTrajectory();
 
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
@@ -498,7 +520,8 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Run auton
-    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(nonAmpAutonPath);
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(nonAmpTravelNotes);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
