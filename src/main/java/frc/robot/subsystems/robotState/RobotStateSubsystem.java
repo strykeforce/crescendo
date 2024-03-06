@@ -2,6 +2,8 @@ package frc.robot.subsystems.robotState;
 
 import com.opencsv.CSVReader;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
+import org.strykeforce.trapper.TrapperSubsystem;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   // Private Variables
@@ -55,10 +58,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean continueToTrap = false;
   private boolean usingDistance = false;
   private boolean isAuto = false;
+  private boolean shootKnownPos = false;
+  private Pose2d shootPos;
 
   private double magazineTuneSpeed = 0.0;
 
   private RobotStates desiredState = RobotStates.STOW;
+  private int curShot = 1;
 
   // Constructor
   public RobotStateSubsystem(
@@ -135,7 +141,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double[] getShootSolution(double distance) {
     double[] shootSolution = new double[3];
     int index;
-
+    distance += RobotStateConstants.kDistanceOffset;
     if (distance < RobotStateConstants.kLookupMinDistance) {
       index = 1;
       logger.warn(
@@ -212,8 +218,24 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_AMP);
   }
 
+  public void startShootKnownPos(Pose2d pos) {
+    shootPos = pos;
+    shootKnownPos = true;
+    usingDistance = false;
+
+    driveSubsystem.setIsAligningShot(true);
+
+    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(pos));
+
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+    setState(RobotStates.TO_SHOOT);
+  }
+
   public void startShoot() {
     usingDistance = false;
+    shootKnownPos = false;
     driveSubsystem.setIsAligningShot(true);
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
@@ -226,6 +248,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void startShootDistance(double distance) {
     usingDistance = true;
+    shootKnownPos = false;
 
     double[] shootSolution = getShootSolution(distance);
 
@@ -429,6 +452,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
         }
 
+        if (shootKnownPos) {
+          double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos));
+          superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+          double vomega = driveSubsystem.getvOmegaToGoal(shootPos);
+          driveSubsystem.move(0, 0, vomega, true);
+        }
+
         if (isAuto && !usingDistance) {
           double vomega = driveSubsystem.getvOmegaToGoal();
           driveSubsystem.move(0, 0, vomega, true);
@@ -438,8 +468,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
 
+        if (!shootKnownPos)
+          org.littletonrobotics.junction.Logger.recordOutput(
+              "ShootingPostion/shot" + Integer.toString(curShot), driveSubsystem.getPoseMeters());
+        else 
+            org.littletonrobotics.junction.Logger.recordOutput(
+              "ShootingPostion/shot" + Integer.toString(curShot), shootKnownPos);
           magazineSubsystem.toEmptying();
 
+          curShot += 1;
           hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
@@ -447,6 +484,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case SHOOTING:
+
         if (!hasShootBeamUnbroken && magazineSubsystem.isRevBeamOpen()) {
           logger.info("Note out of Magazine");
           shootDelayTimer.stop();

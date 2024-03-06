@@ -119,6 +119,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return omegaSpinController.calculate(
         getPoseMeters().getRotation().getRadians(), target.getRadians());
   }
+  
+    public double getvOmegaToGoal(Pose2d pos) {
+    return omegaController.calculate(
+        pos.getRotation().getRadians(),
+        pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians());
+  }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
   public void move(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
@@ -198,8 +204,24 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return pose.getTranslation().plus(shooterOffset);
   }
 
+    public Translation2d getShooterPos(Pose2d pos) {
+    Pose2d pose = pos;
+    Translation2d shooterOffset =
+        new Translation2d(-RobotConstants.kShooterOffset, pose.getRotation());
+
+    return pose.getTranslation().plus(shooterOffset);
+  }
+
   public double getDistanceToSpeaker() {
     return getShooterPos()
+        .getDistance(
+            robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                ? RobotConstants.kBlueSpeakerPos
+                : RobotConstants.kRedSpeakerPos);
+  }
+
+    public double getDistanceToSpeaker(Pose2d pos) {
+    return getShooterPos(pos)
         .getDistance(
             robotStateSubsystem.getAllianceColor() == Alliance.Blue
                 ? RobotConstants.kBlueSpeakerPos
@@ -218,6 +240,20 @@ public class DriveSubsystem extends MeasurableSubsystem {
         .minus(getPoseMeters().getTranslation())
         .getAngle()
         .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+        .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
+  }
+
+    public Rotation2d getShooterAngleToSpeaker(Pose2d pos) {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
+      return RobotConstants.kBlueSpeakerPos
+          .minus(pos.getTranslation())
+          .getAngle()
+          .minus(pos.getRotation().rotateBy(RobotConstants.kShooterHeading))
+          .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
+    return RobotConstants.kRedSpeakerPos
+        .minus(pos.getTranslation())
+        .getAngle()
+        .minus(pos.getRotation().rotateBy(RobotConstants.kShooterHeading))
         .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
   }
 
