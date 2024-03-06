@@ -5,6 +5,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auto.DefaultAutoCommand;
+import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
+import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
+import frc.robot.commands.auton.AmpMid_5PieceCommand;
+import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -127,11 +131,15 @@ public class AutoSwitch extends MeasurableSubsystem {
   private AutoCommandInterface getAutoCommand(int switchPos) {
     switch (switchPos) {
       case 0x00:
-
+        // return new AmpInitial_WingNotes_ACommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, "", getSubsystem(), getName())
+      case 0x01:
+        // return new AmpInitial_WingNotes_BCommand(driveSubsystem, robotStateSubsystem, getDescription(), getSubsystem(), getName())
+      case 0x10:
+        return new AmpMid_5PieceCommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem);
       case 0x20:
-
+        return new NonAmpAutoCommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem);
       case 0x21:
-
+        
       default:
         String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);
         DriverStation.reportWarning(msg, false);

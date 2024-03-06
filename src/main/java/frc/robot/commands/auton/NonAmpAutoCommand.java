@@ -6,13 +6,14 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveAutonWithHeadingCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class NonAmpAutoCommand extends SequentialCommandGroup {
+public class NonAmpAutoCommand extends SequentialCommandGroup implements AutoCommandInterface {
   private DriveAutonWithHeadingCommand initialToNote5;
   private DriveAutonCommand note5ToShoot;
   private DriveAutonCommand shootToNote4;

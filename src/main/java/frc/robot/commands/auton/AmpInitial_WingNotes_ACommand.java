@@ -10,13 +10,14 @@ import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup {
+public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup implements AutoCommandInterface{
 
   DriveAutonCommand firstPath;
   DriveAutonCommand secondPath;
