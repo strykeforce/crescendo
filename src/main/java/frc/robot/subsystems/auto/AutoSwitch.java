@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auto.DefaultAutoCommand;
+import frc.robot.commands.auton.DoNothingCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -132,6 +133,10 @@ public class AutoSwitch extends MeasurableSubsystem {
 
       case 0x21:
 
+      case 0x30:
+        return new DoNothingCommand(
+            robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
+
       default:
         String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);
         DriverStation.reportWarning(msg, false);
@@ -149,6 +154,7 @@ public class AutoSwitch extends MeasurableSubsystem {
     sendableChooser.addOption("00 Source 3 piece", 0x00);
     sendableChooser.setDefaultOption("20 Amp 4 piece interfere", 0x01);
     sendableChooser.setDefaultOption("21 Amp 4 piece avoid", 0x21);
+    sendableChooser.setDefaultOption("30 Do Nothing", 0x30);
     SmartDashboard.putData("Auto Mode", sendableChooser);
   }
 
