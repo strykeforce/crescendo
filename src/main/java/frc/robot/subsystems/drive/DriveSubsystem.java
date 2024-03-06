@@ -119,8 +119,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return omegaSpinController.calculate(
         getPoseMeters().getRotation().getRadians(), target.getRadians());
   }
-  
-    public double getvOmegaToGoal(Pose2d pos) {
+
+  public double getvOmegaToGoal(Pose2d pos) {
     return omegaController.calculate(
         pos.getRotation().getRadians(),
         pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians());
@@ -204,7 +204,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return pose.getTranslation().plus(shooterOffset);
   }
 
-    public Translation2d getShooterPos(Pose2d pos) {
+  public Translation2d getShooterPos(Pose2d pos) {
     Pose2d pose = pos;
     Translation2d shooterOffset =
         new Translation2d(-RobotConstants.kShooterOffset, pose.getRotation());
@@ -220,7 +220,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
                 : RobotConstants.kRedSpeakerPos);
   }
 
-    public double getDistanceToSpeaker(Pose2d pos) {
+  public double getDistanceToSpeaker(Pose2d pos) {
     return getShooterPos(pos)
         .getDistance(
             robotStateSubsystem.getAllianceColor() == Alliance.Blue
@@ -243,7 +243,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
   }
 
-    public Rotation2d getShooterAngleToSpeaker(Pose2d pos) {
+  public Rotation2d getShooterAngleToSpeaker(Pose2d pos) {
     if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
       return RobotConstants.kBlueSpeakerPos
           .minus(pos.getTranslation())

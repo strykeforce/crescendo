@@ -1,9 +1,8 @@
 package frc.robot.subsystems.robotState;
 
 import com.opencsv.CSVReader;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
@@ -24,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
-import org.strykeforce.trapper.TrapperSubsystem;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   // Private Variables
@@ -468,12 +466,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
 
-        if (!shootKnownPos)
-          org.littletonrobotics.junction.Logger.recordOutput(
-              "ShootingPostion/shot" + Integer.toString(curShot), driveSubsystem.getPoseMeters());
-        else 
+          if (!shootKnownPos)
             org.littletonrobotics.junction.Logger.recordOutput(
-              "ShootingPostion/shot" + Integer.toString(curShot), shootKnownPos);
+                "ShootingPostion/shot" + Integer.toString(curShot), driveSubsystem.getPoseMeters());
+          else
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingPostion/shot" + Integer.toString(curShot), shootKnownPos);
           magazineSubsystem.toEmptying();
 
           curShot += 1;
@@ -484,7 +482,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case SHOOTING:
-
         if (!hasShootBeamUnbroken && magazineSubsystem.isRevBeamOpen()) {
           logger.info("Note out of Magazine");
           shootDelayTimer.stop();

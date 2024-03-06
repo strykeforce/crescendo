@@ -16,7 +16,8 @@ public class PositionShootCommand extends Command {
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
-      IntakeSubsystem intakeSubsystem, Pose2d shootPos) {
+      IntakeSubsystem intakeSubsystem,
+      Pose2d shootPos) {
     addRequirements(superStructure, magazineSubsystem, intakeSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
     this.shootPos = shootPos;
@@ -24,7 +25,8 @@ public class PositionShootCommand extends Command {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.startShootKnownPos(shootPos);;
+    robotStateSubsystem.startShootKnownPos(shootPos);
+    ;
   }
 
   @Override
