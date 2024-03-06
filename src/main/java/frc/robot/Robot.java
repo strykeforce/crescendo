@@ -117,11 +117,12 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.setIsAuto(true);
     if (!m_robotContainer.hasElbowZeroed()) m_robotContainer.zeroElbow();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (m_robotContainer.getAutoSwitch().getAutoCommand() != null) {
+      m_robotContainer.getAutoSwitch().getAutoCommand().schedule();
     }
   }
 
@@ -133,6 +134,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.setIsAuto(false);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

@@ -179,6 +179,7 @@ public class RobotContainer {
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
+            elbowSubsystem,
             "NonAmpInitial1_MiddleNote5",
             "MiddleNote5_NonAmpShoot2",
             "NonAmpShoot2_MiddleNote4",
@@ -210,6 +211,7 @@ public class RobotContainer {
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
+            elbowSubsystem,
             "NonAmpInitial1_MiddleNote3",
             "MiddleNote3_NonAmpShoot2",
             "NonAmpShoot2_MiddleNote4_B",
@@ -493,6 +495,10 @@ public class RobotContainer {
 
   public void setIsEvent(boolean isEvent) {
     this.isEvent = isEvent;
+  }
+
+  public void setIsAuto(boolean isAuto) {
+    robotStateSubsystem.setIsAuto(isAuto);
   }
 
   private void configureOperatorBindings() {

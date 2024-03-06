@@ -8,10 +8,12 @@ import frc.robot.commands.auto.SetHoloContKPCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
+import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -29,6 +31,7 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
+  private ElbowSubsystem elbowSubsystem;
 
   public AmpInitial_WingNotes_ACommand(
       DriveSubsystem driveSubsystem,
@@ -36,6 +39,7 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
+      ElbowSubsystem elbowSubsystem,
       String pathOne,
       String pathTwo,
       String pathThree) {
@@ -43,12 +47,14 @@ public class AmpInitial_WingNotes_ACommand extends SequentialCommandGroup
     secondPath = new DriveAutonCommand(driveSubsystem, pathTwo, true, false);
     thirdPath = new DriveAutonCommand(driveSubsystem, pathThree, true, false);
     this.robotStateSubsystem = robotStateSubsystem;
+    this.elbowSubsystem = elbowSubsystem;
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
         new ParallelCommandGroup(
             new setAngleOffsetCommand(driveSubsystem, 50.0),
-            new SetHoloContKPCommand(driveSubsystem, 0.5)),
+            new SetHoloContKPCommand(driveSubsystem, 0.5),
+            new ZeroElbowCommand(elbowSubsystem)),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         firstPath,
         new WaitCommand(0.1),

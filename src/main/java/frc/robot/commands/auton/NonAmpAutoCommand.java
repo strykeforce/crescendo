@@ -1,11 +1,16 @@
 package frc.robot.commands.auton;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.setAngleOffsetCommand;
+import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -24,6 +29,7 @@ public class NonAmpAutoCommand extends SequentialCommandGroup implements AutoCom
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
+      ElbowSubsystem elbowSubsystem,
       String firstPathName,
       String secondPathName,
       String thirdPathName,
@@ -35,6 +41,10 @@ public class NonAmpAutoCommand extends SequentialCommandGroup implements AutoCom
 
     addCommands(
         new SequentialCommandGroup(
+            new ResetGyroCommand(driveSubsystem),
+            new ParallelCommandGroup(
+                new setAngleOffsetCommand(driveSubsystem, -50.0),
+                new ZeroElbowCommand(elbowSubsystem)),
             // new ToggleVisionUpdatesCommand(driveSubsystem),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-50)),
             new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),

@@ -8,7 +8,8 @@ public final class AutonConstants {
 
   public final class Setpoints {
     // Starting Positions
-    public static final Pose2d MI1 = new Pose2d(1.34, 5.55, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d MI1 =
+        new Pose2d(1.47, 5.55, Rotation2d.fromDegrees(0.0)); // 1.34 on x
     public static final Pose2d AI1 = new Pose2d(1.09, 6.94, Rotation2d.fromDegrees(50));
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
     public static final Pose2d NAI1 = new Pose2d(0.96, 4.156, Rotation2d.fromDegrees(-50));

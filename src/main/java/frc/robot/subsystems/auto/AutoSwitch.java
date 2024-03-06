@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auto.DefaultAutoCommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
+import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.AmpMid_5PieceCommand;
 import frc.robot.commands.auton.DoNothingCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
@@ -137,16 +138,18 @@ public class AutoSwitch extends MeasurableSubsystem {
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
+            elbowSubsystem,
             "AmpInitial1_WingNote1",
             "WingNote1_WingNote2_A",
             "WingNote2_WingNote3_A");
       case 0x01:
-        return new AmpInitial_WingNotes_ACommand(
+        return new AmpInitial_WingNotes_BCommand(
             driveSubsystem,
             robotStateSubsystem,
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
+            elbowSubsystem,
             "AmpInitial1_WingNote1",
             "WingNote1_WingNote2_B",
             "WingNote2_WingNote3_B");
@@ -156,7 +159,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             robotStateSubsystem,
             superStructure,
             magazineSubsystem,
-            intakeSubsystem);
+            intakeSubsystem,
+            elbowSubsystem);
       case 0x20:
         return new NonAmpAutoCommand(
             driveSubsystem,
@@ -164,6 +168,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
+            elbowSubsystem,
             "NonAmpInitial1_MiddleNote5",
             "MiddleNote5_NonAmpShoot2",
             "NonAmpShoot2_MiddleNote4",
@@ -175,6 +180,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
+            elbowSubsystem,
             "NonAmpInitial1_MiddleNote3",
             "MiddleNote3_NonAmpShoot2",
             "NonAmpShoot2_MiddleNote4",
