@@ -1,6 +1,7 @@
 package frc.robot.subsystems.robotState;
 
 import com.opencsv.CSVReader;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
@@ -56,6 +57,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean continueToTrap = false;
   private boolean usingDistance = false;
   private boolean isAuto = false;
+  private Pose2d preClimbPose = new Pose2d();
 
   private double magazineTuneSpeed = 0.0;
 
@@ -303,6 +305,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     climbSubsystem.trapClimb();
     this.continueToTrap = continueToTrap;
     this.decendClimbAfterTrap = decendAfterTrap;
+
+    preClimbPose = driveSubsystem.getPoseMeters();
 
     setState(RobotStates.CLIMBING);
   }
@@ -631,6 +635,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case POST_CLIMB:
+        if (Math.sqrt(
+                Math.pow((driveSubsystem.getPoseMeters().getX() - preClimbPose.getX()), 2)
+                    + Math.pow((driveSubsystem.getPoseMeters().getY() - preClimbPose.getY()), 2))
+            > RobotStateConstants.kPostClimbBackupDist) {
+          postClimbStow();
+        }
         break;
       case TO_DEFENSE:
         if (superStructure.isFinished()
