@@ -1,6 +1,8 @@
 package frc.robot.commands.robotState;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.subsystems.climb.ClimbIOFX;
@@ -89,6 +91,9 @@ public class AirwaveHealthCheck extends SequentialCommandGroup {
             wristIOSRX,
             climbIOFX,
             forkIOSRX),
+        new ToggleTrapBarPosCommand(climbSubsystem),
+        new WaitCommand(0.3),
+        new ToggleTrapBarPosCommand(climbSubsystem),
         new LockZeroCommand(driveSubsystem));
   }
 }
