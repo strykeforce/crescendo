@@ -537,12 +537,16 @@ public class RobotContainer {
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .onTrue(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem));
 
-    // Run auton
-    new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .onTrue(nonAmpTravelNotes);
+    // // Run auton
+    // new JoystickButton(xboxController, XboxController.Button.kStart.value)
+    //     .onTrue(nonAmpTravelNotes);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
@@ -584,11 +588,19 @@ public class RobotContainer {
     // Stow Command
     new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem))
         .onFalse(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem));
 
     // // Vision Shoot
     new JoystickButton(driveJoystick, Button.M_SWH.id)

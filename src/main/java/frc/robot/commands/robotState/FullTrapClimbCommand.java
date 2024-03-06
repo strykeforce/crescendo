@@ -8,22 +8,29 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class FullTrapClimbCommand extends Command {
   private RobotStateSubsystem robotStateSubsystem;
+  private boolean climbAllowed;
 
   public FullTrapClimbCommand(
       RobotStateSubsystem robotStateSubsystem,
       ClimbSubsystem climbSubsystem,
       SuperStructure superStructure) {
     this.robotStateSubsystem = robotStateSubsystem;
+    climbAllowed = true;
     addRequirements(climbSubsystem, superStructure);
   }
 
   @Override
   public void initialize() {
-    robotStateSubsystem.climb(true, false);
+    if (robotStateSubsystem.getState() == RobotStates.CLIMB_PREPPED) {
+      robotStateSubsystem.climb(true, false);
+    } else {
+      climbAllowed = false;
+    }
   }
 
   @Override
   public boolean isFinished() {
-    return robotStateSubsystem.getState() == RobotStates.TRAP;
+
+    return !climbAllowed || robotStateSubsystem.getState() == RobotStates.TRAP;
   }
 }

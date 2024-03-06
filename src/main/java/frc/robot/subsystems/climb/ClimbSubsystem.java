@@ -217,7 +217,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public void descend() {
-    setPosition(ClimbConstants.kLeftClimbPrepPos);
+    setPosition(ClimbConstants.kLeftClimbHighPrepPos);
     curState = ClimbStates.DESCENDING;
   }
 
@@ -322,6 +322,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
             prepClimbRequestCount = 0;
             prepHighClimb();
           } else {
+            prepClimbRequestCount = 0;
             logger.info("PREPPING -> PREPPED");
             curState = ClimbStates.PREPPED;
             forkIO.setPct(0.0);

@@ -29,9 +29,9 @@ public final class ClimbConstants {
   public static final double kZeroSpeedThreshold = 1;
 
   // Forks
-  public static final double kZeroForkPct = -0.3;
-  public static final double kZeroForkMaxVel = 1;
-  public static final int kForkZeroStableCounts = 3;
+  public static final double kZeroForkPct = -0.35;
+  public static final double kZeroForkMaxVel = 0.5;
+  public static final int kForkZeroStableCounts = 5;
   public static final double kCloseEnoughForks = 100;
   public static final double kLeftExtendPos = 500;
   public static final double kRightExtendPos = 500;
