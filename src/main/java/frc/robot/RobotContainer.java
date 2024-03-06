@@ -117,6 +117,7 @@ public class RobotContainer {
   private Boolean isEvent = true;
 
   private NonAmpAutoCommand nonAmpAutonPath;
+  private NonAmpAutoCommand nonAmpAutoNote3;
   private NonAmpInitial_Note3Command nonAmpNote3;
   private NonAmpInit_TravelNotesCommand nonAmpTravelNotes;
   private AmpInitial_WingNotes_BCommand ampInitial_WingNotes_BCommand;
@@ -171,14 +172,18 @@ public class RobotContainer {
             shooterSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
-    // nonAmpAutonPath =
-    //     new NonAmpAutoCommand(
-    //         driveSubsystem,
-    //         robotStateSubsystem,
-    //         superStructure,
-    //         magazineSubsystem,
-    //         intakeSubsystem);
-    // nonAmpAutonPath.generateTrajectory();
+    nonAmpAutonPath =
+        new NonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "NonAmpInitial1_MiddleNote5",
+            "MiddleNote5_NonAmpShoot2",
+            "NonAmpShoot2_MiddleNote4",
+            "MiddleNote4_NonAmpShoot2");
+    nonAmpAutonPath.generateTrajectory();
 
     // nonAmpNote3 =
     //     new NonAmpInitial_Note3Command(
@@ -188,6 +193,28 @@ public class RobotContainer {
     //         magazineSubsystem,
     //         intakeSubsystem);
     // nonAmpNote3.generateTrajectory();
+
+    nonAmpTravelNotes =
+        new NonAmpInit_TravelNotesCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem);
+    nonAmpTravelNotes.generateTrajectory();
+
+    nonAmpAutoNote3 =
+        new NonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "NonAmpInitial1_MiddleNote3",
+            "MiddleNote3_NonAmpShoot2",
+            "NonAmpShoot2_MiddleNote4_B",
+            "MiddleNote4_NonAmpShoot2_B");
+    nonAmpAutoNote3.generateTrajectory();
 
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
@@ -515,8 +542,7 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Run auton
-    new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .onTrue(ampInitial_WingNotes_ACommand);
+    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(nonAmpAutoNote3);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));

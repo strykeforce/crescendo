@@ -1,9 +1,7 @@
 package frc.robot.commands.auton;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
-import frc.robot.commands.drive.DriveAutonWithHeadingCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.subsystems.auto.AutoCommandInterface;
@@ -13,11 +11,11 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class NonAmpAutoCommand extends SequentialCommandGroup implements AutoCommandInterface {
-  private DriveAutonWithHeadingCommand initialToNote5;
-  private DriveAutonCommand note5ToShoot;
-  private DriveAutonCommand shootToNote4;
-  private DriveAutonCommand note4ToShoot;
+public class NonAmpAutoCommand extends SequentialCommandGroup {
+  private DriveAutonCommand firstPath;
+  private DriveAutonCommand secondPath;
+  private DriveAutonCommand thirdPath;
+  private DriveAutonCommand fourthPath;
   private boolean hasGenerated = false;
 
   public NonAmpAutoCommand(
@@ -25,32 +23,28 @@ public class NonAmpAutoCommand extends SequentialCommandGroup implements AutoCom
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
-      IntakeSubsystem intakeSubsystem) {
-    initialToNote5 =
-        new DriveAutonWithHeadingCommand(
-            driveSubsystem,
-            "NonAmpInitial1_MiddleNote5",
-            true,
-            true,
-            Rotation2d.fromDegrees(-10.6),
-            0.0,
-            true);
-    note5ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote5_NonAmpShoot2", true, false);
-    shootToNote4 = new DriveAutonCommand(driveSubsystem, "NonAmpShoot2_MiddleNote4", true, false);
-    note4ToShoot = new DriveAutonCommand(driveSubsystem, "MiddleNote4_NonAmpShoot2", true, false);
+      IntakeSubsystem intakeSubsystem,
+      String firstPathName,
+      String secondPathName,
+      String thirdPathName,
+      String fourthPathName) {
+    firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, true, true);
+    secondPath = new DriveAutonCommand(driveSubsystem, secondPathName, true, false);
+    thirdPath = new DriveAutonCommand(driveSubsystem, thirdPathName, true, false);
+    fourthPath = new DriveAutonCommand(driveSubsystem, fourthPathName, true, false);
 
     addCommands(
         new SequentialCommandGroup(
             // new ToggleVisionUpdatesCommand(driveSubsystem),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-50)),
             new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
-            initialToNote5,
-            note5ToShoot,
+            firstPath,
+            secondPath,
             new AutoWaitNoteStagedCommand(robotStateSubsystem),
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-            shootToNote4,
-            note4ToShoot,
+            thirdPath,
+            fourthPath,
             new AutoWaitNoteStagedCommand(robotStateSubsystem),
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)
@@ -59,10 +53,10 @@ public class NonAmpAutoCommand extends SequentialCommandGroup implements AutoCom
   }
 
   public void generateTrajectory() {
-    initialToNote5.generateTrajectory();
-    note5ToShoot.generateTrajectory();
-    shootToNote4.generateTrajectory();
-    note4ToShoot.generateTrajectory();
+    firstPath.generateTrajectory();
+    secondPath.generateTrajectory();
+    thirdPath.generateTrajectory();
+    fourthPath.generateTrajectory();
     hasGenerated = true;
   }
 
