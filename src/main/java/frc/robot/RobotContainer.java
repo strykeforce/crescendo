@@ -42,6 +42,7 @@ import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
+import frc.robot.commands.elbow.ZeroRecoveryElbowCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
@@ -410,6 +411,10 @@ public class RobotContainer {
         .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
         .withSize(1, 1)
         .withPosition(6, 1);
+    Shuffleboard.getTab("Match")
+        .add("ZeroRecoveryElbowCommand", new ZeroRecoveryElbowCommand(elbowSubsystem))
+        .withSize(1, 1)
+        .withPosition(7, 1);
   }
 
   public void configureTuningDashboard() {

@@ -129,7 +129,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
             * ElbowConstants.kFxPulley;
     logger.info("RelSetPointPostRatio {}", relSetpointOffset);
     // elbow.setPosition(relSetpointOffset);
-    setpointOffset = -curPos + relSetpointOffset;
+    setpointOffset = curPos - relSetpointOffset;
 
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}, setpointOffset: {}",
