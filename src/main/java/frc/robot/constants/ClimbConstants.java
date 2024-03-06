@@ -24,8 +24,8 @@ public final class ClimbConstants {
   public static final double kCloseEnoughRots = 0.5;
   public static final double kMaxRots = 100.0;
   public static final double kMinRots = 0.0;
-  public static final double kZeroPct = -0.2;
-  public static final double kZeroStableCounts = 3;
+  public static final double kZeroPct = -0.5;
+  public static final double kZeroStableCounts = 5;
   public static final double kZeroSpeedThreshold = 1;
 
   // Forks

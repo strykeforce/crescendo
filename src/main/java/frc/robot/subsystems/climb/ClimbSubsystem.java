@@ -30,9 +30,9 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private boolean isTrapBarExtended = false;
   private boolean isRatchetOn = false;
   private boolean isForkExtended = false;
-  private int climbZeroStableCounts = 0;
   private double leftForkSetpoint = 0.0;
   private double rightForkSetpoint = 0.0;
+  private int climbZeroStableCounts = 0;
   private int leftForkZeroStableCounts = 0;
   private int rightForkZeroStableCounts = 0;
   private boolean hasLeftForkZeroed = false;
@@ -172,12 +172,13 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     hasClimbZeroed = false;
     hasLeftForkZeroed = false;
     hasRightForkZeroed = false;
+    climbZeroStableCounts = 0;
     logger.info("{} -> ZEROING_ALL", curState);
     curState = ClimbStates.ZEROING_ALL;
-
+    
     forkIO.enableSoftLimits(false);
     forkIO.setPct(ClimbConstants.kZeroForkPct);
-
+    
     enableRatchet(false);
     climbIO.setCurrentLimit(ClimbConstants.getZeroCurrentLimit());
     climbIO.setSoftLimitsEnabled(false);

@@ -223,6 +223,10 @@ public class RobotContainer {
     return climbSubsystem.hasClimbZeroed();
   }
 
+  public Command getClimbZeroCommand() {
+    return new ZeroClimbCommand(climbSubsystem);
+  }
+
   public void zeroElbow() {
     elbowSubsystem.zero();
   }

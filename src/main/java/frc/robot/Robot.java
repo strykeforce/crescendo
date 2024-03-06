@@ -140,7 +140,8 @@ public class Robot extends LoggedRobot {
       m_robotContainer.zeroElbow();
     }
     if (!m_robotContainer.hasClimbZeroed()) {
-      m_robotContainer.zeroClimb();
+      // m_robotContainer.zeroClimb();
+      m_robotContainer.getClimbZeroCommand().schedule();
     }
   }
 
