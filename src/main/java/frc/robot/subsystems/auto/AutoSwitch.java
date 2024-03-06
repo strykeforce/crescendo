@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auto.DefaultAutoCommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
-import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.AmpMid_5PieceCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.constants.AutonConstants;
@@ -131,16 +130,55 @@ public class AutoSwitch extends MeasurableSubsystem {
   private AutoCommandInterface getAutoCommand(int switchPos) {
     switch (switchPos) {
       case 0x00:
-        return new AmpInitial_WingNotes_ACommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, "AmpInitial1_WingNote1", "WingNote1_WingNote2_A", "WingNote2_WingNote3_A");
+        return new AmpInitial_WingNotes_ACommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "AmpInitial1_WingNote1",
+            "WingNote1_WingNote2_A",
+            "WingNote2_WingNote3_A");
       case 0x01:
-        return new AmpInitial_WingNotes_ACommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, "AmpInitial1_WingNote1", "WingNote1_WingNote2_B", "WingNote2_WingNote3_B");
+        return new AmpInitial_WingNotes_ACommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "AmpInitial1_WingNote1",
+            "WingNote1_WingNote2_B",
+            "WingNote2_WingNote3_B");
       case 0x10:
-        return new AmpMid_5PieceCommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem);
+        return new AmpMid_5PieceCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem);
       case 0x20:
-        return new NonAmpAutoCommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, "NonAmpInitial1_MiddleNote5", "MiddleNote5_NonAmpShoot2", "NonAmpShoot2_MiddleNote4", "MiddleNote4_NonAmpShoot2");
+        return new NonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "NonAmpInitial1_MiddleNote5",
+            "MiddleNote5_NonAmpShoot2",
+            "NonAmpShoot2_MiddleNote4",
+            "MiddleNote4_NonAmpShoot2");
       case 0x21:
-        return new NonAmpAutoCommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, "NonAmpInitial1_MiddleNote3", "MiddleNote3_NonAmpShoot2", "NonAmpShoot2_MiddleNote4", "MiddleNote4_NonAmpShoot2");
-        
+        return new NonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "NonAmpInitial1_MiddleNote3",
+            "MiddleNote3_NonAmpShoot2",
+            "NonAmpShoot2_MiddleNote4",
+            "MiddleNote4_NonAmpShoot2");
+
       default:
         String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);
         DriverStation.reportWarning(msg, false);

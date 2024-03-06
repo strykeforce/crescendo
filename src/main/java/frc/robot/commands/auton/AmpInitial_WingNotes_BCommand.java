@@ -19,7 +19,8 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class AmpInitial_WingNotes_BCommand extends SequentialCommandGroup implements AutoCommandInterface{
+public class AmpInitial_WingNotes_BCommand extends SequentialCommandGroup
+    implements AutoCommandInterface {
 
   DriveAutonCommand firstPath;
   DriveAutonCommand secondPath;

@@ -1,7 +1,5 @@
 package frc.robot.commands.auton;
 
-import javax.sound.midi.MidiChannel;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -32,7 +30,6 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
 
-
   public AmpMid_5PieceCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
@@ -42,10 +39,13 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
     this.robotStateSubsystem = robotStateSubsystem;
 
     midInitWingNote3 = new DriveAutonCommand(driveSubsystem, "MiddleStart_WingNote3", true, true);
-    wingNote3WingNote2 = new DriveAutonCommand(driveSubsystem, "WingNote3_WingNote2_A", true, false);
-    wingNote2WingNote1 = new DriveAutonCommand(driveSubsystem, "WingNote2_WingNote1_A", true, false);
+    wingNote3WingNote2 =
+        new DriveAutonCommand(driveSubsystem, "WingNote3_WingNote2_A", true, false);
+    wingNote2WingNote1 =
+        new DriveAutonCommand(driveSubsystem, "WingNote2_WingNote1_A", true, false);
     wingNote1MidNote1 = new DriveAutonCommand(driveSubsystem, "WingNote1_MiddleNote1", true, false);
-    midNote1ShootPos = new DriveAutonCommand(driveSubsystem, "MiddleNote1_MiddleShoot", true, false);
+    midNote1ShootPos =
+        new DriveAutonCommand(driveSubsystem, "MiddleNote1_MiddleShoot", true, false);
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
