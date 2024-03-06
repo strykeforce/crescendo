@@ -11,7 +11,7 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class NonAmpAutoCommand extends SequentialCommandGroup {
+public class NonAmpAutoCommand extends SequentialCommandGroup implements AutoCommandInterface {
   private DriveAutonCommand firstPath;
   private DriveAutonCommand secondPath;
   private DriveAutonCommand thirdPath;
