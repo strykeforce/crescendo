@@ -204,9 +204,11 @@ public class AutoSwitch extends MeasurableSubsystem {
   }
 
   private void configSendableChooser() {
-    sendableChooser.addOption("00 Source 3 piece", 0x00);
-    sendableChooser.setDefaultOption("20 Amp 4 piece interfere", 0x01);
-    sendableChooser.setDefaultOption("21 Amp 4 piece avoid", 0x21);
+    sendableChooser.addOption("00 Amp Interfering 4 piece", 0x00);
+    sendableChooser.setDefaultOption("01 Amp 4 piece avoid", 0x01);
+    sendableChooser.setDefaultOption("10 Mid 5 piece", 0x10);
+    sendableChooser.setDefaultOption("20 NonAmp 2 Piece Mid(5 & 4)", 0x20);
+    sendableChooser.setDefaultOption("21 NonAmp 2 Piece Mid(5 & 3)", 0x21);
     sendableChooser.setDefaultOption("30 Do Nothing", 0x30);
     SmartDashboard.putData("Auto Mode", sendableChooser);
   }
