@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -50,6 +51,7 @@ import frc.robot.commands.robotState.DecendCommand;
 import frc.robot.commands.robotState.DistanceShootCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
+import frc.robot.commands.robotState.PositionShootCommand;
 import frc.robot.commands.robotState.PostClimbStowCommand;
 import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
@@ -366,6 +368,11 @@ public class RobotContainer {
         .addBoolean("isAuto", () -> robotStateSubsystem.getIsAuto())
         .withSize(1, 1)
         .withPosition(2, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("PositionShoot", new PositionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, new Pose2d(3, AutonConstants.Setpoints.W2.getY(), Rotation2d.fromDegrees(0.0))))
+        .withSize(1, 1)
+        .withPosition(1, 1);
   }
 
   private void configureMatchDashboard() {
