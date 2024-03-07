@@ -13,7 +13,7 @@ public final class ShooterConstants {
   public static final int kRightShooterTalonID = 41;
   public static final double kCloseEnough = 0.75; // 0.5
   public static final double kShootTime = 0.04; // 0.2 - now delay after beam unbroken
-  public static final double kPodiumShootTime = 0.2;
+  public static final double kPodiumShootTime = 0.5;
   public static final double kPodiumSpeed = 0;
 
   public static final TalonFXConfiguration getLeftShooterConfig() {

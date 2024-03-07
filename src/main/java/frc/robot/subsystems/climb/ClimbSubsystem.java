@@ -104,6 +104,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void extendForks() {
     isForkExtended = true;
     forkIO.setLeftPos(ClimbConstants.kLeftExtendPos);
+    // forkIO.setLeftPct(0.5);
     forkIO.setRightPos(ClimbConstants.kRightExtendPos);
     leftForkSetpoint = ClimbConstants.kLeftExtendPos;
     rightForkSetpoint = ClimbConstants.kRightExtendPos;
@@ -113,6 +114,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void retractForks() {
     isForkExtended = false;
     forkIO.setLeftPos(ClimbConstants.kLeftRetractPos);
+    // forkIO.setLeftPct(-0.5);
     forkIO.setRightPos(ClimbConstants.kRightRetractPos);
     leftForkSetpoint = ClimbConstants.kLeftRetractPos;
     rightForkSetpoint = ClimbConstants.kRightRetractPos;
@@ -192,11 +194,11 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public boolean isForkFinished() {
-    // return Math.abs(leftForkSetpoint - forkInputs.leftPosTicks) <=
-    // ClimbConstants.kCloseEnoughForks
-    // && Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
-    // <= ClimbConstants.kCloseEnoughForks;
-    return true;
+    return Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
+            <= ClimbConstants.kCloseEnoughForks
+        && Math.abs(rightForkSetpoint - forkInputs.rightPosTicks)
+            <= ClimbConstants.kCloseEnoughForks;
+    // return true;
   }
 
   public void prepTrapClimb() {
@@ -225,6 +227,8 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void stow() {
     prepClimbRequestCount = 0;
     setPosition(ClimbConstants.kLeftStowPos);
+    logger.info("{} -> STOWING", curState);
+    curState = ClimbStates.STOWING;
   }
 
   @Override
@@ -319,6 +323,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         break;
       case PREPPING:
         if (isFinished() && isForkFinished()) {
+          forkIO.setLeftPct(0.0);
           if (prepClimbRequestCount > 1) {
             prepClimbRequestCount = 0;
             prepHighClimb();
@@ -349,13 +354,13 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
       case DOWN:
         break;
       case STOWING:
-        if (forkTimer.hasElapsed(0.5)) {
-          forkIO.setPct(0.0);
+        if (isForkFinished()) {
+          // forkIO.setLeftPct(0.0);
         }
-        if (isFinished()) {
+        if (isFinished() && isForkFinished()) {
           logger.info("STOWING -> STOWED");
           curState = ClimbStates.STOWED;
-          forkIO.setPct(0.0);
+          // forkIO.setLeftPct(0.0);
         }
         break;
       case STOWED:

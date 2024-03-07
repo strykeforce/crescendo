@@ -35,7 +35,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
-    logger = LoggerFactory.getLogger(Robot.class);
     if (isReal()) {
       Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
       Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -58,7 +57,7 @@ public class Robot extends LoggedRobot {
 
       // Comp robot conditions or not
       eventFlag = new DigitalInput(RobotConstants.kEventInterlockID);
-      isEvent = false; // eventFlag.get();
+      isEvent = eventFlag.get();
       if (isEvent) {
         System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
         System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");
@@ -74,6 +73,7 @@ public class Robot extends LoggedRobot {
     }
     Logger.start();
 
+    logger = LoggerFactory.getLogger(Robot.class);
     m_robotContainer = new RobotContainer();
     // m_robotContainer.setIsEvent(isEvent);
     if (!isEvent) {

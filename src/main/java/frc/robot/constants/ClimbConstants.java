@@ -32,11 +32,11 @@ public final class ClimbConstants {
   public static final double kZeroForkPct = -0.35;
   public static final double kZeroForkMaxVel = 0.5;
   public static final int kForkZeroStableCounts = 5;
-  public static final double kCloseEnoughForks = 100;
+  public static final double kCloseEnoughForks = 25; // 100
   public static final double kLeftExtendPos = 500;
   public static final double kRightExtendPos = 500;
-  public static final double kLeftRetractPos = 10;
-  public static final double kRightRetractPos = 10;
+  public static final double kLeftRetractPos = 20; // 10
+  public static final double kRightRetractPos = 20; // 10
 
   // PRE-CLIMB
   public static final double kLeftClimbPrepPos = 70.0;

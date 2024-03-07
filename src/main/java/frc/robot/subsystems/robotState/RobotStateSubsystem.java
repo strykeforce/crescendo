@@ -313,7 +313,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void prepareClimb() {
-    magazineSubsystem.setSpeed(0.0);
+    magazineSubsystem.toPrepClimb();
     climbSubsystem.zero(true);
     climbSubsystem.extendForks();
     superStructure.toPrepClimb();
@@ -523,7 +523,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_PODIUM:
         if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
-          superStructure.slowWheelSpin();
+          // superStructure.slowWheelSpin();
+          superStructure.stopShoot();
         }
         // if (superStructure.isFinished() && magazineSubsystem.getState() ==
         // MagazineStates.SHOOT)
