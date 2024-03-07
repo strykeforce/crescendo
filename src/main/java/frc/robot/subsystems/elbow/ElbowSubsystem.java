@@ -78,14 +78,17 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public void zero() {
-    io.zeroBlind();
-    hasZeroed = true;
-    setState(ElbowStates.ZEROED);
+    // io.zeroBlind();
+    hasZeroed = false;
+    // setState(ElbowStates.ZEROED);
+    io.setPosition(ElbowConstants.kZeroPos);
+    setState(ElbowStates.ZEROING);
+    setpoint = ElbowConstants.kZeroPos;
   }
 
   public void zeroRecovery() {
     io.zeroRecovery();
-    setState(ElbowStates.ZEROING);
+    setState(ElbowStates.RECOVERY_ZEROING);
     io.setPosition(0.0);
     setpoint = 0.0;
     numRecoveryZeros = 1;
@@ -107,7 +110,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
           curState = ElbowStates.IDLE;
         }
         break;
-      case ZEROING:
+      case RECOVERY_ZEROING:
         // if (inputs.velocity <= ElbowConstants.kMinVelocityZeroing) zeroStable++;
         // else zeroStable = 0;
         // if (zeroStable > ElbowConstants.kMinStableZeroCounts) {
@@ -127,9 +130,19 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         }
 
         break;
+      case ZEROING:
+        if (inputs.revLimitClosed) {
+          io.configHardwareLimit(ElbowConstants.getRunLimitConfig());
+          io.configMotionMagic(ElbowConstants.getRunConfig());
+          hasZeroed = true;
+          logger.info("Zeroed");
+          setState(ElbowStates.ZEROED);
+        }
+        break;
       case ZEROED:
         break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("Elbow State", curState);
   }
 
   @Override
@@ -147,6 +160,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     IDLE,
     MOVING,
     ZEROING,
+    RECOVERY_ZEROING,
     ZEROED
   }
 }
