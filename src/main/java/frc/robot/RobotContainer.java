@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -36,10 +35,8 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
 import frc.robot.commands.drive.XLockCommand;
-import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
@@ -51,26 +48,21 @@ import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
-import frc.robot.commands.robotState.DistanceShootCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.PodiumCommand;
-import frc.robot.commands.robotState.PositionShootCommand;
 import frc.robot.commands.robotState.PostClimbStowCommand;
 import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
-import frc.robot.commands.robotState.ScoreTrapCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.ToggleDefenseCommand;
-import frc.robot.commands.robotState.TrapCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
-import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -282,9 +274,12 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(2, 0);
 
-    Shuffleboard.getTab("Pit").add("Wrist Pos Zero", new ClosedLoopWristCommand(wristSubsystem, 0)).withSize(1, 1).withPosition(3, 0);
+    Shuffleboard.getTab("Pit")
+        .add("Wrist Pos Zero", new ClosedLoopWristCommand(wristSubsystem, 0))
+        .withSize(1, 1)
+        .withPosition(3, 0);
 
-        Shuffleboard.getTab("Pit")
+    Shuffleboard.getTab("Pit")
         .add("Zero Climb", new ZeroClimbCommand(climbSubsystem))
         .withSize(1, 1)
         .withPosition(4, 0);
@@ -299,20 +294,20 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(1, 1);
 
-        Shuffleboard.getTab("Pit")
+    Shuffleboard.getTab("Pit")
         .add("Lock Wheels Zero", new LockZeroCommand(driveSubsystem))
         .withSize(1, 1)
         .withPosition(3, 1);
-        //     Shuffleboard.getTab("Pit")
-        // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))
-        // .withSize(1, 1)
-        // .withPosition(2, 0);
-
+    //     Shuffleboard.getTab("Pit")
+    // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))
+    // .withSize(1, 1)
+    // .withPosition(2, 0);
 
     // // Climb buttons
     // Shuffleboard.getTab("Pit")
     //     .add(
-    //         "Prep Climb", new PrepClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
+    //         "Prep Climb", new PrepClimbCommand(robotStateSubsystem, climbSubsystem,
+    // superStructure))
     //     .withSize(1, 1)
     //     .withPosition(0, 2);
     // Shuffleboard.getTab("Pit")
@@ -363,15 +358,12 @@ public class RobotContainer {
     //     .withSize(1, 1)
     //     .withPosition(0, 1);
 
-    
     // Shuffleboard.getTab("Pit")
     //     .add(
     //         "Set Gyro offset -50",
     //         new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-50)))
     //     .withSize(1, 1)
     //     .withPosition(3, 0);
-
-
 
     // Shuffleboard.getTab("Pit")
     //     .add(
@@ -391,8 +383,6 @@ public class RobotContainer {
     //         new FullTrapClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
     //     .withSize(1, 1)
     //     .withPosition(7, 2);
-
-    
 
     // Shuffleboard.getTab("Pit")
     //     .add(
@@ -470,9 +460,18 @@ public class RobotContainer {
   }
 
   public void configureDebugDashboard() {
-    Shuffleboard.getTab("Debug").add(new DecendCommand(robotStateSubsystem, climbSubsystem, superStructure)).withSize(1, 1).withPosition(0, 0);
-    Shuffleboard.getTab("Debug").add(new ZeroClimbCommand(climbSubsystem)).withSize(1, 1).withPosition(1, 0);
-    Shuffleboard.getTab("Debug").add(new ZeroRecoveryElbowCommand(elbowSubsystem)).withSize(1, 1).withPosition(2, 0);
+    Shuffleboard.getTab("Debug")
+        .add(new DecendCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .withSize(1, 1)
+        .withPosition(0, 0);
+    Shuffleboard.getTab("Debug")
+        .add(new ZeroClimbCommand(climbSubsystem))
+        .withSize(1, 1)
+        .withPosition(1, 0);
+    Shuffleboard.getTab("Debug")
+        .add(new ZeroRecoveryElbowCommand(elbowSubsystem))
+        .withSize(1, 1)
+        .withPosition(2, 0);
   }
 
   public void configureTuningDashboard() {
