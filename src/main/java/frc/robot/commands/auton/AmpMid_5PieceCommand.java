@@ -1,5 +1,8 @@
 package frc.robot.commands.auton;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -9,8 +12,11 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
+import frc.robot.commands.robotState.PositionShootCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.commands.superStructure.SpinUpWheelsCommand;
+import frc.robot.constants.SuperStructureConstants;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
@@ -53,6 +59,10 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
     addCommands(
         new ResetGyroCommand(driveSubsystem),
         new ParallelCommandGroup(
+            new SpinUpWheelsCommand(
+                superStructure,
+                SuperStructureConstants.kShooterSubwooferSetPoint,
+                SuperStructureConstants.kShooterSubwooferSetPoint),
             new setAngleOffsetCommand(driveSubsystem, 0.0),
             new SetHoloContKPCommand(driveSubsystem, 1.0),
             new ZeroElbowCommand(elbowSubsystem)),
@@ -63,21 +73,26 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         wingNote3WingNote2,
-        new WaitCommand(0.09),
+        new WaitCommand(0.12),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         wingNote2WingNote1,
-        new WaitCommand(0.09),
+        new WaitCommand(0.12),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         new SetHoloContKPCommand(driveSubsystem, 3.0),
         wingNote1MidNote1,
         midNote1ShootPos,
+        new SpinUpWheelsCommand(superStructure, 73, 80),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
-        new VisionShootCommand(
-            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        new PositionShootCommand(
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            new Pose2d(new Translation2d(4.0, 5.5), new Rotation2d())));
   }
 
   public void generateTrajectory() {

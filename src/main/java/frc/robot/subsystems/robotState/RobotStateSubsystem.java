@@ -222,7 +222,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     shootKnownPos = true;
     usingDistance = false;
 
-    driveSubsystem.setIsAligningShot(true);
+    driveSubsystem.setIsAligningShot(false);
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(pos));
 
@@ -446,7 +446,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case TO_SHOOT:
-        if (!usingDistance) {
+        if (!usingDistance && !shootKnownPos) {
           double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
         }

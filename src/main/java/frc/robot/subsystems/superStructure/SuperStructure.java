@@ -79,6 +79,11 @@ public class SuperStructure extends MeasurableSubsystem {
   // }
   // }
 
+  public void spinUpWheels(double lSpeed, double rSpeed) {
+    shooterSubsystem.setLeftSpeed(lSpeed);
+    shooterSubsystem.setRightSpeed(rSpeed);
+  }
+
   // Helper Methods
   public void zeroElbow() {
     elbowSubsystem.zero();

@@ -370,7 +370,14 @@ public class RobotContainer {
         .withPosition(2, 1);
 
     Shuffleboard.getTab("Pit")
-        .add("PositionShoot", new PositionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, new Pose2d(3, AutonConstants.Setpoints.W2.getY(), Rotation2d.fromDegrees(0.0))))
+        .add(
+            "PositionShoot",
+            new PositionShootCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                new Pose2d(3, AutonConstants.Setpoints.W2.getY(), Rotation2d.fromDegrees(0.0))))
         .withSize(1, 1)
         .withPosition(1, 1);
   }

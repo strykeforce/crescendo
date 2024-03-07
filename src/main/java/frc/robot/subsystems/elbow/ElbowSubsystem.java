@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elbow;
 
 import frc.robot.constants.ElbowConstants;
+import frc.robot.constants.SuperStructureConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -136,6 +137,8 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
           io.configMotionMagic(ElbowConstants.getRunConfig());
           hasZeroed = true;
           logger.info("Zeroed");
+
+          setPosition(SuperStructureConstants.kElbowSubwooferSetPoint);
           setState(ElbowStates.ZEROED);
         }
         break;
