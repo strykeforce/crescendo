@@ -4,21 +4,35 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
 import frc.robot.constants.ElbowConstants;
 import frc.robot.constants.RobotConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.AfterHealthCheck;
+import org.strykeforce.healthcheck.BeforeHealthCheck;
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.HealthCheck;
+import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.CancoderMeasureable;
 
-public class ElbowIOFX implements ElbowIO {
+public class ElbowIOFX implements ElbowIO, Checkable {
   private Logger logger;
+
+  @HealthCheck
+  @Position(
+      percentOutput = {0.1, -0.1},
+      encoderChange = 25)
   private TalonFX elbow;
+
   private CANcoder remoteEncoder;
 
   private double absSensorInitial;
@@ -33,6 +47,7 @@ public class ElbowIOFX implements ElbowIO {
   StatusSignal<Double> currPosition;
   StatusSignal<Double> currVelocity;
   StatusSignal<Double> absRots;
+  StatusSignal<ReverseLimitValue> revLim;
 
   public ElbowIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -52,6 +67,12 @@ public class ElbowIOFX implements ElbowIO {
     currPosition = elbow.getPosition();
     currVelocity = elbow.getVelocity();
     absRots = remoteEncoder.getAbsolutePosition();
+    revLim = elbow.getReverseLimit();
+  }
+
+  @Override
+  public String getName() {
+    return "Elbow";
   }
 
   //   public int getPulseWidthFor(PWMChannel channel) {
@@ -85,15 +106,13 @@ public class ElbowIOFX implements ElbowIO {
   public void zeroBlind() {
     absSensorInitial = elbow.getPosition().getValue();
 
-    relSetpointOffset = 0.0;
-    setpointOffset = absSensorInitial - RobotConstants.kElbowZeroPos - relSetpointOffset;
+    // relSetpointOffset = 0.0;
+    // setpointOffset = absSensorInitial - RobotConstants.kElbowZeroPos - relSetpointOffset;
+    relSetpointOffset = 0;
+    setpointOffset = 0;
+    elbow.setPosition(RobotConstants.kElbowZeroPos);
     logger.info("BLIND ZERO");
-    logger.info(
-        "Abs: {}, Zero Pos: {}, Offset: {}, setpointOffset: {}",
-        absSensorInitial,
-        RobotConstants.kElbowZero,
-        relSetpointOffset,
-        setpointOffset);
+    logger.info("Abs: {}, Zero Pos: {}", absSensorInitial, RobotConstants.kElbowZeroPos);
   }
 
   @Override
@@ -113,7 +132,7 @@ public class ElbowIOFX implements ElbowIO {
             * ElbowConstants.kFxPulley;
     logger.info("RelSetPointPostRatio {}", relSetpointOffset);
     // elbow.setPosition(relSetpointOffset);
-    setpointOffset = -curPos + relSetpointOffset;
+    setpointOffset = curPos - relSetpointOffset;
 
     logger.info(
         "Abs: {}, Zero Pos: {}, Offset: {}, setpointOffset: {}",
@@ -140,6 +159,25 @@ public class ElbowIOFX implements ElbowIO {
     inputs.positionRots = currPosition.refresh().getValue() - setpointOffset;
     inputs.absRots = absRots.refresh().getValue();
     inputs.velocity = currVelocity.refresh().getValue();
+    inputs.revLimitClosed = revLim.refresh().getValue() == ReverseLimitValue.ClosedToGround;
+  }
+
+  @Override
+  public void setCurrentLimit(CurrentLimitsConfigs config) {
+    configurator = elbow.getConfigurator();
+    configurator.apply(config);
+  }
+
+  @Override
+  public void configMotionMagic(MotionMagicConfigs config) {
+    configurator = elbow.getConfigurator();
+    configurator.apply(config);
+  }
+
+  @Override
+  public void configHardwareLimit(HardwareLimitSwitchConfigs config) {
+    configurator = elbow.getConfigurator();
+    configurator.apply(config);
   }
 
   @Override
@@ -148,9 +186,11 @@ public class ElbowIOFX implements ElbowIO {
     telemetryService.register(new CancoderMeasureable(remoteEncoder));
   }
 
-  @Override
-  public void setCurrentLimit(CurrentLimitsConfigs config) {
-    configurator = elbow.getConfigurator();
-    configurator.apply(config);
+  @BeforeHealthCheck
+  @AfterHealthCheck
+  public boolean goToZero() {
+    setPosition(0.0);
+    return Math.abs(currPosition.refresh().getValue() - setpointOffset)
+        <= ElbowConstants.kCloseEnoughRots;
   }
 }

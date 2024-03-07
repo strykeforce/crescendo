@@ -8,8 +8,10 @@ import ch.qos.logback.classic.util.ContextInitializer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.constants.BuildConstants;
 import frc.robot.constants.RobotConstants;
 import java.util.NoSuchElementException;
@@ -33,7 +35,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
-    logger = LoggerFactory.getLogger(Robot.class);
     if (isReal()) {
       Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
       Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -56,7 +57,7 @@ public class Robot extends LoggedRobot {
 
       // Comp robot conditions or not
       eventFlag = new DigitalInput(RobotConstants.kEventInterlockID);
-      isEvent = false; // eventFlag.get();
+      isEvent = eventFlag.get();
       if (isEvent) {
         System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
         System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");
@@ -72,12 +73,17 @@ public class Robot extends LoggedRobot {
     }
     Logger.start();
 
+    logger = LoggerFactory.getLogger(Robot.class);
     m_robotContainer = new RobotContainer();
     // m_robotContainer.setIsEvent(isEvent);
     if (!isEvent) {
       m_robotContainer.configureTelemetry();
       // m_robotContainer.configurePitDashboard();
     }
+    Shuffleboard.getTab("Match")
+        .add(new ToggleAllianceColorCommand(m_robotContainer))
+        .withSize(1, 1)
+        .withPosition(2, 0);
   }
 
   @Override
@@ -88,7 +94,8 @@ public class Robot extends LoggedRobot {
         Alliance alliance = DriverStation.getAlliance().get();
         if (alliance == Alliance.Blue || alliance == Alliance.Red) {
           hasAlliance = true;
-          // m_robotContainer.setAllianceColor(alliance);
+          m_robotContainer.setAllianceColor(alliance);
+          m_robotContainer.getAutoSwitch().getAutoCommand().generateTrajectory();
           logger.info("Set Alliance to {}", alliance);
         }
       } catch (NoSuchElementException error) {
@@ -101,18 +108,21 @@ public class Robot extends LoggedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.getAutoSwitch().checkSwitch();
+  }
 
   @Override
   public void disabledExit() {}
 
   @Override
   public void autonomousInit() {
-    if (!m_robotContainer.hasElbowZeroed()) m_robotContainer.zeroElbow();
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_robotContainer.setIsAuto(true);
+    // if (!m_robotContainer.hasElbowZeroed()) m_robotContainer.zeroElbow();
+    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (m_robotContainer.getAutoSwitch().getAutoCommand() != null) {
+      m_robotContainer.getAutoSwitch().getAutoCommand().schedule();
     }
   }
 
@@ -124,11 +134,16 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.setIsAuto(false);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
     if (!m_robotContainer.hasElbowZeroed()) {
       m_robotContainer.zeroElbow();
+    }
+    if (!m_robotContainer.hasClimbZeroed()) {
+      // m_robotContainer.zeroClimb();
+      m_robotContainer.getClimbZeroCommand().schedule();
     }
   }
 

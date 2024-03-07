@@ -20,8 +20,8 @@ public final class MagazineConstants {
 
   public static final double kReleaseTime = 0.75;
   public static final double kPodiumPrepareSpeed = -10;
-  public static final double kPodiumShootSpeed = 90; // FIXME
-  public static final double kTrapReleaseSpeed = -20.0;
+  public static final double kPodiumShootSpeed = 75; // 90
+  public static final double kTrapReleaseSpeed = -30.0; // -20.0
   public static final double kTrapReleaseTime = 0.75;
   public static final double kAmpReleaseSpeed = 20.0;
 
@@ -42,10 +42,13 @@ public final class MagazineConstants {
         new MotionMagicConfigs().withMotionMagicAcceleration(300).withMotionMagicJerk(5000);
     config.MotionMagic = motionMagic;
 
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
     config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
 
     MotorOutputConfigs motorConfig = new MotorOutputConfigs();
     motorConfig.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput = motorConfig;
 
     return config;
   }

@@ -111,6 +111,11 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.PREP_PODIUM);
   }
 
+  public void toPrepClimb() {
+    setSpeed(MagazineConstants.kReversingSpeed);
+    setState(MagazineStates.REVERSING);
+  }
+
   public void trap() {
     setSpeed(MagazineConstants.kTrapReleaseSpeed);
     setState(MagazineStates.TRAP);
@@ -119,7 +124,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   public boolean hasPiece() {
     return curState == MagazineStates.FULL
         || curState == MagazineStates.EMPTYING
-        || curState == MagazineStates.REVERSING
         || curState == MagazineStates.RELEASE;
   }
 
@@ -196,16 +200,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case INTAKING:
         if (isRevBeamBroken()) {
-          setSpeed(MagazineConstants.kReversingSpeed);
-          setState(MagazineStates.REVERSING);
-        }
-        break;
-      case REVERSING:
-        if (isRevBeamOpen()) {
-          setSpeed(0.0);
+          // setSpeed(0.0);
           setState(MagazineStates.FULL);
-        } else {
-          setSpeed(MagazineConstants.kReversingSpeed);
         }
         break;
       case EMPTYING:
@@ -229,6 +225,12 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case RELEASE:
         if (releaseTimer.hasElapsed(MagazineConstants.kReleaseTime)) {
           setEmpty();
+        }
+        break;
+      case REVERSING:
+        if (isRevBeamOpen()) {
+          setSpeed(0.0);
+          setState(MagazineStates.FULL);
         }
         break;
       case TRAP:
@@ -257,12 +259,12 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     EMPTY,
     FULL,
     INTAKING,
-    REVERSING,
     EMPTYING,
     SPEEDUP,
     PREP_PODIUM,
     SHOOT,
     RELEASE,
-    TRAP
+    TRAP,
+    REVERSING
   }
 }

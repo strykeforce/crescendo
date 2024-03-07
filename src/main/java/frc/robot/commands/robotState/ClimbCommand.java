@@ -8,24 +8,31 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class ClimbCommand extends Command {
   private RobotStateSubsystem robotStateSubsystem;
+  private boolean climbAllowed;
 
   public ClimbCommand(
       RobotStateSubsystem robotStateSubsystem,
       ClimbSubsystem climbSubsystem,
       SuperStructure superStructure) {
     this.robotStateSubsystem = robotStateSubsystem;
+    climbAllowed = true;
 
     addRequirements(superStructure, climbSubsystem);
   }
 
   @Override
   public void initialize() {
-    robotStateSubsystem.climb(false);
+    if (robotStateSubsystem.getState() == RobotStates.CLIMB_PREPPED) {
+      robotStateSubsystem.climb(false, false);
+    } else {
+      climbAllowed = false;
+    }
   }
 
   @Override
   public boolean isFinished() {
-    return robotStateSubsystem.getState() != RobotStates.CLIMBING
-        && robotStateSubsystem.getState() != RobotStates.FOLDING_OUT;
+    return !climbAllowed
+        || robotStateSubsystem.getState() != RobotStates.CLIMBING
+            && robotStateSubsystem.getState() != RobotStates.FOLDING_OUT;
   }
 }

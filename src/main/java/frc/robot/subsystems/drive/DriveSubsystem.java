@@ -43,6 +43,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final HolonomicDriveController holonomicController;
   private RobotStateSubsystem robotStateSubsystem;
 
+  private final ProfiledPIDController omegaSpinController;
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
   private final PIDController yController;
@@ -57,8 +58,20 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
 
+  private boolean updateVision = true;
+
   public DriveSubsystem(SwerveIO io) {
     this.io = io;
+
+    // Setup omega Controller
+    omegaSpinController =
+        new ProfiledPIDController(
+            DriveConstants.kPOmega,
+            DriveConstants.kIOmega,
+            DriveConstants.kDOmega,
+            new TrapezoidProfile.Constraints(
+                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaSpin));
+    omegaSpinController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     // Setup Holonomic Controller
     omegaController =
@@ -67,16 +80,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmega));
+                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaPath));
     omegaController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     xController =
         new PIDController(
-            DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
+            DriveConstants.kXPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
     // xController.setIntegratorRange(DriveConstants.kIMin, DriveConstants.kIMax);
     yController =
         new PIDController(
-            DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
+            DriveConstants.kYPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
     // yController.setIntegratorRange(DriveConstants.kIMin, DriveConstants.kIMax);
     holonomicController = new HolonomicDriveController(xController, yController, omegaController);
     // Disabling the holonomic controller makes the robot directly follow the
@@ -90,13 +103,27 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (!isAligningShot) {
       io.drive(vXmps, vYmps, vOmegaRadps, true);
     } else {
-      double vOmegaRadpsNew =
-          omegaController.calculate(
-              getPoseMeters().getRotation().getRadians(),
-              getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
-
+      double vOmegaRadpsNew = getvOmegaToGoal();
       io.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
+  }
+
+  public double getvOmegaToGoal() {
+    return omegaSpinController.calculate(
+        getPoseMeters().getRotation().getRadians(),
+        getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
+  }
+
+  public double getvOmegaToTarget(Rotation2d target) {
+    holoContAngle = target;
+    return omegaSpinController.calculate(
+        getPoseMeters().getRotation().getRadians(), target.getRadians());
+  }
+
+  public double getvOmegaToGoal(Pose2d pos) {
+    return omegaController.calculate(
+        pos.getRotation().getRadians(),
+        pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians());
   }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
@@ -123,22 +150,37 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("reset odometry with: {}", pose);
   }
 
+  public boolean usingVisionUpdates() {
+    return updateVision;
+  }
+
+  public void enableVisionUpdates(boolean val) {
+    updateVision = val;
+  }
+
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
-    io.addVisionMeasurement(pose, timestamp);
+    if (updateVision) io.addVisionMeasurement(pose, timestamp);
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
-    io.addVisionMeasurement(pose, timestamp, stdDevvs);
+    if (updateVision) io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController() {
     xController.reset();
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
+    omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
+  }
+
+  public void setHolonomicControllerTranslationkP(double kP) {
+    xController.setP(kP);
+    yController.setP(kP);
   }
 
   public void resetOmegaController() {
     omegaController.reset(inputs.gyroRotation2d.getRadians());
+    omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
   }
 
   // Getters/Setters
@@ -162,12 +204,28 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return pose.getTranslation().plus(shooterOffset);
   }
 
+  public Translation2d getShooterPos(Pose2d pos) {
+    Pose2d pose = pos;
+    Translation2d shooterOffset =
+        new Translation2d(-RobotConstants.kShooterOffset, pose.getRotation());
+
+    return pose.getTranslation().plus(shooterOffset);
+  }
+
   public double getDistanceToSpeaker() {
     return getShooterPos()
         .getDistance(
             robotStateSubsystem.getAllianceColor() == Alliance.Blue
-                ? RobotConstants.kRedSpeakerPos
-                : RobotConstants.kBlueSpeakerPos);
+                ? RobotConstants.kBlueSpeakerPos
+                : RobotConstants.kRedSpeakerPos);
+  }
+
+  public double getDistanceToSpeaker(Pose2d pos) {
+    return getShooterPos(pos)
+        .getDistance(
+            robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                ? RobotConstants.kBlueSpeakerPos
+                : RobotConstants.kRedSpeakerPos);
   }
 
   // FIXME: probably doesn't work with red alliance side
@@ -176,11 +234,27 @@ public class DriveSubsystem extends MeasurableSubsystem {
       return RobotConstants.kBlueSpeakerPos
           .minus(getPoseMeters().getTranslation())
           .getAngle()
-          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
+          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+          .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
     return RobotConstants.kRedSpeakerPos
         .minus(getPoseMeters().getTranslation())
         .getAngle()
-        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading));
+        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+        .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
+  }
+
+  public Rotation2d getShooterAngleToSpeaker(Pose2d pos) {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
+      return RobotConstants.kBlueSpeakerPos
+          .minus(pos.getTranslation())
+          .getAngle()
+          .minus(pos.getRotation().rotateBy(RobotConstants.kShooterHeading))
+          .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
+    return RobotConstants.kRedSpeakerPos
+        .minus(pos.getTranslation())
+        .getAngle()
+        .minus(pos.getRotation().rotateBy(RobotConstants.kShooterHeading))
+        .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
   }
 
   public DriveStates getDriveState() {
@@ -215,7 +289,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void setGyroOffset(Rotation2d rotation) {
-    io.setGyroOffset(rotation);
+    io.setGyroOffset(apply(rotation));
   }
 
   public void setEnableHolo(boolean enabled) {
@@ -253,7 +327,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   // Field flipping stuff
-  private boolean shouldFlip() {
+  public boolean shouldFlip() {
     return robotStateSubsystem.getAllianceColor() == Alliance.Red;
   }
 
@@ -282,6 +356,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (shouldFlip()) {
       return new Rotation2d(-rotation.getCos(), rotation.getSin());
     } else return rotation;
+  }
+
+  public double apply(double x) {
+    logger.info("initial x: {}", x);
+    if (shouldFlip()) {
+      return DriveConstants.kFieldMaxX - x;
+    } else return x;
   }
 
   // Trajectory TOML Parsing
@@ -360,60 +441,98 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
-  private Pose2d parseEndPoint(TomlParseResult parseResult, String pose) {
-    TomlTable table = parseResult.getTable(pose);
+  private Pose2d parseEndPoint(TomlParseResult parseResult, String poseName) {
+    TomlTable table = parseResult.getTable(poseName);
 
     if (table.contains("dataPoint")) {
+      Pose2d pose;
+
       switch (table.getString("dataPoint")) {
           // Starting Positions
         case "MI1":
-          return Setpoints.MI1;
+          pose = Setpoints.MI1;
+          break;
+        case "NAI1":
+          pose = Setpoints.NAI1;
+          break;
+        case "AI1":
+          pose = Setpoints.AI1;
+          break;
 
           // Wing Notes
         case "W1":
-          return Setpoints.W1;
+          pose = Setpoints.W1;
+          break;
         case "W2":
-          return Setpoints.W2;
+          pose = Setpoints.W2;
+          break;
         case "W3":
-          return Setpoints.W3;
+          pose = Setpoints.W3;
+          break;
 
           // Middle Notes
         case "M1":
-          return Setpoints.M1;
+          pose = Setpoints.M1;
+          break;
         case "M2":
-          return Setpoints.M2;
+          pose = Setpoints.M2;
+          break;
         case "M3":
-          return Setpoints.M3;
+          pose = Setpoints.M3;
+          break;
         case "M4":
-          return Setpoints.M4;
+          pose = Setpoints.M4;
+          break;
         case "M5":
-          return Setpoints.M5;
+          pose = Setpoints.M5;
+          break;
 
           // Shooting Positions
         case "AS1":
-          return Setpoints.AS1;
+          pose = Setpoints.AS1;
+          break;
         case "MS1":
-          return Setpoints.MS1;
+          pose = Setpoints.MS1;
+          break;
         case "NAS1":
-          return Setpoints.NAS1;
+          pose = Setpoints.NAS1;
+          break;
+        case "NAS2":
+          pose = Setpoints.NAS2;
+          break;
 
         default:
           logger.warn("Bad data point {}", table.getString("dataPoint"));
           return new Pose2d();
       }
+
+      double angle = pose.getRotation().getDegrees();
+      double X = pose.getX();
+      double Y = pose.getY();
+
+      if (table.contains("angle")) {
+        angle = table.getDouble("angle");
+        logger.info("Changing angle to {}", angle);
+      }
+
+      if (table.contains("dX")) {
+        X = X + table.getDouble("dX");
+        logger.info("Changing X to {}", X);
+      }
+
+      if (table.contains("dY")) {
+        Y = Y + table.getDouble("dY");
+        logger.info("Changing Y to {}", Y);
+      }
+      pose = new Pose2d(X, Y, Rotation2d.fromDegrees(angle));
+
+      return pose;
     } else {
       return new Pose2d(
           table.getDouble("x"),
           table.getDouble("y"),
           Rotation2d.fromDegrees(table.getDouble("angle")));
     }
-  }
-
-  private Pose2d parsePose2d(TomlParseResult parseResult, String pose) {
-    return new Pose2d(
-        parseResult.getTable(pose).getDouble("x"),
-        parseResult.getTable(pose).getDouble("y"),
-        Rotation2d.fromDegrees(parseResult.getTable(pose).getDouble("angle")));
   }
 
   // Control Methods

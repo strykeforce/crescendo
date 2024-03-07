@@ -24,23 +24,26 @@ public final class ClimbConstants {
   public static final double kCloseEnoughRots = 0.5;
   public static final double kMaxRots = 100.0;
   public static final double kMinRots = 0.0;
-  public static final double kZeroPct = -0.1;
-  public static final double kZeroStableCounts = 3;
+  public static final double kZeroPct = -0.5;
+  public static final double kZeroStableCounts = 5;
   public static final double kZeroSpeedThreshold = 1;
 
   // Forks
-  public static final double kZeroForkPct = -0.3;
-  public static final double kZeroForkMaxVel = 1;
-  public static final int kForkZeroStableCounts = 3;
-  public static final double kCloseEnoughForks = 100;
+  public static final double kZeroForkPct = -0.35;
+  public static final double kZeroForkMaxVel = 0.5;
+  public static final int kForkZeroStableCounts = 5;
+  public static final double kCloseEnoughForks = 25; // 100
   public static final double kLeftExtendPos = 500;
   public static final double kRightExtendPos = 500;
-  public static final double kLeftRetractPos = 10;
-  public static final double kRightRetractPos = 10;
+  public static final double kLeftRetractPos = 20; // 10
+  public static final double kRightRetractPos = 20; // 10
 
   // PRE-CLIMB
   public static final double kLeftClimbPrepPos = 70.0;
   public static final double kRightClimbPrepPos = 70.0;
+
+  public static final double kLeftClimbHighPrepPos = 90.0;
+  public static final double kRightClimbHighPrepPos = 90.0;
 
   // TRAP CLIMB
   public static final double kLeftClimbTrapPos = 5.5;
@@ -71,9 +74,9 @@ public final class ClimbConstants {
     config.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic = new MotionMagicConfigs();
-    motionMagic.MotionMagicAcceleration = 80;
-    motionMagic.MotionMagicCruiseVelocity = 700;
-    motionMagic.MotionMagicJerk = 3000;
+    motionMagic.MotionMagicAcceleration = 60; // 80
+    motionMagic.MotionMagicCruiseVelocity = 350; // 350
+    motionMagic.MotionMagicJerk = 1500; // 3000
     config.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOutput = new MotorOutputConfigs();
@@ -106,9 +109,9 @@ public final class ClimbConstants {
     config.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic = new MotionMagicConfigs();
-    motionMagic.MotionMagicAcceleration = 80;
+    motionMagic.MotionMagicAcceleration = 60; // 80
     motionMagic.MotionMagicCruiseVelocity = 350; // 700
-    motionMagic.MotionMagicJerk = 3000;
+    motionMagic.MotionMagicJerk = 1500; // 3000
     config.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOutput = new MotorOutputConfigs();

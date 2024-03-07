@@ -5,7 +5,7 @@ import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 public final class WristConstants {
   public static final int kWristTalonSrxId = 35;
-  public static final double kCloseEnoughTicks = 50;
+  public static final double kCloseEnoughTicks = 114;
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
   public static final double kWristZeroTicks = RobotConstants.kWristZero;
@@ -16,7 +16,7 @@ public final class WristConstants {
   public static TalonSRXConfiguration getSrxConfiguration() {
     TalonSRXConfiguration config = new TalonSRXConfiguration();
 
-    config.forwardSoftLimitThreshold = 800;
+    config.forwardSoftLimitThreshold = 1515;
     config.forwardSoftLimitEnable = true; // fixme
 
     config.reverseSoftLimitThreshold = -2200.0;

@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public class RobotConstants {
 
   // Field Positions
   // FIXME: need to measure or get distance from CAD or something
-  public static final double kRedSpeakerXPos = 0;
+  public static final double kRedSpeakerXPos = 16.540988;
   public static final double kRedSpeakerYPos = 5.547868;
   public static final double kBlueSpeakerXPos = 0;
   public static final double kBlueSpeakerYPos = 5.547868;
@@ -31,6 +32,8 @@ public class RobotConstants {
       new Translation2d(kRedSpeakerXPos, kRedSpeakerYPos);
   public static final Translation2d kBlueSpeakerPos =
       new Translation2d(kBlueSpeakerXPos, kBlueSpeakerYPos);
+
+  public static final double kDegreeShootOffset = Units.degreesToRadians(-3.5);
 
   // Robot Sizes
   public static final double kShooterOffset = 0.2; // meters
@@ -41,7 +44,7 @@ public class RobotConstants {
   public static double kElbowZero = 0.11206;
   public static double kElbowRecoveryZero = 0.11206;
   public static double kElbowZeroPos = 34.0;
-  public static double kWristZero = 1132.0;
+  public static double kWristZero = 2322.0;
 
   // Climb Servos
   public static double kLeftTrapBarExtend = 0.0;
@@ -90,47 +93,47 @@ public class RobotConstants {
 
   public static class CompConstants {
     // Drive
-    public static final Double kWheelDiameterInches = 3.0;
+    public static final double kWheelDiameterInches = 3.0 * 504.0 / 500.0;
 
     // Elbow
-    public static final Double kElbowZero = 0.01465; // 0.0105
-    public static final Double kElbowRecoveryZero = 0.01465;
-    public static final Double kElbowZeroPos = 30.45;
+    public static final double kElbowZero = 0.01465; // 0.0105
+    public static final double kElbowRecoveryZero = -0.2656;
+    public static final double kElbowZeroPos = 30.45;
 
     // Wrist
-    public static final Double kWristZero = 2603.0;
+    public static final double kWristZero = 2322.0;
 
     // Climb
-    public static final Double kLeftTrapBarExtend = 0.8;
-    public static final Double kLeftTrapBarRetract = 0.36;
-    public static final Double kRightTrapBarExtend = 0.18;
-    public static final Double kRightTrapBarRetract = 0.6;
+    public static final double kLeftTrapBarExtend = 0.5;
+    public static final double kLeftTrapBarRetract = 0.0;
+    public static final double kRightTrapBarExtend = 0.5;
+    public static final double kRightTrapBarRetract = 1.0;
 
-    public static final Double kLeftRatchetOn = 0.2;
-    public static final Double kLeftRatchetOff = 0.8;
-    public static final double kRightRatchetOn = 0.4;
+    public static final double kLeftRatchetOn = 0.0;
+    public static final double kLeftRatchetOff = 1.0;
+    public static final double kRightRatchetOn = 0.0;
     public static final double kRightRatchetOff = 1.0;
   }
 
   public static class ProtoConstants {
     // Drive
-    public static final Double kWheelDiameterInches = 3.0 * 503.5 / 500.0;
+    public static final double kWheelDiameterInches = 3.0 * 503.5 / 500.0;
 
     // Elbow
-    public static final Double kElbowZero = 0.23291; // -0.11816
-    public static final Double kElbowRecoveryZero = 0.23291;
-    public static final Double kElbowZeroPos = 34.0;
+    public static final double kElbowZero = 0.23291; // -0.11816
+    public static final double kElbowRecoveryZero = 0.23291;
+    public static final double kElbowZeroPos = 34.0;
 
     // Wrist
-    public static final Double kWristZero = 3293.0; // 3310
+    public static final double kWristZero = 3293.0; // 3310
 
     // Climb
-    public static final Double kLeftTrapBarExtend = 0.0;
-    public static final Double kLeftTrapBarRetract = 0.0;
-    public static final Double kRightTrapBarExtend = 0.0;
-    public static final Double kRightTrapBarRetract = 0.0;
-    public static final Double kLeftRatchetOn = 0.0;
-    public static final Double kLeftRatchetOff = 0.0;
+    public static final double kLeftTrapBarExtend = 0.0;
+    public static final double kLeftTrapBarRetract = 0.0;
+    public static final double kRightTrapBarExtend = 0.0;
+    public static final double kRightTrapBarRetract = 0.0;
+    public static final double kLeftRatchetOn = 0.0;
+    public static final double kLeftRatchetOff = 0.0;
     public static final double kRightRatchetOn = 0.0;
     public static final double kRightRatchetOff = 0.0;
   }
