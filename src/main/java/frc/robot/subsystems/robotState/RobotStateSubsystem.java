@@ -186,6 +186,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
+    superStructure.setIsAuto(isAuto);
   }
 
   // Control Methods
@@ -489,7 +490,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.start();
           hasShootBeamUnbroken = true;
         }
-        if (hasShootBeamUnbroken && shootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
+        if (hasShootBeamUnbroken) {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);

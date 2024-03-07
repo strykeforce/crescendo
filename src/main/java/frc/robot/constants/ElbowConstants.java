@@ -46,6 +46,9 @@ public final class ElbowConstants {
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
+    config.HardwareLimitSwitch.ReverseLimitEnable = false;
+    config.HardwareLimitSwitch.ForwardLimitEnable = false;
+
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 34;
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
