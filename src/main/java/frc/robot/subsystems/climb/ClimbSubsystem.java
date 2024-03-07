@@ -175,10 +175,10 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     climbZeroStableCounts = 0;
     logger.info("{} -> ZEROING_ALL", curState);
     curState = ClimbStates.ZEROING_ALL;
-    
+
     forkIO.enableSoftLimits(false);
     forkIO.setPct(ClimbConstants.kZeroForkPct);
-    
+
     enableRatchet(false);
     climbIO.setCurrentLimit(ClimbConstants.getZeroCurrentLimit());
     climbIO.setSoftLimitsEnabled(false);
