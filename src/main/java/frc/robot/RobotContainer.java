@@ -27,6 +27,7 @@ import frc.robot.commands.auton.NonAmpInitial_Note3Command;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
+import frc.robot.commands.climb.IncrementRequestPrepClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
 import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
@@ -44,9 +45,11 @@ import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
+import frc.robot.commands.elbow.ZeroRecoveryElbowCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
+import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
 import frc.robot.commands.robotState.DistanceShootCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
@@ -242,8 +245,20 @@ public class RobotContainer {
     return elbowSubsystem.hasZeroed();
   }
 
+  public boolean hasClimbZeroed() {
+    return climbSubsystem.hasClimbZeroed();
+  }
+
+  public Command getClimbZeroCommand() {
+    return new ZeroClimbCommand(climbSubsystem);
+  }
+
   public void zeroElbow() {
     elbowSubsystem.zero();
+  }
+
+  public void zeroClimb() {
+    climbSubsystem.zeroAll();
   }
 
   public void configurePitDashboard() {
@@ -438,6 +453,10 @@ public class RobotContainer {
         .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
         .withSize(1, 1)
         .withPosition(6, 1);
+    Shuffleboard.getTab("Match")
+        .add("ZeroRecoveryElbowCommand", new ZeroRecoveryElbowCommand(elbowSubsystem))
+        .withSize(1, 1)
+        .withPosition(7, 1);
   }
 
   public void configureTuningDashboard() {
@@ -532,6 +551,17 @@ public class RobotContainer {
         .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
         .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
 
+    // Climb
+    new Trigger((() -> xboxController.getLeftTriggerAxis() > 0.5))
+        .onTrue(new ClimbCommand(robotStateSubsystem, climbSubsystem, superStructure));
+    new Trigger((() -> xboxController.getRightTriggerAxis() > 0.5))
+        .onTrue(new FullTrapClimbCommand(robotStateSubsystem, climbSubsystem, superStructure));
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .onTrue(new ClimbTrapDecendCommand(robotStateSubsystem, climbSubsystem, superStructure));
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(new PrepClimbCommand(robotStateSubsystem, climbSubsystem, superStructure))
+        .onTrue(new IncrementRequestPrepClimbCommand(climbSubsystem));
+
     // Amp Prep
     new JoystickButton(xboxController, XboxController.Button.kA.value)
         .onTrue(
@@ -558,11 +588,16 @@ public class RobotContainer {
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .onTrue(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem));
 
-    // Run auton
-    new JoystickButton(xboxController, XboxController.Button.kStart.value).onTrue(nonAmpAutoNote3);
+    // // Run auton
+    // new JoystickButton(xboxController, XboxController.Button.kStart.value)
+    //     .onTrue(nonAmpTravelNotes);
     //   // Amp Command
     //   new JoystickButton(xboxController, XboxController.Button.kX.value)
     //       .onTrue(new AmpCommand(robotStateSubsystem, superStructure, magazineSubsystem));
@@ -604,11 +639,19 @@ public class RobotContainer {
     // Stow Command
     new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem))
         .onFalse(
-            new StowCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+            new PostClimbStowCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                climbSubsystem));
 
     // // Vision Shoot
     new JoystickButton(driveJoystick, Button.M_SWH.id)

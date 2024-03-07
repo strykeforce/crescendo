@@ -44,6 +44,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Timer magazineShootDelayTimer = new Timer();
   private Timer ampStowTimer = new Timer();
   private Timer startShootDelay = new Timer();
+  private Timer climbTrapTimer = new Timer();
   private Timer scoreTrapTimer = new Timer();
   private boolean hasDelayed = false;
   private double shootDelay = 0.0;
@@ -320,9 +321,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.PREPPING_CLIMB);
   }
 
-  public void climb(boolean continueToTrap) {
+  public void climb(boolean continueToTrap, boolean decendAfterTrap) {
     climbSubsystem.trapClimb();
     this.continueToTrap = continueToTrap;
+    this.decendClimbAfterTrap = decendAfterTrap;
 
     setState(RobotStates.CLIMBING);
   }
@@ -334,6 +336,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_TRAP);
   }
 
+  public void scoreTrap() {
+    scoreTrapTimer.reset();
+    scoreTrapTimer.start();
+    magazineSubsystem.trap();
+    setState(RobotStates.SCORE_TRAP);
+  }
+
+  // Overload of scoreTrap()
   public void scoreTrap(boolean decend) {
     scoreTrapTimer.reset();
     scoreTrapTimer.start();
@@ -351,6 +361,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void postClimbStow() {
     toStow();
     climbSubsystem.retractForks();
+    climbSubsystem.retractTrapBar();
     climbSubsystem.stow();
 
     setState(RobotStates.TO_STOW);
@@ -393,6 +404,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             desiredState = RobotStates.STOW;
             toIntake();
           }
+
+          if (magazineSubsystem.hasPiece()) {
+            intakeSubsystem.toReversing();
+          } else if (!magazineSubsystem.hasPiece()) {
+            toIntake();
+            break;
+          }
+
           setState(RobotStates.STOW);
         }
         break;
@@ -567,7 +586,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case PREPPING_CLIMB:
-        if (climbSubsystem.isFinished() && superStructure.isFinished()) {
+        if (climbSubsystem.isFinished()
+            && climbSubsystem.isForkFinished()
+            && climbSubsystem.hasClimbZeroed()
+            && superStructure.isFinished()) {
           setState(RobotStates.CLIMB_PREPPED);
         }
         break;
@@ -604,10 +626,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         if (superStructure.isFinished()) {
           // climbSubsystem.extendTrapBar();
+          climbTrapTimer.reset();
+          climbTrapTimer.start();
           setState(RobotStates.TRAP);
         }
         break;
       case TRAP:
+        if (climbTrapTimer.hasElapsed(RobotStateConstants.kClimbTrapTimer)) {
+          scoreTrap(); // Transitions to SCORE_TRAP
+        }
         // if (!magazineSubsystem.hasPiece()) {
         // climbSubsystem.retractTrapBar();
         // superStructure.toFold();

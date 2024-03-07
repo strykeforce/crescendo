@@ -97,21 +97,21 @@ public class RobotConstants {
 
     // Elbow
     public static final double kElbowZero = 0.01465; // 0.0105
-    public static final double kElbowRecoveryZero = 0.01465;
+    public static final double kElbowRecoveryZero = -0.2656;
     public static final double kElbowZeroPos = 30.45;
 
     // Wrist
     public static final double kWristZero = 2322.0;
 
     // Climb
-    public static final double kLeftTrapBarExtend = 0.8;
-    public static final double kLeftTrapBarRetract = 0.36;
-    public static final double kRightTrapBarExtend = 0.18;
-    public static final double kRightTrapBarRetract = 0.6;
+    public static final double kLeftTrapBarExtend = 0.5;
+    public static final double kLeftTrapBarRetract = 0.0;
+    public static final double kRightTrapBarExtend = 0.5;
+    public static final double kRightTrapBarRetract = 1.0;
 
-    public static final double kLeftRatchetOn = 0.2;
-    public static final double kLeftRatchetOff = 0.8;
-    public static final double kRightRatchetOn = 0.4;
+    public static final double kLeftRatchetOn = 0.0;
+    public static final double kLeftRatchetOff = 1.0;
+    public static final double kRightRatchetOn = 0.0;
     public static final double kRightRatchetOff = 1.0;
   }
 
