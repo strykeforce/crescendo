@@ -428,7 +428,8 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(5, 0);
     Shuffleboard.getTab("Match")
-        .addDouble("Navx Update Number", () -> driveSubsystem.getPoseMeters().getRotation())
+        .addDouble(
+            "Navx Update Number", () -> driveSubsystem.getPoseMeters().getRotation().getRadians())
         .withSize(1, 1)
         .withPosition(7, 0);
     Shuffleboard.getTab("Match")
