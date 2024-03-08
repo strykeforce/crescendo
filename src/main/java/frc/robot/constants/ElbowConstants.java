@@ -17,7 +17,7 @@ public final class ElbowConstants {
   public static final double kCloseEnoughRots = 1;
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
-  public static final double kElbowResetPos = 30.0; // 0.1 deg = 0.058 rev 0.15
+  public static final double kElbowResetPos = 30.45; // 0.1 deg = 0.058 rev 0.15
 
   public static final double kAbsEncoderToMechRatio = 68.0 / 38.0;
   public static final double kFxGearbox = 50;

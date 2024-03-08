@@ -61,6 +61,10 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return curState;
   }
 
+  public boolean getRevLimitSwitch() {
+    return inputs.revLimitClosed;
+  }
+
   public void setState(ElbowStates state) {
     logger.info("{} -> {}", curState, state);
     curState = state;

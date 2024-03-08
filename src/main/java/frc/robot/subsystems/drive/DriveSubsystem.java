@@ -288,6 +288,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return inputs.isConnected;
   }
 
+  public double getNavxUpdateNum() {
+    return inputs.updateCount;
+  }
+
   public void setGyroOffset(Rotation2d rotation) {
     io.setGyroOffset(apply(rotation));
   }

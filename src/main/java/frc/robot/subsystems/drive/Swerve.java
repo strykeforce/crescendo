@@ -201,6 +201,7 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.gyroRate = swerveDrive.getGyroRate();
     inputs.isConnected = ahrs.isConnected();
     inputs.poseMeters = swerveDrive.getPoseMeters();
+    inputs.updateCount = ahrs.getTempC();
   }
 
   @Override

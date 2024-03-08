@@ -418,11 +418,19 @@ public class RobotContainer {
             () -> visionSubsystem.isCameraConnected(0) && visionSubsystem.isCameraConnected(1))
         .withSize(1, 1)
         .withPosition(4, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean("Elbow Limit Switch On", () -> elbowSubsystem.getRevLimitSwitch())
+        .withSize(1, 1)
+        .withPosition(7, 1);
 
     Shuffleboard.getTab("Match")
         .addBoolean("Is NavX Connected", () -> driveSubsystem.isNavxWorking())
         .withSize(1, 1)
         .withPosition(5, 0);
+    Shuffleboard.getTab("Match")
+        .addDouble("Navx Update Number", () -> driveSubsystem.getPoseMeters().getRotation())
+        .withSize(1, 1)
+        .withPosition(7, 0);
     Shuffleboard.getTab("Match")
         .addBoolean("Is Traj Generated", () -> autoSwitch.getAutoCommand().hasGenerated())
         .withSize(1, 1)
@@ -524,6 +532,8 @@ public class RobotContainer {
     this.alliance = alliance;
     allianceColor.withProperties(Map.of("colorWhenTrue", "red", "colorWhenFalse", "blue"));
     robotStateSubsystem.setAllianceColor(alliance);
+
+    autoSwitch.getAutoCommand().generateTrajectory();
 
     // Flips gyro angle if alliance is red team
     if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
