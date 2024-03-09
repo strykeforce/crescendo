@@ -118,6 +118,10 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   public void trap() {
     setSpeed(MagazineConstants.kTrapReleaseSpeed);
+
+    releaseTimer.reset();
+    releaseTimer.start();
+
     setState(MagazineStates.TRAP);
   }
 

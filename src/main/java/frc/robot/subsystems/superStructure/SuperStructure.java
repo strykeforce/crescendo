@@ -51,7 +51,9 @@ public class SuperStructure extends MeasurableSubsystem {
 
   // Getter/Setter Methods
   public boolean isFinished() {
-    return elbowSubsystem.isFinished() && wristSubsystem.isFinished() && shooterSubsystem.atSpeed();
+    return elbowSubsystem.isFinished()
+        && wristSubsystem.isFinished()
+        && (shooterSubsystem.atSpeed());
   }
 
   public boolean isElbowZeroed() {
@@ -277,7 +279,7 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
     rightShooterSpeed = SuperStructureConstants.kShooterPodiumPrepSetPoint;
 
-    shooterSubsystem.setSpeed(rightShooterSpeed);
+    shooterSubsystem.setPercent(leftShooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
     elbowSubsystem.setPosition(elbowSetpoint);
 

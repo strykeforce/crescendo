@@ -59,7 +59,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean isAuto = false;
   private boolean shootKnownPos = false;
   private Pose2d shootPos;
-
+  private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
 
   private RobotStates desiredState = RobotStates.STOW;
@@ -141,6 +141,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     double[] shootSolution = new double[3];
     int index;
     distance += RobotStateConstants.kDistanceOffset;
+    grabbedShotDistance = distance;
     if (distance < RobotStateConstants.kLookupMinDistance) {
       index = 1;
       logger.warn(
@@ -172,7 +173,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
     shootSolution[1] = Double.parseDouble(lookupTable[index][2]); // Right Shooter
-    shootSolution[2] = Double.parseDouble(lookupTable[index][3]); // Elbow
+    shootSolution[2] =
+        Double.parseDouble(lookupTable[index][3]) + RobotStateConstants.kElbowShootOffset; // Elbow
 
     return shootSolution;
   }
@@ -486,12 +488,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
 
-          if (!shootKnownPos)
+          if (!shootKnownPos) {
             org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingPostion/shot" + Integer.toString(curShot), driveSubsystem.getPoseMeters());
-          else
+                "ShootingData/shot" + Integer.toString(curShot) + "/Position",
+                driveSubsystem.getPoseMeters());
             org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingPostion/shot" + Integer.toString(curShot), shootKnownPos);
+                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+          } else {
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Position", shootPos);
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+          }
           magazineSubsystem.toEmptying();
 
           curShot += 1;

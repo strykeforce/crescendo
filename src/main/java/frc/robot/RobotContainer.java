@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
@@ -41,16 +43,22 @@ import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
+import frc.robot.commands.elbow.SetElbowHasZeroedCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.elbow.ZeroRecoveryElbowCommand;
+import frc.robot.commands.intake.OpenLoopIntakeCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
+import frc.robot.commands.magazine.RecoverMagazineCommand;
+import frc.robot.commands.robotState.AirwaveHealthCheck;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
+import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.PodiumCommand;
+import frc.robot.commands.robotState.PositionShootCommand;
 import frc.robot.commands.robotState.PostClimbStowCommand;
 import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
@@ -130,18 +138,34 @@ public class RobotContainer {
   public GenericEntry duplicateShooters;
   public GenericEntry shootDelay;
 
+  private Swerve swerve;
+  private WristIOSRX wristIO;
+  private ElbowIOFX elbowIO;
+  private ShooterIOFX shooterIO;
+  private IntakeIOFX intakeIO;
+  private MagazineIOFX magazineIO;
+  private ClimbIOFX climbIO;
+  private ForkIOSRX forkIO;
+
   public RobotContainer() {
+    swerve = new Swerve();
+    wristIO = new WristIOSRX();
+    elbowIO = new ElbowIOFX();
+    shooterIO = new ShooterIOFX();
+    intakeIO = new IntakeIOFX();
+    magazineIO = new MagazineIOFX();
+    climbIO = new ClimbIOFX();
+    forkIO = new ForkIOSRX();
     robotConstants = new RobotConstants();
-    driveSubsystem = new DriveSubsystem(new Swerve());
+    driveSubsystem = new DriveSubsystem(swerve);
     visionSubsystem = new VisionSubsystem(driveSubsystem);
-    wristSubsystem = new WristSubsystem(new WristIOSRX());
-    elbowSubsystem = new ElbowSubsystem(new ElbowIOFX());
-    shooterSubsystem = new ShooterSubsystem(new ShooterIOFX());
-    intakeSubsystem = new IntakeSubsystem(new IntakeIOFX());
-    magazineSubsystem = new MagazineSubsystem(new MagazineIOFX());
+    wristSubsystem = new WristSubsystem(wristIO);
+    elbowSubsystem = new ElbowSubsystem(elbowIO);
+    shooterSubsystem = new ShooterSubsystem(shooterIO);
+    intakeSubsystem = new IntakeSubsystem(intakeIO);
+    magazineSubsystem = new MagazineSubsystem(magazineIO);
     climbSubsystem =
-        new ClimbSubsystem(
-            new ClimbIOFX(), new ClimbRatchetIOServo(), new TrapBarIOServo(), new ForkIOSRX());
+        new ClimbSubsystem(climbIO, new ClimbRatchetIOServo(), new TrapBarIOServo(), forkIO);
 
     intakeSubsystem.setFwdLimitSwitchSupplier(driveSubsystem.getAzimuth1FwdLimitSupplier());
 
@@ -259,6 +283,45 @@ public class RobotContainer {
   public void configurePitDashboard() {
     Shuffleboard.getTab("Pit")
         .add(
+            "Position Shot Location",
+            new PositionShootCommand(
+                robotStateSubsystem,
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem,
+                driveSubsystem,
+                new Pose2d(new Translation2d(2, 5.5), new Rotation2d())));
+    Shuffleboard.getTab("Pit")
+        .add(
+            "HealtCheck",
+            new AirwaveHealthCheck(
+                swerve,
+                driveSubsystem,
+                intakeIO,
+                intakeSubsystem,
+                magazineIO,
+                magazineSubsystem,
+                shooterIO,
+                shooterSubsystem,
+                elbowIO,
+                elbowSubsystem,
+                wristIO,
+                wristSubsystem,
+                climbIO,
+                forkIO,
+                climbSubsystem))
+        .withSize(1, 1)
+        .withPosition(4, 1);
+    Shuffleboard.getTab("Pit")
+        .add("Turn Intake Off", new OpenLoopIntakeCommand(intakeSubsystem, 0.0))
+        .withSize(1, 1)
+        .withPosition(5, 1);
+    Shuffleboard.getTab("Pit")
+        .add("Set Zero Elbow False", new SetElbowHasZeroedCommand(elbowSubsystem, false))
+        .withSize(1, 1)
+        .withPosition(5, 0);
+    Shuffleboard.getTab("Pit")
+        .add(
             "Stow",
             new StowCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))
@@ -272,7 +335,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add("Zero Elbow", new ZeroElbowCommand(elbowSubsystem))
         .withSize(1, 1)
-        .withPosition(2, 0);
+        .withPosition(0, 2);
 
     Shuffleboard.getTab("Pit")
         .add("Wrist Pos Zero", new ClosedLoopWristCommand(wristSubsystem, 0))
@@ -428,8 +491,7 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(5, 0);
     Shuffleboard.getTab("Match")
-        .addDouble(
-            "Navx Update Number", () -> driveSubsystem.getPoseMeters().getRotation().getRadians())
+        .addDouble("NavX Current Rotation", () -> driveSubsystem.getGyroRotation2d().getDegrees())
         .withSize(1, 1)
         .withPosition(7, 0);
     Shuffleboard.getTab("Match")
@@ -569,6 +631,9 @@ public class RobotContainer {
         .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.2))
         .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
 
+    new Trigger(() -> robotStateSubsystem.hasNote())
+        .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+
     // Open Loop Elbow
     new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
         .onTrue(new OpenLoopElbowCommand(elbowSubsystem, 0.1))
@@ -620,6 +685,10 @@ public class RobotContainer {
                 magazineSubsystem,
                 intakeSubsystem,
                 climbSubsystem));
+
+    // Magazine recover
+    new Trigger(() -> (xboxController.getPOV() != -1))
+        .onTrue(new RecoverMagazineCommand(magazineSubsystem));
 
     // // Run auton
     // new JoystickButton(xboxController, XboxController.Button.kStart.value)

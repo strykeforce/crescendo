@@ -36,7 +36,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
   }
 
   public boolean hasNote() {
-    return (curState == IntakeState.HAS_PIECE);
+    return (curState == IntakeState.HAS_PIECE) || curState == IntakeState.REVERSING;
   }
 
   public void toIntaking() {

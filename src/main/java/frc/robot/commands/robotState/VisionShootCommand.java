@@ -9,6 +9,7 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class VisionShootCommand extends Command {
   RobotStateSubsystem robotStateSubsystem;
+  boolean flag = false;
 
   public VisionShootCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -21,13 +22,16 @@ public class VisionShootCommand extends Command {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.startShoot();
+    flag =
+        !((robotStateSubsystem.intakeHasNote() && robotStateSubsystem.magazineHasNote()))
+            && robotStateSubsystem.getIsAuto();
+    if (!flag) robotStateSubsystem.startShoot();
   }
 
   @Override
   public boolean isFinished() {
     RobotStates curState = robotStateSubsystem.getState();
 
-    return (curState != RobotStates.SHOOTING && curState != RobotStates.TO_SHOOT);
+    return flag || (curState != RobotStates.SHOOTING && curState != RobotStates.TO_SHOOT);
   }
 }

@@ -17,6 +17,7 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   private ShooterStates curState = ShooterStates.IDLE;
   private double leftSetpoint = 0.0;
   double rightSetpoint = 0.0;
+  private boolean pctOut = false;
 
   ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
   private Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
@@ -36,12 +37,14 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
 
   @Override
   public boolean atSpeed() {
-    return (Math.abs(leftSetpoint - inputs.velocityLeft) < ShooterConstants.kCloseEnough
-        && Math.abs(rightSetpoint - inputs.velocityRight) < ShooterConstants.kCloseEnough);
+    return pctOut
+        || ((Math.abs(leftSetpoint - inputs.velocityLeft) < ShooterConstants.kCloseEnough
+            && Math.abs(rightSetpoint - inputs.velocityRight) < ShooterConstants.kCloseEnough));
   }
 
   @Override
   public void setSpeed(double speed) {
+    pctOut = false;
     leftSetpoint = speed;
     rightSetpoint = speed; // FIXME: add inversion where appropriate
     io.setSpeed(speed);
@@ -51,11 +54,13 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   }
 
   public void setLeftSpeed(double speed) {
+    pctOut = false;
     leftSetpoint = speed;
     io.setLeftSpeed(speed);
   }
 
   public void setRightSpeed(double speed) {
+    pctOut = false;
     rightSetpoint = speed;
     io.setRightSpeed(speed);
   }
@@ -71,7 +76,10 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
   public void toEmptying() {}
 
   // Helper Methods
-
+  public void setPercent(double pct) {
+    pctOut = true;
+    io.setPct(pct);
+  }
   // Periodic
   @Override
   public void periodic() {

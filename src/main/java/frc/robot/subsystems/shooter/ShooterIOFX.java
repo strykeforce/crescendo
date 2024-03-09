@@ -4,17 +4,23 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.ShooterConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.BeforeHealthCheck;
+import org.strykeforce.healthcheck.Checkable;
 import org.strykeforce.healthcheck.Follow;
 import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.healthcheck.Timed;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class ShooterIOFX implements ShooterIO {
+public class ShooterIOFX implements ShooterIO, Checkable {
+
+  public double leftSetpoint = 0.0;
+
   @HealthCheck
   @Timed(
       percentOutput = {0.2, -0.2, 0.8, -0.8},
@@ -24,6 +30,12 @@ public class ShooterIOFX implements ShooterIO {
   @HealthCheck
   @Follow(leader = ShooterConstants.kLeftShooterTalonID)
   private TalonFX shooterRight;
+
+  @BeforeHealthCheck
+  public boolean followTalons() {
+    shooterRight.setControl(new Follower(ShooterConstants.kLeftShooterTalonID, false));
+    return true;
+  }
 
   private Logger logger;
 
@@ -56,7 +68,13 @@ public class ShooterIOFX implements ShooterIO {
   }
 
   @Override
+  public String getName() {
+    return "Shooter";
+  }
+
+  @Override
   public void updateInputs(ShooterIOInputs inputs) {
+    inputs.leftSetpoint = leftSetpoint;
     inputs.velocityLeft = curLeftVelocity.refresh().getValue();
     inputs.velocityRight = curRightVelocity.refresh().getValue();
   }
@@ -71,6 +89,7 @@ public class ShooterIOFX implements ShooterIO {
 
   @Override
   public void setSpeed(double speed) {
+    leftSetpoint = speed;
     shooterLeft.setControl(velocityLeftRequest.withVelocity(speed));
     shooterRight.setControl(
         velocityRightRequest.withVelocity(
@@ -79,6 +98,7 @@ public class ShooterIOFX implements ShooterIO {
 
   @Override
   public void setLeftSpeed(double speed) {
+    leftSetpoint = speed;
     shooterLeft.setControl(velocityLeftRequest.withVelocity(speed));
   }
 

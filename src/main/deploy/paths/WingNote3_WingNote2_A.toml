@@ -8,12 +8,12 @@ target_yaw = 0.0 #degrees
 [start_pose]
     dataPoint "W3"
     dX = -0.1
-    dY = 0.50
+    dY = 0.25
     angle = -210.0
 [end_pose]
     dataPoint "W2"
-    dX = 0.45
-    dY = -0.1
+    dX = 0.25 # .2
+    dY = -0.3 # -0.35
     angle = 0.0
 
 [[internal_points]]

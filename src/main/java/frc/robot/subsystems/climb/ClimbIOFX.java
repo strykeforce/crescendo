@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.constants.ClimbConstants;
@@ -138,8 +139,11 @@ public class ClimbIOFX implements ClimbIO, Checkable {
 
   @BeforeHealthCheck
   public boolean goToZero() {
-    setPosition(1);
-    return Math.abs(leftPos.refresh().getValue() - 1) <= ClimbConstants.kCloseEnoughRots
-        && Math.abs(rightPos.refresh().getValue() - 1) <= ClimbConstants.kCloseEnoughRots;
+    rightClimb.setControl(new Follower(ClimbConstants.kLeftClimbFxId, false));
+    // setLeftPos(3);
+    // // setPosition(1);
+    // return Math.abs(leftPos.refresh().getValue() - 3) <= ClimbConstants.kCloseEnoughRots
+    //     && Math.abs(rightPos.refresh().getValue() - 3) <= ClimbConstants.kCloseEnoughRots;
+    return true;
   }
 }

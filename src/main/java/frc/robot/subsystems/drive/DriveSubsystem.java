@@ -569,6 +569,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     // Log Outputs FIXME
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Odometry", inputs.poseMeters);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "ShootingData/AngleToGoal", getShooterAngleToSpeaker());
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "ShootingData/DistanceToGoal", getDistanceToSpeaker());
 
     switch (currDriveState) {
       case IDLE:

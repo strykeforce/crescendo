@@ -9,6 +9,7 @@ public interface ShooterIO {
   public static class ShooterIOInputs {
     public double velocityLeft;
     public double velocityRight;
+    public double leftSetpoint = 0.0;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {}

@@ -16,6 +16,7 @@ import frc.robot.commands.robotState.PositionShootCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.superStructure.SpinUpWheelsCommand;
+import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.SuperStructureConstants;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -32,6 +33,7 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
   DriveAutonCommand wingNote2WingNote1;
   DriveAutonCommand wingNote1MidNote1;
   DriveAutonCommand midNote1ShootPos;
+  PositionShootCommand midShootCommand;
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
@@ -55,7 +57,16 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
     wingNote1MidNote1 = new DriveAutonCommand(driveSubsystem, "WingNote1_MiddleNote1", true, false);
     midNote1ShootPos =
         new DriveAutonCommand(driveSubsystem, "MiddleNote1_MiddleShoot", true, false);
-
+    midShootCommand =
+        new PositionShootCommand(
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            new Pose2d(
+                new Translation2d(4.0 - RobotStateConstants.kDistanceOffset, 5.55),
+                new Rotation2d()));
     addCommands(
         new ResetGyroCommand(driveSubsystem),
         new ParallelCommandGroup(
@@ -85,14 +96,9 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
         new SetHoloContKPCommand(driveSubsystem, 3.0),
         wingNote1MidNote1,
         midNote1ShootPos,
-        new SpinUpWheelsCommand(superStructure, 73, 80),
+        new SpinUpWheelsCommand(superStructure, 73, 40),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
-        new PositionShootCommand(
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem,
-            new Pose2d(new Translation2d(4.0, 5.5), new Rotation2d())));
+        midShootCommand);
   }
 
   public void generateTrajectory() {
@@ -101,6 +107,7 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
     wingNote2WingNote1.generateTrajectory();
     wingNote1MidNote1.generateTrajectory();
     midNote1ShootPos.generateTrajectory();
+    midShootCommand.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }

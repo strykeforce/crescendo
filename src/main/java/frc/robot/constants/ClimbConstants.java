@@ -37,6 +37,7 @@ public final class ClimbConstants {
   public static final double kRightExtendPos = 500;
   public static final double kLeftRetractPos = 20; // 10
   public static final double kRightRetractPos = 20; // 10
+  public static final double kRevsPerInch = 2.98;
 
   // PRE-CLIMB
   public static final double kLeftClimbPrepPos = 80.0; // 70
@@ -46,11 +47,11 @@ public final class ClimbConstants {
   public static final double kRightClimbHighPrepPos = 90.0;
 
   // TRAP CLIMB
-  public static final double kLeftClimbTrapPos = 5.5;
-  public static final double kRightClimbTrapPos = 5.5;
+  public static final double kLeftClimbTrapPos = 11.46; // 5.5
+  public static final double kRightClimbTrapPos = 11.46; // 5.5
 
-  public static final double kLeftStowPos = 1.0;
-  public static final double kRightStowPos = 1.0;
+  public static final double kLeftStowPos = 2.5;
+  public static final double kRightStowPos = 2.5;
 
   public static TalonFXConfiguration getLeftConfig() {
     TalonFXConfiguration config = new TalonFXConfiguration();

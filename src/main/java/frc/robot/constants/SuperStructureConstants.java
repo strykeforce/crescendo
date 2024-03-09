@@ -46,7 +46,7 @@ public final class SuperStructureConstants {
   // PODIUM PREP
   public static final double kWristPodiumPrepSetPoint = kWristStowSetPoint;
   public static final double kElbowPodiumPrepSetPoint = -26.6; // -28.3
-  public static final double kShooterPodiumPrepSetPoint = 1;
+  public static final double kShooterPodiumPrepSetPoint = 0.05; // 1
 
   // PODIUM
   public static final double kWristPodiumSetPoint = kWristIntakeSetPoint;
