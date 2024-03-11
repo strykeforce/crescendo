@@ -139,7 +139,7 @@ public class ClimbIOFX implements ClimbIO, Checkable {
 
   @BeforeHealthCheck
   public boolean goToZero() {
-    rightClimb.setControl(new Follower(ClimbConstants.kLeftClimbFxId, false));
+    rightClimb.setControl(new Follower(ClimbConstants.kLeftClimbFxId, true));
     // setLeftPos(3);
     // // setPosition(1);
     // return Math.abs(leftPos.refresh().getValue() - 3) <= ClimbConstants.kCloseEnoughRots

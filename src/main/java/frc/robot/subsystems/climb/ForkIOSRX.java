@@ -119,13 +119,4 @@ public class ForkIOSRX implements ForkIO, Checkable {
     telemetryService.register(leftFork);
     telemetryService.register(rightFork);
   }
-
-  @BeforeHealthCheck
-  public boolean goToZero() {
-    setPosition(ClimbConstants.kLeftRetractPos);
-    return Math.abs(leftFork.getSelectedSensorPosition() - ClimbConstants.kLeftRetractPos)
-            <= ClimbConstants.kCloseEnoughForks
-        && Math.abs(rightFork.getSelectedSensorPosition() - ClimbConstants.kLeftExtendPos)
-            <= ClimbConstants.kCloseEnoughForks;
-  }
 }

@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -40,6 +41,7 @@ import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
+import frc.robot.commands.elbow.ClosedLoopElbowOffsetCommand;
 import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
@@ -68,10 +70,13 @@ import frc.robot.commands.robotState.ToggleDefenseCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
+import frc.robot.commands.robotState.UpdateElbowOffsetCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
+import frc.robot.constants.RobotStateConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.auto.AutoSwitch;
@@ -89,6 +94,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineIOFX;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.shooter.ShooterIOFX;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
@@ -137,6 +143,7 @@ public class RobotContainer {
   public GenericEntry elbowPos;
   public GenericEntry duplicateShooters;
   public GenericEntry shootDelay;
+  private GenericEntry newElbowOffset;
 
   private Swerve swerve;
   private WristIOSRX wristIO;
@@ -281,6 +288,7 @@ public class RobotContainer {
   }
 
   public void configurePitDashboard() {
+
     Shuffleboard.getTab("Pit")
         .add(
             "Position Shot Location",
@@ -361,8 +369,16 @@ public class RobotContainer {
         .add("Lock Wheels Zero", new LockZeroCommand(driveSubsystem))
         .withSize(1, 1)
         .withPosition(3, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Set to Shoot Positon",
+            new ClosedLoopElbowOffsetCommand(
+                elbowSubsystem, 16.914, () -> robotStateSubsystem.getElbowOffset()))
+        .withPosition(7, 0)
+        .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
-    // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))
+    // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))()
     // .withSize(1, 1)
     // .withPosition(2, 0);
 
@@ -461,6 +477,30 @@ public class RobotContainer {
   }
 
   private void configureMatchDashboard() {
+    newElbowOffset =
+        Shuffleboard.getTab("Match")
+            .add(
+                "Change Elbow Offset",
+                Preferences.getDouble(
+                    RobotStateConstants.kElbowPreferencesKey,
+                    RobotStateConstants.kElbowShootOffset))
+            .withWidget(BuiltInWidgets.kTextView)
+            .withSize(1, 1)
+            .withPosition(8, 0)
+            .getEntry();
+    Shuffleboard.getTab("Match")
+        .add(
+            "Set Elbow Offset",
+            new UpdateElbowOffsetCommand(
+                robotStateSubsystem,
+                () -> newElbowOffset.getDouble(RobotStateConstants.kElbowShootOffset)))
+        .withPosition(9, 0)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Match")
+        .addDouble("Elbow Offset", () -> robotStateSubsystem.getElbowOffset())
+        .withPosition(8, 1)
+        .withSize(1, 1);
+
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
@@ -632,6 +672,12 @@ public class RobotContainer {
         .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
 
     new Trigger(() -> robotStateSubsystem.hasNote())
+        .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+
+    new Trigger(
+            () ->
+                (robotStateSubsystem.getState() == RobotStates.TO_PODIUM
+                    && magazineSubsystem.getSpeed() >= MagazineConstants.kPodiumRumbleSpeed))
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
 
     // Open Loop Elbow
