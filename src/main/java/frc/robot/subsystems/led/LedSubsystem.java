@@ -31,8 +31,12 @@ public class LedSubsystem extends MeasurableSubsystem{
         return currState;
     }
 
+    private void setState(LedState state) {
+        currState = state;
+    }
+
     public void setColor(int r, int g, int b) {
-        currState = LedState.SOLID;
+        setState(LedState.SOLID);
         for (var i = 0; i < ledBuffer.getLength(); i++) {
             ledBuffer.setRGB(i, r, g, b);
         }
@@ -43,7 +47,7 @@ public class LedSubsystem extends MeasurableSubsystem{
     }
 
     public void setFlaming() {
-        currState = LedState.FLAMING;
+        setState(LedState.FLAMING);
     }
     
     public void setOff() {
