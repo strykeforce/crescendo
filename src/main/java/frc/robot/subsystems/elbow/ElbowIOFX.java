@@ -145,6 +145,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   @Override
   public void setPosition(double position) {
     setpoint = position + setpointOffset;
+
     elbow.setControl(positionRequst.withPosition(setpoint));
   }
 
@@ -160,6 +161,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
     inputs.absRots = absRots.refresh().getValue();
     inputs.velocity = currVelocity.refresh().getValue();
     inputs.revLimitClosed = revLim.refresh().getValue() == ReverseLimitValue.ClosedToGround;
+    inputs.setpoint = setpoint;
   }
 
   @Override

@@ -117,6 +117,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    logger.info("Auto Init");
     m_robotContainer.setIsAuto(true);
     // if (!m_robotContainer.hasElbowZeroed()) m_robotContainer.zeroElbow();
     // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -134,6 +135,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    logger.info("Teleop Init | Match #{}", DriverStation.getMatchNumber());
     m_robotContainer.setIsAuto(false);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

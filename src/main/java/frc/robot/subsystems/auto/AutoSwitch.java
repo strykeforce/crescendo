@@ -183,8 +183,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             elbowSubsystem,
             "NonAmpInitial1_MiddleNote3",
             "MiddleNote3_NonAmpShoot2",
-            "NonAmpShoot2_MiddleNote4",
-            "MiddleNote4_NonAmpShoot2");
+            "NonAmpShoot2_MiddleNote4_B",
+            "MiddleNote4_NonAmpShoot2_B");
 
       case 0x30:
         return new DoNothingCommand(

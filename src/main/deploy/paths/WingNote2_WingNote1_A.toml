@@ -7,13 +7,13 @@ target_yaw = 30.0 #degrees
 
 [start_pose]
     dataPoint "W2"
-    dX = 0.45
-    dY = -0.1
+    dX = 0.25 # .20
+    dY = -0.3 # Red - -0.3 | Blue - -0.3 
     angle = 180.0
     
 [end_pose]
     dataPoint = "W1"
-    dY = -0.15
+    dY = 0.2 # Red - 0.2 | Blue - 0.05 
     dX = 0.2
     angle = 30.0
 

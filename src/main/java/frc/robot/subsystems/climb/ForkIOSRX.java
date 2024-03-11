@@ -26,6 +26,12 @@ public class ForkIOSRX implements ForkIO, Checkable {
   @Follow(leader = ClimbConstants.kLeftForkSRXId)
   private TalonSRX rightFork;
 
+  @BeforeHealthCheck
+  public boolean followTalons() {
+    rightFork.follow(leftFork);
+    return true;
+  }
+
   public ForkIOSRX() {
     logger = LoggerFactory.getLogger(this.getClass());
     leftFork = new TalonSRX(ClimbConstants.kLeftForkSRXId);
@@ -112,14 +118,5 @@ public class ForkIOSRX implements ForkIO, Checkable {
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(leftFork);
     telemetryService.register(rightFork);
-  }
-
-  @BeforeHealthCheck
-  public boolean goToZero() {
-    setPosition(ClimbConstants.kLeftRetractPos);
-    return Math.abs(leftFork.getSelectedSensorPosition() - ClimbConstants.kLeftRetractPos)
-            <= ClimbConstants.kCloseEnoughForks
-        && Math.abs(rightFork.getSelectedSensorPosition() - ClimbConstants.kLeftExtendPos)
-            <= ClimbConstants.kCloseEnoughForks;
   }
 }

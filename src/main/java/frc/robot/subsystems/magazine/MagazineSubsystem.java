@@ -118,6 +118,10 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   public void trap() {
     setSpeed(MagazineConstants.kTrapReleaseSpeed);
+
+    releaseTimer.reset();
+    releaseTimer.start();
+
     setState(MagazineStates.TRAP);
   }
 
@@ -234,9 +238,6 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         }
         break;
       case TRAP:
-        if (releaseTimer.hasElapsed(MagazineConstants.kTrapReleaseTime)) {
-          setEmpty();
-        }
         break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("Magazine State", curState);

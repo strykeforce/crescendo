@@ -10,6 +10,7 @@ public interface WristIO {
     public double position = 0.0;
     public boolean isRevLimitSwitch = false;
     public boolean isFwdLimitSwitchClosed = false;
+    public double setpoint = 0.0;
   }
 
   public default void updateInputs(WristIOInputs inputs) {}

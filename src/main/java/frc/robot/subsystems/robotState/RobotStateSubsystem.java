@@ -3,6 +3,7 @@ package frc.robot.subsystems.robotState;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
@@ -59,11 +60,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean isAuto = false;
   private boolean shootKnownPos = false;
   private Pose2d shootPos;
-
+  private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
 
   private RobotStates desiredState = RobotStates.STOW;
   private int curShot = 1;
+
+  private double elbowOffset = RobotStateConstants.kElbowShootOffset;
 
   // Constructor
   public RobotStateSubsystem(
@@ -79,7 +82,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
     this.climbSubsystem = climbSubsystem;
-
+    grabElbowOffsetPreferences();
     parseLookupTable();
   }
 
@@ -93,6 +96,21 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       logger.info("{} -> {}", this.curState, robotState);
       this.curState = robotState;
     }
+  }
+
+  public void grabElbowOffsetPreferences() {
+    elbowOffset =
+        Preferences.getDouble(
+            RobotStateConstants.kElbowPreferencesKey, RobotStateConstants.kElbowShootOffset);
+  }
+
+  public double getElbowOffset() {
+    return elbowOffset;
+  }
+
+  public void setElbowOffsetPreferences(double offset) {
+    Preferences.setDouble(RobotStateConstants.kElbowPreferencesKey, offset);
+    elbowOffset = offset;
   }
 
   public void setAllianceColor(Alliance alliance) {
@@ -141,6 +159,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     double[] shootSolution = new double[3];
     int index;
     distance += RobotStateConstants.kDistanceOffset;
+    grabbedShotDistance = distance;
     if (distance < RobotStateConstants.kLookupMinDistance) {
       index = 1;
       logger.warn(
@@ -172,7 +191,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
     shootSolution[1] = Double.parseDouble(lookupTable[index][2]); // Right Shooter
-    shootSolution[2] = Double.parseDouble(lookupTable[index][3]); // Elbow
+    shootSolution[2] = Double.parseDouble(lookupTable[index][3]) + elbowOffset; // Elbow
 
     return shootSolution;
   }
@@ -486,12 +505,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
 
-          if (!shootKnownPos)
+          if (!shootKnownPos) {
             org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingPostion/shot" + Integer.toString(curShot), driveSubsystem.getPoseMeters());
-          else
+                "ShootingData/shot" + Integer.toString(curShot) + "/Position",
+                driveSubsystem.getPoseMeters());
             org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingPostion/shot" + Integer.toString(curShot), shootKnownPos);
+                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+          } else {
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Position", shootPos);
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+          }
           magazineSubsystem.toEmptying();
 
           curShot += 1;
@@ -645,7 +670,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case SCORE_TRAP:
         if (scoreTrapTimer.hasElapsed(RobotStateConstants.kTrapTimer)) {
           superStructure.toFold();
-          magazineSubsystem.setSpeed(0.0);
           setState(RobotStates.FOLDING_IN);
         }
         break;
@@ -654,6 +678,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           climbSubsystem.retractTrapBar();
         }
         if (superStructure.isFinished()) {
+          magazineSubsystem.setSpeed(0.0);
+          magazineSubsystem.setEmpty();
           superStructure.toPrepClimb();
 
           if (decendClimbAfterTrap) {

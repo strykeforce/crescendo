@@ -17,6 +17,8 @@ import org.strykeforce.telemetry.TelemetryService;
 public class WristIOSRX implements WristIO, Checkable {
   private Logger logger;
 
+  private double setpoint = 0;
+
   @HealthCheck
   @Position(
       percentOutput = {-0.1, 0.1},
@@ -51,6 +53,7 @@ public class WristIOSRX implements WristIO, Checkable {
 
   @Override
   public void setPosition(double position) {
+    setpoint = position;
     wrist.set(TalonSRXControlMode.MotionMagic, position);
   }
 
@@ -64,6 +67,7 @@ public class WristIOSRX implements WristIO, Checkable {
     inputs.position = wrist.getSelectedSensorPosition();
     inputs.isRevLimitSwitch = wrist.isRevLimitSwitchClosed() == 1;
     inputs.isFwdLimitSwitchClosed = wrist.isFwdLimitSwitchClosed() == 1;
+    inputs.setpoint = setpoint;
   }
 
   @Override

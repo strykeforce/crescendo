@@ -75,6 +75,7 @@ public class AirwaveHealthCheck extends SequentialCommandGroup {
 
     addCommands(
         new ZeroClimbCommand(climbSubsystem),
+        new ResetCaseHealthCheckCommand(),
         new IOHealthCheckCommand(
             List.of(
                 driveSubsystem,
@@ -87,6 +88,7 @@ public class AirwaveHealthCheck extends SequentialCommandGroup {
             swerve,
             intakeIOFX,
             magazineIOFX,
+            shooterIOFX,
             elbowIOFX,
             wristIOSRX,
             climbIOFX,

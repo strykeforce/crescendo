@@ -12,7 +12,8 @@ public final class AutonConstants {
         new Pose2d(1.47, 5.55, Rotation2d.fromDegrees(0.0)); // 1.34 on x
     public static final Pose2d AI1 = new Pose2d(1.09, 6.94, Rotation2d.fromDegrees(50));
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
-    public static final Pose2d NAI1 = new Pose2d(0.96, 4.156, Rotation2d.fromDegrees(-50));
+    public static final Pose2d NAI1 = new Pose2d(1.00, 4.19, Rotation2d.fromDegrees(-50));
+    // 0.96 4.156
 
     // Wing Notes
     public static final Pose2d W1 = new Pose2d(2.89, 7.0, Rotation2d.fromDegrees(0.0));
