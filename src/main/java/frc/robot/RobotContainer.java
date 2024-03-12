@@ -91,6 +91,7 @@ import frc.robot.subsystems.elbow.ElbowIOFX;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeIOFX;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineIOFX;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -118,6 +119,7 @@ public class RobotContainer {
   private final ElbowSubsystem elbowSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final ClimbSubsystem climbSubsystem;
+  private final LedSubsystem ledSubsystem;
   private final AutoSwitch autoSwitch;
 
   private final XboxController xboxController = new XboxController(1);
@@ -171,6 +173,7 @@ public class RobotContainer {
     shooterSubsystem = new ShooterSubsystem(shooterIO);
     intakeSubsystem = new IntakeSubsystem(intakeIO);
     magazineSubsystem = new MagazineSubsystem(magazineIO);
+    ledSubsystem = new LedSubsystem();
     climbSubsystem =
         new ClimbSubsystem(climbIO, new ClimbRatchetIOServo(), new TrapBarIOServo(), forkIO);
 
@@ -186,7 +189,8 @@ public class RobotContainer {
             intakeSubsystem,
             magazineSubsystem,
             superStructure,
-            climbSubsystem);
+            climbSubsystem,
+            ledSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
     autoSwitch =
