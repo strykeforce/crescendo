@@ -437,10 +437,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case STOW:
-        if (driveSubsystem.getDistanceToSpeaker() < RobotStateConstants.kSpinUpMinDistance) {
+        if (magazineHasNote() && driveSubsystem.getDistanceToSpeaker() < RobotStateConstants.kSpinUpDistThreshold) {
           superStructure.spinUp();
         } else {
-          superStructure.spinUpWheels(0, 0);
+          superStructure.stopShoot();
         }
 
         break;
