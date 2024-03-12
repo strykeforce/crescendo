@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
-import frc.robot.constants.SuperStructureConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -437,7 +436,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case STOW:
-        if (magazineHasNote() && driveSubsystem.getDistanceToSpeaker() < RobotStateConstants.kLookupMaxDistance) {
+        if (magazineHasNote()
+            && driveSubsystem.getDistanceToSpeaker() < RobotStateConstants.kLookupMaxDistance) {
           superStructure.spinUp();
         } else {
           superStructure.stopShoot();
