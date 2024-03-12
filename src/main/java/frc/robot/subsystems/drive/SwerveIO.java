@@ -27,6 +27,7 @@ public interface SwerveIO {
     public double gyroRate = 0.0;
     public boolean isConnected = false;
     public Pose2d poseMeters = new Pose2d();
+    public double updateCount = 0;
   }
 
   public default SwerveModule[] getSwerveModules() {

@@ -1,16 +1,20 @@
 package frc.robot.subsystems.robotState;
 
 import com.opencsv.CSVReader;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.superStructure.SuperStructure.SuperStructureStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
 import java.util.List;
@@ -23,13 +27,14 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   // Private Variables
-  private Logger logger = LoggerFactory.getLogger(IntakeSubsystem.class);
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private VisionSubsystem visionSubsystem;
   private DriveSubsystem driveSubsystem;
   private IntakeSubsystem intakeSubsystem;
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
+  private ClimbSubsystem climbSubsystem;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
@@ -39,12 +44,29 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
   private Timer ampStowTimer = new Timer();
+  private Timer startShootDelay = new Timer();
+  private Timer climbTrapTimer = new Timer();
+  private Timer scoreTrapTimer = new Timer();
+  private boolean hasDelayed = false;
+  private double shootDelay = 0.0;
+  private boolean hasShootBeamUnbroken = false;
 
   private Alliance allianceColor = Alliance.Blue;
 
   private boolean safeStow = false;
-
+  private boolean decendClimbAfterTrap = false;
+  private boolean continueToTrap = false;
+  private boolean usingDistance = false;
+  private boolean isAuto = false;
+  private boolean shootKnownPos = false;
+  private Pose2d shootPos;
+  private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
+
+  private RobotStates desiredState = RobotStates.STOW;
+  private int curShot = 1;
+
+  private double elbowOffset = RobotStateConstants.kElbowShootOffset;
 
   // Constructor
   public RobotStateSubsystem(
@@ -52,13 +74,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       DriveSubsystem driveSubsystem,
       IntakeSubsystem intakeSubsystem,
       MagazineSubsystem magazineSubsystem,
-      SuperStructure superStructure) {
+      SuperStructure superStructure,
+      ClimbSubsystem climbSubsystem) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
-
+    this.climbSubsystem = climbSubsystem;
+    grabElbowOffsetPreferences();
     parseLookupTable();
   }
 
@@ -74,6 +98,21 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void grabElbowOffsetPreferences() {
+    elbowOffset =
+        Preferences.getDouble(
+            RobotStateConstants.kElbowPreferencesKey, RobotStateConstants.kElbowShootOffset);
+  }
+
+  public double getElbowOffset() {
+    return elbowOffset;
+  }
+
+  public void setElbowOffsetPreferences(double offset) {
+    Preferences.setDouble(RobotStateConstants.kElbowPreferencesKey, offset);
+    elbowOffset = offset;
+  }
+
   public void setAllianceColor(Alliance alliance) {
     allianceColor = alliance;
     logger.info("Change color to: {}", allianceColor);
@@ -85,6 +124,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public boolean hasNote() {
     return magazineSubsystem.hasPiece() || intakeSubsystem.isBeamBroken();
+  }
+
+  public boolean intakeHasNote() {
+    return intakeSubsystem.hasNote();
+  }
+
+  public boolean magazineHasNote() {
+    return magazineSubsystem.hasPiece();
   }
 
   // Helper Methods
@@ -111,9 +158,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double[] getShootSolution(double distance) {
     double[] shootSolution = new double[3];
     int index;
-
+    distance += RobotStateConstants.kDistanceOffset;
+    grabbedShotDistance = distance;
     if (distance < RobotStateConstants.kLookupMinDistance) {
-      index = 0;
+      index = 1;
       logger.warn(
           "Distance {} is less than min distance in table {}",
           distance,
@@ -133,20 +181,32 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       logger.info(
           "Distance: {} | Measured {}", Double.parseDouble(lookupTable[index][0]), distance);
       /*
-      index =
-          (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
-              / RobotStateConstants.kDistanceIncrement;*/
+       * index =
+       * (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
+       * / RobotStateConstants.kDistanceIncrement;
+       */
     }
+
+    logger.info("Left Shooter: {}", lookupTable[index][1]);
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
     shootSolution[1] = Double.parseDouble(lookupTable[index][2]); // Right Shooter
-    shootSolution[2] = Double.parseDouble(lookupTable[index][3]); // Elbow
+    shootSolution[2] = Double.parseDouble(lookupTable[index][3]) + elbowOffset; // Elbow
 
     return shootSolution;
   }
 
+  public boolean getIsAuto() {
+    return isAuto;
+  }
+
   public void setMagazineTune(double speed) {
     magazineTuneSpeed = speed;
+  }
+
+  public void setIsAuto(boolean isAuto) {
+    this.isAuto = isAuto;
+    superStructure.setIsAuto(isAuto);
   }
 
   // Control Methods
@@ -169,16 +229,47 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toAmp() {
     driveSubsystem.setIsAligningShot(false);
+    magazineSubsystem.setSpeed(0.0);
     superStructure.amp();
-    intakeSubsystem.setPercent(0.0);
+    intakeSubsystem.toEjecting();
+    // intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_AMP);
   }
 
+  public void startShootKnownPos(Pose2d pos) {
+    shootPos = pos;
+    shootKnownPos = true;
+    usingDistance = false;
+
+    driveSubsystem.setIsAligningShot(false);
+
+    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(pos));
+
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+    setState(RobotStates.TO_SHOOT);
+  }
+
   public void startShoot() {
+    usingDistance = false;
+    shootKnownPos = false;
     driveSubsystem.setIsAligningShot(true);
 
     double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+    setState(RobotStates.TO_SHOOT);
+  }
+
+  public void startShootDistance(double distance) {
+    usingDistance = true;
+    shootKnownPos = false;
+
+    double[] shootSolution = getShootSolution(distance);
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -198,10 +289,28 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toStow() {
     driveSubsystem.setIsAligningShot(false);
     intakeSubsystem.setPercent(0.0);
-    magazineSubsystem.setSpeed(0.0);
+    // magazineSubsystem.setSpeed(0.0);
     superStructure.stow();
 
     setState(RobotStates.TO_STOW);
+  }
+
+  public void toDefenseStow() {
+    driveSubsystem.setIsAligningShot(false);
+    intakeSubsystem.setPercent(0.0);
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.defenceStow();
+
+    desiredState = RobotStates.INTAKING;
+
+    setState(RobotStates.TO_STOW);
+  }
+
+  public void toDefense() {
+    driveSubsystem.setIsAligningShot(false);
+    superStructure.defense();
+
+    setState(RobotStates.TO_DEFENSE);
   }
 
   public void toPreparePodium() {
@@ -220,6 +329,61 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_SUBWOOFER);
+  }
+
+  public void prepareClimb() {
+    magazineSubsystem.toPrepClimb();
+    climbSubsystem.zero(true);
+    climbSubsystem.extendForks();
+    superStructure.toPrepClimb();
+
+    setState(RobotStates.PREPPING_CLIMB);
+  }
+
+  public void climb(boolean continueToTrap, boolean decendAfterTrap) {
+    climbSubsystem.trapClimb();
+    this.continueToTrap = continueToTrap;
+    this.decendClimbAfterTrap = decendAfterTrap;
+
+    setState(RobotStates.CLIMBING);
+  }
+
+  public void toTrap() {
+    // climbSubsystem.extendTrapBar();
+    superStructure.toTrap();
+
+    setState(RobotStates.TO_TRAP);
+  }
+
+  public void scoreTrap() {
+    scoreTrapTimer.reset();
+    scoreTrapTimer.start();
+    magazineSubsystem.trap();
+    setState(RobotStates.SCORE_TRAP);
+  }
+
+  // Overload of scoreTrap()
+  public void scoreTrap(boolean decend) {
+    scoreTrapTimer.reset();
+    scoreTrapTimer.start();
+    magazineSubsystem.trap();
+    this.decendClimbAfterTrap = decend;
+    setState(RobotStates.SCORE_TRAP);
+  }
+
+  public void decendClimb() {
+    superStructure.toPrepClimb();
+
+    setState(RobotStates.PREPPING_DECEND);
+  }
+
+  public void postClimbStow() {
+    toStow();
+    climbSubsystem.retractForks();
+    climbSubsystem.retractTrapBar();
+    climbSubsystem.stow();
+
+    setState(RobotStates.TO_STOW);
   }
 
   // FIXME
@@ -242,6 +406,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toTune() {
     setState(RobotStates.TO_TUNE);
     superStructure.shootTune();
+    hasDelayed = false;
+  }
+
+  public void setShootDelay(double delay) {
+    shootDelay = delay;
   }
 
   // Periodic
@@ -250,6 +419,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     switch (curState) {
       case TO_STOW:
         if (superStructure.isFinished()) {
+          if (desiredState == RobotStates.INTAKING) {
+            desiredState = RobotStates.STOW;
+            toIntake();
+          }
+
+          if (magazineSubsystem.hasPiece()) {
+            intakeSubsystem.toReversing();
+          } else if (!magazineSubsystem.hasPiece()) {
+            toIntake();
+            break;
+          }
+
           setState(RobotStates.STOW);
         }
         break;
@@ -265,17 +446,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case INTAKING:
-        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
-            && (magazineSubsystem.getState() != MagazineStates.INTAKING
-                && magazineSubsystem.getState() != MagazineStates.REVERSING)) {
-          magazineSubsystem.toIntaking();
-        }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
 
           intakeSubsystem.setPercent(0);
 
           toStow();
+        }
+        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
+            && (magazineSubsystem.getState() != MagazineStates.INTAKING)
+            && magazineSubsystem.hasPiece() == false) {
+          magazineSubsystem.toIntaking();
         }
         break;
 
@@ -303,25 +484,57 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case TO_SHOOT:
-        double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
-        superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+        if (!usingDistance && !shootKnownPos) {
+          double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+          superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+        }
+
+        if (shootKnownPos) {
+          double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos));
+          superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+          double vomega = driveSubsystem.getvOmegaToGoal(shootPos);
+          driveSubsystem.move(0, 0, vomega, true);
+        }
+
+        if (isAuto && !usingDistance) {
+          double vomega = driveSubsystem.getvOmegaToGoal();
+          driveSubsystem.move(0, 0, vomega, true);
+        }
 
         if (driveSubsystem.isDriveStill()
-            && driveSubsystem.isPointingAtGoal()
+            && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
 
+          if (!shootKnownPos) {
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Position",
+                driveSubsystem.getPoseMeters());
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+          } else {
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Position", shootPos);
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+          }
           magazineSubsystem.toEmptying();
 
-          shootDelayTimer.stop();
-          shootDelayTimer.reset();
-          shootDelayTimer.start();
+          curShot += 1;
+          hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
         }
         break;
 
       case SHOOTING:
-        if (shootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
+        if (!hasShootBeamUnbroken && magazineSubsystem.isRevBeamOpen()) {
+          logger.info("Note out of Magazine");
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+          hasShootBeamUnbroken = true;
+        }
+        if (hasShootBeamUnbroken) {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           magazineSubsystem.setSpeed(0);
@@ -335,22 +548,24 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_PODIUM:
         if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
-          superStructure.slowWheelSpin();
+          // superStructure.slowWheelSpin();
+          superStructure.stopShoot();
         }
-        // if (superStructure.isFinished() && magazineSubsystem.getState() == MagazineStates.SHOOT)
+        // if (superStructure.isFinished() && magazineSubsystem.getState() ==
+        // MagazineStates.SHOOT)
         // {
-        //   superStructure.podiumShoot();
+        // superStructure.podiumShoot();
 
-        //   magazineShootDelayTimer.stop();
-        //   magazineShootDelayTimer.reset();
-        //   magazineShootDelayTimer.start();
+        // magazineShootDelayTimer.stop();
+        // magazineShootDelayTimer.reset();
+        // magazineShootDelayTimer.start();
 
-        //   setState(RobotStates.PODIUM_SHOOTING);
+        // setState(RobotStates.PODIUM_SHOOTING);
         // }
         break;
 
       case PODIUM_SHOOTING:
-        if (magazineShootDelayTimer.hasElapsed(ShooterConstants.kShootTime)) {
+        if (magazineShootDelayTimer.hasElapsed(ShooterConstants.kPodiumShootTime)) {
           magazineShootDelayTimer.stop();
 
           superStructure.stopPodiumShoot();
@@ -365,6 +580,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.stop();
           shootDelayTimer.reset();
           shootDelayTimer.start();
+          hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
         }
@@ -378,27 +594,136 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         break;
       case TO_TUNE:
-        if (superStructure.isFinished()) {
+        if (superStructure.isFinished() && !hasDelayed) {
+          startShootDelay.reset();
+          startShootDelay.start();
+          hasDelayed = true;
+        }
+        if (startShootDelay.hasElapsed(shootDelay) && hasDelayed) {
           magazineSubsystem.toEmptying(magazineTuneSpeed);
 
           shootDelayTimer.stop();
           shootDelayTimer.reset();
           shootDelayTimer.start();
+          hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
+          hasDelayed = false;
         }
+        break;
+      case PREPPING_CLIMB:
+        if (climbSubsystem.isFinished()
+            && climbSubsystem.isForkFinished()
+            && climbSubsystem.hasClimbZeroed()
+            && superStructure.isFinished()) {
+          setState(RobotStates.CLIMB_PREPPED);
+        }
+        break;
+      case CLIMB_PREPPED:
+        break;
+
+      case CLIMBING:
+        if (climbSubsystem.getPosition() <= RobotStateConstants.kClimbMoveElbowPos) {
+          superStructure.toFold();
+          setState(RobotStates.FOLDING_OUT);
+        }
+        // if (climbSubsystem.isFinished()) {
+        // setState(RobotStates.FOLDING_OUT);
+        // }
+        break;
+
+      case FOLDING_OUT:
+        if (superStructure.isFinished() && climbSubsystem.isFinished()) {
+          if (continueToTrap) toTrap();
+          else setState(RobotStates.CLIMBED);
+        }
+        break;
+
+      case CLIMBED:
+        break;
+
+      case TO_TRAP:
+        logger.info(
+            "Wrist Pos: {}, greater than: {}",
+            superStructure.getWristPos(),
+            superStructure.getWristPos() >= RobotStateConstants.kMaxWristToMoveTrapBar);
+        if (superStructure.getWristPos() >= RobotStateConstants.kMinWristToMoveTrapBar) {
+          climbSubsystem.extendTrapBar();
+        }
+        if (superStructure.isFinished()) {
+          // climbSubsystem.extendTrapBar();
+          climbTrapTimer.reset();
+          climbTrapTimer.start();
+          setState(RobotStates.TRAP);
+        }
+        break;
+      case TRAP:
+        if (climbTrapTimer.hasElapsed(RobotStateConstants.kClimbTrapTimer)) {
+          scoreTrap(); // Transitions to SCORE_TRAP
+        }
+        // if (!magazineSubsystem.hasPiece()) {
+        // climbSubsystem.retractTrapBar();
+        // superStructure.toFold();
+        // setState(RobotStates.FOLDING_IN);
+        // }
+        break;
+      case SCORE_TRAP:
+        if (scoreTrapTimer.hasElapsed(RobotStateConstants.kTrapTimer)) {
+          superStructure.toFold();
+          setState(RobotStates.FOLDING_IN);
+        }
+        break;
+      case FOLDING_IN:
+        if (superStructure.getWristPos() <= RobotStateConstants.kMaxWristToMoveTrapBar) {
+          climbSubsystem.retractTrapBar();
+        }
+        if (superStructure.isFinished()) {
+          magazineSubsystem.setSpeed(0.0);
+          magazineSubsystem.setEmpty();
+          superStructure.toPrepClimb();
+
+          if (decendClimbAfterTrap) {
+            setState(RobotStates.PREPPING_DECEND);
+          } else {
+            setState(RobotStates.CLIMBED);
+          }
+        }
+        break;
+      case PREPPING_DECEND:
+        if (superStructure.isFinished()) {
+          climbSubsystem.descend();
+
+          setState(RobotStates.DESCENDING);
+        }
+        break;
+      case DESCENDING:
+        if (climbSubsystem.isFinished()) {
+          setState(RobotStates.POST_CLIMB);
+        }
+        break;
+      case POST_CLIMB:
+        break;
+      case TO_DEFENSE:
+        if (superStructure.isFinished()
+            && superStructure.getState() == SuperStructureStates.DEFENSE) {
+          setState(RobotStates.DEFENSE);
+        }
+        break;
+      case DEFENSE:
         break;
       default:
         break;
     }
 
-    org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState.ordinal());
+    org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState);
   }
 
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("state", () -> curState.ordinal()));
+    return Set.of(
+        new Measure("state", () -> curState.ordinal()),
+        new Measure("using distance", () -> usingDistance ? 1.0 : 0.0));
   }
 
   @Override
@@ -421,6 +746,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     PODIUM_SHOOTING,
     TO_SUBWOOFER,
     RELEASE,
-    TO_TUNE
+    TO_TUNE,
+    PREPPING_CLIMB,
+    CLIMB_PREPPED,
+    TO_TRAP,
+    TRAP,
+    SCORE_TRAP,
+    FOLDING_OUT,
+    FOLDING_IN,
+    DESCENDING,
+    POST_CLIMB,
+    PREPPING_DECEND,
+    CLIMBING,
+    CLIMBED,
+    TO_DEFENSE,
+    DEFENSE
   }
 }

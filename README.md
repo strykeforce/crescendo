@@ -31,6 +31,8 @@
 | Shooter   | FX       | rightShoot | 41  |  13      | 10        | falcon |         |
 | Climb     | FX       | leftClimb  | 50  |  15      |           | falcon |         |
 | Climb     | FX       | rightClimb | 51  |  4       |           | falcon |         |
+| Climb     | SRX      | leftFork   | 52  | 7        |           | johnson |        |
+| Climb     | SRX      | rightFork  | 53  | 8        |           | johnson |        |
 | -         | rio      | -          | -   | 20       |           |        |         |
 | coder/sw  | vrm      | top        | -   | 21       |           |        |         |
 | radio     | vrm      | bottom     | -   | 22       |           |        |         |
@@ -55,7 +57,21 @@
 | Robot     | eventInterlock | 6   |
 |           |                | 7   |
 |           |                | 8   |
-|           |                | 9   |
+|           |                | 9   | 
+
+## PWM
+| Subsystem | name         | ID  |
+| --------- | ------------ | --- |
+| Climb     | leftRatchet  | 0   |
+| Climb     | rightRatchet | 1   |
+| Climb     | leftTrapBar  | 2   |
+| Climb     | rightTrapBar | 3   |
+|           |              | 4   |
+|           |              | 5   |
+|           |              | 6   |
+|           |              | 7   |
+|           |              | 8   |
+|           |              | 9 |
 
 ## MXP
 | Subsystem | name   | ID |

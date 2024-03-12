@@ -7,10 +7,22 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.WristConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.AfterHealthCheck;
+import org.strykeforce.healthcheck.BeforeHealthCheck;
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.HealthCheck;
+import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class WristIOSRX implements WristIO {
+public class WristIOSRX implements WristIO, Checkable {
   private Logger logger;
+
+  private double setpoint = 0;
+
+  @HealthCheck
+  @Position(
+      percentOutput = {-0.1, 0.1},
+      encoderChange = 2000)
   private TalonSRX wrist;
 
   public WristIOSRX() {
@@ -26,6 +38,11 @@ public class WristIOSRX implements WristIO {
   }
 
   @Override
+  public String getName() {
+    return "Wrist";
+  }
+
+  @Override
   public void zero() {
     double absolute = wrist.getSensorCollection().getPulseWidthPosition() & 0xFFF;
     double offset = absolute - RobotConstants.kWristZero;
@@ -36,6 +53,7 @@ public class WristIOSRX implements WristIO {
 
   @Override
   public void setPosition(double position) {
+    setpoint = position;
     wrist.set(TalonSRXControlMode.MotionMagic, position);
   }
 
@@ -49,10 +67,18 @@ public class WristIOSRX implements WristIO {
     inputs.position = wrist.getSelectedSensorPosition();
     inputs.isRevLimitSwitch = wrist.isRevLimitSwitchClosed() == 1;
     inputs.isFwdLimitSwitchClosed = wrist.isFwdLimitSwitchClosed() == 1;
+    inputs.setpoint = setpoint;
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(wrist);
+  }
+
+  @BeforeHealthCheck
+  @AfterHealthCheck
+  public boolean goToZero() {
+    setPosition(0.0);
+    return Math.abs(wrist.getSelectedSensorPosition()) <= WristConstants.kCloseEnoughTicks;
   }
 }

@@ -22,6 +22,8 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import java.util.function.BooleanSupplier;
 import org.strykeforce.gyro.SF_AHRS;
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
@@ -29,9 +31,8 @@ import org.strykeforce.swerve.V6TalonSwerveModule;
 import org.strykeforce.swerve.V6TalonSwerveModule.ClosedLoopUnits;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class Swerve implements SwerveIO {
-
-  private final SwerveDrive swerveDrive;
+public class Swerve implements SwerveIO, Checkable {
+  @HealthCheck private final SwerveDrive swerveDrive;
 
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;
@@ -70,6 +71,8 @@ public class Swerve implements SwerveIO {
       configurator = driveTalon.getConfigurator();
       configurator.apply(new TalonFXConfiguration()); // factory default
       configurator.apply(DriveConstants.getDriveTalonConfig());
+      driveTalon.getSupplyVoltage().setUpdateFrequency(100);
+      driveTalon.getSupplyCurrent().setUpdateFrequency(100);
 
       swerveModules[i] =
           moduleBuilder
@@ -100,6 +103,11 @@ public class Swerve implements SwerveIO {
   }
 
   // Getters/Setter
+  @Override
+  public String getName() {
+    return "Swerve";
+  }
+
   public SwerveModule[] getSwerveModules() {
     return swerveDrive.getSwerveModules();
   }
@@ -193,6 +201,7 @@ public class Swerve implements SwerveIO {
     inputs.gyroRate = swerveDrive.getGyroRate();
     inputs.isConnected = ahrs.isConnected();
     inputs.poseMeters = swerveDrive.getPoseMeters();
+    inputs.updateCount = ahrs.getTempC();
   }
 
   @Override

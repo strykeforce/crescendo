@@ -94,7 +94,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     releaseTimer.stop();
     releaseTimer.reset();
     releaseTimer.start();
-    setSpeed(MagazineConstants.kReleaseSpeed);
+    setSpeed(MagazineConstants.kAmpReleaseSpeed);
     setState(MagazineStates.RELEASE);
   }
 
@@ -111,10 +111,23 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.PREP_PODIUM);
   }
 
+  public void toPrepClimb() {
+    setSpeed(MagazineConstants.kReversingSpeed);
+    setState(MagazineStates.REVERSING);
+  }
+
+  public void trap() {
+    setSpeed(MagazineConstants.kTrapReleaseSpeed);
+
+    releaseTimer.reset();
+    releaseTimer.start();
+
+    setState(MagazineStates.TRAP);
+  }
+
   public boolean hasPiece() {
     return curState == MagazineStates.FULL
         || curState == MagazineStates.EMPTYING
-        || curState == MagazineStates.REVERSING
         || curState == MagazineStates.RELEASE;
   }
 
@@ -191,16 +204,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case INTAKING:
         if (isRevBeamBroken()) {
-          setSpeed(MagazineConstants.kReversingSpeed);
-          setState(MagazineStates.REVERSING);
-        }
-        break;
-      case REVERSING:
-        if (isRevBeamOpen()) {
-          setSpeed(0.0);
+          // setSpeed(0.0);
           setState(MagazineStates.FULL);
-        } else {
-          setSpeed(MagazineConstants.kReversingSpeed);
         }
         break;
       case EMPTYING:
@@ -212,7 +217,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case PREP_PODIUM:
         if (isNotePrepped()) {
-          setSpeed(MagazineConstants.kShootSpeed);
+          setSpeed(MagazineConstants.kPodiumShootSpeed);
           setState(MagazineStates.SPEEDUP);
           atEdgeOne = false;
           pastEdgeOne = false;
@@ -226,7 +231,16 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
           setEmpty();
         }
         break;
+      case REVERSING:
+        if (isRevBeamOpen()) {
+          setSpeed(0.0);
+          setState(MagazineStates.FULL);
+        }
+        break;
+      case TRAP:
+        break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("Magazine State", curState);
   }
 
   // Grapher
@@ -246,11 +260,12 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     EMPTY,
     FULL,
     INTAKING,
-    REVERSING,
     EMPTYING,
     SPEEDUP,
     PREP_PODIUM,
     SHOOT,
-    RELEASE
+    RELEASE,
+    TRAP,
+    REVERSING
   }
 }

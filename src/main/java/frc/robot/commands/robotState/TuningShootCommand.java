@@ -18,6 +18,7 @@ public class TuningShootCommand extends InstantCommand {
   DoubleSupplier magazineSpeed;
   DoubleSupplier elbowPos;
   BooleanSupplier duplicateShooters;
+  DoubleSupplier shootDelay;
 
   public TuningShootCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -28,7 +29,8 @@ public class TuningShootCommand extends InstantCommand {
       DoubleSupplier rShooterSpeed,
       DoubleSupplier magazineSpeed,
       DoubleSupplier elbowPos,
-      BooleanSupplier duplicateShooters) {
+      BooleanSupplier duplicateShooters,
+      DoubleSupplier shootDelay) {
     addRequirements(superStructure, magazineSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
     this.superStructure = superStructure;
@@ -39,16 +41,18 @@ public class TuningShootCommand extends InstantCommand {
     this.magazineSpeed = magazineSpeed;
     this.elbowPos = elbowPos;
     this.duplicateShooters = duplicateShooters;
+    this.shootDelay = shootDelay;
   }
 
   @Override
   public void initialize() {
     superStructure.saveSetpoint(
-        -lShooterSpeed.getAsDouble(),
+        lShooterSpeed.getAsDouble(),
         duplicateShooters.getAsBoolean()
             ? lShooterSpeed.getAsDouble()
             : rShooterSpeed.getAsDouble(),
         elbowPos.getAsDouble());
     robotStateSubsystem.setMagazineTune(magazineSpeed.getAsDouble());
+    robotStateSubsystem.setShootDelay(shootDelay.getAsDouble());
   }
 }
