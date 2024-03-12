@@ -21,7 +21,7 @@ public final class SuperStructureConstants {
   public static final double kShooterPreClimbSetPoint = 0.0;
 
   // TRAP
-  public static final double kElbowFoldedSetPoint = -13.94;
+  public static final double kElbowFoldedSetPoint = -11.104; // -13.94
   public static final double kWristFoldedSetPoint = kWristStowSetPoint;
   public static final double kWristTrapSetPoint = 1040.0; // 585 800
   public static final double kElbowTrapSetPoint = kElbowFoldedSetPoint;
