@@ -35,6 +35,7 @@ import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.DriveSpeedSpinCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
@@ -52,7 +53,6 @@ import frc.robot.commands.intake.OpenLoopIntakeCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.magazine.RecoverMagazineCommand;
 import frc.robot.commands.robotState.AirwaveHealthCheck;
-import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
@@ -700,10 +700,12 @@ public class RobotContainer {
         .onTrue(new IncrementRequestPrepClimbCommand(climbSubsystem));
 
     // Amp Prep
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .onTrue(
+    //         new AmpCommand(
+    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(
-            new AmpCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onTrue(new DriveSpeedSpinCommand(driveSubsystem, xboxController));
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
     //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
