@@ -100,6 +100,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isCameraConnected(int index) {
+    if (index == 1) index = 0; // FIXME
     return cams[index].isCameraConnected();
   }
 
@@ -232,7 +233,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
         validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
       }
     }
-
     // Tightens std devs if time elapses
     if (getSeconds() - timeLastVision >= VisionConstants.kTimeToDecayDev
         && curState == VisionStates.TRUSTWHEELS) {
@@ -277,6 +277,25 @@ public class VisionSubsystem extends MeasurableSubsystem {
           cameraPose
               .getTranslation()
               .minus(offsets[idx].rotateBy(cameraPose.getRotation().rotateBy(rotsOff[idx])));
+      Pose2d pose12D = result.getFirstPose().toPose2d();
+      Translation2d trans1 =
+          pose12D
+              .getTranslation()
+              .minus(offsets[idx].rotateBy(pose12D.getRotation().rotateBy(rotsOff[idx])));
+      Rotation2d camRot1 = pose12D.getRotation().rotateBy(rotsOff[idx]);
+
+      Pose2d pose22D = result.getSecondPose().toPose2d();
+      Translation2d trans2 =
+          pose22D
+              .getTranslation()
+              .minus(offsets[idx].rotateBy(pose12D.getRotation().rotateBy(rotsOff[idx])));
+      Rotation2d camRot2 = pose22D.getRotation().rotateBy(rotsOff[idx]);
+
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "VisionSubsystem/Pose1" + names[idx], result.getFirstPose().toPose2d());
+
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "VisionSubsystem/Pose2" + names[idx], result.getSecondPose().toPose2d());
 
       Rotation2d cameraRot = cameraPose.getRotation().rotateBy(rotsOff[idx]);
       // If updating with vision go into state machine to update

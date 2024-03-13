@@ -35,7 +35,7 @@ public final class VisionConstants {
   public static final int powerNumber = 4;
 
   // Constants for cameras
-  public static final int kNumCams = 2;
+  public static final int kNumCams = 1;
 
   // Names
   public static final String kCam1Name = "Shooter";
