@@ -23,4 +23,6 @@ public interface ShooterIO {
   public default void setRightSpeed(double speed) {}
 
   public default void registerWith(TelemetryService telemetryService) {}
+
+  public default void enableFwdLimitSwitch(boolean enabled) {}
 }

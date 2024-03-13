@@ -80,6 +80,11 @@ public class ShooterSubsystem extends MeasurableSubsystem implements ClosedLoopS
     pctOut = true;
     io.setPct(pct);
   }
+
+  public void enableFwdLimitSwitch(boolean enabled) {
+    io.enableFwdLimitSwitch(enabled);
+  }
+
   // Periodic
   @Override
   public void periodic() {
