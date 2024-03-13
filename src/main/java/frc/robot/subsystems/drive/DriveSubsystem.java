@@ -269,6 +269,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return Math.abs(getShooterAngleToSpeaker().getDegrees()) <= DriveConstants.kDegreesCloseEnough;
   }
 
+  public boolean isPointingAtGoal(Pose2d pos) {
+    return Math.abs(getShooterAngleToSpeaker(pos).getDegrees())
+        <= DriveConstants.kDegreesCloseEnough;
+  }
+
   public boolean isDriveStill() {
     double vX = getFieldRelSpeed().vxMetersPerSecond;
     double vY = getFieldRelSpeed().vyMetersPerSecond;
