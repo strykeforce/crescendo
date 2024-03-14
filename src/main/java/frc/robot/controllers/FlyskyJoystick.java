@@ -1,6 +1,7 @@
 package frc.robot.controllers;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class FlyskyJoystick implements ControllerInterface {
   private Joystick flysky;
@@ -23,6 +24,10 @@ public class FlyskyJoystick implements ControllerInterface {
   public double getYaw() {
     return flysky.getRawAxis(Axis.YAW.id);
   }
+
+  public void setRumble(boolean on) {
+    flysky.setRumble(RumbleType.kBothRumble, on ? 1 : 0);
+  };
 
   public enum Axis {
     FWD(0),

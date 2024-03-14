@@ -7,4 +7,6 @@ public interface ControllerInterface {
   public double getStr();
 
   public double getYaw();
+
+  public void setRumble(boolean on);
 }

@@ -57,7 +57,8 @@ public class Robot extends LoggedRobot {
 
       // Comp robot conditions or not
       eventFlag = new DigitalInput(RobotConstants.kEventInterlockID);
-      isEvent = eventFlag.get();
+      // isEvent = eventFlag.get();
+      isEvent = false;
       if (isEvent) {
         System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
         System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");

@@ -344,6 +344,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     climbSubsystem.trapClimb();
     this.continueToTrap = continueToTrap;
     this.decendClimbAfterTrap = decendAfterTrap;
+    visionSubsystem.setVisionUpdates(false);
 
     setState(RobotStates.CLIMBING);
   }
@@ -698,6 +699,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case DESCENDING:
         if (climbSubsystem.isFinished()) {
+          visionSubsystem.setVisionUpdates(true);
           setState(RobotStates.POST_CLIMB);
         }
         break;

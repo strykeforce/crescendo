@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.XboxController;
@@ -56,6 +57,7 @@ import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
+import frc.robot.commands.robotState.DriverRumbleCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
@@ -377,6 +379,16 @@ public class RobotContainer {
                 elbowSubsystem, 16.914, () -> robotStateSubsystem.getElbowOffset()))
         .withPosition(7, 0)
         .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("driver rumble", new DriverRumbleCommand(robotStateSubsystem, driveJoystick))
+        .withPosition(2, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("operator rumble", new OperatorRumbleCommand(robotStateSubsystem, xboxController))
+        .withPosition(2, 2)
+        .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
     // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))()
     // .withSize(1, 1)
@@ -673,12 +685,19 @@ public class RobotContainer {
 
     new Trigger(() -> robotStateSubsystem.hasNote())
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+    new Trigger(() -> robotStateSubsystem.hasNote())
+        .onTrue(new DriverRumbleCommand(robotStateSubsystem, driveJoystick));
 
     new Trigger(
             () ->
                 (robotStateSubsystem.getState() == RobotStates.TO_PODIUM
                     && magazineSubsystem.getSpeed() >= MagazineConstants.kPodiumRumbleSpeed))
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+    new Trigger(
+            () ->
+                (robotStateSubsystem.getState() == RobotStates.TO_PODIUM
+                    && magazineSubsystem.getSpeed() >= MagazineConstants.kPodiumRumbleSpeed))
+        .onTrue(new DriverRumbleCommand(robotStateSubsystem, driveJoystick));
 
     // Open Loop Elbow
     new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
@@ -869,6 +888,11 @@ public class RobotContainer {
     // Elbow at zero
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, 0.0));
+  }
+
+  public void setDriverRumble(boolean on) {
+    FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
+    flysky.setRumble(on);
   }
 
   public Command getAutonomousCommand() {
