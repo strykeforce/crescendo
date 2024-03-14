@@ -49,7 +49,8 @@ public class Swerve implements SwerveIO, Checkable {
         new V6TalonSwerveModule.V6Builder()
             .driveGearRatio(DriveConstants.kDriveGearRatio)
             .wheelDiameterInches(RobotConstants.kWheelDiameterInches)
-            .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond);
+            .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond)
+            .latencyCompensation(true);
 
     V6TalonSwerveModule[] swerveModules = new V6TalonSwerveModule[4];
     Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
@@ -85,7 +86,7 @@ public class Swerve implements SwerveIO, Checkable {
     }
 
     ahrs = new SF_AHRS(SerialPort.Port.kUSB, SerialDataType.kProcessedData, (byte) 200);
-    swerveDrive = new SwerveDrive(ahrs, swerveModules);
+    swerveDrive = new SwerveDrive(true, 0.02, ahrs, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
 
