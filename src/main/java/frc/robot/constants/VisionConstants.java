@@ -45,6 +45,8 @@ public final class VisionConstants {
   public static final int kCam1Idx = 0;
   public static final int kCam2Idx = 0;
 
+  public static final double kLoopTime = 0.02;
+
   // Poses
   public static final Pose3d kCam1Pose =
       new Pose3d(
