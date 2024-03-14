@@ -35,7 +35,7 @@ public final class VisionConstants {
   public static final int powerNumber = 4;
 
   // Constants for cameras
-  public static final int kNumCams = 1;
+  public static final int kNumCams = 2;
 
   // Names
   public static final String kCam1Name = "Shooter";
@@ -46,7 +46,7 @@ public final class VisionConstants {
   public static final int kCam2Idx = 0;
 
   public static final double kLoopTime = 0.02;
-
+  public static final int kCircularBufferSize = 1000;
   // Poses
   public static final Pose3d kCam1Pose =
       new Pose3d(

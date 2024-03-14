@@ -58,7 +58,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   AprilTagFieldLayout field;
 
-  CircularBuffer<Double> gyroData = new CircularBuffer<Double>(1000);
+  CircularBuffer<Double> gyroData = new CircularBuffer<Double>(VisionConstants.kCircularBufferSize);
 
   // Deadeye<TargetListTargetData> cam = new Deadeye<TargetListTargetData>("A0",
   // TargetListTargetData.class, NetworkTableInstance.getDefault(), null);
@@ -199,10 +199,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   private Pose2d getCorrectPose(Pose2d pose1, Pose2d pose2, double timestamp) {
     Pose2d closest = new Pose2d();
+    if (gyroData.size() != VisionConstants.kCircularBufferSize) return pose1;
     double rotation =
         gyroData.get(
             FastMath.floorToInt(
-                (RobotController.getFPGATime() - timestamp) / VisionConstants.kLoopTime));
+                ((RobotController.getFPGATime() - timestamp) / 1000000.0)
+                    / VisionConstants.kLoopTime));
     return getCloserPose(pose1, pose2, rotation);
   }
 
@@ -358,7 +360,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
               String rawCamera = "VisionSubsystem/RawAcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
                   rawCamera, result.getCameraPose().toPose2d());
-
+              org.littletonrobotics.junction.Logger.recordOutput(
+                  "VisionSubsystem/Timestamp", result.getTimeStamp());
               updatesToWheels++;
 
               fedStdDevs = scaledStdDev.get(0, 0);
