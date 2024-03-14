@@ -11,14 +11,14 @@ public final class AutonConstants {
   public static final String[][] kNonAmpPathMatrix = {
     {
       null,
-      "NonAmpShoot1_MiddleNote1.toml",
-      "NonAmpShoot1_MiddleNote2.toml",
-      "NonAmpShoot1_MiddleNote3.toml",
-      "NonAmpShoot1_MiddleNote4.toml",
-      "NonAmpShoot1_MiddleNote5.toml"
+      "NonAmpShoot2_MiddleNote1.toml",
+      "NonAmpShoot2_MiddleNote2.toml",
+      "NonAmpShoot2_MiddleNote3.toml",
+      "NonAmpShoot2_MiddleNote4.toml",
+      "NonAmpShoot2_MiddleNote5.toml"
     },
     {
-      "MiddleNote1_NonAmpShoot.toml",
+      "MiddleNote1_NonAmpShoot2.toml",
       null,
       "MiddleNote1_MiddleNote2.toml",
       "MiddleNote1_MiddleNote3.toml",
@@ -26,7 +26,7 @@ public final class AutonConstants {
       "MiddleNote1_MiddleNote5.toml"
     },
     {
-      "MiddleNote2_NonAmpShoot.toml",
+      "MiddleNote2_NonAmpShoot2.toml",
       "MiddleNote2_MiddleNote1.toml",
       null,
       "MiddleNote2_MiddleNote3",
@@ -34,7 +34,7 @@ public final class AutonConstants {
       "MiddleNote2_MiddleNote5.toml"
     },
     {
-      "MiddleNote3_NonAmpShoot.toml",
+      "MiddleNote3_NonAmpShoot2.toml",
       "MiddleNote3_MiddleNote1.toml",
       "MiddleNote3_MiddleNote2.toml",
       null,
@@ -42,7 +42,7 @@ public final class AutonConstants {
       "MiddleNote3_MiddleNote5.toml"
     },
     {
-      "MiddleNote4_NonAmpShoot.toml",
+      "MiddleNote4_NonAmpShoot2.toml",
       "MiddleNote4_MiddleNote1.toml",
       "MiddleNote4_MiddleNote2.toml",
       "MiddleNote4_MiddleNote3.toml",
@@ -50,7 +50,7 @@ public final class AutonConstants {
       "MiddleNote4_MiddleNote5.toml"
     },
     {
-      "MiddleNote5_NonAmpShoot.toml",
+      "MiddleNote5_NonAmpShoot2.toml",
       "MiddleNote5_MiddleNote1.toml",
       "MiddleNote5_MiddleNote2.toml",
       "MiddleNote5_MiddleNote3.toml",
