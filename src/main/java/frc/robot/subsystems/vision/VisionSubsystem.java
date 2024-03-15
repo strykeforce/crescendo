@@ -212,8 +212,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
 
-    gyroData.addFirst(driveSubsystem.getGyroRotation2d().getRadians());
-
+    gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
+    logger.info(gyroData.getFirst() + "");
     org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/State", curState.name());
 
     scaledStdDev = adaptiveVisionMatrix.copy();
@@ -281,6 +281,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
       // Take out data from pair
       WallEyeResult result = res.getFirst();
+
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "VisionSubsystem/Timestamp", result.getTimeStamp());
       int idx = res.getSecond();
 
       for (int i = 0; i < 2; ++i)
@@ -294,23 +297,41 @@ public class VisionSubsystem extends MeasurableSubsystem {
                       result.getNumTags()));
 
       Pose2d cameraPose;
+      Translation2d centerPos;
+      Rotation2d cameraRot;
 
       // Get center of Robot pose
       if (result.getNumTags() > 1) {
         cameraPose = result.getCameraPose().toPose2d();
+
+        centerPos =
+            cameraPose
+                .getTranslation()
+                .minus(offsets[idx].rotateBy(cameraPose.getRotation().rotateBy(rotsOff[idx])));
+
+        cameraRot = cameraPose.getRotation().rotateBy(rotsOff[idx]);
       } else {
-        Pose2d cameraPose1 = result.getFirstPose().toPose2d().rotateBy(rotsOff[idx]);
-        Pose2d cameraPose2 = result.getSecondPose().toPose2d().rotateBy(rotsOff[idx]);
+        Pose2d cameraPose1 = result.getFirstPose().toPose2d();
+        Pose2d cameraPose2 = result.getSecondPose().toPose2d();
+
+        cameraPose1 =
+            new Pose2d(
+                cameraPose1.getTranslation(), cameraPose1.getRotation().rotateBy(rotsOff[idx]));
+        cameraPose2 =
+            new Pose2d(
+                cameraPose2.getTranslation(), cameraPose2.getRotation().rotateBy(rotsOff[idx]));
+
+        String outputString = "VisionSubsystem/Pose" + names[idx] + "1";
+        org.littletonrobotics.junction.Logger.recordOutput(outputString, cameraPose1);
+        outputString = "VisionSubsystem/Pose" + names[idx] + "2";
+        org.littletonrobotics.junction.Logger.recordOutput(outputString, cameraPose2);
 
         cameraPose = getCorrectPose(cameraPose1, cameraPose2, result.getTimeStamp());
+
+        centerPos =
+            cameraPose.getTranslation().minus(offsets[idx].rotateBy(cameraPose.getRotation()));
+        cameraRot = cameraPose.getRotation();
       }
-
-      Translation2d centerPos =
-          cameraPose
-              .getTranslation()
-              .minus(offsets[idx].rotateBy(cameraPose.getRotation().rotateBy(rotsOff[idx])));
-
-      Rotation2d cameraRot = cameraPose.getRotation().rotateBy(rotsOff[idx]);
       // If updating with vision go into state machine to update
       if (visionUpdates) {
         switch (curState) {
@@ -360,8 +381,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
               String rawCamera = "VisionSubsystem/RawAcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
                   rawCamera, result.getCameraPose().toPose2d());
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  "VisionSubsystem/Timestamp", result.getTimeStamp());
               updatesToWheels++;
 
               fedStdDevs = scaledStdDev.get(0, 0);
