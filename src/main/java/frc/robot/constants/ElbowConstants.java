@@ -136,7 +136,7 @@ public final class ElbowConstants {
             .withReverseLimitAutosetPositionValue(kElbowResetPos)
             .withReverseLimitAutosetPositionEnable(true)
             .withReverseLimitEnable(true)
-            .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen);
+            .withReverseLimitType(ReverseLimitTypeValue.NormallyClosed);
 
     return hardwareConfig;
   }
@@ -147,7 +147,7 @@ public final class ElbowConstants {
             .withReverseLimitAutosetPositionValue(kElbowResetPos)
             .withReverseLimitAutosetPositionEnable(false)
             .withReverseLimitEnable(false)
-            .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen);
+            .withReverseLimitType(ReverseLimitTypeValue.NormallyClosed);
 
     return hardwareConfig;
   }
