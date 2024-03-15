@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.VisionConstants;
@@ -57,6 +58,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   AprilTagFieldLayout field;
 
+  CircularBuffer<Double> gyroData = new CircularBuffer<Double>(VisionConstants.kCircularBufferSize);
+
   // Deadeye<TargetListTargetData> cam = new Deadeye<TargetListTargetData>("A0",
   // TargetListTargetData.class, NetworkTableInstance.getDefault(), null);
 
@@ -100,6 +103,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isCameraConnected(int index) {
+    if (index == 1) index = 0; // FIXME
     return cams[index].isCameraConnected();
   }
 
@@ -187,10 +191,29 @@ public class VisionSubsystem extends MeasurableSubsystem {
             FastMath.pow(VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
   }
 
+  private Pose2d getCloserPose(Pose2d pose1, Pose2d pose2, double rotation) {
+    if (Math.abs(rotation - pose1.getRotation().getRadians())
+        <= Math.abs(rotation - pose2.getRotation().getRadians())) return pose1;
+    else return pose2;
+  }
+
+  private Pose2d getCorrectPose(Pose2d pose1, Pose2d pose2, double timestamp) {
+    Pose2d closest = new Pose2d();
+    if (gyroData.size() != VisionConstants.kCircularBufferSize) return pose1;
+    double rotation =
+        gyroData.get(
+            FastMath.floorToInt(
+                ((RobotController.getFPGATime() - timestamp) / 1000000.0)
+                    / VisionConstants.kLoopTime));
+    return getCloserPose(pose1, pose2, rotation);
+  }
+
   // Periodic
   @Override
   public void periodic() {
 
+    gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
+    logger.info(gyroData.getFirst() + "");
     org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/State", curState.name());
 
     scaledStdDev = adaptiveVisionMatrix.copy();
@@ -232,7 +255,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
         validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
       }
     }
-
     // Tightens std devs if time elapses
     if (getSeconds() - timeLastVision >= VisionConstants.kTimeToDecayDev
         && curState == VisionStates.TRUSTWHEELS) {
@@ -259,6 +281,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
       // Take out data from pair
       WallEyeResult result = res.getFirst();
+
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "VisionSubsystem/Timestamp", result.getTimeStamp());
       int idx = res.getSecond();
 
       for (int i = 0; i < 2; ++i)
@@ -271,14 +296,42 @@ public class VisionSubsystem extends MeasurableSubsystem {
                       result.getNumTags() == 1 ? minTagDistance(result) : avgTagDistance(result),
                       result.getNumTags()));
 
-      // Get center of Robot pose
-      Pose2d cameraPose = result.getCameraPose().toPose2d();
-      Translation2d centerPos =
-          cameraPose
-              .getTranslation()
-              .minus(offsets[idx].rotateBy(cameraPose.getRotation().rotateBy(rotsOff[idx])));
+      Pose2d cameraPose;
+      Translation2d centerPos;
+      Rotation2d cameraRot;
 
-      Rotation2d cameraRot = cameraPose.getRotation().rotateBy(rotsOff[idx]);
+      // Get center of Robot pose
+      if (result.getNumTags() > 1) {
+        cameraPose = result.getCameraPose().toPose2d();
+
+        centerPos =
+            cameraPose
+                .getTranslation()
+                .minus(offsets[idx].rotateBy(cameraPose.getRotation().rotateBy(rotsOff[idx])));
+
+        cameraRot = cameraPose.getRotation().rotateBy(rotsOff[idx]);
+      } else {
+        Pose2d cameraPose1 = result.getFirstPose().toPose2d();
+        Pose2d cameraPose2 = result.getSecondPose().toPose2d();
+
+        cameraPose1 =
+            new Pose2d(
+                cameraPose1.getTranslation(), cameraPose1.getRotation().rotateBy(rotsOff[idx]));
+        cameraPose2 =
+            new Pose2d(
+                cameraPose2.getTranslation(), cameraPose2.getRotation().rotateBy(rotsOff[idx]));
+
+        String outputString = "VisionSubsystem/Pose" + names[idx] + "1";
+        org.littletonrobotics.junction.Logger.recordOutput(outputString, cameraPose1);
+        outputString = "VisionSubsystem/Pose" + names[idx] + "2";
+        org.littletonrobotics.junction.Logger.recordOutput(outputString, cameraPose2);
+
+        cameraPose = getCorrectPose(cameraPose1, cameraPose2, result.getTimeStamp());
+
+        centerPos =
+            cameraPose.getTranslation().minus(offsets[idx].rotateBy(cameraPose.getRotation()));
+        cameraRot = cameraPose.getRotation();
+      }
       // If updating with vision go into state machine to update
       if (visionUpdates) {
         switch (curState) {
@@ -328,7 +381,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
               String rawCamera = "VisionSubsystem/RawAcceptedCam" + names[idx] + "Pose";
               org.littletonrobotics.junction.Logger.recordOutput(
                   rawCamera, result.getCameraPose().toPose2d());
-
               updatesToWheels++;
 
               fedStdDevs = scaledStdDev.get(0, 0);
