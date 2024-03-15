@@ -35,7 +35,6 @@ import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
-import frc.robot.commands.drive.DriveSpeedSpinCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
@@ -53,6 +52,7 @@ import frc.robot.commands.intake.OpenLoopIntakeCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.magazine.RecoverMagazineCommand;
 import frc.robot.commands.robotState.AirwaveHealthCheck;
+import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
@@ -74,6 +74,7 @@ import frc.robot.commands.robotState.UpdateElbowOffsetCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
@@ -93,6 +94,7 @@ import frc.robot.subsystems.intake.IntakeIOFX;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineIOFX;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
+import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.shooter.ShooterIOFX;
@@ -101,6 +103,7 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import java.util.List;
 import java.util.Map;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
@@ -119,6 +122,7 @@ public class RobotContainer {
   private final ShooterSubsystem shooterSubsystem;
   private final ClimbSubsystem climbSubsystem;
   private final AutoSwitch autoSwitch;
+  private final PathHandler pathHandler;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -189,6 +193,17 @@ public class RobotContainer {
             climbSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
+
+    pathHandler =
+        new PathHandler(
+            null,
+            robotStateSubsystem,
+            driveSubsystem,
+            List.of(3, 4, 5),
+            AutonConstants.kNonAmpPathMatrix,
+            false,
+            2.0);
+
     autoSwitch =
         new AutoSwitch(
             robotStateSubsystem,
@@ -199,7 +214,8 @@ public class RobotContainer {
             climbSubsystem,
             elbowSubsystem,
             wristSubsystem,
-            shooterSubsystem);
+            shooterSubsystem,
+            pathHandler);
 
     // visionSubsystem.setVisionUpdates(false);
     nonAmpAutonPath =
@@ -700,12 +716,12 @@ public class RobotContainer {
         .onTrue(new IncrementRequestPrepClimbCommand(climbSubsystem));
 
     // Amp Prep
-    // new JoystickButton(xboxController, XboxController.Button.kA.value)
-    //     .onTrue(
-    //         new AmpCommand(
-    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new DriveSpeedSpinCommand(driveSubsystem, xboxController));
+        .onTrue(
+            new AmpCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .onTrue(new DriveSpeedSpinCommand(driveSubsystem, xboxController));
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
     //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));

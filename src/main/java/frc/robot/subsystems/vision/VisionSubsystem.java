@@ -213,7 +213,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   public void periodic() {
 
     gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
-    logger.info(gyroData.getFirst() + "");
+
     org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/State", curState.name());
 
     scaledStdDev = adaptiveVisionMatrix.copy();

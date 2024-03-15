@@ -81,6 +81,7 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   public void setState(PathStates state) {
+    logger.info("{} -> {}", curState, state);
     curState = state;
   }
 
@@ -125,6 +126,7 @@ public class PathHandler extends MeasurableSubsystem {
   @Override
   public void periodic() {
     if (handling) {
+      org.littletonrobotics.junction.Logger.recordOutput("PathHandler State", curState.name());
       switch (curState) {
         case SHOOT:
           if (canShoot) {
@@ -141,6 +143,7 @@ public class PathHandler extends MeasurableSubsystem {
               nextPath = paths[0][noteOrder.get(0)];
             }
 
+            logger.info("Begin Trajectory " + pathNames[0][noteOrder.get(0)]);
             startNewPath(nextPath);
             logger.info("SHOOT -> DRIVE_FETCH");
             curState = PathStates.DRIVE_FETCH;
@@ -151,6 +154,8 @@ public class PathHandler extends MeasurableSubsystem {
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
 
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
+
+            driveSubsystem.drive(0, 0, 0);
             logger.info("DRIVE_FETCH -> FETCH");
             timer.reset();
             timer.start();
@@ -173,8 +178,9 @@ public class PathHandler extends MeasurableSubsystem {
             numPieces -= 0.5;
             logger.info("FETCH -> DRIVE_SHOOT");
             nextPath = paths[noteOrder.get(0)][0];
+            logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
             noteOrder.remove(0);
-            curState = PathStates.SHOOT;
+            curState = PathStates.DRIVE_SHOOT;
             startNewPath(nextPath);
           }
 
@@ -202,6 +208,7 @@ public class PathHandler extends MeasurableSubsystem {
           break;
 
         case DONE:
+          handling = false;
           break;
 
         default:
