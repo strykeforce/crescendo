@@ -10,6 +10,7 @@ public interface ShooterIO {
     public double velocityLeft;
     public double velocityRight;
     public double leftSetpoint = 0.0;
+    public boolean isFwdLimitSwitchClosed = false;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {}
@@ -23,6 +24,4 @@ public interface ShooterIO {
   public default void setRightSpeed(double speed) {}
 
   public default void registerWith(TelemetryService telemetryService) {}
-
-  public default void enableFwdLimitSwitch(boolean enabled) {}
 }
