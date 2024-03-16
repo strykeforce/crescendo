@@ -2,10 +2,13 @@ package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
@@ -14,6 +17,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 public final class ElbowConstants {
   public static final int kElbowTalonFxId = 30;
   public static final int kRemoteEncoderID = 31;
+  public static final int kHighResCANcoderID = 32;
   public static final double kCloseEnoughRots = 1;
   public static final double kMaxPivotTicks = 0;
   public static final double kMinPivotTicks = 1000;
@@ -30,6 +34,9 @@ public final class ElbowConstants {
   public static final double kZeroOffset = 0.00276; // 1 degree = 0.00276
   public static final double kZeroVelocity = 0.05;
 
+  public static final int kPreciseSlot = 1;
+  public static final int kNormalSlot = 0;
+
   // Zero Recovery Constants
   public static final double kZeroRecoveryVelocity = 0.05;
   public static final double kMinVelocityZeroing = 1;
@@ -38,6 +45,14 @@ public final class ElbowConstants {
   public static final double kCloseEnoughAbs = 0.0001;
 
   public static CANcoderConfiguration getCanCoderConfig() {
+    CANcoderConfiguration config = new CANcoderConfiguration();
+
+    config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+
+    return config;
+  }
+
+  public static CANcoderConfiguration getHighResCANcoderConfig() {
     CANcoderConfiguration config = new CANcoderConfiguration();
 
     config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
@@ -70,6 +85,17 @@ public final class ElbowConstants {
     slot0.GravityType = GravityTypeValue.Elevator_Static;
     config.Slot0 = slot0;
 
+    Slot1Configs slot1 = new Slot1Configs();
+    slot1.kP = 2.0; // 1.2
+    slot1.kI = 2.0;
+    slot1.kD = 0.2;
+    slot1.kS = 0.0;
+    slot1.kV = 0.110;
+    slot1.kA = 0.0;
+    slot1.kG = -0.150;
+    slot1.GravityType = GravityTypeValue.Elevator_Static;
+    config.Slot1 = slot1;
+
     // MotionMagicConfigs motionMagic =
     //     new MotionMagicConfigs()
     //         .withMotionMagicAcceleration(400)
@@ -78,6 +104,22 @@ public final class ElbowConstants {
     config.MotionMagic = getZeroConfig();
 
     config.HardwareLimitSwitch = getZeroLimitConfig();
+
+    return config;
+  }
+
+  public static FeedbackConfigs getPreciseConfig() {
+    FeedbackConfigs config = new FeedbackConfigs();
+
+    config.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+
+    return config;
+  }
+
+  public static FeedbackConfigs getNormalConfig() {
+    FeedbackConfigs config = new FeedbackConfigs();
+
+    config.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
     return config;
   }

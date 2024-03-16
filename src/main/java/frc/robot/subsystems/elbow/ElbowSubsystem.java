@@ -23,6 +23,8 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private int recoveryZeroStableCounts = 0;
   private double prevRecoveryAbs = 0.0;
 
+  private boolean isPrecise = false;
+
   public ElbowSubsystem(ElbowIO io) {
     this.io = io;
     // this.encoderIo = encoderIo;
@@ -33,7 +35,25 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public void setPosition(double position) {
-    io.setPosition(position);
+    setPosition(position, false);
+  }
+
+  public void setPosition(double position, boolean precise) {
+    if (isPrecise != precise) {
+      logger.info("isPrecise: {} -> {}", isPrecise, precise);
+      if (precise) {
+        io.setPosition(position, ElbowConstants.kNormalSlot);
+        io.setPreciseControl();
+        io.setPosition(position, ElbowConstants.kPreciseSlot);
+      } else {
+        io.setNormalControl();
+        io.setPosition(position, ElbowConstants.kNormalSlot);
+      }
+    } else {
+      io.setPosition(
+          position, isPrecise ? ElbowConstants.kPreciseSlot : ElbowConstants.kNormalSlot);
+    }
+    isPrecise = precise;
 
     if (setpoint != position) logger.info("Elbow moving to {} rotations", setpoint);
 
@@ -90,7 +110,9 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     // io.zeroBlind();
     hasZeroed = false;
     // setState(ElbowStates.ZEROED);
-    io.setPosition(ElbowConstants.kZeroPos);
+    io.configHardwareLimit(ElbowConstants.getZeroLimitConfig());
+    io.configMotionMagic(ElbowConstants.getZeroConfig());
+    io.setPosition(ElbowConstants.kZeroPos, 0);
     setState(ElbowStates.ZEROING);
     setpoint = ElbowConstants.kZeroPos;
   }
@@ -98,7 +120,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void zeroRecovery() {
     io.zeroRecovery();
     setState(ElbowStates.RECOVERY_ZEROING);
-    io.setPosition(0.0);
+    io.setPosition(0.0, 0);
     setpoint = 0.0;
     numRecoveryZeros = 1;
 
@@ -109,6 +131,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void periodic() {
     io.updateInputs(inputs);
     org.littletonrobotics.junction.Logger.processInputs("Elbow", inputs);
+    org.littletonrobotics.junction.Logger.recordOutput("Elbow Is Precise", isPrecise);
 
     switch (curState) {
       case IDLE:
@@ -143,6 +166,9 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         if (inputs.revLimitClosed) {
           io.configHardwareLimit(ElbowConstants.getRunLimitConfig());
           io.configMotionMagic(ElbowConstants.getRunConfig());
+
+          io.setHighResCANcoderPos();
+
           hasZeroed = true;
           logger.info("Zeroed");
 

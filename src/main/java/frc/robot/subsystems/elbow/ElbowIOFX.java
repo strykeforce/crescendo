@@ -34,6 +34,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   private TalonFX elbow;
 
   private CANcoder remoteEncoder;
+  private CANcoder highResCANcoder;
 
   private double absSensorInitial;
   private double relSetpointOffset;
@@ -48,13 +49,20 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   StatusSignal<Double> currVelocity;
   StatusSignal<Double> absRots;
   StatusSignal<ReverseLimitValue> revLim;
+  StatusSignal<Double> curHighResPosition;
 
   public ElbowIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    elbow = new TalonFX(ElbowConstants.kElbowTalonFxId);
+    elbow = new TalonFX(ElbowConstants.kElbowTalonFxId, "*");
     remoteEncoder = new CANcoder(ElbowConstants.kRemoteEncoderID);
+    highResCANcoder = new CANcoder(ElbowConstants.kHighResCANcoderID, "*");
 
     CANcoderConfigurator canCoderConfig = remoteEncoder.getConfigurator();
+    CANcoderConfigurator highResCANcoderConfig = highResCANcoder.getConfigurator();
+
+    highResCANcoderConfig.apply(new CANcoderConfiguration());
+    highResCANcoderConfig.apply(ElbowConstants.getHighResCANcoderConfig());
+
     canCoderConfig.apply(new CANcoderConfiguration());
     canCoderConfig.apply(ElbowConstants.getCanCoderConfig());
 
@@ -68,6 +76,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
     currVelocity = elbow.getVelocity();
     absRots = remoteEncoder.getAbsolutePosition();
     revLim = elbow.getReverseLimit();
+    curHighResPosition = highResCANcoder.getPosition();
   }
 
   @Override
@@ -143,9 +152,30 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   }
 
   @Override
-  public void setPosition(double position) {
-    setpoint = position + setpointOffset;
+  public void setHighResCANcoderPos() {
+    double pos = currPosition.getValueAsDouble();
 
+    pos /= 1.0; // FIXME
+
+    highResCANcoder.setPosition(pos);
+  }
+
+  @Override
+  public void setPreciseControl() {
+    configurator = elbow.getConfigurator();
+    configurator.apply(ElbowConstants.getPreciseConfig());
+  }
+
+  @Override
+  public void setNormalControl() {
+    configurator = elbow.getConfigurator();
+    configurator.apply(ElbowConstants.getNormalConfig());
+  }
+
+  @Override
+  public void setPosition(double position, int slot) {
+    setpoint = position + setpointOffset;
+    positionRequst.withSlot(slot);
     elbow.setControl(positionRequst.withPosition(setpoint));
   }
 
@@ -162,6 +192,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
     inputs.velocity = currVelocity.refresh().getValue();
     inputs.revLimitClosed = revLim.refresh().getValue() == ReverseLimitValue.ClosedToGround;
     inputs.setpoint = setpoint;
+    inputs.highResPosRots = curHighResPosition.refresh().getValueAsDouble();
   }
 
   @Override
@@ -191,7 +222,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   @BeforeHealthCheck
   @AfterHealthCheck
   public boolean goToZero() {
-    setPosition(0.0);
+    setPosition(0.0, 0);
     return Math.abs(currPosition.refresh().getValue() - setpointOffset)
         <= ElbowConstants.kCloseEnoughRots;
   }
