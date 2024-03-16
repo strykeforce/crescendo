@@ -21,7 +21,7 @@ public final class MagazineConstants {
   public static final double kReleaseTime = 0.75;
   public static final double kPodiumPrepareSpeed = -10;
   public static final double kPodiumShootSpeed = 105; // 90
-  public static final double kTrapReleaseSpeed = -20.0; // -30.0
+  public static final double kTrapReleaseSpeed = -15.0; // -30.0
   public static final double kTrapReleaseTime = 0.75;
   public static final double kAmpReleaseSpeed = 20.0;
   public static final double kPodiumRumbleSpeed = 80;
