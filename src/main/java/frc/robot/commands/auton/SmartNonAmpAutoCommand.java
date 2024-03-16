@@ -16,6 +16,7 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import java.util.List;
 
 public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements AutoCommandInterface {
   private PathHandler pathHandler;
@@ -51,6 +52,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
   }
 
   public void generateTrajectory() {
+    pathHandler.setPreference(List.of(3, 5, 4, 3, 5, 4, 3, 4, 5, 3));
     pathHandler.generateTrajectory();
     hasGenerated = true;
   }

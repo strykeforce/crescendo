@@ -199,7 +199,7 @@ public class RobotContainer {
             null,
             robotStateSubsystem,
             driveSubsystem,
-            List.of(3, 4, 5),
+            List.of(),
             AutonConstants.kNonAmpPathMatrix,
             false,
             2.0);

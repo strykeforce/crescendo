@@ -6,7 +6,7 @@ public final class RobotStateConstants {
   public static final double kLookupMaxDistance = 5.4; // 540cm
   public static final double kDistanceIncrement = 0.01; // 1cm
   public static final double kDistanceOffset = 0.00;
-  public static final double kElbowShootOffset = 0.45; // .5 .7
+  public static final double kElbowShootOffset = 0.0; // .5 .7
   public static final String kElbowPreferencesKey = "Elbow/Offset";
 
   public static final double kSpeakerY = 5.547868; // m

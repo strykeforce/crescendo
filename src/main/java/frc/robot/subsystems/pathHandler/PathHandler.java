@@ -9,6 +9,7 @@ import frc.robot.subsystems.drive.PathData;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -69,8 +70,10 @@ public class PathHandler extends MeasurableSubsystem {
   public void generateTrajectory() {
     noteOrder.add(0);
 
-    for (int i : noteOrder)
-      for (int j : noteOrder)
+    Set<Integer> singleNotes = new HashSet<Integer>(noteOrder);
+
+    for (int i : singleNotes)
+      for (int j : singleNotes)
         if (i != j) paths[i][j] = driveSubsystem.generateTrajectory(pathNames[i][j]);
 
     noteOrder.remove(noteOrder.indexOf(0));
@@ -85,8 +88,8 @@ public class PathHandler extends MeasurableSubsystem {
     curState = state;
   }
 
-  public void setPreference(ArrayList<Integer> list) {
-    noteOrder = list;
+  public void setPreference(List<Integer> list) {
+    noteOrder = new ArrayList<>(list);
   }
 
   public boolean hasNewPath() {

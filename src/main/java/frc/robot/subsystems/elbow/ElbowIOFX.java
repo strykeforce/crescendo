@@ -51,7 +51,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
 
   public ElbowIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    elbow = new TalonFX(ElbowConstants.kElbowTalonFxId);
+    elbow = new TalonFX(ElbowConstants.kElbowTalonFxId, "*");
     remoteEncoder = new CANcoder(ElbowConstants.kRemoteEncoderID);
 
     CANcoderConfigurator canCoderConfig = remoteEncoder.getConfigurator();
