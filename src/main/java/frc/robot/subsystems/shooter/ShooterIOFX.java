@@ -7,6 +7,10 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
+import com.ctre.phoenix6.signals.ForwardLimitValue;
+
+import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.ShooterConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +54,8 @@ public class ShooterIOFX implements ShooterIO, Checkable {
   StatusSignal<Double> curLeftVelocity;
   StatusSignal<Double> curRightVelocity;
 
+  private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
+
   public ShooterIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     shooterLeft = new TalonFX(ShooterConstants.kLeftShooterTalonID);
@@ -57,7 +63,11 @@ public class ShooterIOFX implements ShooterIO, Checkable {
 
     configurator = shooterLeft.getConfigurator();
     configurator.apply(new TalonFXConfiguration()); // factory default
-    configurator.apply(ShooterConstants.getLeftShooterConfig());
+    configurator.apply(
+        ShooterConstants.getLeftShooterConfig()
+            .HardwareLimitSwitch
+            .withForwardLimitSource(ForwardLimitSourceValue.RemoteTalonFX)
+            .withForwardLimitRemoteSensorID(MagazineConstants.kMagazineFalconID));
 
     configurator = shooterRight.getConfigurator();
     configurator.apply(new TalonFXConfiguration()); // factory default
@@ -65,6 +75,8 @@ public class ShooterIOFX implements ShooterIO, Checkable {
 
     curLeftVelocity = shooterLeft.getVelocity();
     curRightVelocity = shooterRight.getVelocity();
+
+    fwdLimitSwitch = shooterLeft.getForwardLimit();
   }
 
   @Override
@@ -77,6 +89,7 @@ public class ShooterIOFX implements ShooterIO, Checkable {
     inputs.leftSetpoint = leftSetpoint;
     inputs.velocityLeft = curLeftVelocity.refresh().getValue();
     inputs.velocityRight = curRightVelocity.refresh().getValue();
+    inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
   }
 
   @Override

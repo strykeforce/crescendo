@@ -10,6 +10,7 @@ public interface ShooterIO {
     public double velocityLeft;
     public double velocityRight;
     public double leftSetpoint = 0.0;
+    public boolean isFwdLimitSwitchClosed = false;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {}
