@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants.Setpoints;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
@@ -50,13 +51,23 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public DriveStates currDriveState = DriveStates.IDLE;
 
+  private double accelX = 0;
+  private double accelY = 0;
+  private double prevVelX = 0;
+  private double prevVelY = 0;
+  private double prevTimeStamp = Timer.getFPGATimestamp();
+  private int velXStableCounts = 0;
+  private int velYStableCounts = 0;
+  private Pose2d moveAndShootVirtualPose = new Pose2d();
+
   // Grapher stuff
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
-  private Double trajectoryActive = 0.0;
+  private double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
+  private boolean isMoveAndShoot = false;
 
   private boolean updateVision = true;
 
@@ -103,7 +114,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (!isAligningShot) {
       io.drive(vXmps, vYmps, vOmegaRadps, true);
     } else {
-      double vOmegaRadpsNew = getvOmegaToGoal();
+      double vOmegaRadpsNew = 0;
+
+      if (isMoveAndShoot) vOmegaRadpsNew = getvOmegaToGoal(moveAndShootVirtualPose);
+      else vOmegaRadpsNew = getvOmegaToGoal();
+
       io.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
   }
@@ -228,6 +243,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
                 : RobotConstants.kRedSpeakerPos);
   }
 
+  public void setMoveAndShootVirtualPose(Pose2d virtualPose) {
+    this.moveAndShootVirtualPose = virtualPose;
+  }
+
   // FIXME: probably doesn't work with red alliance side
   public Rotation2d getShooterAngleToSpeaker() {
     if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
@@ -289,6 +308,24 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return velStill && gyroStill;
   }
 
+  public boolean isMoveShootAllowed(boolean isAuto) {
+    double vX = getFieldRelSpeed().vxMetersPerSecond;
+    double vY = getFieldRelSpeed().vyMetersPerSecond;
+
+    // Take fieldRel Speed and get the magnitude of the vector
+    double wheelSpeed = FastMath.hypot(vX, vY);
+
+    double gyroRate = inputs.gyroRate;
+
+    boolean velStill =
+        Math.abs(wheelSpeed) <= DriveConstants.kMaxMoveShootVelocity
+            && Math.abs(velXStableCounts) <= DriveConstants.kVelocityStableCounts
+            && Math.abs(velYStableCounts) <= DriveConstants.kVelocityStableCounts;
+    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+
+    return velStill && gyroStill && (isAuto || vX <= DriveConstants.kMoveShootTeleMaxVelX);
+  }
+
   public boolean isNavxWorking() {
     return inputs.isConnected;
   }
@@ -309,6 +346,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void setIsAligningShot(boolean isAligningShot) {
     this.isAligningShot = isAligningShot;
     if (isAligningShot) resetOmegaController();
+  }
+
+  public void setIsMoveAndShoot(boolean isMoveAndShoot) {
+    this.isMoveAndShoot = isMoveAndShoot;
+    if (isMoveAndShoot) resetOmegaController();
   }
 
   public void setDriveState(DriveStates driveStates) {
@@ -578,6 +620,30 @@ public class DriveSubsystem extends MeasurableSubsystem {
         "ShootingData/AngleToGoal", getShooterAngleToSpeaker());
     org.littletonrobotics.junction.Logger.recordOutput(
         "ShootingData/DistanceToGoal", getDistanceToSpeaker());
+
+    // Compute acceleration
+    accelX =
+        (getFieldRelSpeed().vxMetersPerSecond - prevVelX)
+            / (Timer.getFPGATimestamp() - prevTimeStamp);
+    accelY =
+        (getFieldRelSpeed().vyMetersPerSecond - prevVelY)
+            / (Timer.getFPGATimestamp() - prevTimeStamp);
+
+    if (Math.abs(accelX) < DriveConstants.kMaxStableAccel) {
+      velXStableCounts++;
+    } else {
+      velXStableCounts = 0;
+    }
+
+    if (Math.abs(accelY) < DriveConstants.kMaxStableAccel) {
+      velYStableCounts++;
+    } else {
+      velYStableCounts = 0;
+    }
+
+    prevVelX = getFieldRelSpeed().vxMetersPerSecond;
+    prevVelY = getFieldRelSpeed().vyMetersPerSecond;
+    prevTimeStamp = Timer.getFPGATimestamp();
 
     switch (currDriveState) {
       case IDLE:

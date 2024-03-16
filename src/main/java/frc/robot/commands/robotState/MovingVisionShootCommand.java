@@ -7,11 +7,11 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class VisionShootCommand extends Command {
+public class MovingVisionShootCommand extends Command {
   private RobotStateSubsystem robotStateSubsystem;
   boolean flag = false;
 
-  public VisionShootCommand(
+  public MovingVisionShootCommand(
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
@@ -25,7 +25,7 @@ public class VisionShootCommand extends Command {
     flag =
         !((robotStateSubsystem.intakeHasNote() && robotStateSubsystem.magazineHasNote()))
             && robotStateSubsystem.getIsAuto();
-    if (!flag) robotStateSubsystem.startShoot();
+    if (!flag) robotStateSubsystem.startMovingShoot();
   }
 
   @Override

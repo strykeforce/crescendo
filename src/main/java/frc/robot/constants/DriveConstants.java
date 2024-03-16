@@ -39,6 +39,12 @@ public final class DriveConstants {
   public static final double kGyroRateStillThreshold = 0.5; // degrees per second
   public static final double kDegreesCloseEnough = 3;
 
+  // Move and shoot thresholds
+  public static final double kMaxStableAccel = 0.1;
+  public static final int kVelocityStableCounts = 5;
+  public static final double kMaxMoveShootVelocity = 5;
+  public static final double kMoveShootTeleMaxVelX = 0.5;
+
   public static final double kDriveMotorOutputGear = 34; // 30
   public static final double kDriveInputGear = 42;
   public static final double kBevelInputGear = 15;
