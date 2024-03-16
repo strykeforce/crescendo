@@ -92,6 +92,11 @@ public class PathHandler extends MeasurableSubsystem {
     noteOrder = new ArrayList<>(list);
   }
 
+  public void setNumPieces(double numPieces) {
+    this.numPieces = numPieces;
+    logger.info("set numPieces to: {}", numPieces);
+  }
+
   public boolean hasNewPath() {
     return nextPath != lastReturnedPath;
   }

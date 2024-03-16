@@ -53,6 +53,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
 
   public void generateTrajectory() {
     pathHandler.setPreference(List.of(3, 5, 4, 3, 5, 4, 3, 4, 5, 3));
+    pathHandler.setNumPieces(10.0);
     pathHandler.generateTrajectory();
     hasGenerated = true;
   }

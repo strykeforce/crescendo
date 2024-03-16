@@ -53,7 +53,7 @@ public class Robot extends LoggedRobot {
           break;
       }
       // /media/sda1/logs
-      Logger.addDataReceiver(new WPILOGWriter());
+      Logger.addDataReceiver(new WPILOGWriter("/V/logs"));
 
       // Comp robot conditions or not
       eventFlag = new DigitalInput(RobotConstants.kEventInterlockID);
