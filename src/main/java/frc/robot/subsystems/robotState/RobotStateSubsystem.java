@@ -587,6 +587,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                   driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
         }
 
+        superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
         Pose2d virtualPos = new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation());
         driveSubsystem.setMoveAndShootVirtualPose(virtualPos);
 
