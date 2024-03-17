@@ -2,9 +2,11 @@ package frc.robot.subsystems.robotState;
 
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -67,6 +69,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private int curShot = 1;
 
   private double elbowOffset = RobotStateConstants.kElbowShootOffset;
+  private DigitalInput soundSensor;
 
   // Constructor
   public RobotStateSubsystem(
@@ -84,6 +87,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.climbSubsystem = climbSubsystem;
     grabElbowOffsetPreferences();
     parseLookupTable();
+    soundSensor = new DigitalInput(RobotConstants.kSoundDetectorDIO);
   }
 
   // Getter/Setter Methods
@@ -416,6 +420,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Periodic
   @Override
   public void periodic() {
+    org.littletonrobotics.junction.Logger.recordOutput("Sound Sensor", soundSensor.get());
+
     switch (curState) {
       case TO_STOW:
         if (superStructure.isFinished()) {

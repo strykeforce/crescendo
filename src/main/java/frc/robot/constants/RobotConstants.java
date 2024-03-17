@@ -21,6 +21,7 @@ public class RobotConstants {
   public static final int kMinAutoSwitchID = 0;
   public static final int kMaxAutoSwitchID = 5;
   public static final int kEventInterlockID = 6;
+  public static final int kSoundDetectorDIO = 7;
 
   // Field Positions
   // FIXME: need to measure or get distance from CAD or something
