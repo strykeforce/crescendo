@@ -70,27 +70,32 @@ public final class ElbowConstants {
     config.HardwareLimitSwitch.ForwardLimitEnable = false;
 
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 34;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.151;
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -100;
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.26;
+
+    config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    config.Feedback.FeedbackRemoteSensorID = ElbowConstants.kHighResCANcoderID;
+    config.Feedback.RotorToSensorRatio = 52.0833;
+    config.Feedback.SensorToMechanismRatio = 4.0;
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 2.0; // 1.2
-    slot0.kI = 2.0;
-    slot0.kD = 0.2;
+    slot0.kP = 150.0; // 1.2
+    slot0.kI = 0.0;
+    slot0.kD = 0.0;
     slot0.kS = 0.0;
-    slot0.kV = 0.110;
+    slot0.kV = 20.0;
     slot0.kA = 0.0;
     slot0.kG = -0.150;
     slot0.GravityType = GravityTypeValue.Elevator_Static;
     config.Slot0 = slot0;
 
     Slot1Configs slot1 = new Slot1Configs();
-    slot1.kP = 2.0; // 1.2
-    slot1.kI = 2.0;
-    slot1.kD = 0.2;
+    slot1.kP = 150.0; // 1.2
+    slot1.kI = 135.0;
+    slot1.kD = 0.0;
     slot1.kS = 0.0;
-    slot1.kV = 0.110;
+    slot1.kV = 20.0;
     slot1.kA = 0.0;
     slot1.kG = -0.150;
     slot1.GravityType = GravityTypeValue.Elevator_Static;
@@ -111,11 +116,19 @@ public final class ElbowConstants {
   public static MotionMagicConfigs getPreciseMMConfig() {
     MotionMagicConfigs config = new MotionMagicConfigs();
 
+    config.MotionMagicCruiseVelocity = 0.15;
+    config.MotionMagicAcceleration = 0.3;
+    config.MotionMagicJerk = 5;
+
     return config;
   }
 
   public static MotionMagicConfigs getNormalMMConfig() {
     MotionMagicConfigs config = new MotionMagicConfigs();
+
+    config.MotionMagicCruiseVelocity = 0.4;
+    config.MotionMagicAcceleration = 0.75;
+    config.MotionMagicJerk = 5;
 
     return config;
   }
