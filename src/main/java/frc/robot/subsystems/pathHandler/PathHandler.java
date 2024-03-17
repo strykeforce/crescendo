@@ -47,6 +47,7 @@ public class PathHandler extends MeasurableSubsystem {
   private Pose2d shotLoc;
 
   private RobotStateSubsystem robotStateSubsystem;
+  private boolean isSpinningUp = false;
 
   public PathHandler(
       DeadEyeSubsystem deadeye,
@@ -187,6 +188,7 @@ public class PathHandler extends MeasurableSubsystem {
           break;
 
         case FETCH:
+          String nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
           if (noteOrder.size() > 1) {
             nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
           } else {
@@ -201,11 +203,13 @@ public class PathHandler extends MeasurableSubsystem {
             logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
             noteOrder.remove(0);
             curState = PathStates.DRIVE_SHOOT;
+            isSpinningUp = false;
             startNewPath(nextPath);
           }
 
           if (timer.hasElapsed(AutonConstants.kDelayForPickup)) {
             logger.info("FETCH -> DRIVE_FETCH");
+            logger.info("Begin Trajectory " + nextPathName);
             noteOrder.remove(0);
             curState = PathStates.DRIVE_FETCH;
             startNewPath(nextPath);
@@ -215,8 +219,11 @@ public class PathHandler extends MeasurableSubsystem {
         case DRIVE_SHOOT:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
 
-          if (robotStateSubsystem.intakeHasNote() && robotStateSubsystem.magazineHasNote()) {
+          if (!isSpinningUp
+              && robotStateSubsystem.intakeHasNote()
+              && robotStateSubsystem.magazineHasNote()) {
             robotStateSubsystem.spinUpShotSolution(shotLoc);
+            isSpinningUp = true;
           }
 
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
