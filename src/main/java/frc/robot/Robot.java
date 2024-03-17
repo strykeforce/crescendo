@@ -110,6 +110,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledPeriodic() {
     m_robotContainer.getAutoSwitch().checkSwitch();
+    m_robotContainer.updateCanivoreStatus();
   }
 
   @Override

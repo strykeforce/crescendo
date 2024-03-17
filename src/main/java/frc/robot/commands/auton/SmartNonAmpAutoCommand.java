@@ -1,5 +1,6 @@
 package frc.robot.commands.auton;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
@@ -22,6 +23,11 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
   private PathHandler pathHandler;
   private boolean hasGenerated = false;
   DriveAutonCommand firstPath;
+  List<Integer> preferences;
+  String[][] pathNames;
+  Double numPieces;
+  Alliance alliance = Alliance.Blue;
+  private RobotStateSubsystem robotStateSubsystem;
 
   public SmartNonAmpAutoCommand(
       DriveSubsystem driveSubsystem,
@@ -31,11 +37,18 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
       IntakeSubsystem intakeSubsystem,
       ElbowSubsystem elbowSubsystem,
       PathHandler pathHandler,
-      String firstPathName) {
+      String firstPathName,
+      String[][] pathNames,
+      List<Integer> preferences,
+      Double numPieces) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
     firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, true, true);
     this.pathHandler = pathHandler;
+    this.robotStateSubsystem = robotStateSubsystem;
+    this.pathNames = pathNames;
+    this.preferences = preferences;
+    this.numPieces = numPieces;
     addCommands(
         new SequentialCommandGroup(
             new ResetGyroCommand(driveSubsystem),
@@ -52,14 +65,15 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
   }
 
   public void generateTrajectory() {
-    pathHandler.setPreference(
-        List.of(5, 4, 3, 5, 3, 4, 5, 4, 3, 5)); // 3, 5, 4, 3, 5, 4, 3, 4, 5, 3
-    pathHandler.setNumPieces(10.0);
+    pathHandler.setPreference(preferences);
+    pathHandler.setPaths(pathNames);
+    pathHandler.setNumPieces(numPieces);
     pathHandler.generateTrajectory();
     hasGenerated = true;
+    alliance = robotStateSubsystem.getAllianceColor();
   }
 
   public boolean hasGenerated() {
-    return hasGenerated;
+    return hasGenerated && alliance == robotStateSubsystem.getAllianceColor();
   }
 }

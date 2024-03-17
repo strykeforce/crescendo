@@ -1,5 +1,7 @@
 package frc.robot.subsystems.robotState;
 
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -35,6 +37,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
   private ClimbSubsystem climbSubsystem;
+  private static CANBus canBus;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
@@ -82,6 +85,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
     this.climbSubsystem = climbSubsystem;
+
+    this.canBus = new CANBus();
     grabElbowOffsetPreferences();
     parseLookupTable();
   }
@@ -89,6 +94,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Getter/Setter Methods
   public RobotStates getState() {
     return curState;
+  }
+
+  public boolean isCANivoreConnected() {
+    CANBusStatus status = canBus.getStatus("CAN FD 1");
+    return status.Status.isOK();
   }
 
   private void setState(RobotStates robotState) {

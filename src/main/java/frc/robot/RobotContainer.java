@@ -132,6 +132,7 @@ public class RobotContainer {
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
   private Boolean isEvent = true;
+  private Boolean canivoreStatus = false;
 
   private NonAmpAutoCommand nonAmpAutonPath;
   private NonAmpAutoCommand nonAmpAutoNote3;
@@ -580,6 +581,11 @@ public class RobotContainer {
         .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
         .withSize(1, 1)
         .withPosition(6, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("CANivore Connected", () -> canivoreStatus)
+        .withSize(1, 1)
+        .withPosition(7, 0);
     // Shuffleboard.getTab("Match")
     //     .add("ZeroRecoveryElbowCommand", new ZeroRecoveryElbowCommand(elbowSubsystem))
     //     .withSize(1, 1)
@@ -668,6 +674,10 @@ public class RobotContainer {
 
   public AutoSwitch getAutoSwitch() {
     return this.autoSwitch;
+  }
+
+  public void updateCanivoreStatus() {
+    this.canivoreStatus = robotStateSubsystem.isCANivoreConnected();
   }
 
   public void setIsEvent(boolean isEvent) {

@@ -93,8 +93,12 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   public void setNumPieces(double numPieces) {
-    this.numPieces = numPieces;
     logger.info("set numPieces to: {}", numPieces);
+    this.numPieces = numPieces - 1;
+  }
+
+  public void setPaths(String[][] pathNames) {
+    this.pathNames = pathNames;
   }
 
   public boolean hasNewPath() {
@@ -133,8 +137,8 @@ public class PathHandler extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    org.littletonrobotics.junction.Logger.recordOutput("PathHandler State", curState.name());
     if (handling) {
-      org.littletonrobotics.junction.Logger.recordOutput("PathHandler State", curState.name());
       switch (curState) {
         case SHOOT:
           if (canShoot) {

@@ -24,6 +24,7 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,7 +200,10 @@ public class AutoSwitch extends MeasurableSubsystem {
             intakeSubsystem,
             elbowSubsystem,
             pathHandler,
-            "NonAmpInitial1_MiddleNote3");
+            "NonAmpInitial1_MiddleNote3",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(3, 5, 4, 3, 5, 4, 3, 4, 5, 3),
+            10.0);
       case 0x23:
         return new SmartNonAmpAutoCommand(
             driveSubsystem,
@@ -209,7 +213,10 @@ public class AutoSwitch extends MeasurableSubsystem {
             intakeSubsystem,
             elbowSubsystem,
             pathHandler,
-            "NonAmpInitial1_MiddleNote5");
+            "NonAmpInitial1_MiddleNote5",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(5, 4, 3, 5, 3, 4, 5, 4, 3, 5),
+            10.0);
       case 0x30:
         return new DoNothingCommand(
             robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
