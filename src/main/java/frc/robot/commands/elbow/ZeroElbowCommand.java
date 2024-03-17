@@ -2,7 +2,6 @@ package frc.robot.commands.elbow;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
-import frc.robot.subsystems.elbow.ElbowSubsystem.ElbowStates;
 
 public class ZeroElbowCommand extends Command {
   ElbowSubsystem elbowSubsystem;
@@ -14,12 +13,13 @@ public class ZeroElbowCommand extends Command {
 
   @Override
   public void initialize() {
-    elbowSubsystem.zero();
+    // elbowSubsystem.zero();
   }
 
   @Override
   public boolean isFinished() {
-    return elbowSubsystem.getState() != ElbowStates.ZEROING;
+    // return elbowSubsystem.getState() != ElbowStates.ZEROING;
+    return true;
   }
 
   @Override
