@@ -97,7 +97,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isCANivoreConnected() {
-    CANBusStatus status = canBus.getStatus("CAN FD 1");
+    CANBusStatus status = canBus.getStatus(RobotStateConstants.kcanivoreString);
     return status.Status.isOK();
   }
 

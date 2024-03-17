@@ -1,6 +1,7 @@
 package frc.robot.constants;
 
 public final class RobotStateConstants {
+  public static final String kcanivoreString = "CAN FD 1";
   public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
   public static final double kLookupMinDistance = 1.5; // 150cm
   public static final double kLookupMaxDistance = 5.4; // 540cm
