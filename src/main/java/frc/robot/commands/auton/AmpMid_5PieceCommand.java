@@ -50,8 +50,10 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
     this.robotStateSubsystem = robotStateSubsystem;
     this.elbowSubsystem = elbowSubsystem;
 
-    midInitWingNote3 = new DriveAutonCommand(driveSubsystem, "MiddleInitial1_WingNote3", true, true);
-    wingNote3MidInit = new DriveAutonCommand(driveSubsystem, "WingNote3_MiddleInitial1", true, false);
+    midInitWingNote3 =
+        new DriveAutonCommand(driveSubsystem, "MiddleInitial1_WingNote3", true, true);
+    wingNote3MidInit =
+        new DriveAutonCommand(driveSubsystem, "WingNote3_MiddleInitial1", true, false);
     midInitWingNote2 =
         new DriveAutonCommand(driveSubsystem, "MiddleInitial1_WingNote2", true, false);
     wingNote2WingNote1 =
@@ -105,7 +107,8 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
 
   public void generateTrajectory() {
     midInitWingNote3.generateTrajectory();
-    wingNote3WingNote2.generateTrajectory();
+    wingNote3MidInit.generateTrajectory();
+    midInitWingNote2.generateTrajectory();
     wingNote2WingNote1.generateTrajectory();
     wingNote1MidNote1.generateTrajectory();
     midNote1ShootPos.generateTrajectory();
