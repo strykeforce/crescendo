@@ -29,7 +29,8 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 public class AmpMid_5PieceCommand extends SequentialCommandGroup implements AutoCommandInterface {
 
   private DriveAutonCommand midInitWingNote3;
-  private DriveAutonCommand wingNote3WingNote2;
+  private DriveAutonCommand wingNote3MidInit;
+  private DriveAutonCommand midInitWingNote2;
   private DriveAutonCommand wingNote2WingNote1;
   private DriveAutonCommand wingNote1MidNote1;
   private DriveAutonCommand midNote1ShootPos;
@@ -50,8 +51,9 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
     this.elbowSubsystem = elbowSubsystem;
 
     midInitWingNote3 = new DriveAutonCommand(driveSubsystem, "MiddleInitial1_WingNote3", true, true);
-    wingNote3WingNote2 =
-        new DriveAutonCommand(driveSubsystem, "WingNote3_WingNote2_A", true, false);
+    wingNote3MidInit = new DriveAutonCommand(driveSubsystem, "WingNote3_MiddleInitial1", true, false);
+    midInitWingNote2 =
+        new DriveAutonCommand(driveSubsystem, "MiddleInitial1_WingNote2", true, false);
     wingNote2WingNote1 =
         new DriveAutonCommand(driveSubsystem, "WingNote2_WingNote1_A", true, false);
     wingNote1MidNote1 = new DriveAutonCommand(driveSubsystem, "WingNote1_MiddleNote1", true, false);
@@ -81,9 +83,9 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
         midInitWingNote3,
         new WaitCommand(0.15),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
-        new VisionShootCommand(
-            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-        wingNote3WingNote2,
+        wingNote3MidInit,
+        new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
+        midInitWingNote2,
         new WaitCommand(0.12),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
