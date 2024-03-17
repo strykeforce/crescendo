@@ -49,7 +49,7 @@ public class AmpMid_5PieceCommand extends SequentialCommandGroup implements Auto
     this.robotStateSubsystem = robotStateSubsystem;
     this.elbowSubsystem = elbowSubsystem;
 
-    midInitWingNote3 = new DriveAutonCommand(driveSubsystem, "MiddleStart_WingNote3", true, true);
+    midInitWingNote3 = new DriveAutonCommand(driveSubsystem, "MiddleInitial1_WingNote3", true, true);
     wingNote3WingNote2 =
         new DriveAutonCommand(driveSubsystem, "WingNote3_WingNote2_A", true, false);
     wingNote2WingNote1 =
