@@ -108,18 +108,14 @@ public final class ElbowConstants {
     return config;
   }
 
-  public static FeedbackConfigs getPreciseConfig() {
-    FeedbackConfigs config = new FeedbackConfigs();
-
-    config.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+  public static MotionMagicConfigs getPreciseMMConfig() {
+    MotionMagicConfigs config = new MotionMagicConfigs();
 
     return config;
   }
 
-  public static FeedbackConfigs getNormalConfig() {
-    FeedbackConfigs config = new FeedbackConfigs();
-
-    config.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+  public static MotionMagicConfigs getNormalMMConfig() {
+    MotionMagicConfigs config = new MotionMagicConfigs();
 
     return config;
   }

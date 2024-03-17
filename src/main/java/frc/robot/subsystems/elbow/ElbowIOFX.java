@@ -166,13 +166,13 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   @Override
   public void setPreciseControl() {
     configurator = elbow.getConfigurator();
-    configurator.apply(ElbowConstants.getPreciseConfig());
+    configurator.apply(ElbowConstants.getPreciseMMConfig());
   }
 
   @Override
   public void setNormalControl() {
     configurator = elbow.getConfigurator();
-    configurator.apply(ElbowConstants.getNormalConfig());
+    configurator.apply(ElbowConstants.getNormalMMConfig());
   }
 
   @Override
