@@ -18,7 +18,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double setpoint = 0;
   private ElbowStates curState = ElbowStates.IDLE;
   private int zeroStable = 0;
-  private boolean hasZeroed = false;
+  private boolean hasZeroed = true;
   private int numRecoveryZeros = 0;
   private int recoveryZeroStableCounts = 0;
   private double prevRecoveryAbs = 0.0;
@@ -31,7 +31,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     setpoint = inputs.positionRots;
     io.zeroBlind();
 
-    zero();
+    io.zero();
   }
 
   public void setPosition(double position) {
@@ -42,12 +42,11 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     if (isPrecise != precise) {
       logger.info("isPrecise: {} -> {}", isPrecise, precise);
       if (precise) {
-        io.setPosition(position, ElbowConstants.kNormalSlot);
         io.setPreciseControl();
         io.setPosition(position, ElbowConstants.kPreciseSlot);
       } else {
-        io.setNormalControl();
         io.setPosition(position, ElbowConstants.kNormalSlot);
+        io.setNormalControl();
       }
     } else {
       io.setPosition(
@@ -108,14 +107,14 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void zero() {
     // io.zeroBlind();
-    io.zero();
-    // hasZeroed = false;
-    // // setState(ElbowStates.ZEROED);
-    // io.configHardwareLimit(ElbowConstants.getZeroLimitConfig());
-    // io.configMotionMagic(ElbowConstants.getZeroConfig());
-    // io.setPosition(ElbowConstants.kZeroPos, 0);
-    // setState(ElbowStates.ZEROING);
-    // setpoint = ElbowConstants.kZeroPos;
+    
+    hasZeroed = false;
+    // setState(ElbowStates.ZEROED);
+    io.configHardwareLimit(ElbowConstants.getZeroLimitConfig());
+    io.configMotionMagic(ElbowConstants.getZeroConfig());
+    io.setPosition(ElbowConstants.kZeroPos, 0);
+    setState(ElbowStates.ZEROING);
+    setpoint = ElbowConstants.kZeroPos;
   }
 
   public void zeroRecovery() {

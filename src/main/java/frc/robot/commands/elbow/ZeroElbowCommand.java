@@ -14,12 +14,13 @@ public class ZeroElbowCommand extends Command {
 
   @Override
   public void initialize() {
-    elbowSubsystem.zero();
+    // elbowSubsystem.zero();
   }
 
   @Override
   public boolean isFinished() {
-    return elbowSubsystem.getState() != ElbowStates.ZEROING;
+    // return elbowSubsystem.getState() != ElbowStates.ZEROING;
+    return true;
   }
 
   @Override
