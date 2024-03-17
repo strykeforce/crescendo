@@ -31,7 +31,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     setpoint = inputs.positionRots;
     io.zeroBlind();
 
-    // zero();
+    zero();
   }
 
   public void setPosition(double position) {
@@ -108,13 +108,14 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void zero() {
     // io.zeroBlind();
-    hasZeroed = false;
-    // setState(ElbowStates.ZEROED);
-    io.configHardwareLimit(ElbowConstants.getZeroLimitConfig());
-    io.configMotionMagic(ElbowConstants.getZeroConfig());
-    io.setPosition(ElbowConstants.kZeroPos, 0);
-    setState(ElbowStates.ZEROING);
-    setpoint = ElbowConstants.kZeroPos;
+    io.zero();
+    // hasZeroed = false;
+    // // setState(ElbowStates.ZEROED);
+    // io.configHardwareLimit(ElbowConstants.getZeroLimitConfig());
+    // io.configMotionMagic(ElbowConstants.getZeroConfig());
+    // io.setPosition(ElbowConstants.kZeroPos, 0);
+    // setState(ElbowStates.ZEROING);
+    // setpoint = ElbowConstants.kZeroPos;
   }
 
   public void zeroRecovery() {
