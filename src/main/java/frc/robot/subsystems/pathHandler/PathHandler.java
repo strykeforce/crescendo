@@ -188,8 +188,11 @@ public class PathHandler extends MeasurableSubsystem {
           break;
 
         case FETCH:
-          String nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
+
+            String nextPathName;
+
           if (noteOrder.size() > 1) {
+            nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
             nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
           } else {
             curState = PathStates.DONE;
