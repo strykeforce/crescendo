@@ -1,5 +1,6 @@
 package frc.robot.subsystems.pathHandler;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
@@ -43,6 +44,7 @@ public class PathHandler extends MeasurableSubsystem {
   // Example [1][2] is a path that goes from note one to note two
   private PathData[][] paths = new PathData[6][6];
   private String[][] pathNames;
+  private Pose2d shotLoc;
 
   private RobotStateSubsystem robotStateSubsystem;
 
@@ -53,13 +55,15 @@ public class PathHandler extends MeasurableSubsystem {
       List<Integer> order,
       String[][] pathNames,
       boolean useDeadeye,
-      double numPieces) {
+      double numPieces,
+      Pose2d shotLoc) {
     this.deadeye = deadeye;
     this.robotStateSubsystem = robotStateSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.useDeadeye = useDeadeye;
     this.numPieces = numPieces - 1.0;
     this.pathNames = pathNames;
+    this.shotLoc = shotLoc;
     noteOrder = new ArrayList<>(order);
 
     logger = LoggerFactory.getLogger(this.getClass());
@@ -99,6 +103,10 @@ public class PathHandler extends MeasurableSubsystem {
 
   public void setPaths(String[][] pathNames) {
     this.pathNames = pathNames;
+  }
+
+  public void setShotLoc(Pose2d shotLoc) {
+    this.shotLoc = shotLoc;
   }
 
   public boolean hasNewPath() {
@@ -206,6 +214,10 @@ public class PathHandler extends MeasurableSubsystem {
 
         case DRIVE_SHOOT:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
+
+          if (robotStateSubsystem.intakeHasNote() && robotStateSubsystem.magazineHasNote()) {
+            robotStateSubsystem.spinUpShotSolution(shotLoc);
+          }
 
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
             logger.info("DRIVE_SHOOT -> SHOOT");

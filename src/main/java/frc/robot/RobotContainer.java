@@ -203,7 +203,8 @@ public class RobotContainer {
             List.of(),
             AutonConstants.kNonAmpPathMatrix,
             false,
-            2.0);
+            2.0,
+            AutonConstants.Setpoints.NAS2);
 
     autoSwitch =
         new AutoSwitch(

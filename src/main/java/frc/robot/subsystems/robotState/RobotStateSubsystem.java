@@ -262,6 +262,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_SHOOT);
   }
 
+  public void spinUpShotSolution(Pose2d pose) {
+    shootPos = pose;
+    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(pose));
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    setState(RobotStates.SPIN_UP);
+  }
+
   public void startShoot() {
     usingDistance = false;
     shootKnownPos = false;
@@ -491,6 +498,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           toStowSafe(); // FIXME: call stow() and possibly wait for timeout
         }
+        break;
+      case SPIN_UP: // Indicator State
         break;
 
       case TO_SHOOT:
@@ -750,6 +759,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     AMP,
     TO_STOW,
     STOW,
+    SPIN_UP,
     TO_SHOOT,
     SHOOTING,
     TO_PODIUM,
