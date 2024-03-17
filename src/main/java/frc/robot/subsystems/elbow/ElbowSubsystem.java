@@ -107,7 +107,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void zero() {
     // io.zeroBlind();
-    
+
     hasZeroed = false;
     // setState(ElbowStates.ZEROED);
     io.configHardwareLimit(ElbowConstants.getZeroLimitConfig());
@@ -167,7 +167,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
           io.configHardwareLimit(ElbowConstants.getRunLimitConfig());
           io.configMotionMagic(ElbowConstants.getRunConfig());
 
-          io.setHighResCANcoderPos();
+          // io.setHighResCANcoderPos();
 
           hasZeroed = true;
           logger.info("Zeroed");

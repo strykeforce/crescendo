@@ -6,14 +6,13 @@ import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
-
-import frc.robot.Robot;
 import frc.robot.constants.ElbowConstants;
 import frc.robot.constants.RobotConstants;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import org.strykeforce.healthcheck.Checkable;
 import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
-import org.strykeforce.telemetry.measurable.CancoderMeasureable;
 
 public class ElbowIOFX implements ElbowIO, Checkable {
   private Logger logger;
@@ -100,6 +98,18 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   @Override
   public void zero() {
     setpointOffset = RobotConstants.kElbowSetpointOffset;
+    configurator = elbow.getConfigurator();
+    double fwdLim =
+        ElbowConstants.getFxConfiguration().SoftwareLimitSwitch.ForwardSoftLimitThreshold
+            + setpointOffset;
+    double revLim =
+        ElbowConstants.getFxConfiguration().SoftwareLimitSwitch.ReverseSoftLimitThreshold
+            + setpointOffset;
+    SoftwareLimitSwitchConfigs softLim = ElbowConstants.getFxConfiguration().SoftwareLimitSwitch;
+    softLim.ForwardSoftLimitThreshold = fwdLim;
+    softLim.ReverseSoftLimitThreshold = revLim;
+    configurator.apply(softLim);
+
     // absSensorInitial = elbow.getPosition().getValue();
 
     // relSetpointOffset = absSensorInitial - RobotConstants.kElbowZero;
@@ -160,7 +170,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
 
     pos /= 1.0; // FIXME
 
-    highResCANcoder.setPosition(pos);
+    // highResCANcoder.setPosition(pos);
   }
 
   @Override
@@ -219,7 +229,8 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(elbow, true);
-    telemetryService.register(new CancoderMeasureable(remoteEncoder));
+    telemetryService.register(remoteEncoder);
+    telemetryService.register(highResCANcoder);
   }
 
   @BeforeHealthCheck
