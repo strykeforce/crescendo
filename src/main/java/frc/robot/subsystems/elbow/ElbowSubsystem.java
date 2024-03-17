@@ -29,7 +29,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     this.io = io;
     // this.encoderIo = encoderIo;
     setpoint = inputs.positionRots;
-    io.zeroBlind();
+    // io.zeroBlind();
 
     io.zero();
   }

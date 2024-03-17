@@ -106,9 +106,9 @@ public final class ElbowConstants {
     //         .withMotionMagicAcceleration(400)
     //         .withMotionMagicCruiseVelocity(90)
     //         .withMotionMagicJerk(5000);
-    config.MotionMagic = getZeroConfig();
+    config.MotionMagic = getNormalMMConfig();
 
-    config.HardwareLimitSwitch = getZeroLimitConfig();
+    config.HardwareLimitSwitch = getRunLimitConfig();
 
     return config;
   }
