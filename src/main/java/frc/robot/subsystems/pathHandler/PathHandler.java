@@ -1,5 +1,6 @@
 package frc.robot.subsystems.pathHandler;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
@@ -43,8 +44,10 @@ public class PathHandler extends MeasurableSubsystem {
   // Example [1][2] is a path that goes from note one to note two
   private PathData[][] paths = new PathData[6][6];
   private String[][] pathNames;
+  private Pose2d shotLoc;
 
   private RobotStateSubsystem robotStateSubsystem;
+  private boolean isSpinningUp = false;
 
   public PathHandler(
       DeadEyeSubsystem deadeye,
@@ -53,13 +56,15 @@ public class PathHandler extends MeasurableSubsystem {
       List<Integer> order,
       String[][] pathNames,
       boolean useDeadeye,
-      double numPieces) {
+      double numPieces,
+      Pose2d shotLoc) {
     this.deadeye = deadeye;
     this.robotStateSubsystem = robotStateSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.useDeadeye = useDeadeye;
     this.numPieces = numPieces - 1.0;
     this.pathNames = pathNames;
+    this.shotLoc = shotLoc;
     noteOrder = new ArrayList<>(order);
 
     logger = LoggerFactory.getLogger(this.getClass());
@@ -99,6 +104,10 @@ public class PathHandler extends MeasurableSubsystem {
 
   public void setPaths(String[][] pathNames) {
     this.pathNames = pathNames;
+  }
+
+  public void setShotLoc(Pose2d shotLoc) {
+    this.shotLoc = shotLoc;
   }
 
   public boolean hasNewPath() {
@@ -179,7 +188,10 @@ public class PathHandler extends MeasurableSubsystem {
           break;
 
         case FETCH:
+          String nextPathName;
+
           if (noteOrder.size() > 1) {
+            nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
             nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
           } else {
             curState = PathStates.DONE;
@@ -193,11 +205,13 @@ public class PathHandler extends MeasurableSubsystem {
             logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
             noteOrder.remove(0);
             curState = PathStates.DRIVE_SHOOT;
+            isSpinningUp = false;
             startNewPath(nextPath);
           }
 
           if (timer.hasElapsed(AutonConstants.kDelayForPickup)) {
             logger.info("FETCH -> DRIVE_FETCH");
+            logger.info("Begin Trajectory " + nextPathName);
             noteOrder.remove(0);
             curState = PathStates.DRIVE_FETCH;
             startNewPath(nextPath);
@@ -206,6 +220,13 @@ public class PathHandler extends MeasurableSubsystem {
 
         case DRIVE_SHOOT:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
+
+          if (!isSpinningUp
+              && robotStateSubsystem.intakeHasNote()
+              && robotStateSubsystem.magazineHasNote()) {
+            robotStateSubsystem.spinUpShotSolution(shotLoc);
+            isSpinningUp = true;
+          }
 
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
             logger.info("DRIVE_SHOOT -> SHOOT");

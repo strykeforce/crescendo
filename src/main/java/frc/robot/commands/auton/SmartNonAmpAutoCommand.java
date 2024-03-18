@@ -1,5 +1,6 @@
 package frc.robot.commands.auton;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,6 +29,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
   Double numPieces;
   Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
+  private Pose2d shootPose;
 
   public SmartNonAmpAutoCommand(
       DriveSubsystem driveSubsystem,
@@ -40,7 +42,8 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
       String firstPathName,
       String[][] pathNames,
       List<Integer> preferences,
-      Double numPieces) {
+      Double numPieces,
+      Pose2d shootPose) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
     firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, true, true);
@@ -49,6 +52,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
     this.pathNames = pathNames;
     this.preferences = preferences;
     this.numPieces = numPieces;
+    this.shootPose = shootPose;
     addCommands(
         new SequentialCommandGroup(
             new ResetGyroCommand(driveSubsystem),
@@ -69,6 +73,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
     pathHandler.setPaths(pathNames);
     pathHandler.setNumPieces(numPieces);
     pathHandler.generateTrajectory();
+    pathHandler.setShotLoc(shootPose);
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }

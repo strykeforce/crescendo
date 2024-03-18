@@ -136,6 +136,10 @@ public class AutoSwitch extends MeasurableSubsystem {
     return changed;
   }
 
+  // OLD:
+  // 0x22 NonAmpInitial1_MiddleNote3 List.of(3, 5, 4, 3, 5, 4, 3, 4, 5, 3)
+  // 0x23 NonAmpInitial1_MiddleNote5 List.of(5, 4, 3, 5, 3, 4, 5, 4, 3, 5)
+  // 0x24 NonAmpInitial1_MiddleNote4 List.of(4, 5, 3, 4, 5, 3, 4, 3, 5, 4)
   private AutoCommandInterface getAutoCommand(int switchPos) {
     switch (switchPos) {
       case 0x00:
@@ -211,23 +215,10 @@ public class AutoSwitch extends MeasurableSubsystem {
             pathHandler,
             "NonAmpInitial1_MiddleNote3",
             AutonConstants.kNonAmpPathMatrix,
-            List.of(3, 5, 4, 3, 5, 4, 3, 4, 5, 3),
-            10.0);
+            List.of(3, 4, 5),
+            3.0,
+            AutonConstants.Setpoints.NAS2);
       case 0x23:
-        return new SmartNonAmpAutoCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem,
-            elbowSubsystem,
-            pathHandler,
-            "NonAmpInitial1_MiddleNote5",
-            AutonConstants.kNonAmpPathMatrix,
-            List.of(5, 4, 3, 5, 3, 4, 5, 4, 3, 5),
-            10.0);
-
-      case 0x24:
         return new SmartNonAmpAutoCommand(
             driveSubsystem,
             robotStateSubsystem,
@@ -238,8 +229,23 @@ public class AutoSwitch extends MeasurableSubsystem {
             pathHandler,
             "NonAmpInitial1_MiddleNote4",
             AutonConstants.kNonAmpPathMatrix,
-            List.of(4, 5, 3, 4, 5, 3, 4, 3, 5, 4),
-            10.0);
+            List.of(4, 3, 5),
+            3.0,
+            AutonConstants.Setpoints.NAS2);
+      case 0x24:
+        return new SmartNonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            "NonAmpInitial1_MiddleNote5",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(5, 3, 4),
+            3.0,
+            AutonConstants.Setpoints.NAS2);
       case 0x30:
         return new DoNothingCommand(
             robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
