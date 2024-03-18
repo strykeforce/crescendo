@@ -28,12 +28,12 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class AmpMid_5PieceCommand extends SequentialCommandGroup implements AutoCommandInterface {
 
-  DriveAutonCommand midInitWingNote3;
-  DriveAutonCommand wingNote3WingNote2;
-  DriveAutonCommand wingNote2WingNote1;
-  DriveAutonCommand wingNote1MidNote1;
-  DriveAutonCommand midNote1ShootPos;
-  PositionShootCommand midShootCommand;
+  private DriveAutonCommand midInitWingNote3;
+  private DriveAutonCommand wingNote3WingNote2;
+  private DriveAutonCommand wingNote2WingNote1;
+  private DriveAutonCommand wingNote1MidNote1;
+  private DriveAutonCommand midNote1ShootPos;
+  private PositionShootCommand midShootCommand;
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
