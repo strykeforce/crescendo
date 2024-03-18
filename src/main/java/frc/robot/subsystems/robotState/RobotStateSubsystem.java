@@ -221,6 +221,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.safeIntake();
     // magazineSubsystem.toIntaking();
     magazineSubsystem.setEmpty();
+    ledSubsystem.setFlaming();
     setState(RobotStates.TO_INTAKING);
   }
 
@@ -239,6 +240,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.amp();
     intakeSubsystem.toEjecting();
     // intakeSubsystem.setPercent(0.0);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_AMP);
   }
@@ -254,6 +256,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_SHOOT);
   }
@@ -267,6 +270,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_SHOOT);
   }
@@ -279,6 +283,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_SHOOT);
   }
@@ -324,6 +329,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     magazineSubsystem.preparePodium();
     intakeSubsystem.setPercent(0.0);
     superStructure.preparePodium();
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_PODIUM);
   }
@@ -333,6 +339,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.setPercent(0.0);
     superStructure.subwoofer();
     intakeSubsystem.setPercent(0.0);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_SUBWOOFER);
   }
@@ -365,6 +372,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     scoreTrapTimer.reset();
     scoreTrapTimer.start();
     magazineSubsystem.trap();
+    ledSubsystem.setOff();
     setState(RobotStates.SCORE_TRAP);
   }
 
@@ -374,6 +382,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     scoreTrapTimer.start();
     magazineSubsystem.trap();
     this.decendClimbAfterTrap = decend;
+    ledSubsystem.setOff();
     setState(RobotStates.SCORE_TRAP);
   }
 
@@ -407,6 +416,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
     }
+    ledSubsystem.setOff();
   }
 
   public void toTune() {
