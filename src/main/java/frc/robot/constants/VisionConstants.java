@@ -16,7 +16,7 @@ public final class VisionConstants {
   public static final double kTimeToDecayDev = 10;
   public static final double kStdDevDecayCoeff = -0.005;
   public static final double kMinStdDev = 0.01;
-  public static final double kMaxAmbig = 0.5;
+  public static final double kMaxAmbig = 1.0;
   public static final int kMaxTimesOffWheels = 5;
 
   // Velocity Filter
@@ -45,6 +45,8 @@ public final class VisionConstants {
   public static final int kCam1Idx = 0;
   public static final int kCam2Idx = 0;
 
+  public static final double kLoopTime = 0.02;
+  public static final int kCircularBufferSize = 1000;
   // Poses
   public static final Pose3d kCam1Pose =
       new Pose3d(
