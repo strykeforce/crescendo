@@ -1,5 +1,15 @@
 package frc.robot.subsystems.auto;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
+import org.strykeforce.thirdcoast.util.AutonSwitch;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -23,14 +33,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
-import org.strykeforce.thirdcoast.util.AutonSwitch;
 
 public class AutoSwitch extends MeasurableSubsystem {
   public Logger logger = LoggerFactory.getLogger(AutoSwitch.class);
@@ -135,6 +137,10 @@ public class AutoSwitch extends MeasurableSubsystem {
     return changed;
   }
 
+  // OLD:
+  // 0x22 NonAmpInitial1_MiddleNote3 List.of(3, 5, 4, 3, 5, 4, 3, 4, 5, 3)
+  // 0x23 NonAmpInitial1_MiddleNote5 List.of(5, 4, 3, 5, 3, 4, 5, 4, 3, 5)
+  // 0x24 NonAmpInitial1_MiddleNote4 List.of(4, 5, 3, 4, 5, 3, 4, 3, 5, 4)
   private AutoCommandInterface getAutoCommand(int switchPos) {
     switch (switchPos) {
       case 0x00:
@@ -202,8 +208,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             pathHandler,
             "NonAmpInitial1_MiddleNote3",
             AutonConstants.kNonAmpPathMatrix,
-            List.of(3, 5, 4, 3, 5, 4, 3, 4, 5, 3),
-            10.0,
+            List.of(3, 4, 5),
+            3.0,
             AutonConstants.Setpoints.NAS2);
       case 0x23:
         return new SmartNonAmpAutoCommand(
@@ -214,12 +220,11 @@ public class AutoSwitch extends MeasurableSubsystem {
             intakeSubsystem,
             elbowSubsystem,
             pathHandler,
-            "NonAmpInitial1_MiddleNote5",
+            "NonAmpInitial1_MiddleNote4",
             AutonConstants.kNonAmpPathMatrix,
-            List.of(5, 4, 3, 5, 3, 4, 5, 4, 3, 5),
-            10.0,
+            List.of(4, 3, 5),
+            3.0,
             AutonConstants.Setpoints.NAS2);
-
       case 0x24:
         return new SmartNonAmpAutoCommand(
             driveSubsystem,
@@ -229,10 +234,10 @@ public class AutoSwitch extends MeasurableSubsystem {
             intakeSubsystem,
             elbowSubsystem,
             pathHandler,
-            "NonAmpInitial1_MiddleNote4",
+            "NonAmpInitial1_MiddleNote5",
             AutonConstants.kNonAmpPathMatrix,
-            List.of(4, 5, 3, 4, 5, 3, 4, 3, 5, 4),
-            10.0,
+            List.of(5, 3, 4),
+            3.0,
             AutonConstants.Setpoints.NAS2);
       case 0x30:
         return new DoNothingCommand(
