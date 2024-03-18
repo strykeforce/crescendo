@@ -47,7 +47,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx};
 
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
-  VisionStates curState = VisionStates.TRUSTWHEELS;
+  //   VisionStates curState = VisionStates.TRUSTWHEELS;
   boolean visionUpdates = true;
   double timeLastVision = 0;
   int updatesToWheels = 0;
@@ -107,14 +107,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return cams[index].isCameraConnected();
   }
 
-  public VisionStates getState() {
-    return curState;
-  }
+  //   public VisionStates getState() {
+  //     return curState;
+  //   }
 
-  public void setState(VisionStates state) {
-    logger.info("{} -> {}", curState, state);
-    curState = state;
-  }
+  //   public void setState(VisionStates state) {
+  //     logger.info("{} -> {}", curState, state);
+  //     curState = state;
+  //   }
 
   // Helper Methods
 
@@ -214,19 +214,19 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
     logger.info(gyroData.getFirst() + "");
-    org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/State", curState.name());
+    // org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/State", curState.name());
 
     scaledStdDev = adaptiveVisionMatrix.copy();
     // cam.getEnabled();
     // If enough time elapses trust vision or if enough time elapses reset the counter
-    if ((getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision)
-        && (curState != VisionStates.TRUSTVISION)) {
-      //   logger.info("{} -> TRUSTVISION");
-      curState = VisionStates.TRUSTVISION;
-      adaptiveVisionMatrix.set(0, 0, VisionConstants.kMinStdDev);
-      adaptiveVisionMatrix.set(1, 0, VisionConstants.kMinStdDev);
-      updatesToWheels = 0;
-    }
+    // if ((getSeconds() - timeLastVision > VisionConstants.kMaxTimeNoVision)
+    //     && (curState != VisionStates.TRUSTVISION)) {
+    //   //   logger.info("{} -> TRUSTVISION");
+    //   curState = VisionStates.TRUSTVISION;
+    //   adaptiveVisionMatrix.set(0, 0, VisionConstants.kMinStdDev);
+    //   adaptiveVisionMatrix.set(1, 0, VisionConstants.kMinStdDev);
+    //   updatesToWheels = 0;
+    // }
 
     // If enough time elapses between camera updates - reset count of updates to 0
     if ((getSeconds() - timeLastVision > VisionConstants.kTimeToResetWheelCount)
@@ -236,14 +236,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
 
     // If the counter gets high enough trust wheels
-    if ((updatesToWheels >= VisionConstants.kResultsForWheels)
-        && curState != VisionStates.TRUSTWHEELS) {
-      //   logger.info("{} -> TRUSTWHEELS", curState);
-      updatesToWheels = 0;
-      offWheels = 0;
-      curState = VisionStates.TRUSTWHEELS;
-      adaptiveVisionMatrix = VisionConstants.kVisionMeasurementStdDevs.copy();
-    }
+    // if ((updatesToWheels >= VisionConstants.kResultsForWheels)
+    //     && curState != VisionStates.TRUSTWHEELS) {
+    //   //   logger.info("{} -> TRUSTWHEELS", curState);
+    //   updatesToWheels = 0;
+    //   offWheels = 0;
+    //   curState = VisionStates.TRUSTWHEELS;
+    //   adaptiveVisionMatrix = VisionConstants.kVisionMeasurementStdDevs.copy();
+    // }
 
     // Clear out old results
     validResults.clear();
@@ -256,8 +256,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
       }
     }
     // Tightens std devs if time elapses
-    if (getSeconds() - timeLastVision >= VisionConstants.kTimeToDecayDev
-        && curState == VisionStates.TRUSTWHEELS) {
+    if (getSeconds() - timeLastVision >= VisionConstants.kTimeToDecayDev) {
 
       // Take x and y weights and linearly decrease them
       for (int i = 0; i < 2; ++i) {
@@ -333,74 +332,73 @@ public class VisionSubsystem extends MeasurableSubsystem {
         cameraRot = cameraPose.getRotation();
       }
       // If updating with vision go into state machine to update
-      if (visionUpdates) {
-        switch (curState) {
+      //   if (visionUpdates) {
+      //     switch (curState) {
 
-            // Uses wheels to act as a filter for the cameras
-          case TRUSTWHEELS:
-            if (isPoseValidWithWheels(result, centerPos)) {
-              String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  outputAccept, new Pose2d(centerPos, cameraRot));
+      //         // Uses wheels to act as a filter for the cameras
+      //       case TRUSTWHEELS:
+      //         if (isPoseValidWithWheels(result, centerPos)) {
+      //           String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
+      //           org.littletonrobotics.junction.Logger.recordOutput(
+      //               outputAccept, new Pose2d(centerPos, cameraRot));
 
-              String rawCamera = "VisionSubsystem/RawAcceptedCam" + names[idx] + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  rawCamera, result.getCameraPose().toPose2d());
+      //           String rawCamera = "VisionSubsystem/RawAcceptedCam" + names[idx] + "Pose";
+      //           org.littletonrobotics.junction.Logger.recordOutput(
+      //               rawCamera, result.getCameraPose().toPose2d());
 
-              fedStdDevs = scaledStdDev.get(0, 0);
-              driveSubsystem.addVisionMeasurement(
-                  new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);
+      //           fedStdDevs = scaledStdDev.get(0, 0);
+      //           driveSubsystem.addVisionMeasurement(
+      //               new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000,
+      // scaledStdDev);
 
-              offWheels = 0;
+      //           offWheels = 0;
 
-            } else {
+      //         } else {
 
-              String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  output, new Pose2d(centerPos, cameraRot));
+      //   String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
+      //   org.littletonrobotics.junction.Logger.recordOutput(
+      //       output, new Pose2d(centerPos, cameraRot));
 
-              String rawCamera = "VisionSubsystem/RawNotAcceptedCam" + names[idx] + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  rawCamera, result.getCameraPose().toPose2d());
+      //   String rawCamera = "VisionSubsystem/RawNotAcceptedCam" + names[idx] + "Pose";
+      //   org.littletonrobotics.junction.Logger.recordOutput(
+      //       rawCamera, result.getCameraPose().toPose2d());
 
-              offWheels++;
-              if (offWheels >= VisionConstants.kMaxTimesOffWheels) {
-                // logger.info("{} -> TRUSTVISION", curState);
-                curState = VisionStates.TRUSTVISION;
-              }
-            }
-            break;
+      //   offWheels++;
+      //   if (offWheels >= VisionConstants.kMaxTimesOffWheels) {
+      //     // logger.info("{} -> TRUSTVISION", curState);
+      //     curState = VisionStates.TRUSTVISION;
+      //   }
+      // }
+      // break;
 
-            // Purely trust vision
-          case TRUSTVISION:
-            if (isPoseValidWithoutWheels(result, centerPos)) {
-              String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  outputAccept, new Pose2d(centerPos, cameraRot));
+      // Purely trust vision
+      //   case TRUSTVISION:
+      if (isPoseValidWithoutWheels(result, centerPos)) {
+        String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
+        org.littletonrobotics.junction.Logger.recordOutput(
+            outputAccept, new Pose2d(centerPos, cameraRot));
 
-              String rawCamera = "VisionSubsystem/RawAcceptedCam" + names[idx] + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  rawCamera, result.getCameraPose().toPose2d());
-              updatesToWheels++;
+        String rawCamera = "VisionSubsystem/RawAcceptedCam" + names[idx] + "Pose";
+        org.littletonrobotics.junction.Logger.recordOutput(
+            rawCamera, result.getCameraPose().toPose2d());
+        updatesToWheels++;
 
-              fedStdDevs = scaledStdDev.get(0, 0);
-              driveSubsystem.addVisionMeasurement(
-                  new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);
+        fedStdDevs = scaledStdDev.get(0, 0);
+        driveSubsystem.addVisionMeasurement(
+            new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);
 
-            } else {
+      } else {
 
-              String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  output, new Pose2d(centerPos, cameraRot));
+        String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
+        org.littletonrobotics.junction.Logger.recordOutput(
+            output, new Pose2d(centerPos, cameraRot));
 
-              String rawCamera = "VisionSubsystem/RawNotAcceptedCam" + names[idx] + "Pose";
-              org.littletonrobotics.junction.Logger.recordOutput(
-                  rawCamera, result.getCameraPose().toPose2d());
-            }
-
-            break;
-        }
+        String rawCamera = "VisionSubsystem/RawNotAcceptedCam" + names[idx] + "Pose";
+        org.littletonrobotics.junction.Logger.recordOutput(
+            rawCamera, result.getCameraPose().toPose2d());
       }
+
+      // break;
     }
   }
 
@@ -408,7 +406,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   @Override
   public Set<Measure> getMeasures() {
     return Set.of(
-        new Measure("State", () -> curState.ordinal()),
+        // new Measure("State", () -> curState.ordinal()),
         new Measure("OffWheels", () -> offWheels),
         new Measure("Updates To Wheels", () -> updatesToWheels),
         new Measure("Adaptive Vision Matrix", () -> adaptiveVisionMatrix.get(0, 0)),
@@ -421,8 +419,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   // State Enum
-  public enum VisionStates {
-    TRUSTWHEELS,
-    TRUSTVISION
-  }
+  //   public enum VisionStates {
+  //     TRUSTWHEELS,
+  //     TRUSTVISION
+  //   }
 }
