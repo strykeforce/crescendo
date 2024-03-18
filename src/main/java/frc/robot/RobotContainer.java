@@ -378,7 +378,7 @@ public class RobotContainer {
         .add(
             "Set to Shoot Positon",
             new ClosedLoopElbowOffsetCommand(
-                elbowSubsystem, 16.914, () -> robotStateSubsystem.getElbowOffset()))
+                elbowSubsystem, 0.08119, () -> robotStateSubsystem.getElbowOffset()))
         .withPosition(7, 0)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")

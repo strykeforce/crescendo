@@ -12,6 +12,7 @@ public interface ElbowIO {
   public static class ElbowIOInputs {
     public double positionRots = 0.0;
     public double encoderPosRots = 0.0;
+    public double highResPosRots = 0.0;
     public double absRots = 0.0;
     public double velocity = 0.0;
     public boolean revLimitClosed = false;
@@ -20,7 +21,7 @@ public interface ElbowIO {
 
   public default void updateInputs(ElbowIOInputs inputs) {}
 
-  public default void setPosition(double position) {}
+  public default void setPosition(double position, int slot) {}
 
   public default void setPct(double percentOutput) {}
 
@@ -37,4 +38,10 @@ public interface ElbowIO {
   public default void registerWith(TelemetryService telemetryService) {}
 
   public default void setCurrentLimit(CurrentLimitsConfigs configs) {}
+
+  public default void setHighResCANcoderPos() {}
+
+  public default void setPreciseControl() {}
+
+  public default void setNormalControl() {}
 }
