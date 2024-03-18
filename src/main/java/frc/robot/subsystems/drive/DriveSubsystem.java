@@ -295,8 +295,28 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return io.getAzimuth1FwdLimitSwitch();
   }
 
+  public boolean isPointingAtFeedTarget() {
+    return Math.abs(getShooterAngleToFeedTarget().getDegrees())
+        <= DriveConstants.kDegreesCloseEnough;
+  }
+
   public boolean isPointingAtGoal() {
     return Math.abs(getShooterAngleToSpeaker().getDegrees()) <= DriveConstants.kDegreesCloseEnough;
+  }
+
+  public boolean isDriveStillFeed() {
+    double vX = getFieldRelSpeed().vxMetersPerSecond;
+    double vY = getFieldRelSpeed().vyMetersPerSecond;
+
+    // Take fieldRel Speed and get the magnitude of the vector
+    double wheelSpeed = FastMath.hypot(vX, vY);
+
+    double gyroRate = inputs.gyroRate;
+
+    boolean velStill = Math.abs(wheelSpeed) <= DriveConstants.kSpeedStillFeedThreshold;
+    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+
+    return velStill && gyroStill;
   }
 
   public boolean isDriveStill() {

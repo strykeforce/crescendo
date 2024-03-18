@@ -512,8 +512,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             getShootSolution(driveSubsystem.getDistanceToFeedTarget(), shootingLookupTable);
         superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
 
-        if (driveSubsystem.isDriveStill()
-            && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
+        if (driveSubsystem.isDriveStillFeed()
+            && (usingDistance ? true : driveSubsystem.isPointingAtFeedTarget())
             && superStructure.isFinished()) {
 
           if (!shootKnownPos) {
