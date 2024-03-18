@@ -3,7 +3,7 @@ max_acceleration = 3.0 #m/s
 start_velocity = 0.0 #m/s
 end_velocity = 0.0 #m/s 
 is_reversed = false
-target_yaw = 0 #degrees
+target_yaw = 0.0 #degrees
 
 [start_pose]
     dataPoint "W3"
