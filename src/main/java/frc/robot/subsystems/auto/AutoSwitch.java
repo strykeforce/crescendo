@@ -1,15 +1,5 @@
 package frc.robot.subsystems.auto;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
-import org.strykeforce.thirdcoast.util.AutonSwitch;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -33,6 +23,14 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
+import org.strykeforce.thirdcoast.util.AutonSwitch;
 
 public class AutoSwitch extends MeasurableSubsystem {
   public Logger logger = LoggerFactory.getLogger(AutoSwitch.class);

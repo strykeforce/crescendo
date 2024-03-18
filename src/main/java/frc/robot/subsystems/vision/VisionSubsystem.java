@@ -203,8 +203,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
 
-    org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/State", curState.name());
-
     scaledStdDev = adaptiveVisionMatrix.copy();
 
     // If enough time elapses between camera updates - reset count of updates to 0
