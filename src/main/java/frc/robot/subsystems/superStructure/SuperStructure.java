@@ -35,6 +35,7 @@ public class SuperStructure extends MeasurableSubsystem {
   private double leftTunePoint = 0.0;
   private double rightTunePoint = 0.0;
   private boolean isAuto = false;
+  private boolean isPrecise = false;
 
   // Constructor
   public SuperStructure(
@@ -128,6 +129,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSetpoint = elbowTunePoint;
 
     logger.info("{} -> TRANSFER(SHOOTING)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.SHOOTING;
@@ -147,6 +149,7 @@ public class SuperStructure extends MeasurableSubsystem {
     wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(SHOOTING)", curState);
+    isPrecise = true;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.SHOOTING;
@@ -162,6 +165,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(AMP)", curState);
+    isPrecise = false;
     flipMagazineOut = true;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.AMP;
@@ -177,6 +181,7 @@ public class SuperStructure extends MeasurableSubsystem {
     wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(INTAKE)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.INTAKE;
@@ -194,6 +199,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
 
     logger.info("{} -> TRANSFER(INTAKE)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.INTAKE;
@@ -210,6 +216,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> SAFE_TRANSFER_ELBOW(DEFENSE)", curState);
+    isPrecise = false;
     flipMagazineOut = true;
     curState = SuperStructureStates.SAFE_TRANSFER_ELBOW;
     nextState = SuperStructureStates.DEFENSE;
@@ -226,6 +233,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> SAFE_TRANSFER_ELBOW(STOW)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.SAFE_TRANSFER_ELBOW;
     nextState = SuperStructureStates.STOW;
@@ -241,6 +249,7 @@ public class SuperStructure extends MeasurableSubsystem {
     wristSubsystem.setPosition(wristSetpoint);
 
     logger.info("{} -> TRANSFER(STOW)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.STOW;
@@ -258,6 +267,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
 
     logger.info("{} -> TRANSFER(STOW)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.STOW;
@@ -274,6 +284,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
 
     logger.info("{} -> TRANSFER(SUBWOOFER)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.SUBWOOFER;
@@ -290,6 +301,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(PREP_PODIUM)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.PREP_PODIUM;
@@ -305,6 +317,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(PREP_CLIMB)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.PREP_CLIMB;
@@ -318,6 +331,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(FOLDING)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.FOLDED;
@@ -331,6 +345,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(TRAP)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.TRAP;
@@ -347,6 +362,7 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(PODIUM)", curState);
+    isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.PODIUM;
@@ -366,8 +382,8 @@ public class SuperStructure extends MeasurableSubsystem {
           }
         } else {
           // FIXME
-          if (true) {
-            elbowSubsystem.setPosition(elbowSetpoint);
+          if (wristSubsystem.getPosition() < SuperStructureConstants.kWristMinToMoveElbow) {
+            elbowSubsystem.setPosition(elbowSetpoint, isPrecise);
           }
         }
         // Once all subsystems are at position go into the desired state
@@ -424,6 +440,7 @@ public class SuperStructure extends MeasurableSubsystem {
         "Wrist Finished", wristSubsystem.isFinished());
     org.littletonrobotics.junction.Logger.recordOutput(
         "Shooter Finished", shooterSubsystem.atSpeed());
+    org.littletonrobotics.junction.Logger.recordOutput("SuperStructure Is Precise", isPrecise);
   }
 
   // Grapher

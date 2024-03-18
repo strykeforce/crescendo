@@ -84,7 +84,7 @@ public class Swerve implements SwerveIO, Checkable {
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
 
-    ahrs = new SF_AHRS(SerialPort.Port.kUSB, SerialDataType.kProcessedData, (byte) 200);
+    ahrs = new SF_AHRS(SerialPort.Port.kUSB2, SerialDataType.kProcessedData, (byte) 200);
     swerveDrive = new SwerveDrive(ahrs, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
