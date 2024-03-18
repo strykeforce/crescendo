@@ -26,7 +26,8 @@ import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
-public class FastAmpMid_5PieceCommand extends SequentialCommandGroup implements AutoCommandInterface {
+public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
+    implements AutoCommandInterface {
 
   private DriveAutonCommand midInitWingNote3;
   private DriveAutonCommand wingNote3MidInit;

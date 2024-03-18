@@ -9,6 +9,7 @@ import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.AmpMid_5PieceCommand;
 import frc.robot.commands.auton.DoNothingCommand;
+import frc.robot.commands.auton.FastAmpMid_5PieceCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.SmartNonAmpAutoCommand;
 import frc.robot.constants.AutonConstants;
@@ -161,6 +162,14 @@ public class AutoSwitch extends MeasurableSubsystem {
             "WingNote2_WingNote3_B");
       case 0x10:
         return new AmpMid_5PieceCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem);
+      case 0x11:
+        return new FastAmpMid_5PieceCommand(
             driveSubsystem,
             robotStateSubsystem,
             superStructure,
