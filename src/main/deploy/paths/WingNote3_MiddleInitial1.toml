@@ -12,6 +12,7 @@ target_yaw = 0.0 #degrees
     angle = 150.0
 [end_pose]
     dataPoint = "MI1"
+    dX = 0.2
     angle = 0.0
 
 [[internal_points]]
