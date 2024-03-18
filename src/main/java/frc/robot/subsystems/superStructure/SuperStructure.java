@@ -101,6 +101,12 @@ public class SuperStructure extends MeasurableSubsystem {
     shooterSubsystem.setSpeed(-0.5);
   }
 
+  // FIXME needs a better name
+  public void spinUp() {
+    shooterSubsystem.setLeftSpeed(SuperStructureConstants.kShooterSpinUpLeftSetPoint);
+    shooterSubsystem.setRightSpeed(SuperStructureConstants.kShooterSpinUpRightSetPoint);
+  }
+
   public void stopPodiumShoot() {
     logger.info("Stop Magazine Belts");
     magazineSubsystem.setSpeed(0.0);
