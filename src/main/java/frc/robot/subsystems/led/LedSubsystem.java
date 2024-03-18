@@ -14,14 +14,23 @@ import frc.robot.constants.LedConstants;
 public class LedSubsystem extends MeasurableSubsystem{
 
     private LedState currState = LedState.OFF;
-    private AddressableLED led = new AddressableLED(LedConstants.kLedPort);
-    private AddressableLEDBuffer ledBuffer;
+
+    private AddressableLED ledR = new AddressableLED(LedConstants.kRightLedPort);
+    private AddressableLEDBuffer ledBufferR;
+
+    private AddressableLED ledL = new AddressableLED(LedConstants.kLeftLedPort);
+    private AddressableLEDBuffer ledBufferL;
 
     public LedSubsystem() {
-        ledBuffer = new AddressableLEDBuffer(LedConstants.kLedLength);
-        led.setLength(ledBuffer.getLength());
-        led.setData(ledBuffer);
-        led.start();
+        ledBufferR = new AddressableLEDBuffer(LedConstants.kRightLedLength);
+        ledR.setLength(ledBufferR.getLength());
+        ledR.setData(ledBufferR);
+        ledR.start();
+
+        ledBufferL = new AddressableLEDBuffer(LedConstants.kLeftLedLength);
+        ledL.setLength(ledBufferL.getLength());
+        ledL.setData(ledBufferL);
+        ledL.start();
     }
 
     public LedState getState() {
@@ -34,15 +43,21 @@ public class LedSubsystem extends MeasurableSubsystem{
 
     public void setColor(int r, int g, int b) {
         setState(LedState.SOLID);
-        for (var i = 0; i < ledBuffer.getLength(); i++) {
-            ledBuffer.setRGB(i, r, g, b);
+        for (var i = 0; i < ledBufferR.getLength(); i++) {
+            ledBufferR.setRGB(i, r, g, b);
+        }
+        for (var i = 0; i < ledBufferL.getLength(); i++) {
+            ledBufferL.setRGB(i, r, g, b);
         }
     }
 
     public void setColor(Color color) {
         setState(LedState.SOLID);
-        for (var i = 0; i < ledBuffer.getLength(); i++) {
-            ledBuffer.setLED(i, color);
+        for (var i = 0; i < ledBufferR.getLength(); i++) {
+            ledBufferR.setLED(i, color);
+        }
+        for (var i = 0; i < ledBufferL.getLength(); i++) {
+            ledBufferL.setLED(i, color);
         }
     }
 
@@ -68,8 +83,11 @@ public class LedSubsystem extends MeasurableSubsystem{
 
         switch (currState) {
             case FLAMING:
-                for (var i = 0; i < ledBuffer.getLength(); i++) {
-                    ledBuffer.setRGB(i, 250, (int) (Math.random() * 185), 0);
+                for (var i = 0; i < ledBufferR.getLength(); i++) {
+                    ledBufferR.setRGB(i, 250, (int) (Math.random() * 185), 0);
+                }
+                for (var i = 0; i < ledBufferL.getLength(); i++) {
+                    ledBufferL.setRGB(i, 250, (int) (Math.random() * 185), 0);
                 }
                 break;
             case SOLID:
