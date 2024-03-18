@@ -168,11 +168,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
-    if (updateVision) io.addVisionMeasurement(pose, timestamp);
+    io.addVisionMeasurement(pose, timestamp);
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
-    if (updateVision) io.addVisionMeasurement(pose, timestamp, stdDevvs);
+    io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController() {

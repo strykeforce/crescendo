@@ -59,6 +59,7 @@ public class RobotConstants {
   public static double kLeftRatchetOff = 0.0;
   public static double kRightRatchetOn = 0.0;
   public static double kRightRatchetOff = 0.0;
+  public static double kElbowSetpointOffset = 0.0;
 
   public RobotConstants() {
     logger.info("SN: {}, isCompBot: {}", RobotController.getSerialNumber(), isCompBot);
@@ -77,6 +78,7 @@ public class RobotConstants {
       kRightRatchetOff = CompConstants.kRightRatchetOff;
       kLeftRatchetOn = CompConstants.kLeftRatchetOn;
       kRightRatchetOn = CompConstants.kRightRatchetOn;
+      kElbowSetpointOffset = CompConstants.kElbowSetpointOffset;
     } else {
       logger.info("Using Proto Robot Constants");
       kWheelDiameterInches = ProtoConstants.kWheelDiameterInches;
@@ -92,6 +94,7 @@ public class RobotConstants {
       kRightRatchetOff = ProtoConstants.kRightRatchetOff;
       kLeftRatchetOn = ProtoConstants.kLeftRatchetOn;
       kRightRatchetOn = ProtoConstants.kRightRatchetOn;
+      kElbowSetpointOffset = ProtoConstants.kElbowSetpointOffset;
     }
   }
 
@@ -103,6 +106,7 @@ public class RobotConstants {
     public static final double kElbowZero = 0.01465; // 0.0105
     public static final double kElbowRecoveryZero = -0.2656;
     public static final double kElbowZeroPos = 30.45;
+    public static final double kElbowSetpointOffset = 0.00409;
 
     // Wrist
     public static final double kWristZero = 2322.0;
@@ -127,6 +131,7 @@ public class RobotConstants {
     public static final double kElbowZero = 0.23291; // -0.11816
     public static final double kElbowRecoveryZero = 0.23291;
     public static final double kElbowZeroPos = 34.0;
+    public static final double kElbowSetpointOffset = 0.0;
 
     // Wrist
     public static final double kWristZero = 3293.0; // 3310
