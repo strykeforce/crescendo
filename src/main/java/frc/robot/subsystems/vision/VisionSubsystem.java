@@ -202,7 +202,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
   public void periodic() {
 
     gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
-    logger.info(gyroData.getFirst() + "");
 
     scaledStdDev = adaptiveVisionMatrix.copy();
 
