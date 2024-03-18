@@ -436,6 +436,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case STOW:
+        if (magazineHasNote()
+            && driveSubsystem.getDistanceToSpeaker() < RobotStateConstants.kLookupMaxDistance) {
+          superStructure.spinUp();
+        } else {
+          superStructure.stopShoot();
+        }
+
         break;
 
       case TO_INTAKING:
