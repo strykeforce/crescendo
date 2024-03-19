@@ -93,6 +93,7 @@ import frc.robot.subsystems.elbow.ElbowIOFX;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeIOFX;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineIOFX;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
@@ -106,6 +107,8 @@ import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -122,6 +125,7 @@ public class RobotContainer {
   private final ElbowSubsystem elbowSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final ClimbSubsystem climbSubsystem;
+  private final LedSubsystem ledSubsystem;
   private final AutoSwitch autoSwitch;
   private final PathHandler pathHandler;
 
@@ -160,6 +164,8 @@ public class RobotContainer {
   private ClimbIOFX climbIO;
   private ForkIOSRX forkIO;
 
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
+
   public RobotContainer() {
     swerve = new Swerve();
     wristIO = new WristIOSRX();
@@ -177,6 +183,7 @@ public class RobotContainer {
     shooterSubsystem = new ShooterSubsystem(shooterIO);
     intakeSubsystem = new IntakeSubsystem(intakeIO);
     magazineSubsystem = new MagazineSubsystem(magazineIO);
+    ledSubsystem = new LedSubsystem();
     climbSubsystem =
         new ClimbSubsystem(climbIO, new ClimbRatchetIOServo(), new TrapBarIOServo(), forkIO);
 
@@ -192,7 +199,8 @@ public class RobotContainer {
             intakeSubsystem,
             magazineSubsystem,
             superStructure,
-            climbSubsystem);
+            climbSubsystem,
+            ledSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
@@ -917,6 +925,11 @@ public class RobotContainer {
     // Elbow at zero
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, 0.0));
+  }
+
+  public void ledTestFunction() {
+    ledSubsystem.setColor(219, 100, 2);
+    logger.info("set color to orange");
   }
 
   public Command getAutonomousCommand() {

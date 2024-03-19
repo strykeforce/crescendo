@@ -7,12 +7,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
+import frc.robot.subsystems.led.LedSubsystem;
+import frc.robot.subsystems.led.LedSubsystem.LedState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
@@ -38,6 +41,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
   private ClimbSubsystem climbSubsystem;
+  private LedSubsystem ledSubsystem;
   private static CANBus canBus;
 
   private RobotStates curState = RobotStates.IDLE;
@@ -80,13 +84,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       IntakeSubsystem intakeSubsystem,
       MagazineSubsystem magazineSubsystem,
       SuperStructure superStructure,
-      ClimbSubsystem climbSubsystem) {
+      ClimbSubsystem climbSubsystem,
+      LedSubsystem ledSubsystem) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
     this.climbSubsystem = climbSubsystem;
+    this.ledSubsystem = ledSubsystem;
 
     this.canBus = new CANBus();
     grabElbowOffsetPreferences();
@@ -234,6 +240,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.safeIntake();
     // magazineSubsystem.toIntaking();
     magazineSubsystem.setEmpty();
+    ledSubsystem.setFlaming();
     setState(RobotStates.TO_INTAKING);
   }
 
@@ -242,6 +249,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.intake();
     // magazineSubsystem.toIntaking();
     magazineSubsystem.setEmpty();
+    ledSubsystem.setFlaming();
     setState(RobotStates.TO_INTAKING);
   }
 
@@ -251,6 +259,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.amp();
     intakeSubsystem.toEjecting();
     // intakeSubsystem.setPercent(0.0);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_AMP);
   }
@@ -267,6 +276,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_SHOOT);
   }
@@ -304,6 +314,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_SHOOT);
   }
@@ -316,6 +327,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_SHOOT);
   }
@@ -334,6 +346,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.setPercent(0.0);
     // magazineSubsystem.setSpeed(0.0);
     superStructure.stow();
+    if (ledSubsystem.getState() == LedState.FLAMING) {
+      ledSubsystem.setOff();
+    }
 
     setState(RobotStates.TO_STOW);
   }
@@ -361,6 +376,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     magazineSubsystem.preparePodium();
     intakeSubsystem.setPercent(0.0);
     superStructure.preparePodium();
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_PODIUM);
   }
@@ -370,6 +386,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.setPercent(0.0);
     superStructure.subwoofer();
     intakeSubsystem.setPercent(0.0);
+    ledSubsystem.setOff();
 
     setState(RobotStates.TO_SUBWOOFER);
   }
@@ -402,6 +419,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     scoreTrapTimer.reset();
     scoreTrapTimer.start();
     magazineSubsystem.trap();
+    ledSubsystem.setOff();
     setState(RobotStates.SCORE_TRAP);
   }
 
@@ -411,6 +429,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     scoreTrapTimer.start();
     magazineSubsystem.trap();
     this.decendClimbAfterTrap = decend;
+    ledSubsystem.setOff();
     setState(RobotStates.SCORE_TRAP);
   }
 
@@ -444,6 +463,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
     }
+    ledSubsystem.setOff();
   }
 
   public void toTune() {
@@ -501,6 +521,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           intakeSubsystem.setPercent(0);
 
+          ledSubsystem.setGreen();
           toStow();
         }
         if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
@@ -604,6 +625,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           curShot += 1;
           hasShootBeamUnbroken = false;
+          if (isAuto) {
+            ledSubsystem.setBlue();
+          }
 
           setState(RobotStates.SHOOTING);
         }
@@ -624,6 +648,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           magazineSubsystem.setSpeed(0);
 
           superStructure.stopShoot();
+          ledSubsystem.setOff();
           toIntake();
           magazineSubsystem.setEmpty();
         }
@@ -634,6 +659,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
           // superStructure.slowWheelSpin();
           superStructure.stopShoot();
+        }
+        if (magazineSubsystem.getSpeed() >= MagazineConstants.kPodiumRumbleSpeed) {
+          ledSubsystem.setBlue();
         }
         // if (superStructure.isFinished() && magazineSubsystem.getState() ==
         // MagazineStates.SHOOT)
@@ -653,6 +681,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           magazineShootDelayTimer.stop();
 
           superStructure.stopPodiumShoot();
+          ledSubsystem.setOff();
           toStow();
         }
         break;
