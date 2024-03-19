@@ -13,6 +13,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
 import frc.robot.subsystems.led.LedSubsystem;
+import frc.robot.subsystems.led.LedSubsystem.LedState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
@@ -302,6 +303,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.setPercent(0.0);
     // magazineSubsystem.setSpeed(0.0);
     superStructure.stow();
+    if (ledSubsystem.getState() == LedState.FLAMING) {
+      ledSubsystem.setOff();
+    }
 
     setState(RobotStates.TO_STOW);
   }

@@ -103,6 +103,8 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -155,6 +157,8 @@ public class RobotContainer {
   private MagazineIOFX magazineIO;
   private ClimbIOFX climbIO;
   private ForkIOSRX forkIO;
+
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public RobotContainer() {
     swerve = new Swerve();
@@ -873,6 +877,11 @@ public class RobotContainer {
     // Elbow at zero
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, 0.0));
+  }
+
+  public void ledTestFunction() {
+    ledSubsystem.setColor(219, 100, 2);
+    logger.info("set color to orange");
   }
 
   public Command getAutonomousCommand() {

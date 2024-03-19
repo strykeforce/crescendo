@@ -57,7 +57,8 @@ public class Robot extends LoggedRobot {
 
       // Comp robot conditions or not
       eventFlag = new DigitalInput(RobotConstants.kEventInterlockID);
-      isEvent = eventFlag.get();
+      // isEvent = eventFlag.get();
+      isEvent = false;
       if (isEvent) {
         System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
         System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");
@@ -84,6 +85,7 @@ public class Robot extends LoggedRobot {
         .add(new ToggleAllianceColorCommand(m_robotContainer))
         .withSize(1, 1)
         .withPosition(2, 0);
+    logger.info("robotinit");
   }
 
   @Override
@@ -105,7 +107,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.ledTestFunction();
+  }
 
   @Override
   public void disabledPeriodic() {
@@ -147,6 +151,7 @@ public class Robot extends LoggedRobot {
       // m_robotContainer.zeroClimb();
       m_robotContainer.getClimbZeroCommand().schedule();
     }
+    m_robotContainer.ledTestFunction();
   }
 
   @Override
