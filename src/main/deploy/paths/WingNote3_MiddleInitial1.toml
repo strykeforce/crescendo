@@ -6,19 +6,15 @@ is_reversed = false
 target_yaw = 0.0 #degrees
 
 [start_pose]
-    dataPoint = "NAS2"
-    angle = 173.3
-
+    dataPoint "W3"
+    dX = -0.1
+    dY = 0.25
+    angle = 150.0
 [end_pose]
-    dataPoint = "M3"
-    dX = -0.5
-    dY = 0.0
-    angle = 180.0
+    dataPoint = "MI1"
+    dX = 0.2
+    angle = 0.0
 
 [[internal_points]]
-    x = 4.9
-    y = 4.34
-
-[[internal_points]]
-    x = 6.3
-    y = 4.1
+    x = 1.99
+    y = 4.8

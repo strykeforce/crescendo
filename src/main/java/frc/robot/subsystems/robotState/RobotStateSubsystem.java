@@ -1,5 +1,7 @@
 package frc.robot.subsystems.robotState;
 
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -20,6 +22,7 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.superStructure.SuperStructure.SuperStructureStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -39,11 +42,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private SuperStructure superStructure;
   private ClimbSubsystem climbSubsystem;
   private LedSubsystem ledSubsystem;
+  private static CANBus canBus;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
 
-  private String[][] lookupTable;
+  private String[][] shootingLookupTable;
+  private String[][] feedingLookupTable;
 
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
@@ -88,13 +93,22 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.superStructure = superStructure;
     this.climbSubsystem = climbSubsystem;
     this.ledSubsystem = ledSubsystem;
+
+    this.canBus = new CANBus();
     grabElbowOffsetPreferences();
-    parseLookupTable();
+
+    shootingLookupTable = parseLookupTable(RobotStateConstants.kShootingLookupTablePath);
+    feedingLookupTable = parseLookupTable(RobotStateConstants.kFeedingLookupTablePath);
   }
 
   // Getter/Setter Methods
   public RobotStates getState() {
     return curState;
+  }
+
+  public boolean isCANivoreConnected() {
+    CANBusStatus status = canBus.getStatus(RobotStateConstants.kcanivoreString);
+    return status.Status.isOK();
   }
 
   private void setState(RobotStates robotState) {
@@ -148,20 +162,24 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Order of Columns: dist meters, left shoot, right shoot, elbow, time of flight
-  private void parseLookupTable() {
+  private String[][] parseLookupTable(String path) {
+    String[][] lookupTable;
+    List<String[]> list = new LinkedList<>();
+
     try {
-      CSVReader csvReader = new CSVReader(new FileReader(RobotStateConstants.kLookupTablePath));
-
-      List<String[]> list = csvReader.readAll();
-      String[][] strArr = new String[list.size()][];
-
-      lookupTable = list.toArray(strArr);
-    } catch (Exception exception) {
-
+      CSVReader csvReader = new CSVReader(new FileReader(path));
+      list = csvReader.readAll();
+    } catch (Exception e) {
+      logger.warn("Failed to read lookup table at {} due to {}", path, e);
     }
+
+    String[][] strArr = new String[list.size()][];
+    lookupTable = list.toArray(strArr);
+
+    return lookupTable;
   }
 
-  private double[] getShootSolution(double distance) {
+  private double[] getShootSolution(double distance, String[][] lookupTable) {
     double[] shootSolution = new double[3];
     int index;
     distance += RobotStateConstants.kDistanceOffset;
@@ -253,7 +271,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     driveSubsystem.setIsAligningShot(false);
 
-    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(pos));
+    double[] shootSolution =
+        getShootSolution(driveSubsystem.getDistanceToSpeaker(pos), shootingLookupTable);
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -262,12 +281,36 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_SHOOT);
   }
 
+  public void startFeed() {
+    usingDistance = false;
+    shootKnownPos = false;
+    driveSubsystem.setIsAligningShot(true);
+    driveSubsystem.setIsFeeding(true);
+
+    double[] feedSolution =
+        getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
+
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
+
+    setState(RobotStates.TO_FEED);
+  }
+
+  public void spinUpShotSolution(Pose2d pose) {
+    shootPos = pose;
+    double[] shootSolution =
+        getShootSolution(driveSubsystem.getDistanceToSpeaker(pose), shootingLookupTable);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    setState(RobotStates.SPIN_UP);
+  }
+
   public void startShoot() {
     usingDistance = false;
     shootKnownPos = false;
     driveSubsystem.setIsAligningShot(true);
 
-    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+    double[] shootSolution =
+        getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -280,7 +323,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     usingDistance = true;
     shootKnownPos = false;
 
-    double[] shootSolution = getShootSolution(distance);
+    double[] shootSolution = getShootSolution(distance, shootingLookupTable);
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -510,15 +553,48 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toStowSafe(); // FIXME: call stow() and possibly wait for timeout
         }
         break;
+      case SPIN_UP: // Indicator State
+        break;
+      case TO_FEED:
+        double[] feedSolution =
+            getShootSolution(driveSubsystem.getDistanceToFeedTarget(), shootingLookupTable);
+        superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
+
+        if (driveSubsystem.isDriveStillFeed()
+            && (usingDistance ? true : driveSubsystem.isPointingAtFeedTarget())
+            && superStructure.isFinished()) {
+
+          if (!shootKnownPos) {
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Position",
+                driveSubsystem.getPoseMeters());
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+          } else {
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Position", shootPos);
+            org.littletonrobotics.junction.Logger.recordOutput(
+                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+          }
+          magazineSubsystem.toEmptying();
+
+          curShot += 1;
+          hasShootBeamUnbroken = false;
+
+          setState(RobotStates.SHOOTING);
+        }
+        break;
 
       case TO_SHOOT:
         if (!usingDistance && !shootKnownPos) {
-          double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker());
+          double[] shootSolution =
+              getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
         }
 
         if (shootKnownPos) {
-          double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos));
+          double[] shootSolution =
+              getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos), shootingLookupTable);
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
           double vomega = driveSubsystem.getvOmegaToGoal(shootPos);
           driveSubsystem.move(0, 0, vomega, true);
@@ -568,6 +644,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (hasShootBeamUnbroken) {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
+          driveSubsystem.setIsFeeding(false);
           magazineSubsystem.setSpeed(0);
 
           superStructure.stopShoot();
@@ -776,6 +853,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     AMP,
     TO_STOW,
     STOW,
+    SPIN_UP,
     TO_SHOOT,
     SHOOTING,
     TO_PODIUM,
@@ -796,6 +874,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     CLIMBING,
     CLIMBED,
     TO_DEFENSE,
-    DEFENSE
+    DEFENSE,
+    TO_FEED
   }
 }

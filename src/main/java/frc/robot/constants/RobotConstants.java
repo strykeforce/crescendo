@@ -23,7 +23,6 @@ public class RobotConstants {
   public static final int kEventInterlockID = 6;
 
   // Field Positions
-  // FIXME: need to measure or get distance from CAD or something
   public static final double kRedSpeakerXPos = 16.540988;
   public static final double kRedSpeakerYPos = 5.547868;
   public static final double kBlueSpeakerXPos = 0;
@@ -32,6 +31,11 @@ public class RobotConstants {
       new Translation2d(kRedSpeakerXPos, kRedSpeakerYPos);
   public static final Translation2d kBlueSpeakerPos =
       new Translation2d(kBlueSpeakerXPos, kBlueSpeakerYPos);
+
+  public static final Translation2d kRedFeedTargetPos =
+      new Translation2d(kRedSpeakerXPos - 1, kRedSpeakerYPos + 1);
+  public static final Translation2d kBlueFeedTargetPos =
+      new Translation2d(kBlueSpeakerXPos + 1, kBlueSpeakerYPos + 1);
 
   public static final double kDegreeShootOffset = Units.degreesToRadians(-3.5);
 
@@ -105,7 +109,7 @@ public class RobotConstants {
     public static final double kElbowSetpointOffset = 0.00409;
 
     // Wrist
-    public static final double kWristZero = 2322.0;
+    public static final double kWristZero = 2223.0; // 2322
 
     // Climb
     public static final double kLeftTrapBarExtend = 0.5;

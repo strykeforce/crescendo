@@ -56,6 +56,7 @@ import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
+import frc.robot.commands.robotState.FeedCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
@@ -74,6 +75,7 @@ import frc.robot.commands.robotState.UpdateElbowOffsetCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
@@ -94,6 +96,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineIOFX;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
+import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.shooter.ShooterIOFX;
@@ -102,6 +105,7 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +127,7 @@ public class RobotContainer {
   private final ClimbSubsystem climbSubsystem;
   private final LedSubsystem ledSubsystem;
   private final AutoSwitch autoSwitch;
+  private final PathHandler pathHandler;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -132,6 +137,7 @@ public class RobotContainer {
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
   private Boolean isEvent = true;
+  private Boolean canivoreStatus = false;
 
   private NonAmpAutoCommand nonAmpAutonPath;
   private NonAmpAutoCommand nonAmpAutoNote3;
@@ -197,6 +203,18 @@ public class RobotContainer {
             ledSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
+
+    pathHandler =
+        new PathHandler(
+            null,
+            robotStateSubsystem,
+            driveSubsystem,
+            List.of(),
+            AutonConstants.kNonAmpPathMatrix,
+            false,
+            2.0,
+            AutonConstants.Setpoints.NAS2);
+
     autoSwitch =
         new AutoSwitch(
             robotStateSubsystem,
@@ -207,7 +225,8 @@ public class RobotContainer {
             climbSubsystem,
             elbowSubsystem,
             wristSubsystem,
-            shooterSubsystem);
+            shooterSubsystem,
+            pathHandler);
 
     // visionSubsystem.setVisionUpdates(false);
     nonAmpAutonPath =
@@ -572,6 +591,11 @@ public class RobotContainer {
         .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
         .withSize(1, 1)
         .withPosition(6, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("CANivore Connected", () -> canivoreStatus)
+        .withSize(1, 1)
+        .withPosition(7, 0);
     // Shuffleboard.getTab("Match")
     //     .add("ZeroRecoveryElbowCommand", new ZeroRecoveryElbowCommand(elbowSubsystem))
     //     .withSize(1, 1)
@@ -662,6 +686,10 @@ public class RobotContainer {
     return this.autoSwitch;
   }
 
+  public void updateCanivoreStatus() {
+    this.canivoreStatus = robotStateSubsystem.isCANivoreConnected();
+  }
+
   public void setIsEvent(boolean isEvent) {
     this.isEvent = isEvent;
   }
@@ -712,6 +740,8 @@ public class RobotContainer {
         .onTrue(
             new AmpCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .onTrue(new DriveSpeedSpinCommand(driveSubsystem, xboxController));
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
     //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
@@ -821,6 +851,24 @@ public class RobotContainer {
         .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
         .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+
+    // Feeding Shoot
+    new JoystickButton(driveJoystick, Button.SWF_UP.id)
+        .onTrue(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWF_UP.id)
+        .onFalse(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
+        .onTrue(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
+        .onFalse(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void configureClimbTestBindings() {
