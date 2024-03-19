@@ -288,7 +288,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void spinUpShotSolution(Pose2d pose) {
     shootPos = pose;
-    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(pose));
+    double[] shootSolution =
+        getShootSolution(driveSubsystem.getDistanceToSpeaker(pose), shootingLookupTable);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     setState(RobotStates.SPIN_UP);
   }
