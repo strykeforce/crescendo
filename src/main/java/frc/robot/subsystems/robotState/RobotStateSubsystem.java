@@ -1,5 +1,7 @@
 package frc.robot.subsystems.robotState;
 
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -36,6 +38,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private SuperStructure superStructure;
   private ClimbSubsystem climbSubsystem;
+  private static CANBus canBus;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
@@ -84,6 +87,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.magazineSubsystem = magazineSubsystem;
     this.superStructure = superStructure;
     this.climbSubsystem = climbSubsystem;
+
+    this.canBus = new CANBus();
     grabElbowOffsetPreferences();
 
     shootingLookupTable = parseLookupTable(RobotStateConstants.kShootingLookupTablePath);
@@ -93,6 +98,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Getter/Setter Methods
   public RobotStates getState() {
     return curState;
+  }
+
+  public boolean isCANivoreConnected() {
+    CANBusStatus status = canBus.getStatus(RobotStateConstants.kcanivoreString);
+    return status.Status.isOK();
   }
 
   private void setState(RobotStates robotState) {
@@ -274,6 +284,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
 
     setState(RobotStates.TO_FEED);
+  }
+
+  public void spinUpShotSolution(Pose2d pose) {
+    shootPos = pose;
+    double[] shootSolution = getShootSolution(driveSubsystem.getDistanceToSpeaker(pose));
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+    setState(RobotStates.SPIN_UP);
   }
 
   public void startShoot() {
@@ -513,6 +530,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           toStowSafe(); // FIXME: call stow() and possibly wait for timeout
         }
+        break;
+      case SPIN_UP: // Indicator State
         break;
       case TO_FEED:
         double[] feedSolution =
@@ -804,6 +823,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     AMP,
     TO_STOW,
     STOW,
+    SPIN_UP,
     TO_SHOOT,
     SHOOTING,
     TO_PODIUM,

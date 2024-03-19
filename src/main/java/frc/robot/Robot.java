@@ -52,7 +52,7 @@ public class Robot extends LoggedRobot {
           Logger.recordMetadata("GitDirty", "Unknown");
           break;
       }
-      // /media/sda1/logs
+      // /media/sda1/logs -> /V/logs
       Logger.addDataReceiver(new WPILOGWriter());
 
       // Comp robot conditions or not
@@ -110,6 +110,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledPeriodic() {
     m_robotContainer.getAutoSwitch().checkSwitch();
+    m_robotContainer.updateCanivoreStatus();
   }
 
   @Override

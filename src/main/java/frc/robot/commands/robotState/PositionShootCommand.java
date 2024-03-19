@@ -13,6 +13,7 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 public class PositionShootCommand extends Command implements AutoCommandInterface {
   RobotStateSubsystem robotStateSubsystem;
   Pose2d shootPos;
+  Pose2d generatedPos;
   DriveSubsystem driveSubsystem;
   boolean triedFlip = false;
 
@@ -26,12 +27,13 @@ public class PositionShootCommand extends Command implements AutoCommandInterfac
     addRequirements(superStructure, magazineSubsystem, intakeSubsystem);
     this.robotStateSubsystem = robotStateSubsystem;
     this.shootPos = shootPos;
+    this.generatedPos = shootPos;
     this.driveSubsystem = driveSubsystem;
   }
 
   @Override
   public void initialize() {
-    robotStateSubsystem.startShootKnownPos(shootPos);
+    robotStateSubsystem.startShootKnownPos(generatedPos);
   }
 
   @Override
@@ -42,7 +44,7 @@ public class PositionShootCommand extends Command implements AutoCommandInterfac
   @Override
   public void generateTrajectory() {
     triedFlip = true;
-    shootPos = driveSubsystem.apply(shootPos);
+    generatedPos = driveSubsystem.apply(shootPos);
   }
 
   @Override
