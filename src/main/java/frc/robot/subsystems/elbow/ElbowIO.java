@@ -44,4 +44,8 @@ public interface ElbowIO {
   public default void setPreciseControl() {}
 
   public default void setNormalControl() {}
+
+  public default boolean isHighResCANcoderConnected() {
+    return true;
+  }
 }

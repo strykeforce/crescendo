@@ -165,6 +165,11 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   }
 
   @Override
+  public boolean isHighResCANcoderConnected() {
+    return curHighResPosition.getStatus().isOK();
+  }
+
+  @Override
   public void setHighResCANcoderPos() {
     double pos = currPosition.getValueAsDouble();
 
