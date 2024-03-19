@@ -846,13 +846,21 @@ public class RobotContainer {
 
     // Feeding Shoot
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onTrue(new FeedCommand(robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onTrue(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onFalse(new FeedCommand(robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onFalse(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onTrue(new FeedCommand(robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onTrue(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onFalse(new FeedCommand(robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+        .onFalse(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void configureClimbTestBindings() {
