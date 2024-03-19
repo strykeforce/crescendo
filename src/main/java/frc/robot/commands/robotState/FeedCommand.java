@@ -25,7 +25,7 @@ public class FeedCommand extends Command {
     flag =
         !((robotStateSubsystem.intakeHasNote() && robotStateSubsystem.magazineHasNote()))
             && robotStateSubsystem.getIsAuto();
-    if (!flag) robotStateSubsystem.startFeed();
+    if (!flag) robotStateSubsystem.toFixedFeeding();
   }
 
   @Override

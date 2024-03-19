@@ -271,20 +271,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_SHOOT);
   }
 
-  public void startFeed() {
-    usingDistance = false;
-    shootKnownPos = false;
-    driveSubsystem.setIsAligningShot(true);
-    driveSubsystem.setIsFeeding(true);
+  // public void startFeed() {
+  //   usingDistance = false;
+  //   shootKnownPos = false;
+  //   driveSubsystem.setIsAligningShot(true);
+  //   driveSubsystem.setIsFeeding(true);
 
-    double[] feedSolution =
-        getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
+  //   double[] feedSolution =
+  //       getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
 
-    magazineSubsystem.setSpeed(0.0);
-    superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
+  //   magazineSubsystem.setSpeed(0.0);
+  //   superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
 
-    setState(RobotStates.TO_FEED);
-  }
+  //   setState(RobotStates.TO_FEED);
+  // }
 
   public void spinUpShotSolution(Pose2d pose) {
     shootPos = pose;
@@ -372,6 +372,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_SUBWOOFER);
+  }
+
+  public void toFixedFeeding() {
+    driveSubsystem.setIsAligningShot(false);
+    intakeSubsystem.setPercent(0.0);
+    superStructure.fixedFeeding();
+    intakeSubsystem.setPercent(0.0);
+
+    setState(RobotStates.TO_FEED);
   }
 
   public void prepareClimb() {
@@ -535,33 +544,37 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case SPIN_UP: // Indicator State
         break;
       case TO_FEED:
-        double[] feedSolution =
-            getShootSolution(driveSubsystem.getDistanceToFeedTarget(), shootingLookupTable);
-        superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
-
-        if (driveSubsystem.isDriveStillFeed()
-            && (usingDistance ? true : driveSubsystem.isPointingAtFeedTarget())
-            && superStructure.isFinished()) {
-
-          if (!shootKnownPos) {
-            org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingData/shot" + Integer.toString(curShot) + "/Position",
-                driveSubsystem.getPoseMeters());
-            org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
-          } else {
-            org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingData/shot" + Integer.toString(curShot) + "/Position", shootPos);
-            org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
-          }
+        if (superStructure.isFinished()) {
           magazineSubsystem.toEmptying();
 
-          curShot += 1;
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
           hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
         }
+        // double[] feedSolution =
+        //     getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
+        // superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
+
+        // if (driveSubsystem.isDriveStillFeed()
+        //     && driveSubsystem.isPointingAtFeedTarget()
+        //     && superStructure.isFinished()) {
+
+        //     org.littletonrobotics.junction.Logger.recordOutput(
+        //         "ShootingData/shot" + Integer.toString(curShot) + "/Position", shootPos);
+        //     org.littletonrobotics.junction.Logger.recordOutput(
+        //         "ShootingData/shot" + Integer.toString(curShot) + "/Distance",
+        // grabbedShotDistance);
+
+        //   magazineSubsystem.toEmptying();
+
+        //   curShot += 1;
+        //   hasShootBeamUnbroken = false;
+
+        //   setState(RobotStates.SHOOTING);
+        // }
         break;
 
       case TO_SHOOT:
