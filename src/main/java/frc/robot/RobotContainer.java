@@ -689,6 +689,10 @@ public class RobotContainer {
     robotStateSubsystem.setIsAuto(isAuto);
   }
 
+  public void stowRobot() {
+    robotStateSubsystem.toStow();
+  }
+
   private void configureOperatorBindings() {
     // Open Loop Wrist
     new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
