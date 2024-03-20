@@ -14,12 +14,10 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
@@ -37,7 +35,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   Translation2d[] offsets = {
     VisionConstants.kCam1Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam2Pose.getTranslation().toTranslation2d(), 
+    VisionConstants.kCam2Pose.getTranslation().toTranslation2d(),
     VisionConstants.kCam3Pose.getTranslation().toTranslation2d()
   };
 
@@ -47,7 +45,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam3Pose.getRotation().toRotation2d()
   };
 
-  String[] names = {VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name};
+  String[] names = {
+    VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name
+  };
+
+  String[] Pinames = {VisionConstants.kPi1Name, VisionConstants.kPi2Name, VisionConstants.kPi2Name};
 
   int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx, VisionConstants.kCam3Idx};
 
@@ -90,7 +92,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     // Initialize all walleyecams
     for (int i = 0; i < VisionConstants.kNumCams; ++i) {
-      cams[i] = new WallEyeCam(names[i], camIndex[i], -1);
+      cams[i] = new WallEyeCam(Pinames[i], camIndex[i], -1);
     }
   }
 
