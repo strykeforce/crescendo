@@ -14,9 +14,12 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
@@ -34,17 +37,19 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   Translation2d[] offsets = {
     VisionConstants.kCam1Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam2Pose.getTranslation().toTranslation2d()
+    VisionConstants.kCam2Pose.getTranslation().toTranslation2d(), 
+    VisionConstants.kCam3Pose.getTranslation().toTranslation2d()
   };
 
   Rotation2d[] rotsOff = {
     VisionConstants.kCam1Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam2Pose.getRotation().toRotation2d()
+    VisionConstants.kCam2Pose.getRotation().toRotation2d(),
+    VisionConstants.kCam3Pose.getRotation().toRotation2d()
   };
 
-  String[] names = {VisionConstants.kCam1Name, VisionConstants.kCam2Name};
+  String[] names = {VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name};
 
-  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx};
+  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx, VisionConstants.kCam3Idx};
 
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
   boolean visionUpdates = true;
@@ -66,6 +71,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Matrix<N3, N1> scaledStdDev;
 
   private double fedStdDevs = 0.0;
+  private RobotStateSubsystem robotStateSubsystem;
 
   // Constructor
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
@@ -91,6 +97,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Getter/Setter Methods
   public void setVisionUpdates(boolean visionUpdates) {
     this.visionUpdates = visionUpdates;
+  }
+
+  public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
+    this.robotStateSubsystem = robotStateSubsystem;
   }
 
   public void setMinTagsNeeded(int num) {
@@ -200,7 +210,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Periodic
   @Override
   public void periodic() {
-
     gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
 
     scaledStdDev = adaptiveVisionMatrix.copy();
