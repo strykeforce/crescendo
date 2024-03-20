@@ -10,6 +10,8 @@ public final class RobotStateConstants {
   public static final double kDistanceOffset = 0.00;
   public static final double kElbowShootOffset = 0.0; // .5 .7
   public static final String kElbowPreferencesKey = "Elbow/Offset";
+  public static final double kLeftFeedLinearCoeff = 2.5;
+  public static final double kRightFeedLinearCoeff = 0;
 
   public static final double kSpeakerY = 5.547868; // m
 

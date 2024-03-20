@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superStructure;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.SuperStructureConstants;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
@@ -299,11 +300,15 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.SUBWOOFER;
   }
 
-  public void fixedFeeding() {
+  public void fixedFeeding(double wheelSpeed) {
     elbowSetpoint = SuperStructureConstants.kElbowSubwooferSetPoint;
     wristSetpoint = SuperStructureConstants.kWristSubwooferSetPoint;
-    leftShooterSpeed = SuperStructureConstants.kLeftShooterFeedingSetPoint;
-    rightShooterSpeed = SuperStructureConstants.kRightShooterFeedingSetPoint;
+    leftShooterSpeed =
+        SuperStructureConstants.kLeftShooterFeedingSetPoint
+            - wheelSpeed * RobotStateConstants.kLeftFeedLinearCoeff;
+    rightShooterSpeed =
+        SuperStructureConstants.kRightShooterFeedingSetPoint
+            - wheelSpeed * RobotStateConstants.kRightFeedLinearCoeff;
 
     shooterSubsystem.setLeftSpeed(leftShooterSpeed);
     shooterSubsystem.setRightSpeed(rightShooterSpeed);

@@ -111,9 +111,8 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
                     new Pose2d(
                         new Translation2d(4.0 - RobotStateConstants.kDistanceOffset, 5.55),
                         new Rotation2d())))),
-        new SpinUpWheelsCommand(superStructure, 73, 40),
-        new AutoWaitNoteStagedCommand(robotStateSubsystem),
-        midShootCommand);
+        new VisionShootCommand(
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void generateTrajectory() {

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
@@ -25,6 +26,7 @@ import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -391,9 +393,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toFixedFeeding() {
+    ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
     driveSubsystem.setIsAligningShot(false);
     intakeSubsystem.setPercent(0.0);
-    superStructure.fixedFeeding();
+    superStructure.fixedFeeding(FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
     intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_FEED);
