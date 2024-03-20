@@ -269,7 +269,7 @@ public class SuperStructure extends MeasurableSubsystem {
     }
 
     wristSubsystem.setPosition(wristSetpoint);
-    if(elbowSubsystem.getPosition() >= SuperStructureConstants.kElbowMinToMoveWrist) {
+    if (elbowSubsystem.getPosition() >= SuperStructureConstants.kElbowMinToMoveWrist) {
       elbowSubsystem.setPosition(elbowSetpoint);
     } else {
       elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
