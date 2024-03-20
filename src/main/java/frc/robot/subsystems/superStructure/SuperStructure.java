@@ -57,6 +57,10 @@ public class SuperStructure extends MeasurableSubsystem {
         && (shooterSubsystem.atSpeed());
   }
 
+  public boolean isShooterAtSpeed() {
+    return shooterSubsystem.atSpeed();
+  }
+
   public boolean isElbowZeroed() {
     return elbowSubsystem.hasZeroed();
   }

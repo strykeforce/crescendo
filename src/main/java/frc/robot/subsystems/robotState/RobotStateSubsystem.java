@@ -373,7 +373,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toPreparePodium() {
     driveSubsystem.setIsAligningShot(false);
-    magazineSubsystem.preparePodium();
     intakeSubsystem.setPercent(0.0);
     superStructure.preparePodium();
     ledSubsystem.setOff();
@@ -669,6 +668,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case TO_PODIUM:
+        if (magazineSubsystem.getState() != MagazineStates.PREP_PODIUM
+            && magazineSubsystem.getState() != MagazineStates.SPEEDUP
+            && magazineSubsystem.getState() != MagazineStates.SHOOT
+            && superStructure.isShooterAtSpeed()) {
+          magazineSubsystem.preparePodium();
+        }
         if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
           // superStructure.slowWheelSpin();
           superStructure.stopShoot();
