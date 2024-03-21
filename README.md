@@ -26,6 +26,7 @@
 | Magazine  | FX       | magazine   | 25  |  10      | 13        | falcon |         |
 | Elbow     | FX       | elbow      | 30  |  6       | 5         | falcon |         |
 | Elbow     | CANcoder | cancoder   | 31  |          |           | -      |         |
+| Elbow     | CANcoder | highRes    | 32  |          |           | -      |         |
 | Wrist     | SRX      | wrist      | 35  |  11      | 11        | 9015   |         |
 | Shooter   | FX       | leftShoot  | 40  |  12      | 12        | falcon |         |
 | Shooter   | FX       | rightShoot | 41  |  13      | 10        | falcon |         |
@@ -62,12 +63,12 @@
 ## PWM
 | Subsystem | name         | ID  |
 | --------- | ------------ | --- |
-| Climb     | leftRatchet  | 0   |
-| Climb     | rightRatchet | 1   |
-| Climb     | leftTrapBar  | 2   |
-| Climb     | rightTrapBar | 3   |
-|           |              | 4   |
-|           |              | 5   |
+|           |              | 0   |
+|           |              | 1   |
+|           |              | 2   |
+|           |              | 3   |
+| Lights    | lights       | 4   |
+| Lights    | lights       | 5   |
 |           |              | 6   |
 |           |              | 7   |
 |           |              | 8   |
