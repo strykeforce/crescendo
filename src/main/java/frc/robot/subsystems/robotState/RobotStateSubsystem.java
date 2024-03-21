@@ -233,6 +233,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
     superStructure.setIsAuto(isAuto);
+    intakeSubsystem.setIsAuto(isAuto);
   }
 
   // Control Methods

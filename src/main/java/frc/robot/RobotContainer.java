@@ -75,6 +75,8 @@ import frc.robot.commands.robotState.UpdateElbowOffsetCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.commands.wrist.WriteWristToStowCommand;
+import frc.robot.commands.wrist.ZeroWristCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
@@ -615,6 +617,19 @@ public class RobotContainer {
         .add(new ZeroRecoveryElbowCommand(elbowSubsystem))
         .withSize(1, 1)
         .withPosition(2, 0);
+
+    Shuffleboard.getTab("Debug")
+        .addBoolean("IS WRIST GOOD", () -> wristSubsystem.isWristAtStow())
+        .withSize(1, 1)
+        .withPosition(4, 0);
+    Shuffleboard.getTab("Debug")
+        .add(new ZeroWristCommand(wristSubsystem))
+        .withSize(1, 1)
+        .withPosition(4, 1);
+    Shuffleboard.getTab("Debug")
+        .add(new WriteWristToStowCommand(wristSubsystem))
+        .withSize(1, 1)
+        .withPosition(4, 2);
   }
 
   public void configureTuningDashboard() {

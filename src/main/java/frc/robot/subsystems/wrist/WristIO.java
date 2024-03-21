@@ -22,4 +22,6 @@ public interface WristIO {
   public default void zero() {}
 
   public default void registerWith(TelemetryService telemetryService) {}
+
+  public default void forceWristPos(double pos) {}
 }

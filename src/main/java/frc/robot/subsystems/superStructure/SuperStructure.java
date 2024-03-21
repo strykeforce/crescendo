@@ -291,7 +291,11 @@ public class SuperStructure extends MeasurableSubsystem {
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
-    elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    if (elbowSubsystem.getPosition() >= SuperStructureConstants.kElbowMinToMoveWrist) {
+      elbowSubsystem.setPosition(elbowSetpoint);
+    } else {
+      elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    }
 
     logger.info("{} -> TRANSFER(SUBWOOFER)", curState);
     isPrecise = false;
