@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public final class AutonConstants {
-  public static final double kDelayForPickup = 0.1; // 0.2
+  public static final double kDelayForPickup = 0.15; // 0.2
 
   public static final int kSwitchStableCounts = 100;
 

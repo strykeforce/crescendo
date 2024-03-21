@@ -459,7 +459,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       setState(RobotStates.PODIUM_SHOOTING);
     } else {
-      safeStow = curState == RobotStates.AMP;
+      safeStow = false;
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
     }

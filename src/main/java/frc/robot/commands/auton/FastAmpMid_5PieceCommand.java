@@ -6,13 +6,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.auto.SetHoloContKPCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.robotState.PositionShootCommand;
+import frc.robot.commands.robotState.PrepShooterCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.superStructure.SpinUpWheelsCommand;
@@ -84,23 +84,33 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
             new ZeroElbowCommand(elbowSubsystem)),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         midInitWingNote3,
-        new WaitCommand(0.1),
-        new AutoWaitNoteStagedCommand(robotStateSubsystem),
+        // new WaitCommand(0.05),
+        // new AutoWaitNoteStagedCommand(robotStateSubsystem),
+
         wingNote3MidInit,
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         midInitWingNote2,
-        new WaitCommand(0.1),
+        // new WaitCommand(0.05),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         wingNote2WingNote1,
-        new WaitCommand(0.1),
+        // new WaitCommand(0.05),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         new SetHoloContKPCommand(driveSubsystem, 3.0),
         wingNote1MidNote1,
-        midNote1ShootPos,
+        new ParallelCommandGroup(
+            midNote1ShootPos,
+            new SequentialCommandGroup(
+                new AutoWaitNoteStagedCommand(robotStateSubsystem),
+                new PrepShooterCommand(
+                    superStructure,
+                    robotStateSubsystem,
+                    new Pose2d(
+                        new Translation2d(4.0 - RobotStateConstants.kDistanceOffset, 5.55),
+                        new Rotation2d())))),
         new SpinUpWheelsCommand(superStructure, 73, 40),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         midShootCommand);

@@ -147,6 +147,9 @@ public class PathHandler extends MeasurableSubsystem {
   @Override
   public void periodic() {
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler State", curState.name());
+    org.littletonrobotics.junction.Logger.recordOutput("PathHandler/NumPieces", numPieces);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "PathHandler/noteOrderSize", noteOrder.size());
     if (handling) {
       switch (curState) {
         case SHOOT:
@@ -190,14 +193,6 @@ public class PathHandler extends MeasurableSubsystem {
         case FETCH:
           String nextPathName;
 
-          if (noteOrder.size() > 1) {
-            nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
-            nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
-          } else {
-            curState = PathStates.DONE;
-            break;
-          }
-
           if (robotStateSubsystem.hasNote() && numPieces > 0.51) {
             numPieces -= 0.5;
             logger.info("FETCH -> DRIVE_SHOOT");
@@ -210,6 +205,13 @@ public class PathHandler extends MeasurableSubsystem {
           }
 
           if (timer.hasElapsed(AutonConstants.kDelayForPickup)) {
+            if (noteOrder.size() > 1) {
+              nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
+              nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
+            } else {
+              curState = PathStates.DONE;
+              break;
+            }
             logger.info("FETCH -> DRIVE_FETCH");
             logger.info("Begin Trajectory " + nextPathName);
             noteOrder.remove(0);
