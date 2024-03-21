@@ -98,7 +98,7 @@ public class SuperStructure extends MeasurableSubsystem {
   }
 
   public void stopShoot() {
-    logger.info("Stop Shooter Wheels");
+    // logger.info("Stop Shooter Wheels");
     if (!isAuto) shooterSubsystem.setSpeed(0.0);
   }
 
