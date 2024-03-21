@@ -98,6 +98,7 @@ public class Robot extends LoggedRobot {
           hasAlliance = true;
           m_robotContainer.setAllianceColor(alliance);
           m_robotContainer.getAutoSwitch().getAutoCommand().generateTrajectory();
+          m_robotContainer.zeroWrist();
           logger.info("Set Alliance to {}", alliance);
         }
       } catch (NoSuchElementException error) {
