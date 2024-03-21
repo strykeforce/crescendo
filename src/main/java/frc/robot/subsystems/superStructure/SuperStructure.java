@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superStructure;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.SuperStructureConstants;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
@@ -57,6 +58,10 @@ public class SuperStructure extends MeasurableSubsystem {
         && (shooterSubsystem.atSpeed());
   }
 
+  public boolean isShooterAtSpeed() {
+    return shooterSubsystem.atSpeed();
+  }
+
   public boolean isElbowZeroed() {
     return elbowSubsystem.hasZeroed();
   }
@@ -93,7 +98,7 @@ public class SuperStructure extends MeasurableSubsystem {
   }
 
   public void stopShoot() {
-    logger.info("Stop Shooter Wheels");
+    // logger.info("Stop Shooter Wheels");
     if (!isAuto) shooterSubsystem.setSpeed(0.0);
   }
 
@@ -263,8 +268,13 @@ public class SuperStructure extends MeasurableSubsystem {
     if (!isAuto) {
       shooterSubsystem.setSpeed(leftShooterSpeed);
     }
+
     wristSubsystem.setPosition(wristSetpoint);
-    elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    if (elbowSubsystem.getPosition() >= SuperStructureConstants.kElbowMinToMoveWrist) {
+      elbowSubsystem.setPosition(elbowSetpoint);
+    } else {
+      elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    }
 
     logger.info("{} -> TRANSFER(STOW)", curState);
     isPrecise = false;
@@ -281,9 +291,35 @@ public class SuperStructure extends MeasurableSubsystem {
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
-    elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    if (elbowSubsystem.getPosition() >= SuperStructureConstants.kElbowMinToMoveWrist) {
+      elbowSubsystem.setPosition(elbowSetpoint);
+    } else {
+      elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    }
 
     logger.info("{} -> TRANSFER(SUBWOOFER)", curState);
+    isPrecise = false;
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.SUBWOOFER;
+  }
+
+  public void fixedFeeding(double wheelSpeed) {
+    elbowSetpoint = SuperStructureConstants.kElbowSubwooferSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristSubwooferSetPoint;
+    leftShooterSpeed =
+        SuperStructureConstants.kLeftShooterFeedingSetPoint
+            - wheelSpeed * RobotStateConstants.kLeftFeedLinearCoeff;
+    rightShooterSpeed =
+        SuperStructureConstants.kRightShooterFeedingSetPoint
+            - wheelSpeed * RobotStateConstants.kRightFeedLinearCoeff;
+
+    shooterSubsystem.setLeftSpeed(leftShooterSpeed);
+    shooterSubsystem.setRightSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+
+    logger.info("{} -> TRANSFER(FEEDING)", curState);
     isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
@@ -424,6 +460,8 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case SUBWOOFER:
         break;
+      case FEEDING:
+        break;
       case PREP_CLIMB:
         break;
       case FOLDED:
@@ -471,6 +509,7 @@ public class SuperStructure extends MeasurableSubsystem {
     PREP_PODIUM,
     SUBWOOFER,
     SAFE_TRANSFER_ELBOW,
-    SAFE_TRANSFER_WRIST
+    SAFE_TRANSFER_WRIST,
+    FEEDING
   }
 }

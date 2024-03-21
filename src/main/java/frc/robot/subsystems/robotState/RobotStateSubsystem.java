@@ -4,6 +4,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
@@ -25,6 +26,7 @@ import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -231,6 +233,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
     superStructure.setIsAuto(isAuto);
+    intakeSubsystem.setIsAuto(isAuto);
   }
 
   // Control Methods
@@ -281,20 +284,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_SHOOT);
   }
 
-  public void startFeed() {
-    usingDistance = false;
-    shootKnownPos = false;
-    driveSubsystem.setIsAligningShot(true);
-    driveSubsystem.setIsFeeding(true);
+  // public void startFeed() {
+  //   usingDistance = false;
+  //   shootKnownPos = false;
+  //   driveSubsystem.setIsAligningShot(true);
+  //   driveSubsystem.setIsFeeding(true);
 
-    double[] feedSolution =
-        getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
+  //   double[] feedSolution =
+  //       getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
 
-    magazineSubsystem.setSpeed(0.0);
-    superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
+  //   magazineSubsystem.setSpeed(0.0);
+  //   superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
 
-    setState(RobotStates.TO_FEED);
-  }
+  //   setState(RobotStates.TO_FEED);
+  // }
 
   public void spinUpShotSolution(Pose2d pose) {
     shootPos = pose;
@@ -373,7 +376,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toPreparePodium() {
     driveSubsystem.setIsAligningShot(false);
-    magazineSubsystem.preparePodium();
     intakeSubsystem.setPercent(0.0);
     superStructure.preparePodium();
     ledSubsystem.setOff();
@@ -389,6 +391,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ledSubsystem.setOff();
 
     setState(RobotStates.TO_SUBWOOFER);
+  }
+
+  public void toFixedFeeding() {
+    ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+    driveSubsystem.setIsAligningShot(false);
+    intakeSubsystem.setPercent(0.0);
+    superStructure.fixedFeeding(FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+    intakeSubsystem.setPercent(0.0);
+
+    setState(RobotStates.TO_FEED);
   }
 
   public void prepareClimb() {
@@ -516,12 +528,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case INTAKING:
+        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE) {
+          ledSubsystem.setGreen();
+        }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
-
           intakeSubsystem.setPercent(0);
-
-          ledSubsystem.setGreen();
           toStow();
         }
         if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
@@ -556,33 +568,37 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case SPIN_UP: // Indicator State
         break;
       case TO_FEED:
-        double[] feedSolution =
-            getShootSolution(driveSubsystem.getDistanceToFeedTarget(), shootingLookupTable);
-        superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
-
-        if (driveSubsystem.isDriveStillFeed()
-            && (usingDistance ? true : driveSubsystem.isPointingAtFeedTarget())
-            && superStructure.isFinished()) {
-
-          if (!shootKnownPos) {
-            org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingData/shot" + Integer.toString(curShot) + "/Position",
-                driveSubsystem.getPoseMeters());
-            org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
-          } else {
-            org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingData/shot" + Integer.toString(curShot) + "/Position", shootPos);
-            org.littletonrobotics.junction.Logger.recordOutput(
-                "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
-          }
+        if (superStructure.isFinished()) {
           magazineSubsystem.toEmptying();
 
-          curShot += 1;
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
           hasShootBeamUnbroken = false;
 
           setState(RobotStates.SHOOTING);
         }
+        // double[] feedSolution =
+        //     getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
+        // superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
+
+        // if (driveSubsystem.isDriveStillFeed()
+        //     && driveSubsystem.isPointingAtFeedTarget()
+        //     && superStructure.isFinished()) {
+
+        //     org.littletonrobotics.junction.Logger.recordOutput(
+        //         "ShootingData/shot" + Integer.toString(curShot) + "/Position", shootPos);
+        //     org.littletonrobotics.junction.Logger.recordOutput(
+        //         "ShootingData/shot" + Integer.toString(curShot) + "/Distance",
+        // grabbedShotDistance);
+
+        //   magazineSubsystem.toEmptying();
+
+        //   curShot += 1;
+        //   hasShootBeamUnbroken = false;
+
+        //   setState(RobotStates.SHOOTING);
+        // }
         break;
 
       case TO_SHOOT:
@@ -656,6 +672,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case TO_PODIUM:
+        if (magazineSubsystem.getState() != MagazineStates.PREP_PODIUM
+            && magazineSubsystem.getState() != MagazineStates.SPEEDUP
+            && magazineSubsystem.getState() != MagazineStates.SHOOT
+            && superStructure.isShooterAtSpeed()) {
+          magazineSubsystem.preparePodium();
+        }
         if (magazineSubsystem.getState() == MagazineStates.SPEEDUP) {
           // superStructure.slowWheelSpin();
           superStructure.stopShoot();

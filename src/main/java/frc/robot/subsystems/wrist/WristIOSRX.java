@@ -52,6 +52,12 @@ public class WristIOSRX implements WristIO, Checkable {
   }
 
   @Override
+  public void forceWristPos(double pos) {
+    logger.info("Forced Pos at {}", pos);
+    wrist.setSelectedSensorPosition(pos);
+  }
+
+  @Override
   public void setPosition(double position) {
     setpoint = position;
     wrist.set(TalonSRXControlMode.MotionMagic, position);

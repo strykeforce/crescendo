@@ -52,8 +52,8 @@ public class Robot extends LoggedRobot {
           Logger.recordMetadata("GitDirty", "Unknown");
           break;
       }
-      // /media/sda1/logs -> /V/logs
-      Logger.addDataReceiver(new WPILOGWriter());
+      // /media/sda1/logs -> /V/logs -> /home/lvuser/logs
+      Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
 
       // Comp robot conditions or not
       eventFlag = new DigitalInput(RobotConstants.kEventInterlockID);
@@ -98,6 +98,7 @@ public class Robot extends LoggedRobot {
           hasAlliance = true;
           m_robotContainer.setAllianceColor(alliance);
           m_robotContainer.getAutoSwitch().getAutoCommand().generateTrajectory();
+          m_robotContainer.zeroWrist();
           logger.info("Set Alliance to {}", alliance);
         }
       } catch (NoSuchElementException error) {

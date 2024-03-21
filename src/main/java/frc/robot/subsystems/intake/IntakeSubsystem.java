@@ -21,6 +21,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
   private boolean beamBroken = false;
   private double beamBreakStableCounts = 0;
+  private boolean isAuto = false;
 
   public IntakeSubsystem(IntakeIO io) {
     this.io = io;
@@ -68,12 +69,18 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     io.setPct(pct);
   }
 
+  public void setIsAuto(boolean val) {
+    isAuto = val;
+  }
+
   // if the switch is closed, a stable count is incremented. if not, stable count is reset to zero.
   public boolean isBeamBroken() {
     if (inputs.isFwdLimitSwitchClosed) beamBreakStableCounts++;
     else beamBreakStableCounts = 0;
 
-    beamBroken = (beamBreakStableCounts > IntakeConstants.kBeamBreakStableCounts);
+    beamBroken =
+        ((isAuto && beamBreakStableCounts > IntakeConstants.kAutoBeamBreakStableCounts)
+            || beamBreakStableCounts > IntakeConstants.kTeleBeamBreakStableCounts);
     return beamBroken;
   }
 

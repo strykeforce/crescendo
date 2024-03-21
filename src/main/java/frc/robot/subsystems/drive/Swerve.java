@@ -86,7 +86,7 @@ public class Swerve implements SwerveIO, Checkable {
     }
 
     ahrs = new SF_AHRS(SerialPort.Port.kUSB2, SerialDataType.kProcessedData, (byte) 200);
-    swerveDrive = new SwerveDrive(true, 0.02, ahrs, swerveModules);
+    swerveDrive = new SwerveDrive(false, 0.02, ahrs, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
 

@@ -7,6 +7,7 @@ target_yaw = 0.0 #degrees
 
 [start_pose]
     dataPoint = "M1"
+    dX = -0.2
     angle = 180.0
 [end_pose]
     x = 4.0

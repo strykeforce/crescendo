@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
@@ -34,17 +35,23 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   Translation2d[] offsets = {
     VisionConstants.kCam1Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam2Pose.getTranslation().toTranslation2d()
+    VisionConstants.kCam2Pose.getTranslation().toTranslation2d(),
+    VisionConstants.kCam3Pose.getTranslation().toTranslation2d()
   };
 
   Rotation2d[] rotsOff = {
     VisionConstants.kCam1Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam2Pose.getRotation().toRotation2d()
+    VisionConstants.kCam2Pose.getRotation().toRotation2d(),
+    VisionConstants.kCam3Pose.getRotation().toRotation2d()
   };
 
-  String[] names = {VisionConstants.kCam1Name, VisionConstants.kCam2Name};
+  String[] names = {
+    VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name
+  };
 
-  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx};
+  String[] Pinames = {VisionConstants.kPi1Name, VisionConstants.kPi2Name, VisionConstants.kPi2Name};
+
+  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx, VisionConstants.kCam3Idx};
 
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
   boolean visionUpdates = true;
@@ -66,6 +73,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Matrix<N3, N1> scaledStdDev;
 
   private double fedStdDevs = 0.0;
+  private RobotStateSubsystem robotStateSubsystem;
 
   // Constructor
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
@@ -84,13 +92,17 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     // Initialize all walleyecams
     for (int i = 0; i < VisionConstants.kNumCams; ++i) {
-      cams[i] = new WallEyeCam(names[i], camIndex[i], -1);
+      cams[i] = new WallEyeCam(Pinames[i], camIndex[i], -1);
     }
   }
 
   // Getter/Setter Methods
   public void setVisionUpdates(boolean visionUpdates) {
     this.visionUpdates = visionUpdates;
+  }
+
+  public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
+    this.robotStateSubsystem = robotStateSubsystem;
   }
 
   public void setMinTagsNeeded(int num) {
@@ -200,7 +212,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Periodic
   @Override
   public void periodic() {
-
     gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
 
     scaledStdDev = adaptiveVisionMatrix.copy();
