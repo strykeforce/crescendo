@@ -24,6 +24,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double prevRecoveryAbs = 0.0;
 
   private boolean isPrecise = false;
+  private boolean ignoreElbowPos = false;
 
   public ElbowSubsystem(ElbowIO io) {
     this.io = io;
@@ -90,8 +91,17 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     curState = state;
   }
 
+  public boolean isElbowConnected() {
+    return io.isHighResCANcoderConnected();
+  }
+
+  public void useElbowPos(boolean val) {
+    ignoreElbowPos = val;
+  }
+
   public boolean isFinished() {
-    return Math.abs(inputs.positionRots - setpoint) <= ElbowConstants.kCloseEnoughRots;
+    return ignoreElbowPos
+        || Math.abs(inputs.positionRots - setpoint) <= ElbowConstants.kCloseEnoughRots;
   }
 
   public boolean hasZeroed() {
@@ -126,7 +136,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   @Override
   public void periodic() {
-    io.updateInputs(inputs);
+    if (isElbowConnected()) io.updateInputs(inputs);
     org.littletonrobotics.junction.Logger.processInputs("Elbow", inputs);
     org.littletonrobotics.junction.Logger.recordOutput("Elbow Is Precise", isPrecise);
 

@@ -46,6 +46,7 @@ import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.elbow.SetElbowHasZeroedCommand;
+import frc.robot.commands.elbow.SetTrustElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.elbow.ZeroRecoveryElbowCommand;
 import frc.robot.commands.intake.OpenLoopIntakeCommand;
@@ -630,6 +631,21 @@ public class RobotContainer {
         .add(new WriteWristToStowCommand(wristSubsystem))
         .withSize(1, 1)
         .withPosition(4, 2);
+        .addBoolean("Is Elbow Ok?", () -> elbowSubsystem.isElbowConnected())
+        .withSize(1, 1)
+        .withPosition(3, 0);
+    Shuffleboard.getTab("Debug")
+        .addDouble("ElbowPos", () -> elbowSubsystem.getPosition())
+        .withSize(1, 1)
+        .withPosition(4, 0);
+    Shuffleboard.getTab("Debug")
+        .add("STOP ELBOW", new SetTrustElbowCommand(elbowSubsystem, true))
+        .withSize(1, 1)
+        .withPosition(3, 1);
+    Shuffleboard.getTab("Debug")
+        .add("START ELBOW", new SetTrustElbowCommand(elbowSubsystem, false))
+        .withSize(1, 1)
+        .withPosition(3, 2);
   }
 
   public void configureTuningDashboard() {
