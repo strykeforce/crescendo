@@ -16,7 +16,7 @@ public final class VisionConstants {
   public static final double kTimeToDecayDev = 10;
   public static final double kStdDevDecayCoeff = -0.005;
   public static final double kMinStdDev = 0.01;
-  public static final double kMaxAmbig = 1.0;
+  public static final double kMaxAmbig = 0.5;
   public static final int kMaxTimesOffWheels = 5;
 
   // Velocity Filter

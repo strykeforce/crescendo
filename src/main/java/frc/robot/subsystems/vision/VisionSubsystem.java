@@ -193,8 +193,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private Pose2d getCloserPose(Pose2d pose1, Pose2d pose2, double rotation) {
-    if (Math.abs(rotation - pose1.getRotation().getRadians())
-        <= Math.abs(rotation - pose2.getRotation().getRadians())) return pose1;
+    if (Math.abs(new Rotation2d(rotation).minus(pose1.getRotation()).getRadians())
+        <= Math.abs(new Rotation2d(rotation).minus(pose2.getRotation()).getRadians())) return pose1;
     else return pose2;
   }
 
@@ -212,7 +212,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Periodic
   @Override
   public void periodic() {
-    gyroData.addFirst(FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
+    double gyroBuffer =
+        FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
+    gyroData.addFirst(gyroBuffer);
+    org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/gyroBuffer", gyroBuffer);
 
     scaledStdDev = adaptiveVisionMatrix.copy();
 

@@ -30,7 +30,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   @HealthCheck
   @Position(
       percentOutput = {0.1, -0.1},
-      encoderChange = 25)
+      encoderChange = 0.13)
   private TalonFX elbow;
 
   private CANcoder remoteEncoder;

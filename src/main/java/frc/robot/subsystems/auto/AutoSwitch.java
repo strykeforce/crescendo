@@ -243,7 +243,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             pathHandler,
             "NonAmpInitial1_MiddleNote5",
             AutonConstants.kNonAmpPathMatrix,
-            List.of(5, 3, 4),
+            List.of(5, 4, 3),
             3.0,
             AutonConstants.Setpoints.NAS2);
       case 0x30:

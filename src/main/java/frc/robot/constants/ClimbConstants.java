@@ -43,8 +43,8 @@ public final class ClimbConstants {
   public static final double kLeftClimbPrepPos = 80.0; // 70
   public static final double kRightClimbPrepPos = 80.0;
 
-  public static final double kLeftClimbHighPrepPos = 90.0;
-  public static final double kRightClimbHighPrepPos = 90.0;
+  public static final double kLeftClimbHighPrepPos = 93.576;
+  public static final double kRightClimbHighPrepPos = 93.576;
 
   // TRAP CLIMB
   public static final double kLeftClimbTrapPos =
