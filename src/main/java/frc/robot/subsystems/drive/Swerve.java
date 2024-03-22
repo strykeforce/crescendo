@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.SPI;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
@@ -83,7 +84,7 @@ public class Swerve implements SwerveIO, Checkable {
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
 
-    ahrs = new SF_AHRS();
+    ahrs = new SF_AHRS(SPI.Port.kMXP, 2_000_000, (byte) 200);
     swerveDrive = new SwerveDrive(false, 0.02, ahrs, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
