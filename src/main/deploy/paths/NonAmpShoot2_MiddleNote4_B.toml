@@ -21,6 +21,6 @@ target_yaw = 0.0 #degrees
 
 [[internal_points]]
     x = 6.3 # 6.2
-    y = 3.6 
+    y = 3.8 # 3.6 
 
 

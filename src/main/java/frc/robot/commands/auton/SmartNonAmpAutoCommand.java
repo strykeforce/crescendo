@@ -74,6 +74,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
     pathHandler.setNumPieces(numPieces);
     pathHandler.generateTrajectory();
     pathHandler.setShotLoc(shootPose);
+    firstPath.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }

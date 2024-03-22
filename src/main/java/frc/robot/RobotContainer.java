@@ -551,8 +551,12 @@ public class RobotContainer {
             () -> visionSubsystem.isCameraConnected(0) && visionSubsystem.isCameraConnected(1))
         .withSize(1, 1)
         .withPosition(4, 0);
+    // Shuffleboard.getTab("Match")
+    //     .addBoolean("Elbow Limit Switch On", () -> elbowSubsystem.getRevLimitSwitch())
+    //     .withSize(1, 1)
+    //     .withPosition(7, 1);
     Shuffleboard.getTab("Match")
-        .addBoolean("Elbow Limit Switch On", () -> elbowSubsystem.getRevLimitSwitch())
+        .addDouble("Elbow Pos", () -> elbowSubsystem.getHighResPos())
         .withSize(1, 1)
         .withPosition(7, 1);
 
@@ -620,7 +624,7 @@ public class RobotContainer {
         .withPosition(2, 0);
 
     Shuffleboard.getTab("Debug")
-        .addBoolean("IS WRIST GOOD", () -> wristSubsystem.isWristAtStow())
+        .addDouble("IS WRIST GOOD", () -> wristSubsystem.getPosition())
         .withSize(1, 1)
         .withPosition(4, 0);
     Shuffleboard.getTab("Debug")
