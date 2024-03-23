@@ -42,6 +42,8 @@ public class Swerve implements SwerveIO, Checkable {
 
   private BooleanSupplier azimuth1FwdLimitSupplier = () -> false;
 
+  private TalonSRX[] azimuths = new TalonSRX[4];
+
   public Swerve() {
 
     var moduleBuilder =
@@ -56,6 +58,7 @@ public class Swerve implements SwerveIO, Checkable {
 
     for (int i = 0; i < 4; i++) {
       var azimuthTalon = new TalonSRX(i);
+      azimuths[i] = azimuthTalon;
       azimuthTalon.configFactoryDefault(RobotConstants.kTalonConfigTimeout);
       azimuthTalon.configAllSettings(
           DriveConstants.getAzimuthTalonConfig(), RobotConstants.kTalonConfigTimeout);
@@ -202,6 +205,10 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.isConnected = ahrs.isConnected();
     inputs.poseMeters = swerveDrive.getPoseMeters();
     inputs.updateCount = ahrs.getTempC();
+    for (int i = 0; i < 4; ++i) {
+      inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
+      inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
+    }
   }
 
   @Override

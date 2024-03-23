@@ -12,7 +12,7 @@ public final class SuperStructureConstants {
 
   // AMP
   public static final double kWristAmpSetPoint = -91.0;
-  public static final double kElbowAmpSetPoint = -0.07723; // -13.5
+  public static final double kElbowAmpSetPoint = -0.08974; // -0.07788 -13.5
   public static final double kShooterAmpSetPoint = 0.0;
 
   // PRE-CLIMB
@@ -23,7 +23,7 @@ public final class SuperStructureConstants {
   // TRAP
   public static final double kElbowFoldedSetPoint = -0.05330; // -13.94
   public static final double kWristFoldedSetPoint = kWristStowSetPoint;
-  public static final double kWristTrapSetPoint = 1070.0; // 585 800
+  public static final double kWristTrapSetPoint = 1120.0; // 585 800
   public static final double kElbowTrapSetPoint = kElbowFoldedSetPoint;
   public static final double kShooterTrapSetPoint = 0.0;
 
