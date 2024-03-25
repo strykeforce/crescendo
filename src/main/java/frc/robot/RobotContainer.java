@@ -611,6 +611,10 @@ public class RobotContainer {
 
   public void configureDebugDashboard() {
     Shuffleboard.getTab("Debug")
+        .add(new OperatorRumbleCommand(robotStateSubsystem, xboxController))
+        .withSize(1, 1)
+        .withPosition(0, 1);
+    Shuffleboard.getTab("Debug")
         .add(new DecendCommand(robotStateSubsystem, climbSubsystem, superStructure))
         .withSize(1, 1)
         .withPosition(0, 0);
