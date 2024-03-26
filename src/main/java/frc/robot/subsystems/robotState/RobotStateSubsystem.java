@@ -484,7 +484,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toTune() {
     setState(RobotStates.TO_TUNE);
-    superStructure.shootTune();
+    superStructure.shootTune(elbowOffset);
     hasDelayed = false;
   }
 

@@ -10,9 +10,9 @@ target_yaw = 0.0 #degrees
 
 [end_pose]
     dataPoint = "M3"
-    dX = -0.7 # -0.5
-    dY = 0.2 # -0.3
-    angle = 180.0
+    dX = -0.5 # -0.5
+    dY = 0.0 # -0.1
+    angle = 0.0
 
 [[internal_points]]
     x = 3.3
@@ -20,4 +20,4 @@ target_yaw = 0.0 #degrees
 
 [[internal_points]]
     x = 5.221
-    y = 4.0
+    y = 4.15

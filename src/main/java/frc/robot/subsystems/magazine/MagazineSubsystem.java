@@ -209,6 +209,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         }
         break;
       case EMPTYING:
+        io.enableRevLimitSwitch(false);
         break;
       case SPEEDUP:
         if (atShootSpeed()) {

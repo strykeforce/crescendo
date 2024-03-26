@@ -124,17 +124,17 @@ public class SuperStructure extends MeasurableSubsystem {
     elbowTunePoint = elbowSetpoint;
   }
 
-  public void shootTune() {
+  public void shootTune(double elbowOffset) {
     wristSubsystem.setPosition(SuperStructureConstants.kWristIntakeSetPoint);
-    elbowSubsystem.setPosition(elbowTunePoint);
+    elbowSubsystem.setPosition(elbowTunePoint + elbowOffset, true);
 
     shooterSubsystem.setLeftSpeed(leftTunePoint);
     shooterSubsystem.setRightSpeed(rightTunePoint);
 
-    elbowSetpoint = elbowTunePoint;
+    elbowSetpoint = elbowTunePoint + elbowOffset;
 
     logger.info("{} -> TRANSFER(SHOOTING)", curState);
-    isPrecise = false;
+    isPrecise = true;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.SHOOTING;

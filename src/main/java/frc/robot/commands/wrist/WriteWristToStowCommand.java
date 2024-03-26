@@ -15,4 +15,9 @@ public class WriteWristToStowCommand extends InstantCommand {
   public void initialize() {
     wristSubsystem.forceWristPos(SuperStructureConstants.kWristStowSetPoint);
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }
