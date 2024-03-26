@@ -1,5 +1,7 @@
 package frc.robot.subsystems.wrist;
 
+import frc.robot.constants.MagazineConstants;
+import frc.robot.constants.SuperStructureConstants;
 import frc.robot.constants.WristConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
 import java.util.Set;
@@ -73,6 +75,11 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return revBeamOpenCount > WristConstants.kMinBeamBreaks;
   }
 
+  public boolean isWristAtStow() {
+    return Math.abs(getPosition() - SuperStructureConstants.kWristStowSetPoint)
+        < MagazineConstants.kCloseEnough;
+  }
+
   public void resetRevBeamCounts() {
     revBeamBrokenCount = 0;
     revBeamOpenCount = 0;
@@ -105,6 +112,10 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     io.zero();
 
     logger.info("Wrist zeroed");
+  }
+
+  public void forceWristPos(double pos) {
+    io.forceWristPos(pos);
   }
 
   @Override

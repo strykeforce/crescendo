@@ -9,7 +9,10 @@ import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.AmpMid_5PieceCommand;
 import frc.robot.commands.auton.DoNothingCommand;
+import frc.robot.commands.auton.FastAmpMid_5PieceCommand;
+import frc.robot.commands.auton.FastAmpMid_5PieceM2Command;
 import frc.robot.commands.auton.NonAmpAutoCommand;
+import frc.robot.commands.auton.SmartNonAmpAutoCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -17,11 +20,13 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
+import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +46,7 @@ public class AutoSwitch extends MeasurableSubsystem {
   private ElbowSubsystem elbowSubsystem;
   private WristSubsystem wristSubsystem;
   private ShooterSubsystem shooterSubsystem;
+  private PathHandler pathHandler;
 
   public boolean useVirtualSwitch;
   private static SendableChooser<Integer> sendableChooser = new SendableChooser<>();
@@ -61,7 +67,8 @@ public class AutoSwitch extends MeasurableSubsystem {
       ClimbSubsystem climbSubsystem,
       ElbowSubsystem elbowSubsystem,
       WristSubsystem wristSubsystem,
-      ShooterSubsystem shooterSubsystem) {
+      ShooterSubsystem shooterSubsystem,
+      PathHandler pathHandler) {
     this.robotStateSubsystem = robotStateSubsystem;
     this.superStructure = superStructure;
     this.magazineSubsystem = magazineSubsystem;
@@ -71,6 +78,7 @@ public class AutoSwitch extends MeasurableSubsystem {
     this.elbowSubsystem = elbowSubsystem;
     this.wristSubsystem = wristSubsystem;
     this.shooterSubsystem = shooterSubsystem;
+    this.pathHandler = pathHandler;
 
     for (int i = RobotConstants.kMinAutoSwitchID; i <= RobotConstants.kMaxAutoSwitchID; i++) {
       switchInputs.add(new DigitalInput(i));
@@ -129,6 +137,10 @@ public class AutoSwitch extends MeasurableSubsystem {
     return changed;
   }
 
+  // OLD:
+  // 0x22 NonAmpInitial1_MiddleNote3 List.of(3, 5, 4, 3, 5, 4, 3, 4, 5, 3)
+  // 0x23 NonAmpInitial1_MiddleNote5 List.of(5, 4, 3, 5, 3, 4, 5, 4, 3, 5)
+  // 0x24 NonAmpInitial1_MiddleNote4 List.of(4, 5, 3, 4, 5, 3, 4, 3, 5, 4)
   private AutoCommandInterface getAutoCommand(int switchPos) {
     switch (switchPos) {
       case 0x00:
@@ -161,6 +173,22 @@ public class AutoSwitch extends MeasurableSubsystem {
             magazineSubsystem,
             intakeSubsystem,
             elbowSubsystem);
+      case 0x11:
+        return new FastAmpMid_5PieceCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem);
+      case 0x12:
+        return new FastAmpMid_5PieceM2Command(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem);
       case 0x20:
         return new NonAmpAutoCommand(
             driveSubsystem,
@@ -185,7 +213,48 @@ public class AutoSwitch extends MeasurableSubsystem {
             "MiddleNote3_NonAmpShoot2",
             "NonAmpShoot2_MiddleNote4_B",
             "MiddleNote4_NonAmpShoot2_B");
-
+      case 0x22:
+        return new SmartNonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            "NonAmpInitial1_MiddleNote3",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(3, 4, 5),
+            4.0,
+            AutonConstants.Setpoints.NAS2);
+      case 0x23:
+        return new SmartNonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            "NonAmpInitial1_MiddleNote4",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(4, 3, 5),
+            4.0,
+            AutonConstants.Setpoints.NAS2);
+      case 0x24:
+        return new SmartNonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            "NonAmpInitial1_MiddleNote5",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(5, 4, 3),
+            4.0,
+            AutonConstants.Setpoints.NAS2);
       case 0x30:
         return new DoNothingCommand(
             robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);

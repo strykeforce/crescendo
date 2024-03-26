@@ -9,15 +9,10 @@ target_yaw = 0.0 #degrees
     dataPoint = "NAI1"
 
 [end_pose]
-    dataPoint = "M3"
-    dX = -0.7 # -0.5
-    dY = -0.3 # -0.35
-    angle = 180.0
+    dataPoint = "M5"
+    dX = 0.0
+    dY = 0.35
 
 [[internal_points]]
-    x = 3.3
-    y = 3.1
-
-[[internal_points]]
-    x = 5.221
-    y = 4.0
+    x = 5.021
+    y = 1.395

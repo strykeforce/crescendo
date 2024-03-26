@@ -52,12 +52,13 @@ public class Robot extends LoggedRobot {
           Logger.recordMetadata("GitDirty", "Unknown");
           break;
       }
-      // /media/sda1/logs
-      Logger.addDataReceiver(new WPILOGWriter());
+      // /media/sda1/logs -> /V/logs -> /home/lvuser/logs
+      Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
 
       // Comp robot conditions or not
       eventFlag = new DigitalInput(RobotConstants.kEventInterlockID);
-      isEvent = eventFlag.get();
+      // isEvent = eventFlag.get();
+      isEvent = false;
       if (isEvent) {
         System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
         System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");
@@ -84,6 +85,7 @@ public class Robot extends LoggedRobot {
         .add(new ToggleAllianceColorCommand(m_robotContainer))
         .withSize(1, 1)
         .withPosition(2, 0);
+    logger.info("robotinit");
   }
 
   @Override
@@ -96,6 +98,7 @@ public class Robot extends LoggedRobot {
           hasAlliance = true;
           m_robotContainer.setAllianceColor(alliance);
           m_robotContainer.getAutoSwitch().getAutoCommand().generateTrajectory();
+          m_robotContainer.zeroWrist();
           logger.info("Set Alliance to {}", alliance);
         }
       } catch (NoSuchElementException error) {
@@ -105,11 +108,14 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.ledTestFunction();
+  }
 
   @Override
   public void disabledPeriodic() {
     m_robotContainer.getAutoSwitch().checkSwitch();
+    m_robotContainer.updateCanivoreStatus();
   }
 
   @Override
@@ -131,7 +137,9 @@ public class Robot extends LoggedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+    m_robotContainer.stowRobot();
+  }
 
   @Override
   public void teleopInit() {
@@ -147,6 +155,7 @@ public class Robot extends LoggedRobot {
       // m_robotContainer.zeroClimb();
       m_robotContainer.getClimbZeroCommand().schedule();
     }
+    m_robotContainer.ledTestFunction();
   }
 
   @Override

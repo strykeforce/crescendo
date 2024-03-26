@@ -35,16 +35,23 @@ public final class VisionConstants {
   public static final int powerNumber = 4;
 
   // Constants for cameras
-  public static final int kNumCams = 2;
+  public static final int kNumCams = 3;
 
   // Names
   public static final String kCam1Name = "Shooter";
   public static final String kCam2Name = "Intake";
+  public static final String kCam3Name = "SecondShooter";
+
+  public static final String kPi1Name = "Shooter";
+  public static final String kPi2Name = "Intake";
 
   // Indexs
   public static final int kCam1Idx = 0;
-  public static final int kCam2Idx = 0;
+  public static final int kCam2Idx = 1;
+  public static final int kCam3Idx = 0;
 
+  public static final double kLoopTime = 0.02;
+  public static final int kCircularBufferSize = 1000;
   // Poses
   public static final Pose3d kCam1Pose =
       new Pose3d(
@@ -54,6 +61,10 @@ public final class VisionConstants {
       new Pose3d(
           new Translation3d(-0.18, -0.325, 0.44),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-15.0)));
+  public static final Pose3d kCam3Pose =
+      new Pose3d(
+          new Translation3d(-0.18, -0.31, 0.36),
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-173.0)));
 
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.

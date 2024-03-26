@@ -39,4 +39,9 @@ public class OperatorRumbleCommand extends Command {
   public void end(boolean interrupted) {
     xboxController.setRumble(RumbleType.kBothRumble, 0);
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }

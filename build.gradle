@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2024.3.1"
+    id "edu.wpi.first.GradleRIO" version "2024.3.2"
     id "com.diffplug.spotless" version "6.12.1"
     id "com.peterabeles.gversion" version "1.10"
 }
@@ -81,7 +81,7 @@ dependencies {
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
 
-    implementation 'org.strykeforce:wallEYE:24.0.0'    
+    implementation 'org.strykeforce:wallEYE:24.2.0'    
 
 }
 

@@ -33,22 +33,23 @@ public final class ClimbConstants {
   public static final double kZeroForkMaxVel = 0.5;
   public static final int kForkZeroStableCounts = 5;
   public static final double kCloseEnoughForks = 25; // 100
-  public static final double kLeftExtendPos = 500;
-  public static final double kRightExtendPos = 500;
+  public static final double kLeftExtendPos = 400; // 500
+  public static final double kRightExtendPos = 400; // 500
   public static final double kLeftRetractPos = 20; // 10
   public static final double kRightRetractPos = 20; // 10
-  public static final double kRevsPerInch = 2.98;
+  public static final double kRevsPerInch = 1.788; // 1.192 -> 2.98
 
   // PRE-CLIMB
   public static final double kLeftClimbPrepPos = 80.0; // 70
   public static final double kRightClimbPrepPos = 80.0;
 
-  public static final double kLeftClimbHighPrepPos = 90.0;
-  public static final double kRightClimbHighPrepPos = 90.0;
+  public static final double kLeftClimbHighPrepPos = 93.576;
+  public static final double kRightClimbHighPrepPos = 93.576;
 
   // TRAP CLIMB
-  public static final double kLeftClimbTrapPos = 13.844; // 17.42 11.46 5.5
-  public static final double kRightClimbTrapPos = 13.844; // 5.5
+  public static final double kLeftClimbTrapPos =
+      12.056; // 10.268 12.056 <- 13.844 <- 17.42 <- 11.46 <- 5.5
+  public static final double kRightClimbTrapPos = 12.056; // 5.5
 
   public static final double kLeftStowPos = 2.5;
   public static final double kRightStowPos = 2.5;

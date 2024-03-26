@@ -25,7 +25,7 @@ public class MagazineIOFX implements MagazineIO, Checkable {
 
   private Logger logger;
 
-  private double setpoint;
+  private double setpoint = 0.0;
 
   private TalonFXConfigurator configurator;
   private MotionMagicVelocityVoltage velocityRequest =
@@ -58,6 +58,7 @@ public class MagazineIOFX implements MagazineIO, Checkable {
     inputs.velocity = currVelocity.refresh().getValue();
     inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
     inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 0;
+    inputs.setpoint = setpoint;
   }
 
   @Override
@@ -87,6 +88,7 @@ public class MagazineIOFX implements MagazineIO, Checkable {
 
   @Override
   public void setSpeed(double speed) {
+    setpoint = speed;
     if (speed == 0.0) magazine.setControl(dutyCycleRequest.withOutput(speed));
     else magazine.setControl(velocityRequest.withVelocity(speed));
   }

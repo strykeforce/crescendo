@@ -7,11 +7,13 @@ target_yaw = 0.0 #degrees
 
 [start_pose]
     dataPoint = "W1"
-    dY = 0.2 # Red - 0.2 | Blue - 0.05
+    dY = -0.05
     dX = 0.2
     angle = 30.0
 [end_pose]
     dataPoint = "M1"
+    dX = -0.2
+
 
 [[internal_points]]
     x = 5.72
