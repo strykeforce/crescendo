@@ -46,6 +46,7 @@ import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.elbow.SetElbowHasZeroedCommand;
+import frc.robot.commands.elbow.SetTrustElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.elbow.ZeroRecoveryElbowCommand;
 import frc.robot.commands.intake.OpenLoopIntakeCommand;
@@ -56,6 +57,7 @@ import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
+import frc.robot.commands.robotState.FeedCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
@@ -74,6 +76,9 @@ import frc.robot.commands.robotState.UpdateElbowOffsetCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
+import frc.robot.commands.wrist.WriteWristToStowCommand;
+import frc.robot.commands.wrist.ZeroWristCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
@@ -91,8 +96,10 @@ import frc.robot.subsystems.elbow.ElbowIOFX;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeIOFX;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineIOFX;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
+import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.shooter.ShooterIOFX;
@@ -101,7 +108,10 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -118,7 +128,9 @@ public class RobotContainer {
   private final ElbowSubsystem elbowSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final ClimbSubsystem climbSubsystem;
+  private final LedSubsystem ledSubsystem;
   private final AutoSwitch autoSwitch;
+  private final PathHandler pathHandler;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -128,6 +140,7 @@ public class RobotContainer {
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
   private Boolean isEvent = true;
+  private Boolean canivoreStatus = false;
 
   private NonAmpAutoCommand nonAmpAutonPath;
   private NonAmpAutoCommand nonAmpAutoNote3;
@@ -154,6 +167,8 @@ public class RobotContainer {
   private ClimbIOFX climbIO;
   private ForkIOSRX forkIO;
 
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
+
   public RobotContainer() {
     swerve = new Swerve();
     wristIO = new WristIOSRX();
@@ -171,6 +186,7 @@ public class RobotContainer {
     shooterSubsystem = new ShooterSubsystem(shooterIO);
     intakeSubsystem = new IntakeSubsystem(intakeIO);
     magazineSubsystem = new MagazineSubsystem(magazineIO);
+    ledSubsystem = new LedSubsystem();
     climbSubsystem =
         new ClimbSubsystem(climbIO, new ClimbRatchetIOServo(), new TrapBarIOServo(), forkIO);
 
@@ -186,9 +202,22 @@ public class RobotContainer {
             intakeSubsystem,
             magazineSubsystem,
             superStructure,
-            climbSubsystem);
+            climbSubsystem,
+            ledSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
+
+    pathHandler =
+        new PathHandler(
+            null,
+            robotStateSubsystem,
+            driveSubsystem,
+            List.of(),
+            AutonConstants.kNonAmpPathMatrix,
+            false,
+            2.0,
+            AutonConstants.Setpoints.NAS2);
+
     autoSwitch =
         new AutoSwitch(
             robotStateSubsystem,
@@ -199,7 +228,8 @@ public class RobotContainer {
             climbSubsystem,
             elbowSubsystem,
             wristSubsystem,
-            shooterSubsystem);
+            shooterSubsystem,
+            pathHandler);
 
     // visionSubsystem.setVisionUpdates(false);
     nonAmpAutonPath =
@@ -375,7 +405,7 @@ public class RobotContainer {
         .add(
             "Set to Shoot Positon",
             new ClosedLoopElbowOffsetCommand(
-                elbowSubsystem, 16.914, () -> robotStateSubsystem.getElbowOffset()))
+                elbowSubsystem, 0.08119, () -> robotStateSubsystem.getElbowOffset()))
         .withPosition(7, 0)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
@@ -565,6 +595,11 @@ public class RobotContainer {
         .addBoolean("Vision updates enabled", () -> driveSubsystem.usingVisionUpdates())
         .withSize(1, 1)
         .withPosition(6, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("CANivore Connected", () -> canivoreStatus)
+        .withSize(1, 1)
+        .withPosition(8, 0);
     // Shuffleboard.getTab("Match")
     //     .add("ZeroRecoveryElbowCommand", new ZeroRecoveryElbowCommand(elbowSubsystem))
     //     .withSize(1, 1)
@@ -584,6 +619,35 @@ public class RobotContainer {
         .add(new ZeroRecoveryElbowCommand(elbowSubsystem))
         .withSize(1, 1)
         .withPosition(2, 0);
+
+    Shuffleboard.getTab("Debug")
+        .addBoolean("IS WRIST GOOD", () -> wristSubsystem.isWristAtStow())
+        .withSize(1, 1)
+        .withPosition(4, 0);
+    Shuffleboard.getTab("Debug")
+        .add(new ZeroWristCommand(wristSubsystem))
+        .withSize(1, 1)
+        .withPosition(4, 1);
+    Shuffleboard.getTab("Debug")
+        .add(new WriteWristToStowCommand(wristSubsystem))
+        .withSize(1, 1)
+        .withPosition(4, 2);
+    Shuffleboard.getTab("Debug")
+        .addBoolean("Is Elbow Ok?", () -> elbowSubsystem.isElbowConnected())
+        .withSize(1, 1)
+        .withPosition(3, 0);
+    Shuffleboard.getTab("Debug")
+        .addDouble("ElbowPos", () -> elbowSubsystem.getPosition())
+        .withSize(1, 1)
+        .withPosition(3, 3);
+    Shuffleboard.getTab("Debug")
+        .add("STOP ELBOW", new SetTrustElbowCommand(elbowSubsystem, true))
+        .withSize(1, 1)
+        .withPosition(3, 1);
+    Shuffleboard.getTab("Debug")
+        .add("START ELBOW", new SetTrustElbowCommand(elbowSubsystem, false))
+        .withSize(1, 1)
+        .withPosition(3, 2);
   }
 
   public void configureTuningDashboard() {
@@ -616,6 +680,10 @@ public class RobotContainer {
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     tab.add("start", new TunedShotCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+  }
+
+  public void zeroWrist() {
+    wristSubsystem.zero();
   }
 
   public void configureTelemetry() {
@@ -655,12 +723,20 @@ public class RobotContainer {
     return this.autoSwitch;
   }
 
+  public void updateCanivoreStatus() {
+    this.canivoreStatus = robotStateSubsystem.isCANivoreConnected();
+  }
+
   public void setIsEvent(boolean isEvent) {
     this.isEvent = isEvent;
   }
 
   public void setIsAuto(boolean isAuto) {
     robotStateSubsystem.setIsAuto(isAuto);
+  }
+
+  public void stowRobot() {
+    robotStateSubsystem.toStow();
   }
 
   private void configureOperatorBindings() {
@@ -705,6 +781,8 @@ public class RobotContainer {
         .onTrue(
             new AmpCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .onTrue(new DriveSpeedSpinCommand(driveSubsystem, xboxController));
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new OpenLoopMagazineCommand(magazineSubsystem, .2))
     //     .onFalse(new OpenLoopMagazineCommand(magazineSubsystem, 0));
@@ -814,6 +892,24 @@ public class RobotContainer {
         .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
         .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+
+    // Feeding Shoot
+    new JoystickButton(driveJoystick, Button.SWF_UP.id)
+        .onTrue(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWF_UP.id)
+        .onFalse(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
+        .onTrue(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
+        .onFalse(
+            new FeedCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void configureClimbTestBindings() {
@@ -870,6 +966,11 @@ public class RobotContainer {
     // Elbow at zero
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .onTrue(new ClosedLoopElbowCommand(elbowSubsystem, 0.0));
+  }
+
+  public void ledTestFunction() {
+    ledSubsystem.setColor(219, 100, 2);
+    logger.info("set color to orange");
   }
 
   public Command getAutonomousCommand() {

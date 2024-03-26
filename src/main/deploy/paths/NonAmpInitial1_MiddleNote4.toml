@@ -1,0 +1,28 @@
+max_velocity = 4.0 #m/s
+max_acceleration = 2.7 #m/s
+start_velocity = 0.0 #m/s
+end_velocity = 0.0 #m/s 
+is_reversed = false
+target_yaw = 0.0 #degrees
+
+[start_pose]
+    dataPoint = "NAI1"
+
+[end_pose]
+    dataPoint = "M4"
+    dX = -0.5 # -0.5
+    dY = -0.3 # -0.3
+    angle = 180.0
+
+
+[[internal_points]]
+    x = 3.4
+    y = 3.1
+
+[[internal_points]]
+    x = 5.6
+    y = 4.1
+
+[[internal_points]]
+    x = 6.5
+    y = 2.33

@@ -7,7 +7,6 @@ public class RecoverMagazineCommand extends InstantCommand {
   MagazineSubsystem magazineSubsystem;
 
   public RecoverMagazineCommand(MagazineSubsystem magazineSubsystem) {
-
     this.magazineSubsystem = magazineSubsystem;
   }
 

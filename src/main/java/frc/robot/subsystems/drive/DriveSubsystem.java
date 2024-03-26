@@ -57,6 +57,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
+  private boolean isFeeding = false;
 
   private boolean updateVision = true;
 
@@ -103,7 +104,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (!isAligningShot) {
       io.drive(vXmps, vYmps, vOmegaRadps, true);
     } else {
-      double vOmegaRadpsNew = getvOmegaToGoal();
+      double vOmegaRadpsNew;
+      if (isFeeding) vOmegaRadpsNew = getvOmegaToFeedTarget();
+      else vOmegaRadpsNew = getvOmegaToGoal();
       io.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
   }
@@ -112,6 +115,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return omegaSpinController.calculate(
         getPoseMeters().getRotation().getRadians(),
         getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
+  }
+
+  public double getvOmegaToFeedTarget() {
+    return omegaSpinController.calculate(
+        getPoseMeters().getRotation().getRadians(),
+        getPoseMeters().getRotation().getRadians() + getShooterAngleToFeedTarget().getRadians());
   }
 
   public double getvOmegaToTarget(Rotation2d target) {
@@ -159,11 +168,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
-    if (updateVision) io.addVisionMeasurement(pose, timestamp);
+    io.addVisionMeasurement(pose, timestamp);
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
-    if (updateVision) io.addVisionMeasurement(pose, timestamp, stdDevvs);
+    io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController() {
@@ -212,6 +221,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return pose.getTranslation().plus(shooterOffset);
   }
 
+  public double getDistanceToFeedTarget() {
+    return getShooterPos()
+        .getDistance(
+            robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                ? RobotConstants.kBlueFeedTargetPos
+                : RobotConstants.kRedFeedTargetPos);
+  }
+
   public double getDistanceToSpeaker() {
     return getShooterPos()
         .getDistance(
@@ -228,7 +245,20 @@ public class DriveSubsystem extends MeasurableSubsystem {
                 : RobotConstants.kRedSpeakerPos);
   }
 
-  // FIXME: probably doesn't work with red alliance side
+  public Rotation2d getShooterAngleToFeedTarget() {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
+      return RobotConstants.kBlueFeedTargetPos
+          .minus(getPoseMeters().getTranslation())
+          .getAngle()
+          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+          .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
+    return RobotConstants.kRedFeedTargetPos
+        .minus(getPoseMeters().getTranslation())
+        .getAngle()
+        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+        .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
+  }
+
   public Rotation2d getShooterAngleToSpeaker() {
     if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
       return RobotConstants.kBlueSpeakerPos
@@ -265,8 +295,28 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return io.getAzimuth1FwdLimitSwitch();
   }
 
+  public boolean isPointingAtFeedTarget() {
+    return Math.abs(getShooterAngleToFeedTarget().getDegrees())
+        <= DriveConstants.kDegreesCloseEnough;
+  }
+
   public boolean isPointingAtGoal() {
     return Math.abs(getShooterAngleToSpeaker().getDegrees()) <= DriveConstants.kDegreesCloseEnough;
+  }
+
+  public boolean isDriveStillFeed() {
+    double vX = getFieldRelSpeed().vxMetersPerSecond;
+    double vY = getFieldRelSpeed().vyMetersPerSecond;
+
+    // Take fieldRel Speed and get the magnitude of the vector
+    double wheelSpeed = FastMath.hypot(vX, vY);
+
+    double gyroRate = inputs.gyroRate;
+
+    boolean velStill = Math.abs(wheelSpeed) <= DriveConstants.kSpeedStillFeedThreshold;
+    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+
+    return velStill && gyroStill;
   }
 
   public boolean isDriveStill() {
@@ -304,6 +354,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void setIsAligningShot(boolean isAligningShot) {
     this.isAligningShot = isAligningShot;
     if (isAligningShot) resetOmegaController();
+  }
+
+  public void setIsFeeding(boolean isFeeding) {
+    this.isFeeding = isFeeding;
+    if (isFeeding) resetOmegaController();
   }
 
   public void setDriveState(DriveStates driveStates) {

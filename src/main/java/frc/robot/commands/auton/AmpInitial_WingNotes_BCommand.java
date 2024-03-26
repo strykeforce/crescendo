@@ -24,12 +24,12 @@ import frc.robot.subsystems.superStructure.SuperStructure;
 public class AmpInitial_WingNotes_BCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
 
-  DriveAutonCommand firstPath;
-  DriveAutonCommand secondPath;
-  DriveAutonCommand thirdPath;
-  DriveAutonCommand fourthPath;
-  DriveAutonCommand fallbackPath;
-  DriveAutonCommand fallbackPath2;
+  private DriveAutonCommand firstPath;
+  private DriveAutonCommand secondPath;
+  private DriveAutonCommand thirdPath;
+  private DriveAutonCommand fourthPath;
+  private DriveAutonCommand fallbackPath;
+  private DriveAutonCommand fallbackPath2;
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
