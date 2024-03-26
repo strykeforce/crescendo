@@ -205,6 +205,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return io.getFieldRelSpeed();
   }
 
+  public ChassisSpeeds getRobotRelSpeed() {
+    return io.getRobotRelSpeed();
+  }
+
   public Translation2d getShooterPos() {
     Pose2d pose = getPoseMeters();
     Translation2d shooterOffset =

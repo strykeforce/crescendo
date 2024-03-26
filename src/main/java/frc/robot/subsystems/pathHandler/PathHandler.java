@@ -1,10 +1,15 @@
 package frc.robot.subsystems.pathHandler;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants;
+import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.PathData;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -21,7 +26,7 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class PathHandler extends MeasurableSubsystem {
 
-  private PathStates curState = PathStates.FETCH;
+  private PathStates curState = PathStates.DONE;
   private DeadEyeSubsystem deadeye;
   private boolean useDeadeye;
   private ArrayList<Integer> noteOrder;
@@ -35,6 +40,9 @@ public class PathHandler extends MeasurableSubsystem {
   private Timer timer = new Timer();
   private Rotation2d robotHeading;
   private Trajectory curTrajectory;
+
+  private ProfiledPIDController deadeyeYDrive;
+  private PIDController deadeyeXDrive;
 
   // NOTE NUMBERS ARE BASED ON THE STANDARDS DOCUMENT
   // A 6x6 array that stores all paths (0 is shootPos, 1 is first note, etc)
@@ -69,6 +77,18 @@ public class PathHandler extends MeasurableSubsystem {
 
     logger = LoggerFactory.getLogger(this.getClass());
 
+    deadeyeYDrive =
+        new ProfiledPIDController(
+            AutonConstants.kPDeadEyeYDrive,
+            AutonConstants.kIDeadEyeYDrive,
+            AutonConstants.kDDeadEyeYDrive,
+            new Constraints(
+                AutonConstants.kMaxVelDeadeyeDrive, AutonConstants.kMaxAccelDeadeyeDrive));
+    deadeyeXDrive =
+        new PIDController(
+            AutonConstants.kPDeadEyeXDrive,
+            AutonConstants.kIDeadEyeXDrive,
+            AutonConstants.kDDeadEyeXDrive);
     generateTrajectory();
   }
 
@@ -117,6 +137,8 @@ public class PathHandler extends MeasurableSubsystem {
   public void startHandling() {
     timer.reset();
     timer.start();
+    deadeye.setCamEnabled(true);
+    setState(PathStates.FETCH);
     handling = true;
   }
 
@@ -173,7 +195,6 @@ public class PathHandler extends MeasurableSubsystem {
             curState = PathStates.DRIVE_FETCH;
           }
           break;
-
         case DRIVE_FETCH:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
 
@@ -191,6 +212,23 @@ public class PathHandler extends MeasurableSubsystem {
           break;
 
         case FETCH:
+          if ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                  && driveSubsystem.getPoseMeters().getX() <= AutonConstants.kMaxXOff / 2 + 1)
+              || (robotStateSubsystem.getAllianceColor() == Alliance.Red
+                  && driveSubsystem.getPoseMeters().getX()
+                      >= DriveConstants.kFieldMaxX / 2 - AutonConstants.kMaxXOff)) {
+            if (deadeye.getNumTargets() > 0) {
+              double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
+              double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
+              driveSubsystem.move(
+                  AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
+            } else {
+              driveSubsystem.move(0.0, 0.0, 0.0, true);
+            }
+          } else {
+            driveSubsystem.move(0.0, 0.0, 0.0, true);
+          }
+
           String nextPathName;
 
           if (robotStateSubsystem.hasNote() && numPieces > 0.51) {

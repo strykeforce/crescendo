@@ -1,9 +1,7 @@
 package frc.robot.subsystems.vision;
 
-import java.util.List;
 import java.util.Set;
 import org.strykeforce.deadeye.Deadeye;
-import org.strykeforce.deadeye.Rect;
 import org.strykeforce.deadeye.TargetListTargetData;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -12,18 +10,12 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class DeadEyeSubsystem extends MeasurableSubsystem {
 
   Deadeye<TargetListTargetData> cam;
-
+  double centerX = 0.0;
   TargetListTargetData data = new TargetListTargetData();
-
-  int borderLengthX = 0;
-  int border1 = 0;
-  int border2 = 0;
 
   public DeadEyeSubsystem() {
     cam = new Deadeye<>("W0", TargetListTargetData.class);
-    borderLengthX = cam.getCapture().width / 3;
-    border1 = borderLengthX;
-    border2 = borderLengthX + border1;
+    centerX = cam.getCapture().width / 2.0;
   }
 
   public boolean isCamEnabled() {
@@ -38,49 +30,59 @@ public class DeadEyeSubsystem extends MeasurableSubsystem {
     return data;
   }
 
-  public boolean isNoteRight() {
-    List<Rect> list = data.targets;
-
-    for (Rect rect : list) {
-      if (rect.topLeft.x >= border2) return true;
-    }
-    return false;
+  public double getDistanceToCamCenter() {
+    if (data.targets.size() > 0) return data.targetsOrderedByCenterX().get(0).center().x - centerX;
+    return 0.0;
   }
 
-  public boolean isNoteMid() {
-    List<Rect> list = data.targets;
-
-    for (Rect rect : list) {
-      if (rect.topLeft.x >= border1 && rect.bottomRight.x <= border2) return true;
-    }
-    return false;
+  public int getNumTargets() {
+    return data.targets.size();
   }
 
-  public boolean isNoteLeft() {
-    List<Rect> list = data.targets;
+  //   public boolean isNoteRight() {
+  //     List<Rect> list = data.targets;
 
-    for (Rect rect : list) {
-      if (rect.bottomRight.x <= border1) return true;
-    }
-    return false;
-  }
+  //     for (Rect rect : list) {
+  //       if (rect.topLeft.x >= border2) return true;
+  //     }
+  //     return false;
+  //   }
+
+  //   public boolean isNoteMid() {
+  //     List<Rect> list = data.targets;
+
+  //     for (Rect rect : list) {
+  //       if (rect.topLeft.x >= border1 && rect.bottomRight.x <= border2) return true;
+  //     }
+  //     return false;
+  //   }
+
+  //   public boolean isNoteLeft() {
+  //     List<Rect> list = data.targets;
+
+  //     for (Rect rect : list) {
+  //       if (rect.bottomRight.x <= border1) return true;
+  //     }
+  //     return false;
+  //   }
 
   @Override
   public void periodic() {
-    data = cam.getTargetData();
-
-    System.err.println(isNoteLeft() + " " + isNoteMid() + " " + isNoteRight());
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Deadeye/TargetDistanceToCenter", getDistanceToCamCenter());
+    TargetListTargetData newData = cam.getTargetData();
+    if (newData != null) {
+      data = newData;
+    }
   }
 
   @Override
   public Set<Measure> getMeasures() {
-    // TODO Auto-generated method stub
-    return null;
+    return Set.of(new Measure("Is deadeye enabled", () -> cam.getEnabled() ? 1 : 0));
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-    // TODO Auto-generated method stub
     super.registerWith(telemetryService);
   }
 }

@@ -46,7 +46,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
       Pose2d shootPose) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
-    firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, true, true);
+    firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, false, true);
     this.pathHandler = pathHandler;
     this.robotStateSubsystem = robotStateSubsystem;
     this.pathNames = pathNames;

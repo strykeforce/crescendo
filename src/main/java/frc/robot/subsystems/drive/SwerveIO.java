@@ -48,6 +48,10 @@ public interface SwerveIO {
     return null;
   }
 
+  public default ChassisSpeeds getRobotRelSpeed() {
+    return null;
+  }
+
   public default SwerveDriveKinematics getKinematics() {
     return null;
   }

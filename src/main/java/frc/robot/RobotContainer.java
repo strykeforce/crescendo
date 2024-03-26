@@ -105,6 +105,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.shooter.ShooterIOFX;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
@@ -131,6 +132,7 @@ public class RobotContainer {
   private final LedSubsystem ledSubsystem;
   private final AutoSwitch autoSwitch;
   private final PathHandler pathHandler;
+  private final DeadEyeSubsystem deadEyeSubsystem;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -178,6 +180,7 @@ public class RobotContainer {
     magazineIO = new MagazineIOFX();
     climbIO = new ClimbIOFX();
     forkIO = new ForkIOSRX();
+    deadEyeSubsystem = new DeadEyeSubsystem();
     robotConstants = new RobotConstants();
     driveSubsystem = new DriveSubsystem(swerve);
     visionSubsystem = new VisionSubsystem(driveSubsystem);
@@ -209,7 +212,7 @@ public class RobotContainer {
 
     pathHandler =
         new PathHandler(
-            null,
+            deadEyeSubsystem,
             robotStateSubsystem,
             driveSubsystem,
             List.of(),
@@ -788,6 +791,10 @@ public class RobotContainer {
         .onTrue(
             new AmpCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .onTrue(
+    //         new TestDeadeyeCleanUpCommand(deadEyeSubsystem, driveSubsystem, robotStateSubsystem))
+    //     .onFalse(new XLockCommand(driveSubsystem));
     // new JoystickButton(xboxController, XboxController.Button.kA.value)
     //     .onTrue(new DriveSpeedSpinCommand(driveSubsystem, xboxController));
     // new JoystickButton(xboxController, XboxController.Button.kB.value)

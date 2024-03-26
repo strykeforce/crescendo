@@ -133,6 +133,16 @@ public class Swerve implements SwerveIO, Checkable {
     return swerveModuleStates;
   }
 
+  public ChassisSpeeds getRobotRelSpeed() {
+    SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
+    SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
+    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
+    for (int i = 0; i < 4; ++i) {
+      swerveModuleStates[i] = swerveModules[i].getState();
+    }
+    return kinematics.toChassisSpeeds(swerveModuleStates);
+  }
+
   public ChassisSpeeds getFieldRelSpeed() {
     SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
     SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
