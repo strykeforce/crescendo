@@ -28,6 +28,8 @@ public interface SwerveIO {
     public boolean isConnected = false;
     public Pose2d poseMeters = new Pose2d();
     public double updateCount = 0;
+    public double[] azimuthVels = {0, 0, 0, 0};
+    public double[] azimuthCurrent = {0, 0, 0, 0};
   }
 
   public default SwerveModule[] getSwerveModules() {

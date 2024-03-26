@@ -70,6 +70,10 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return inputs.positionRots;
   }
 
+  public double getHighResPos() {
+    return inputs.highResPosRots;
+  }
+
   public double getSetpoint() {
     return setpoint;
   }

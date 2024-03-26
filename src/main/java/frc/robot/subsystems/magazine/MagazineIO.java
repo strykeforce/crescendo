@@ -11,6 +11,7 @@ public interface MagazineIO {
     public boolean isFwdLimitSwitchClosed = false;
     public boolean isRevLimitSwitchClosed = false;
     public boolean isSecondFwdLimitSwitchClosed = false;
+    public double setpoint = 0.0;
   }
 
   public default void updateInputs(MagazineIOInputs inputs) {}

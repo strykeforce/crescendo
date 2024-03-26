@@ -15,4 +15,9 @@ public class ZeroWristCommand extends InstantCommand {
   public void initialize() {
     wristSubsystem.zero();
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }

@@ -5,7 +5,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.kauailabs.navx.frc.AHRS.SerialDataType;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,7 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.SPI;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
@@ -43,6 +42,8 @@ public class Swerve implements SwerveIO, Checkable {
 
   private BooleanSupplier azimuth1FwdLimitSupplier = () -> false;
 
+  private TalonSRX[] azimuths = new TalonSRX[4];
+
   public Swerve() {
 
     var moduleBuilder =
@@ -57,6 +58,7 @@ public class Swerve implements SwerveIO, Checkable {
 
     for (int i = 0; i < 4; i++) {
       var azimuthTalon = new TalonSRX(i);
+      azimuths[i] = azimuthTalon;
       azimuthTalon.configFactoryDefault(RobotConstants.kTalonConfigTimeout);
       azimuthTalon.configAllSettings(
           DriveConstants.getAzimuthTalonConfig(), RobotConstants.kTalonConfigTimeout);
@@ -85,7 +87,7 @@ public class Swerve implements SwerveIO, Checkable {
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
 
-    ahrs = new SF_AHRS(SerialPort.Port.kUSB2, SerialDataType.kProcessedData, (byte) 200);
+    ahrs = new SF_AHRS(SPI.Port.kMXP, 2_000_000, (byte) 200);
     swerveDrive = new SwerveDrive(false, 0.02, ahrs, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
@@ -203,6 +205,10 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.isConnected = ahrs.isConnected();
     inputs.poseMeters = swerveDrive.getPoseMeters();
     inputs.updateCount = ahrs.getTempC();
+    for (int i = 0; i < 4; ++i) {
+      inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
+      inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
+    }
   }
 
   @Override

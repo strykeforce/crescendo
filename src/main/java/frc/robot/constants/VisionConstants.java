@@ -16,7 +16,7 @@ public final class VisionConstants {
   public static final double kTimeToDecayDev = 10;
   public static final double kStdDevDecayCoeff = -0.005;
   public static final double kMinStdDev = 0.01;
-  public static final double kMaxAmbig = 1.0;
+  public static final double kMaxAmbig = 0.5;
   public static final int kMaxTimesOffWheels = 5;
 
   // Velocity Filter
@@ -64,7 +64,7 @@ public final class VisionConstants {
   public static final Pose3d kCam3Pose =
       new Pose3d(
           new Translation3d(-0.18, -0.31, 0.36),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-170.0)));
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-173.0)));
 
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.
