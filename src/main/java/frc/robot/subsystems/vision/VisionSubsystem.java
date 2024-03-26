@@ -180,16 +180,36 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return avg;
   }
 
-  private double getStdDevFactor(double distance, int numTags) {
-    if (numTags == 1)
-      return 1
-          / FastMath.pow(
-              VisionConstants.baseNumber,
-              FastMath.pow(VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber));
-    return 1
-        / FastMath.pow(
-            VisionConstants.baseNumber,
-            FastMath.pow(VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
+  private double getStdDevFactor(double distance, int numTags, String camName) {
+    switch (camName) {
+      case "SecondShooter":
+        if (numTags == 1)
+          return 1
+              / FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.FOV45SinlgeTagCoeff * distance,
+                      VisionConstants.FOV45powerNumber));
+        return 1
+            / FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV45MultiTagCoeff * distance,
+                    VisionConstants.FOV45powerNumber));
+
+      default:
+        if (numTags == 1)
+          return 1
+              / FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber));
+        return 1
+            / FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
+    }
   }
 
   private Pose2d getCloserPose(Pose2d pose1, Pose2d pose2, double rotation) {
@@ -274,7 +294,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
               adaptiveVisionMatrix.get(0, 0)
                   / getStdDevFactor(
                       result.getNumTags() == 1 ? minTagDistance(result) : avgTagDistance(result),
-                      result.getNumTags()));
+                      result.getNumTags(),
+                      names[idx]));
 
       Pose2d cameraPose;
       Translation2d centerPos;

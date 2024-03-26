@@ -32,7 +32,10 @@ public final class VisionConstants {
   public static final double singleTagCoeff = 25.0 / 100.0;
   public static final double multiTagCoeff = 18.0 / 100.0;
   public static final double baseNumber = Math.E;
-  public static final int powerNumber = 4;
+  public static final double powerNumber = 4.0;
+  public static final double FOV45MultiTagCoeff = 13.0 / 100.0;
+  public static final double FOV45powerNumber = 3.5;
+  public static final double FOV45SinlgeTagCoeff = 16.0 / 100.0;
 
   // Constants for cameras
   public static final int kNumCams = 3;
