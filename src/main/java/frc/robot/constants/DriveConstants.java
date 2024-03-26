@@ -29,17 +29,17 @@ public final class DriveConstants {
 
   public static final double kFieldMaxX = 16.540988; // m
   public static final double kFieldMaxY = 8.21055; // m
-  
+
   public static final int kTalonConfigTimeout = 10; // ms
 
   public static final double kRobotLength = 0.5461;
   public static final double kRobotWidth = 0.6922;
-  
+
   public static final double kSpeedStillFeedThreshold = 0.5;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 0.5; // degrees per second
   public static final double kDegreesCloseEnough = 3;
-  
+
   // Move and shoot thresholds
   public static final double kMaxStableAccel = 0.1;
   public static final int kVelocityStableCounts = 5;
@@ -51,7 +51,7 @@ public final class DriveConstants {
   public static final double kDriveInputGear = 42;
   public static final double kBevelInputGear = 15;
   public static final double kBevelOutputGear = 45;
-  
+
   public static final double kDriveGearRatio =
       (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
   //   public static final double kWheelDiameterInches = 3.0 * 506.0 / 500.0;

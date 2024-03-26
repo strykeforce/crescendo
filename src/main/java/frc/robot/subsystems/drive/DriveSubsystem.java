@@ -371,7 +371,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
             && Math.abs(velYStableCounts) <= DriveConstants.kVelocityStableCounts;
     boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
 
-    return velStill && gyroStill && getDistanceToSpeaker() <= DriveConstants.kMaxSpeakerDist && (isAuto || vX <= DriveConstants.kMoveShootTeleMaxVelX);
+    return velStill
+        && gyroStill
+        && getDistanceToSpeaker() <= DriveConstants.kMaxSpeakerDist
+        && (isAuto || vX <= DriveConstants.kMoveShootTeleMaxVelX);
   }
 
   public boolean isNavxWorking() {

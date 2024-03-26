@@ -4,7 +4,6 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -355,7 +354,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
     double[] shootSolution =
         getShootSolution(
-            driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
+            driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())),
+            shootingLookupTable);
 
     for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
       virtualT =
@@ -365,7 +365,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                   speeds.vyMetersPerSecond * shootSolution[3]));
       shootSolution =
           getShootSolution(
-              driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
+              driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())),
+              shootingLookupTable);
     }
 
     driveSubsystem.setMoveAndShootVirtualPose(
@@ -697,7 +698,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
         double[] shootSolution =
             getShootSolution(
-                driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
+                driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())),
+                shootingLookupTable);
 
         for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
           virtualT =
@@ -707,7 +709,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                       speeds.vyMetersPerSecond * shootSolution[3]));
           shootSolution =
               getShootSolution(
-                  driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
+                  driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())),
+                  shootingLookupTable);
         }
 
         superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
