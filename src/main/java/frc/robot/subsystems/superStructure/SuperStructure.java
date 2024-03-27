@@ -343,6 +343,12 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.PREP_PODIUM;
   }
 
+  public void stageEblow(double elbowSetpoint) {
+    this.elbowSetpoint = elbowSetpoint;
+
+    elbowSubsystem.setPosition(elbowSetpoint);
+  }
+
   public void toPrepClimb() {
     elbowSetpoint = SuperStructureConstants.kElbowPreClimbSetPoint;
     wristSetpoint = SuperStructureConstants.kWristPreClimbSetPoint;
