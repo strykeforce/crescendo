@@ -59,6 +59,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private boolean isAligningShot = false;
   private boolean isFeeding = false;
 
+  private boolean tuningYaw = false;
+
   private boolean updateVision = true;
 
   public DriveSubsystem(SwerveIO io) {
@@ -67,7 +69,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // Setup omega Controller
     omegaSpinController =
         new ProfiledPIDController(
-            DriveConstants.kPOmega,
+            DriveConstants.kPOmegaSpin,
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
@@ -101,12 +103,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
-    if (!isAligningShot) {
+    if (!isAligningShot && !tuningYaw) {
       io.drive(vXmps, vYmps, vOmegaRadps, true);
     } else {
       double vOmegaRadpsNew;
       if (isFeeding) vOmegaRadpsNew = getvOmegaToFeedTarget();
-      else vOmegaRadpsNew = getvOmegaToGoal();
+      else if (tuningYaw) {
+        vOmegaRadpsNew = getvOmegaToTarget(Rotation2d.fromDegrees(DriveConstants.kYawTuningTarget));
+      } else vOmegaRadpsNew = getvOmegaToGoal();
       io.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
   }
@@ -320,8 +324,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isDriveStill() {
-    double vX = getFieldRelSpeed().vxMetersPerSecond;
-    double vY = getFieldRelSpeed().vyMetersPerSecond;
+    logger.info(
+        "Timestamp Before FieldRel: {}",
+        org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+    ChassisSpeeds cs = getFieldRelSpeed();
+    double vX = cs.vxMetersPerSecond;
+    double vY = cs.vyMetersPerSecond;
+    logger.info(
+        "Timestamp After FieldRel: {}",
+        org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
 
     // Take fieldRel Speed and get the magnitude of the vector
     double wheelSpeed = FastMath.hypot(vX, vY);
@@ -359,6 +370,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void setIsFeeding(boolean isFeeding) {
     this.isFeeding = isFeeding;
     if (isFeeding) resetOmegaController();
+  }
+
+  public void setIsTuningYaw(boolean isTuningYaw) {
+    this.tuningYaw = isTuningYaw;
+    if (isTuningYaw) resetOmegaController();
+  }
+
+  public boolean getIsTuningYaw() {
+    return this.tuningYaw;
   }
 
   public void setDriveState(DriveStates driveStates) {
@@ -681,6 +701,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
         new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()),
-        new Measure("Distance to goal", () -> getDistanceToSpeaker()));
+        new Measure("Distance to goal", () -> getDistanceToSpeaker()),
+        new Measure("Is Yaw Tuning", () -> getIsTuningYaw() ? 1 : 0));
   }
 }

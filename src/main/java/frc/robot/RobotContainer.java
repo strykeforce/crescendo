@@ -38,7 +38,9 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.StopTuningYawCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
+import frc.robot.commands.drive.TuneYawCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowOffsetCommand;
@@ -68,7 +70,6 @@ import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
-import frc.robot.commands.robotState.ToggleDefenseCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -134,6 +135,7 @@ public class RobotContainer {
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
+  private final FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
 
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
@@ -801,12 +803,25 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // SubWoofer
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //     .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Defense
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure,
+    // magazineSubsystem));
+
+    // Yaw Tuning
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+        .onTrue(
+            new TuneYawCommand(
+                () -> flysky.getFwd(),
+                () -> flysky.getStr(),
+                () -> flysky.getYaw(),
+                driveSubsystem,
+                robotStateSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
+        .onTrue(new StopTuningYawCommand(driveSubsystem));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -836,8 +851,6 @@ public class RobotContainer {
   }
 
   private void configureDriverBindings() {
-    FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
-
     driveSubsystem.setDefaultCommand(
         new DriveTeleopCommand(
             () -> flysky.getFwd(),
@@ -880,7 +893,7 @@ public class RobotContainer {
                 intakeSubsystem,
                 climbSubsystem));
 
-    // // Vision Shoot
+    // Vision Shoot
     new JoystickButton(driveJoystick, Button.M_SWH.id)
         .onTrue(
             new VisionShootCommand(

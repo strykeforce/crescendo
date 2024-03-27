@@ -215,9 +215,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     logger.info("Left Shooter: {}", lookupTable[index][1]);
 
+    logger.info(
+        "Timestamp Before Parsing Doubles: {}",
+        org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
     shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
     shootSolution[1] = Double.parseDouble(lookupTable[index][2]); // Right Shooter
     shootSolution[2] = Double.parseDouble(lookupTable[index][3]) + elbowOffset; // Elbow
+    logger.info(
+        "Timestamp AFter Parsing Doubles: {}",
+        org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
 
     return shootSolution;
   }
@@ -603,9 +609,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_SHOOT:
         if (!usingDistance && !shootKnownPos) {
+          logger.info(
+              "Timestamp Before Shot Sol: {}",
+              org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
           double[] shootSolution =
               getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
+          logger.info(
+              "Timestamp After Shot Sol Before Shoot: {}",
+              org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+          logger.info(
+              "Timestamp After Shoot: {}",
+              org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
         }
 
         if (shootKnownPos) {
@@ -620,10 +635,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           double vomega = driveSubsystem.getvOmegaToGoal();
           driveSubsystem.move(0, 0, vomega, true);
         }
-
+        logger.info(
+            "Timestamp Before Conditions: {}",
+            org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
         if (driveSubsystem.isDriveStill()
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
+          logger.info(
+              "Timestamp After Conditions: {}",
+              org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
 
           if (!shootKnownPos) {
             org.littletonrobotics.junction.Logger.recordOutput(
