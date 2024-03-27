@@ -49,8 +49,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
 
-  private String[][] shootingLookupTable;
-  private String[][] feedingLookupTable;
+  private double[][] shootingLookupTable;
+  private double[][] feedingLookupTable;
 
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
@@ -164,24 +164,31 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Order of Columns: dist meters, left shoot, right shoot, elbow, time of flight
-  private String[][] parseLookupTable(String path) {
-    String[][] lookupTable;
+  private double[][] parseLookupTable(String path) {
+    double[][] lookupTable;
     List<String[]> list = new LinkedList<>();
-
+    List<double[]> listD = new LinkedList<>();
     try {
       CSVReader csvReader = new CSVReader(new FileReader(path));
       list = csvReader.readAll();
+      for (String[] sArr: list) {
+        double [] dArr = new double[sArr.length];
+        for (int i = 0; i < sArr.length; ++i)
+            dArr[i] = Double.parseDouble(sArr[i]);
+        listD.add(dArr);
+      } 
+        
     } catch (Exception e) {
       logger.warn("Failed to read lookup table at {} due to {}", path, e);
     }
-
-    String[][] strArr = new String[list.size()][];
-    lookupTable = list.toArray(strArr);
+    
+    double[][] doubleArr = new double[list.size()][];
+    lookupTable = listD.toArray(doubleArr);
 
     return lookupTable;
   }
 
-  private double[] getShootSolution(double distance, String[][] lookupTable) {
+  private double[] getShootSolution(double distance, double[][] lookupTable) {
     double[] shootSolution = new double[3];
     int index;
     distance += RobotStateConstants.kDistanceOffset;
@@ -205,7 +212,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                       / RobotStateConstants.kDistanceIncrement
                   + 1.0);
       logger.info(
-          "Distance: {} | Measured {}", Double.parseDouble(lookupTable[index][0]), distance);
+          "Distance: {} | Measured {}", lookupTable[index][0], distance);
       /*
        * index =
        * (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
@@ -218,9 +225,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     logger.info(
         "Timestamp Before Parsing Doubles: {}",
         org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
-    shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
-    shootSolution[1] = Double.parseDouble(lookupTable[index][2]); // Right Shooter
-    shootSolution[2] = Double.parseDouble(lookupTable[index][3]) + elbowOffset; // Elbow
+    shootSolution[0] = lookupTable[index][1]; // Left Shooter
+    shootSolution[1] = lookupTable[index][2]; // Right Shooter
+    shootSolution[2] = lookupTable[index][3] + elbowOffset; // Elbow
     logger.info(
         "Timestamp AFter Parsing Doubles: {}",
         org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
