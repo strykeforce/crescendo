@@ -300,6 +300,14 @@ public class RobotContainer {
     // configurePitDashboard();
   }
 
+  public void enableDeadeye() {
+    deadEyeSubsystem.setCamEnabled(true);
+  }
+
+  public void killPathHandler() {
+    pathHandler.killPathHandler();
+  }
+
   public boolean hasElbowZeroed() {
     return elbowSubsystem.hasZeroed();
   }

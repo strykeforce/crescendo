@@ -81,6 +81,7 @@ public class Robot extends LoggedRobot {
       m_robotContainer.configureTelemetry();
       // m_robotContainer.configurePitDashboard();
     }
+    m_robotContainer.enableDeadeye();
     Shuffleboard.getTab("Match")
         .add(new ToggleAllianceColorCommand(m_robotContainer))
         .withSize(1, 1)
@@ -138,6 +139,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit() {
+    m_robotContainer.killPathHandler();
     m_robotContainer.stowRobot();
   }
 

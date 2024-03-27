@@ -153,6 +153,11 @@ public class PathHandler extends MeasurableSubsystem {
     return nextPath;
   }
 
+  public void killPathHandler() {
+    driveSubsystem.move(0.0, 0.0, 0.0, true);
+    setState(PathStates.DONE);
+  }
+
   public void startNewPath(PathData path) {
     curTrajectory = path.trajectory;
     robotHeading = path.targetYaw;
@@ -213,7 +218,8 @@ public class PathHandler extends MeasurableSubsystem {
 
         case FETCH:
           if ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
-                  && driveSubsystem.getPoseMeters().getX() <= AutonConstants.kMaxXOff / 2 + 1)
+                  && driveSubsystem.getPoseMeters().getX()
+                      <= DriveConstants.kFieldMaxX / 2 + AutonConstants.kMaxXOff)
               || (robotStateSubsystem.getAllianceColor() == Alliance.Red
                   && driveSubsystem.getPoseMeters().getX()
                       >= DriveConstants.kFieldMaxX / 2 - AutonConstants.kMaxXOff)) {
