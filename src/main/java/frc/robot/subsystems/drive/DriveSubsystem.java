@@ -43,7 +43,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final HolonomicDriveController holonomicController;
   private RobotStateSubsystem robotStateSubsystem;
 
-  private final PIDController omegaShootTrackController;
+  private final ProfiledPIDController omegaShootTrackController;
   private final ProfiledPIDController omegaSpinController;
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
@@ -69,8 +69,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     // Setup omega Controller
     omegaShootTrackController =
-        new PIDController(
-            DriveConstants.kPOmegaSpin, DriveConstants.kIOmega, DriveConstants.kDOmega);
+        new ProfiledPIDController(
+            DriveConstants.kPOmegaSpin,
+            DriveConstants.kIOmega,
+            DriveConstants.kDOmega,
+            new TrapezoidProfile.Constraints(
+                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaSpin));
     omegaShootTrackController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
     omegaSpinController =
         new ProfiledPIDController(
@@ -116,6 +120,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
       else if (tuningYaw) {
         vOmegaRadpsNew = getvOmegaToGoal();
       } else vOmegaRadpsNew = getvOmegaToGoal();
+      lastVelocity[0] = vYmps;
       io.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
   }
@@ -189,7 +194,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
-    omegaShootTrackController.reset();
+    omegaShootTrackController.reset(inputs.gyroRotation2d.getRadians());
   }
 
   public void setHolonomicControllerTranslationkP(double kP) {
@@ -200,7 +205,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void resetOmegaController() {
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
-    omegaShootTrackController.reset();
+    omegaShootTrackController.reset(inputs.gyroRotation2d.getRadians());
   }
 
   // Getters/Setters

@@ -285,7 +285,7 @@ public class RobotContainer {
 
     // calibrateWheelSize = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
     // calibrateWheelSize.generateTrajectory();
-
+    // visionSubsystem.setVisionUpdates(false);
     configureDriverBindings();
     configureOperatorBindings();
     // configureClimbTestBindings();
@@ -790,6 +790,8 @@ public class RobotContainer {
         .onTrue(
             new AmpCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(xboxController,
+    // XboxController.Button.kA.value).onTrue(calibrateWheelSize);
     // new JoystickButton(xboxController, XboxController.Button.kA.value)
     //     .onTrue(new DriveSpeedSpinCommand(driveSubsystem, xboxController));
     // new JoystickButton(xboxController, XboxController.Button.kB.value)

@@ -323,8 +323,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
         updatesToWheels++;
 
         fedStdDevs = scaledStdDev.get(0, 0);
-        driveSubsystem.addVisionMeasurement(
-            new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);
+        if (visionUpdates)
+          driveSubsystem.addVisionMeasurement(
+              new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);
 
       } else {
 
