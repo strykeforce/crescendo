@@ -144,6 +144,7 @@ public final class DriveConstants {
   public static final double kIMin = 0.0;
   public static final double kIMax = 0.0;
 
+  public static final double kPOmegaSpin = 10.0; // 4.5
   public static final double kPOmega = 4.5; // 4.5
   public static final double kIOmega = 0.0;
   public static final double kDOmega = 0.0; // 0.001
@@ -154,6 +155,7 @@ public final class DriveConstants {
   // Default safety path constants
   public static final Pose2d startPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
   public static final Pose2d endPose2d = new Pose2d(1, 0, Rotation2d.fromDegrees(0));
+  public static final double kYawTuningTarget = 0;
 
   public static ArrayList<Translation2d> getDefaultInternalWaypoints() {
     ArrayList<Translation2d> waypoints = new ArrayList<>();

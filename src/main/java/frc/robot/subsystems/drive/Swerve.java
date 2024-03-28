@@ -44,6 +44,9 @@ public class Swerve implements SwerveIO, Checkable {
 
   private TalonSRX[] azimuths = new TalonSRX[4];
 
+  private V6TalonSwerveModule[] swerveModules;
+  private SwerveDriveKinematics kinematics;
+
   public Swerve() {
 
     var moduleBuilder =
@@ -53,7 +56,7 @@ public class Swerve implements SwerveIO, Checkable {
             .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond)
             .latencyCompensation(true);
 
-    V6TalonSwerveModule[] swerveModules = new V6TalonSwerveModule[4];
+    swerveModules = new V6TalonSwerveModule[4];
     Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
 
     for (int i = 0; i < 4; i++) {
@@ -76,6 +79,7 @@ public class Swerve implements SwerveIO, Checkable {
       configurator.apply(DriveConstants.getDriveTalonConfig());
       driveTalon.getSupplyVoltage().setUpdateFrequency(100);
       driveTalon.getSupplyCurrent().setUpdateFrequency(100);
+      driveTalon.getClosedLoopReference().setUpdateFrequency(200);
 
       swerveModules[i] =
           moduleBuilder
@@ -91,6 +95,8 @@ public class Swerve implements SwerveIO, Checkable {
     swerveDrive = new SwerveDrive(false, 0.02, ahrs, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
+
+    kinematics = swerveDrive.getKinematics();
 
     odometryStrategy =
         new PoseEstimatorOdometryStrategy(
@@ -134,18 +140,20 @@ public class Swerve implements SwerveIO, Checkable {
   }
 
   public ChassisSpeeds getFieldRelSpeed() {
-    SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
-    SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
+    // SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
+    // SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
     for (int i = 0; i < 4; ++i) {
       swerveModuleStates[i] = swerveModules[i].getState();
     }
     ChassisSpeeds roboRelSpeed = kinematics.toChassisSpeeds(swerveModuleStates);
+
+    Rotation2d heading = swerveDrive.getHeading().unaryMinus();
     return new ChassisSpeeds(
-        roboRelSpeed.vxMetersPerSecond * swerveDrive.getHeading().unaryMinus().getCos()
-            + roboRelSpeed.vyMetersPerSecond * swerveDrive.getHeading().unaryMinus().getSin(),
-        -roboRelSpeed.vxMetersPerSecond * swerveDrive.getHeading().unaryMinus().getSin()
-            + roboRelSpeed.vyMetersPerSecond * swerveDrive.getHeading().unaryMinus().getCos(),
+        roboRelSpeed.vxMetersPerSecond * heading.getCos()
+            + roboRelSpeed.vyMetersPerSecond * heading.getSin(),
+        -roboRelSpeed.vxMetersPerSecond * heading.getSin()
+            + roboRelSpeed.vyMetersPerSecond * heading.getCos(),
         roboRelSpeed.omegaRadiansPerSecond);
   }
 
