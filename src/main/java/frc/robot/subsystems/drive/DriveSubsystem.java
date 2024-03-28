@@ -517,6 +517,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "AI1":
           pose = Setpoints.AI1;
           break;
+        case "AI2":
+          pose = Setpoints.AI2;
+          break;
+        case "AI3":
+          pose = Setpoints.AI3;
+          break;
 
           // Wing Notes
         case "W1":

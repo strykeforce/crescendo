@@ -74,6 +74,10 @@ public class LedSubsystem extends MeasurableSubsystem {
     setColor(LedConstants.kGreen);
   }
 
+  public void setYellowish() {
+    setColor(LedConstants.kYellowish);
+  }
+
   public void setBlue() {
     setColor(LedConstants.kBlue);
   }
