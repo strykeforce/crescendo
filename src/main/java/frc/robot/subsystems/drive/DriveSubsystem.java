@@ -72,6 +72,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private boolean isMoveAndShoot = false;
 
   private boolean tuningYaw = false;
+  private double trackingSetpoint = 0.0;
 
   private boolean updateVision = true;
 
@@ -131,10 +132,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
       else if (isMoveAndShoot) vOmegaRadpsNew = getvOmegaToGoal(moveAndShootVirtualPose);
       else if (tuningYaw) {
         vOmegaRadpsNew = getvOmegaToGoal();
-      } else 
-      vOmegaRadpsNew = getvOmegaToGoal();
-      lastVelocity[0] = vYmps;
-      io.move(vXmps, vYmps, vOmegaRadpsNew, true);
+      } else vOmegaRadpsNew = getvOmegaToGoal();
+      io.move(
+          vXmps * (isMoveAndShoot ? DriveConstants.kMoveShootVelDetune : 1.0),
+          vYmps * (isMoveAndShoot ? DriveConstants.kMoveShootVelDetune : 1.0),
+          vOmegaRadpsNew,
+          true);
     }
   }
 
@@ -157,9 +160,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public double getvOmegaToGoal(Pose2d pos) {
-    return omegaShootTrackController.calculate(
-        pos.getRotation().getRadians(),
-        pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians());
+    trackingSetpoint = pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians();
+    return omegaShootTrackController.calculate(pos.getRotation().getRadians(), trackingSetpoint);
   }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
@@ -392,7 +394,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         Math.abs(wheelSpeed) <= DriveConstants.kMaxMoveShootVelocity
             && Math.abs(velXStableCounts) <= DriveConstants.kVelocityStableCounts
             && Math.abs(velYStableCounts) <= DriveConstants.kVelocityStableCounts;
-    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kMaxMoveGyroRateThreshold;
 
     return velStill
         && gyroStill
@@ -419,18 +421,19 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void setIsAligningShot(boolean isAligningShot) {
     this.isAligningShot = isAligningShot;
-    if (isAligningShot) resetOmegaController();
+    resetOmegaController();
   }
 
   public void setIsFeeding(boolean isFeeding) {
     this.isFeeding = isFeeding;
-    if (isFeeding) resetOmegaController();
+    resetOmegaController();
   }
 
   public void setIsMoveAndShoot(boolean isMoveAndShoot) {
     this.isMoveAndShoot = isMoveAndShoot;
-    if (isMoveAndShoot) resetOmegaController();
+    resetOmegaController();
   }
+
   public void setIsTuningYaw(boolean isTuningYaw) {
     this.tuningYaw = isTuningYaw;
     if (isTuningYaw) resetOmegaController();
@@ -438,7 +441,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public boolean getIsTuningYaw() {
     return this.tuningYaw;
-  
+  }
 
   public void setDriveState(DriveStates driveStates) {
     logger.info("{} -> {}", currDriveState, driveStates);
@@ -790,6 +793,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             "Angle For Goal",
             () ->
                 (getPoseMeters().getRotation().getDegrees()
-                    + getShooterAngleToSpeaker().getDegrees())));
+                    + getShooterAngleToSpeaker().getDegrees())),
+        new Measure("MoveShoot Angle", () -> trackingSetpoint));
   }
 }

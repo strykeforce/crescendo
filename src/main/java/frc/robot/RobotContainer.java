@@ -38,9 +38,7 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.drive.StopTuningYawCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
-import frc.robot.commands.drive.TuneYawCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowOffsetCommand;
@@ -62,6 +60,7 @@ import frc.robot.commands.robotState.DecendCommand;
 import frc.robot.commands.robotState.FeedCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
+import frc.robot.commands.robotState.MovingVisionShootCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.PodiumCommand;
 import frc.robot.commands.robotState.PositionShootCommand;
@@ -74,7 +73,6 @@ import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.UpdateElbowOffsetCommand;
-import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.commands.wrist.WriteWristToStowCommand;
@@ -814,16 +812,16 @@ public class RobotContainer {
     // magazineSubsystem));
 
     // Yaw Tuning
-    new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(
-            new TuneYawCommand(
-                () -> flysky.getFwd(),
-                () -> flysky.getStr(),
-                () -> flysky.getYaw(),
-                driveSubsystem,
-                robotStateSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(new StopTuningYawCommand(driveSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .onTrue(
+    //         new TuneYawCommand(
+    //             () -> flysky.getFwd(),
+    //             () -> flysky.getStr(),
+    //             () -> flysky.getYaw(),
+    //             driveSubsystem,
+    //             robotStateSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //     .onTrue(new StopTuningYawCommand(driveSubsystem));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -898,7 +896,7 @@ public class RobotContainer {
     // Vision Shoot
     new JoystickButton(driveJoystick, Button.M_SWH.id)
         .onTrue(
-            new VisionShootCommand(
+            new MovingVisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Release Game Piece Command

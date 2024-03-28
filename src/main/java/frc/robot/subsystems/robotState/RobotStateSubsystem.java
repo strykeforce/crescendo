@@ -64,7 +64,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double shootDelay = 0.0;
   private boolean hasShootBeamUnbroken = false;
 
-  private double[] shootSolution = new double[3];
+  private double[] shootSolution = new double[4];
 
   private Alliance allianceColor = Alliance.Blue;
 
@@ -238,6 +238,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     shootSolution[0] = shootingLookupTable[index][1]; // Left Shooter
     shootSolution[1] = shootingLookupTable[index][2]; // Right Shooter
     shootSolution[2] = shootingLookupTable[index][3] + elbowOffset; // Elbow
+    shootSolution[3] = shootingLookupTable[index][4];
     // logger.info(
     //     "Timestamp AFter Parsing Doubles: {}",
     //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
@@ -357,7 +358,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void startMovingShoot() {
-    usingDistance = true;
+    usingDistance = false;
     shootKnownPos = false;
     movingShoot = true;
 
@@ -366,10 +367,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
     ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
-    double[] shootSolution =
-        getShootSolution(
-            driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())),
-            shootingLookupTable);
+    getShootSolution(driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
 
     for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
       virtualT =
@@ -377,12 +375,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
               new Translation2d(
                   speeds.vxMetersPerSecond * shootSolution[3],
                   speeds.vyMetersPerSecond * shootSolution[3]));
-      shootSolution =
-          getShootSolution(
-              driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())),
-              shootingLookupTable);
+      getShootSolution(driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
     }
-
     driveSubsystem.setMoveAndShootVirtualPose(
         new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation()));
     magazineSubsystem.setSpeed(0.0);
@@ -722,10 +716,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         // Approximate future position of robot
         Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
         ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
-        double[] shootSolution =
-            getShootSolution(
-                driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())),
-                shootingLookupTable);
+        getShootSolution(
+            driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
 
         for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
           virtualT =
@@ -733,10 +725,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                   new Translation2d(
                       speeds.vxMetersPerSecond * shootSolution[3],
                       speeds.vyMetersPerSecond * shootSolution[3]));
-          shootSolution =
-              getShootSolution(
-                  driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())),
-                  shootingLookupTable);
+          getShootSolution(
+              driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
         }
 
         superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);

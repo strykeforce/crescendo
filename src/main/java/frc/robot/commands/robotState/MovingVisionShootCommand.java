@@ -32,6 +32,6 @@ public class MovingVisionShootCommand extends Command {
   public boolean isFinished() {
     RobotStates curState = robotStateSubsystem.getState();
 
-    return flag || (curState != RobotStates.SHOOTING && curState != RobotStates.TO_SHOOT);
+    return flag || (curState != RobotStates.SHOOTING && curState != RobotStates.TO_MOVING_SHOOT);
   }
 }
