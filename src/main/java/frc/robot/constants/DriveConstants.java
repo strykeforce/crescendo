@@ -137,7 +137,7 @@ public final class DriveConstants {
   public static final double kIMin = 0.0;
   public static final double kIMax = 0.0;
 
-  public static final double kPOmegaSpin = 9.0; // 4.5
+  public static final double kPOmegaSpin = 10.0; // 4.5
   public static final double kPOmega = 4.5; // 4.5
   public static final double kIOmega = 0.0;
   public static final double kDOmega = 0.0; // 0.001

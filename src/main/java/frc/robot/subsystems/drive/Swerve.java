@@ -79,6 +79,7 @@ public class Swerve implements SwerveIO, Checkable {
       configurator.apply(DriveConstants.getDriveTalonConfig());
       driveTalon.getSupplyVoltage().setUpdateFrequency(100);
       driveTalon.getSupplyCurrent().setUpdateFrequency(100);
+      driveTalon.getClosedLoopReference().setUpdateFrequency(200);
 
       swerveModules[i] =
           moduleBuilder

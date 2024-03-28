@@ -78,11 +78,7 @@ public class TuneYawCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return Math.abs(
-                driveSubsystem.getPoseMeters().getRotation().getDegrees()
-                    - DriveConstants.kYawTuningTarget)
-            <= DriveConstants.kDegreesCloseEnough
-        || !driveSubsystem.getIsTuningYaw();
+    return false;
   }
 
   @Override

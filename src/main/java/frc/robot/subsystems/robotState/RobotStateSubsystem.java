@@ -62,6 +62,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double shootDelay = 0.0;
   private boolean hasShootBeamUnbroken = false;
 
+  private double[] shootSolution = new double[3];
+
   private Alliance allianceColor = Alliance.Blue;
 
   private boolean safeStow = false;
@@ -171,36 +173,42 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     try {
       CSVReader csvReader = new CSVReader(new FileReader(path));
       list = csvReader.readAll();
-      for (String[] sArr: list) {
-        double [] dArr = new double[sArr.length];
-        for (int i = 0; i < sArr.length; ++i)
-            dArr[i] = Double.parseDouble(sArr[i]);
+      int line = 0;
+      for (String[] sArr : list) {
+        if (line == 0) {
+          line++;
+          continue;
+        }
+        double[] dArr = new double[sArr.length];
+        for (int i = 0; i < sArr.length; ++i) dArr[i] = Double.parseDouble(sArr[i]);
         listD.add(dArr);
-      } 
-        
+      }
+
     } catch (Exception e) {
       logger.warn("Failed to read lookup table at {} due to {}", path, e);
     }
-    
-    double[][] doubleArr = new double[list.size()][];
+
+    double[][] doubleArr = new double[listD.size()][];
     lookupTable = listD.toArray(doubleArr);
 
     return lookupTable;
   }
 
-  private double[] getShootSolution(double distance, double[][] lookupTable) {
-    double[] shootSolution = new double[3];
+  private void getShootSolution(double distance) {
+    // logger.info(
+    //     "Timestamp Before Starting Parse: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
     int index;
     distance += RobotStateConstants.kDistanceOffset;
     grabbedShotDistance = distance;
     if (distance < RobotStateConstants.kLookupMinDistance) {
-      index = 1;
+      index = 0;
       logger.warn(
           "Distance {} is less than min distance in table {}",
           distance,
           RobotStateConstants.kLookupMinDistance);
     } else if (distance > RobotStateConstants.kLookupMaxDistance) {
-      index = lookupTable.length - 1;
+      index = shootingLookupTable.length - 1;
       logger.warn(
           "Distance {} is more than max distance in table {}",
           distance,
@@ -210,9 +218,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           (int)
               ((distance - RobotStateConstants.kLookupMinDistance)
                       / RobotStateConstants.kDistanceIncrement
-                  + 1.0);
-      logger.info(
-          "Distance: {} | Measured {}", lookupTable[index][0], distance);
+                  + 0.0);
+      //   logger.info("Distance: {} | Measured {}", shootingLookupTable[index][0], distance);
       /*
        * index =
        * (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
@@ -220,19 +227,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
        */
     }
 
-    logger.info("Left Shooter: {}", lookupTable[index][1]);
+    // logger.info("Left Shooter: {}", shootingLookupTable[index][1]);
 
-    logger.info(
-        "Timestamp Before Parsing Doubles: {}",
-        org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
-    shootSolution[0] = lookupTable[index][1]; // Left Shooter
-    shootSolution[1] = lookupTable[index][2]; // Right Shooter
-    shootSolution[2] = lookupTable[index][3] + elbowOffset; // Elbow
-    logger.info(
-        "Timestamp AFter Parsing Doubles: {}",
-        org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
-
-    return shootSolution;
+    // logger.info(
+    //     "Timestamp Before Parsing Doubles: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+    shootSolution[0] = shootingLookupTable[index][1]; // Left Shooter
+    shootSolution[1] = shootingLookupTable[index][2]; // Right Shooter
+    shootSolution[2] = shootingLookupTable[index][3] + elbowOffset; // Elbow
+    // logger.info(
+    //     "Timestamp AFter Parsing Doubles: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
   }
 
   public boolean getIsAuto() {
@@ -287,8 +292,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     driveSubsystem.setIsAligningShot(false);
 
-    double[] shootSolution =
-        getShootSolution(driveSubsystem.getDistanceToSpeaker(pos), shootingLookupTable);
+    getShootSolution(driveSubsystem.getDistanceToSpeaker(pos));
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -314,8 +318,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void spinUpShotSolution(Pose2d pose) {
     shootPos = pose;
-    double[] shootSolution =
-        getShootSolution(driveSubsystem.getDistanceToSpeaker(pose), shootingLookupTable);
+    getShootSolution(driveSubsystem.getDistanceToSpeaker(pose));
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     setState(RobotStates.SPIN_UP);
   }
@@ -325,8 +328,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     shootKnownPos = false;
     driveSubsystem.setIsAligningShot(true);
 
-    double[] shootSolution =
-        getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
+    getShootSolution(driveSubsystem.getDistanceToSpeaker());
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -339,7 +341,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     usingDistance = true;
     shootKnownPos = false;
 
-    double[] shootSolution = getShootSolution(distance, shootingLookupTable);
+    getShootSolution(distance);
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -616,23 +618,21 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_SHOOT:
         if (!usingDistance && !shootKnownPos) {
-          logger.info(
-              "Timestamp Before Shot Sol: {}",
-              org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
-          double[] shootSolution =
-              getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
-          logger.info(
-              "Timestamp After Shot Sol Before Shoot: {}",
-              org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+          //   logger.info(
+          //       "Timestamp Before Shot Sol: {}",
+          //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+          getShootSolution(driveSubsystem.getDistanceToSpeaker());
+          //   logger.info(
+          //       "Timestamp After Shot Sol Before Shoot: {}",
+          //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
-          logger.info(
-              "Timestamp After Shoot: {}",
-              org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+          //   logger.info(
+          //       "Timestamp After Shoot: {}",
+          //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
         }
 
         if (shootKnownPos) {
-          double[] shootSolution =
-              getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos), shootingLookupTable);
+          getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos));
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
           double vomega = driveSubsystem.getvOmegaToGoal(shootPos);
           driveSubsystem.move(0, 0, vomega, true);
@@ -642,15 +642,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           double vomega = driveSubsystem.getvOmegaToGoal();
           driveSubsystem.move(0, 0, vomega, true);
         }
-        logger.info(
-            "Timestamp Before Conditions: {}",
-            org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+        // logger.info(
+        //     "Timestamp Before Conditions: {}",
+        //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
         if (driveSubsystem.isDriveStill()
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
-          logger.info(
-              "Timestamp After Conditions: {}",
-              org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+          //   logger.info(
+          //       "Timestamp After Conditions: {}",
+          //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
 
           if (!shootKnownPos) {
             org.littletonrobotics.junction.Logger.recordOutput(

@@ -43,6 +43,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final HolonomicDriveController holonomicController;
   private RobotStateSubsystem robotStateSubsystem;
 
+  private final PIDController omegaShootTrackController;
   private final ProfiledPIDController omegaSpinController;
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
@@ -67,6 +68,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     this.io = io;
 
     // Setup omega Controller
+    omegaShootTrackController =
+        new PIDController(
+            DriveConstants.kPOmegaSpin, DriveConstants.kIOmega, DriveConstants.kDOmega);
+    omegaShootTrackController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
     omegaSpinController =
         new ProfiledPIDController(
             DriveConstants.kPOmegaSpin,
@@ -109,14 +114,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
       double vOmegaRadpsNew;
       if (isFeeding) vOmegaRadpsNew = getvOmegaToFeedTarget();
       else if (tuningYaw) {
-        vOmegaRadpsNew = getvOmegaToTarget(Rotation2d.fromDegrees(DriveConstants.kYawTuningTarget));
+        vOmegaRadpsNew = getvOmegaToGoal();
       } else vOmegaRadpsNew = getvOmegaToGoal();
       io.move(vXmps, vYmps, vOmegaRadpsNew, true);
     }
   }
 
   public double getvOmegaToGoal() {
-    return omegaSpinController.calculate(
+    return omegaShootTrackController.calculate(
         getPoseMeters().getRotation().getRadians(),
         getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
   }
@@ -134,7 +139,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public double getvOmegaToGoal(Pose2d pos) {
-    return omegaController.calculate(
+    return omegaShootTrackController.calculate(
         pos.getRotation().getRadians(),
         pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians());
   }
@@ -184,6 +189,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
+    omegaShootTrackController.reset();
   }
 
   public void setHolonomicControllerTranslationkP(double kP) {
@@ -194,6 +200,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void resetOmegaController() {
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
+    omegaShootTrackController.reset();
   }
 
   // Getters/Setters
@@ -324,15 +331,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isDriveStill() {
-    logger.info(
-        "Timestamp Before FieldRel: {}",
-        org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+    // logger.info(
+    //     "Timestamp Before FieldRel: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
     ChassisSpeeds cs = getFieldRelSpeed();
     double vX = cs.vxMetersPerSecond;
     double vY = cs.vyMetersPerSecond;
-    logger.info(
-        "Timestamp After FieldRel: {}",
-        org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+    // logger.info(
+    //     "Timestamp After FieldRel: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
 
     // Take fieldRel Speed and get the magnitude of the vector
     double wheelSpeed = FastMath.hypot(vX, vY);
@@ -645,7 +652,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // Log Outputs FIXME
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Odometry", inputs.poseMeters);
     org.littletonrobotics.junction.Logger.recordOutput(
-        "ShootingData/AngleToGoal", getShooterAngleToSpeaker());
+        "ShootingData/AngleToGoal", getShooterAngleToSpeaker().getDegrees());
     org.littletonrobotics.junction.Logger.recordOutput(
         "ShootingData/DistanceToGoal", getDistanceToSpeaker());
 
@@ -702,6 +709,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("YAW Vel", () -> lastVelocity[2]),
         new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()),
         new Measure("Distance to goal", () -> getDistanceToSpeaker()),
-        new Measure("Is Yaw Tuning", () -> getIsTuningYaw() ? 1 : 0));
+        new Measure("Is Yaw Tuning", () -> getIsTuningYaw() ? 1 : 0),
+        new Measure(
+            "Angle For Goal",
+            () ->
+                (getPoseMeters().getRotation().getDegrees()
+                    + getShooterAngleToSpeaker().getDegrees())));
   }
 }

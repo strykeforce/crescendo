@@ -33,7 +33,7 @@ public class WristSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     setpoint = position;
     curState = WristStates.MOVING;
 
-    logger.info("Wrist moving to {} ticks", setpoint);
+    // logger.info("Wrist moving to {} ticks", setpoint);
   }
 
   public void setPct(double pct) {
