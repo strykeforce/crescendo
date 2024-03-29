@@ -11,7 +11,10 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.GyroTrimConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.MountPoseConfigs;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -31,6 +34,8 @@ public final class DriveConstants {
   public static final double kFieldMaxY = 8.21055; // m
 
   public static final int kTalonConfigTimeout = 10; // ms
+
+  public static final int kPigeonCanID = 4;
 
   public static final double kRobotLength = 0.5461;
   public static final double kRobotWidth = 0.6922;
@@ -127,6 +132,20 @@ public final class DriveConstants {
     driveConfig.MotorOutput = motorConfigs;
 
     return driveConfig;
+  }
+
+  public static Pigeon2Configuration getPigeon2Configuration() {
+    Pigeon2Configuration config = new Pigeon2Configuration();
+
+    config.MountPose.MountPoseYaw = -90.0;
+    config.MountPose.MountPoseRoll = 0.0;
+    config.MountPose.MountPosePitch = 0.0;
+
+    config.GyroTrim.GyroScalarX = 0.0;
+    config.GyroTrim.GyroScalarY = 0.0;
+    config.GyroTrim.GyroScalarZ = -2.12;
+
+    return config;
   }
 
   // Holonomic Controller Constants
