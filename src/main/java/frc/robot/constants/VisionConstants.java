@@ -38,20 +38,23 @@ public final class VisionConstants {
   public static final double FOV45SinlgeTagCoeff = 16.0 / 100.0;
 
   // Constants for cameras
-  public static final int kNumCams = 3;
+  public static final int kNumCams = 4;
 
   // Names
   public static final String kCam1Name = "Shooter";
   public static final String kCam2Name = "Intake";
-  public static final String kCam3Name = "SecondShooter";
+  public static final String kCam3Name = "AngledShooterLeft";
+  public static final String kCam4Name = "AngledShooterRight";
 
   public static final String kPi1Name = "Shooter";
   public static final String kPi2Name = "Intake";
+  public static final String kPi3Name = "AngledShooters";
 
   // Indexs
   public static final int kCam1Idx = 0;
-  public static final int kCam2Idx = 1;
+  public static final int kCam2Idx = 0;
   public static final int kCam3Idx = 0;
+  public static final int kCam4Idx = 1;
 
   public static final double kLoopTime = 0.02;
   public static final int kCircularBufferSize = 1000;

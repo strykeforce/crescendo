@@ -46,12 +46,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
   };
 
   String[] names = {
-    VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name
+    VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name, VisionConstants.kCam4Name
   };
 
-  String[] Pinames = {VisionConstants.kPi1Name, VisionConstants.kPi2Name, VisionConstants.kPi2Name};
+  String[] Pinames = {VisionConstants.kPi1Name, VisionConstants.kPi2Name, VisionConstants.kPi3Name, VisionConstants.kPi3Name};
 
-  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx, VisionConstants.kCam3Idx};
+  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx, VisionConstants.kCam3Idx, VisionConstants.kCam4Idx};
 
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
   boolean visionUpdates = true;
