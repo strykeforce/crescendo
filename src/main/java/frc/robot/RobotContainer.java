@@ -232,7 +232,8 @@ public class RobotContainer {
             elbowSubsystem,
             wristSubsystem,
             shooterSubsystem,
-            pathHandler);
+            pathHandler,
+            deadEyeSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
     nonAmpAutonPath =

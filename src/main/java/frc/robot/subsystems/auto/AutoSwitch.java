@@ -24,6 +24,7 @@ import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,7 @@ public class AutoSwitch extends MeasurableSubsystem {
   private int curAutoSwitchPos = -1;
   private int newAutoSwitchPos;
   private int autoSwitchStableCounts = 0;
+  private DeadEyeSubsystem deadeye;
 
   public AutoSwitch(
       RobotStateSubsystem robotStateSubsystem,
@@ -68,7 +70,8 @@ public class AutoSwitch extends MeasurableSubsystem {
       ElbowSubsystem elbowSubsystem,
       WristSubsystem wristSubsystem,
       ShooterSubsystem shooterSubsystem,
-      PathHandler pathHandler) {
+      PathHandler pathHandler,
+      DeadEyeSubsystem deadeye) {
     this.robotStateSubsystem = robotStateSubsystem;
     this.superStructure = superStructure;
     this.magazineSubsystem = magazineSubsystem;
@@ -79,6 +82,7 @@ public class AutoSwitch extends MeasurableSubsystem {
     this.wristSubsystem = wristSubsystem;
     this.shooterSubsystem = shooterSubsystem;
     this.pathHandler = pathHandler;
+    this.deadeye = deadeye;
 
     for (int i = RobotConstants.kMinAutoSwitchID; i <= RobotConstants.kMaxAutoSwitchID; i++) {
       switchInputs.add(new DigitalInput(i));
@@ -222,6 +226,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             intakeSubsystem,
             elbowSubsystem,
             pathHandler,
+            deadeye,
             "NonAmpInitial1_MiddleNote3",
             AutonConstants.kNonAmpPathMatrix,
             List.of(3, 4, 5),
@@ -236,6 +241,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             intakeSubsystem,
             elbowSubsystem,
             pathHandler,
+            deadeye,
             "NonAmpInitial1_MiddleNote4",
             AutonConstants.kNonAmpPathMatrix,
             List.of(4, 3, 5),
@@ -250,6 +256,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             intakeSubsystem,
             elbowSubsystem,
             pathHandler,
+            deadeye,
             "NonAmpInitial1_MiddleNote5",
             AutonConstants.kNonAmpPathMatrix,
             List.of(5, 4, 3),

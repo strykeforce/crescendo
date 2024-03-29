@@ -87,6 +87,7 @@ public class Robot extends LoggedRobot {
         .withSize(1, 1)
         .withPosition(2, 0);
     logger.info("robotinit");
+    m_robotContainer.enableDeadeye();
   }
 
   @Override

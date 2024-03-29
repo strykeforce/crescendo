@@ -58,10 +58,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
   private boolean isFeeding = false;
+  private boolean deadEYEAutoDrive = false;
 
   private boolean updateVision = true;
 
   public DriveSubsystem(SwerveIO io) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
     this.io = io;
 
     // Setup omega Controller
@@ -140,6 +143,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
+  public void recordYVel(double val) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", val);
+  }
+
+  public void setDeadEyeDrive(boolean val) {
+    deadEYEAutoDrive = val;
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", deadEYEAutoDrive);
+  }
+
   // Holonomic Controller
   public void calculateController(State desiredState, Rotation2d desiredAngle) {
     holoContInput = desiredState;
@@ -152,6 +164,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
         holoContOutput.vyMetersPerSecond,
         holoContOutput.omegaRadiansPerSecond,
         false);
+  }
+
+  public void driveAutonXController(State desiredState, Rotation2d desiredAngle, double driveY) {
+    holoContInput = desiredState;
+    holoContAngle = desiredAngle;
+    holoContOutput = holonomicController.calculate(inputs.poseMeters, desiredState, desiredAngle);
+    // logger.info("input: {}, output: {}, angle: {}", holoContInput,
+    // holoContOutput, desiredAngle);
+    io.move(holoContOutput.vxMetersPerSecond, driveY, holoContOutput.omegaRadiansPerSecond, false);
   }
 
   public void resetOdometry(Pose2d pose) {

@@ -202,19 +202,45 @@ public class PathHandler extends MeasurableSubsystem {
           break;
         case DRIVE_FETCH:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
+          double curX = driveSubsystem.getPoseMeters().getX();
+          if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * 0.50)
+              && ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                      && curX >= AutonConstants.kSwitchXLine)
+                  || (robotStateSubsystem.getAllianceColor() == Alliance.Red
+                      && curX <= DriveConstants.kFieldMaxX - AutonConstants.kSwitchXLine))) {
+
+            // driveSubsystem.drive(0, 0, 0);
+            logger.info("DRIVE_FETCH -> END_PATH");
+            // timer.reset();
+            // timer.start();
+            curState = PathStates.END_PATH;
+            deadeyeYDrive.reset(
+                deadeye.getDistanceToCamCenter());
+            // driveSubsystem.setEnableHolo(false);
+            // driveSubsystem.grapherTrajectoryActive(false);
+          }
+
+          break;
+        case END_PATH:
+          double yVel =
+              deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0)
+                  * (robotStateSubsystem.getAllianceColor() == Alliance.Red ? -1.0 : 1.0);
+          driveSubsystem.recordYVel(yVel);
+          if (deadeye.getNumTargets() > 0)
+            driveSubsystem.driveAutonXController(
+                curTrajectory.sample(timer.get()), robotHeading, yVel);
+          else driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
 
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
-
             driveSubsystem.drive(0, 0, 0);
-            logger.info("DRIVE_FETCH -> FETCH");
+            deadeyeYDrive.reset(deadeye.getDistanceToCamCenter(), 0.0);
+            logger.info("END_PATH -> FETCH");
             timer.reset();
             timer.start();
             curState = PathStates.FETCH;
             driveSubsystem.setEnableHolo(false);
             driveSubsystem.grapherTrajectoryActive(false);
           }
-
-          break;
 
         case FETCH:
           if ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
@@ -248,7 +274,8 @@ public class PathHandler extends MeasurableSubsystem {
             startNewPath(nextPath);
           }
 
-          if (timer.hasElapsed(AutonConstants.kDelayForPickup)) {
+          if (timer.hasElapsed(AutonConstants.kDelayForDeadeye)
+              || deadeye.getNumTargets() < 0 && timer.hasElapsed(AutonConstants.kDelayForPickup)) {
             if (noteOrder.size() > 1) {
               nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
               nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
@@ -309,6 +336,7 @@ public class PathHandler extends MeasurableSubsystem {
   public enum PathStates {
     SHOOT,
     FETCH,
+    END_PATH,
     DRIVE_FETCH,
     DRIVE_SHOOT,
     DONE
