@@ -64,6 +64,6 @@ public class TestDeadeyeCleanUpCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return timeOut.hasElapsed(AutonConstants.kDelayForPickup) || robotStateSubsystem.hasNote();
+    return timeOut.hasElapsed(AutonConstants.kDelayForDeadeye) || robotStateSubsystem.hasNote();
   }
 }

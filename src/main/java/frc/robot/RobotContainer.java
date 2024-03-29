@@ -305,6 +305,10 @@ public class RobotContainer {
     deadEyeSubsystem.setCamEnabled(true);
   }
 
+  public double getCenterPixels() {
+    return deadEyeSubsystem.getDistanceToCamCenter();
+  }
+
   public void killPathHandler() {
     pathHandler.killPathHandler();
   }

@@ -1,7 +1,11 @@
 package frc.robot.subsystems.vision;
 
+import frc.robot.constants.VisionConstants;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Set;
 import org.strykeforce.deadeye.Deadeye;
+import org.strykeforce.deadeye.Rect;
 import org.strykeforce.deadeye.TargetListTargetData;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -31,7 +35,17 @@ public class DeadEyeSubsystem extends MeasurableSubsystem {
   }
 
   public double getDistanceToCamCenter() {
-    if (data.targets.size() > 0) return data.targetsOrderedByCenterX().get(0).center().x - centerX;
+    if (data == null) return 0.0;
+
+    ArrayList<Rect> validTargs = new ArrayList<Rect>();
+    for (Rect targ : data.targets) {
+      //   data.targetsOrderedByBottomRightX()
+      if (targ.center().y <= VisionConstants.kBumperPixelLine) validTargs.add(targ);
+    }
+    validTargs.sort(
+        Comparator.comparingInt(r -> -((Rect) r).center().y)
+            .thenComparingInt(r -> Math.abs(((int) centerX - ((Rect) r).center().x))));
+    if (validTargs.size() > 0) return validTargs.get(0).center().x - centerX;
     return 0.0;
   }
 

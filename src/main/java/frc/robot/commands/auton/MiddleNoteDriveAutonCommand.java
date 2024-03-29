@@ -103,8 +103,6 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
                       && curX >= AutonConstants.kSwitchXLine)
                   || (robotStateSubsystem.getAllianceColor() == Alliance.Red
                       && curX <= DriveConstants.kFieldMaxX - AutonConstants.kSwitchXLine))) {
-            deadeyeYDrive.reset(
-                deadeye.getDistanceToCamCenter());
             curState = DriveState.DEADEYE_DRIVE;
             driveSubsystem.setDeadEyeDrive(true);
             logger.info("NORM_DRIVE -> DEADEYE_DRIVE");
@@ -112,8 +110,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
           break;
 
         case DEADEYE_DRIVE:
-          double yVel =
-              deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
+          double yVel = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
           driveSubsystem.recordYVel(yVel);
           driveSubsystem.driveAutonXController(desiredState, robotHeading, yVel);
           break;

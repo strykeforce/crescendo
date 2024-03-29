@@ -211,20 +211,23 @@ public class PathHandler extends MeasurableSubsystem {
 
             // driveSubsystem.drive(0, 0, 0);
             logger.info("DRIVE_FETCH -> END_PATH");
+            deadeyeYDrive =
+                new ProfiledPIDController(
+                    AutonConstants.kPDeadEyeYDrive,
+                    AutonConstants.kIDeadEyeYDrive,
+                    AutonConstants.kDDeadEyeYDrive,
+                    new Constraints(
+                        AutonConstants.kMaxVelDeadeyeDrive, AutonConstants.kMaxAccelDeadeyeDrive));
             // timer.reset();
             // timer.start();
             curState = PathStates.END_PATH;
-            deadeyeYDrive.reset(
-                deadeye.getDistanceToCamCenter());
             // driveSubsystem.setEnableHolo(false);
             // driveSubsystem.grapherTrajectoryActive(false);
           }
 
           break;
         case END_PATH:
-          double yVel =
-              deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0)
-                  * (robotStateSubsystem.getAllianceColor() == Alliance.Red ? -1.0 : 1.0);
+          double yVel = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
           driveSubsystem.recordYVel(yVel);
           if (deadeye.getNumTargets() > 0)
             driveSubsystem.driveAutonXController(
@@ -233,7 +236,6 @@ public class PathHandler extends MeasurableSubsystem {
 
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
             driveSubsystem.drive(0, 0, 0);
-            deadeyeYDrive.reset(deadeye.getDistanceToCamCenter(), 0.0);
             logger.info("END_PATH -> FETCH");
             timer.reset();
             timer.start();
@@ -241,7 +243,7 @@ public class PathHandler extends MeasurableSubsystem {
             driveSubsystem.setEnableHolo(false);
             driveSubsystem.grapherTrajectoryActive(false);
           }
-
+          break;
         case FETCH:
           if ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
                   && driveSubsystem.getPoseMeters().getX()
@@ -275,7 +277,7 @@ public class PathHandler extends MeasurableSubsystem {
           }
 
           if (timer.hasElapsed(AutonConstants.kDelayForDeadeye)
-              || deadeye.getNumTargets() < 0 && timer.hasElapsed(AutonConstants.kDelayForPickup)) {
+              || deadeye.getNumTargets() == 0 && timer.hasElapsed(AutonConstants.kDelayForPickup)) {
             if (noteOrder.size() > 1) {
               nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
               nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
