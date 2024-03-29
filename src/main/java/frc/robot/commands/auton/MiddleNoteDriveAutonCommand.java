@@ -98,7 +98,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
         case NORM_DRIVE:
           driveSubsystem.calculateController(desiredState, robotHeading);
           if (deadeye.getNumTargets() > 0
-              && timer.hasElapsed(trajectory.getTotalTimeSeconds() * 0.50)
+              && timer.hasElapsed(trajectory.getTotalTimeSeconds() * AutonConstants.kPercentLeft)
               && ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
                       && curX >= AutonConstants.kSwitchXLine)
                   || (robotStateSubsystem.getAllianceColor() == Alliance.Red

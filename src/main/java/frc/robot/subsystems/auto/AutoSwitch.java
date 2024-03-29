@@ -184,7 +184,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
-            elbowSubsystem);
+            elbowSubsystem,
+            deadeye);
       case 0x12:
         return new FastAmpMid_5PieceM2Command(
             driveSubsystem,
@@ -192,7 +193,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             superStructure,
             magazineSubsystem,
             intakeSubsystem,
-            elbowSubsystem);
+            elbowSubsystem,
+            deadeye);
       case 0x20:
         return new NonAmpAutoCommand(
             driveSubsystem,

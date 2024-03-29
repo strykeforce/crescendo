@@ -25,6 +25,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.vision.DeadEyeSubsystem;
 
 public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -33,13 +34,14 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
   private DriveAutonCommand wingNote3MidInit;
   private DriveAutonCommand midInitWingNote2;
   private DriveAutonCommand wingNote2WingNote1;
-  private DriveAutonCommand wingNote1MidNote1;
+  private MiddleNoteDriveAutonCommand wingNote1MidNote1;
   private DriveAutonCommand midNote1ShootPos;
   private PositionShootCommand midShootCommand;
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
   private ElbowSubsystem elbowSubsystem;
+  private DeadEyeSubsystem deadeye;
 
   public FastAmpMid_5PieceCommand(
       DriveSubsystem driveSubsystem,
@@ -47,9 +49,11 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
-      ElbowSubsystem elbowSubsystem) {
+      ElbowSubsystem elbowSubsystem,
+      DeadEyeSubsystem deadeye) {
     this.robotStateSubsystem = robotStateSubsystem;
     this.elbowSubsystem = elbowSubsystem;
+    this.deadeye = deadeye;
 
     midInitWingNote3 =
         new DriveAutonCommand(driveSubsystem, "MiddleInitial1_WingNote3", true, true);
@@ -59,7 +63,9 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
         new DriveAutonCommand(driveSubsystem, "MiddleInitial1_WingNote2", true, false);
     wingNote2WingNote1 =
         new DriveAutonCommand(driveSubsystem, "WingNote2_WingNote1_A", true, false);
-    wingNote1MidNote1 = new DriveAutonCommand(driveSubsystem, "WingNote1_MiddleNote1", true, false);
+    wingNote1MidNote1 =
+        new MiddleNoteDriveAutonCommand(
+            driveSubsystem, robotStateSubsystem, deadeye, "WingNote1_MiddleNote1", true, false);
     midNote1ShootPos =
         new DriveAutonCommand(driveSubsystem, "MiddleNote1_MiddleShoot", true, false);
     midShootCommand =

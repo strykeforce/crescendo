@@ -40,6 +40,7 @@ public class PathHandler extends MeasurableSubsystem {
   private Timer timer = new Timer();
   private Rotation2d robotHeading;
   private Trajectory curTrajectory;
+  private boolean deadeyeFlag = false;
 
   private ProfiledPIDController deadeyeYDrive;
   private PIDController deadeyeXDrive;
@@ -203,7 +204,7 @@ public class PathHandler extends MeasurableSubsystem {
         case DRIVE_FETCH:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
           double curX = driveSubsystem.getPoseMeters().getX();
-          if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * 0.50)
+          if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * AutonConstants.kPercentLeft)
               && ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
                       && curX >= AutonConstants.kSwitchXLine)
                   || (robotStateSubsystem.getAllianceColor() == Alliance.Red
@@ -252,6 +253,7 @@ public class PathHandler extends MeasurableSubsystem {
                   && driveSubsystem.getPoseMeters().getX()
                       >= DriveConstants.kFieldMaxX / 2 - AutonConstants.kMaxXOff)) {
             if (deadeye.getNumTargets() > 0) {
+              deadeyeFlag = true;
               double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
               double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
               driveSubsystem.move(
@@ -277,7 +279,10 @@ public class PathHandler extends MeasurableSubsystem {
           }
 
           if (timer.hasElapsed(AutonConstants.kDelayForDeadeye)
-              || deadeye.getNumTargets() == 0 && timer.hasElapsed(AutonConstants.kDelayForPickup)) {
+              || deadeye.getNumTargets() == 0
+                  && !deadeyeFlag
+                  && timer.hasElapsed(AutonConstants.kDelayForPickup)) {
+            deadeyeFlag = false;
             if (noteOrder.size() > 1) {
               nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
               nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
