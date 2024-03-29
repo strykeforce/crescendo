@@ -70,6 +70,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean usingDistance = false;
   private boolean isAuto = false;
   private boolean shootKnownPos = false;
+  private boolean inWaitForUnbreakMode = false;
   private Pose2d shootPos;
   private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
@@ -470,10 +471,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineShootDelayTimer.start();
 
       setState(RobotStates.PODIUM_SHOOTING);
-    } else {
+    } else if (curState == RobotStates.AMP) {
       safeStow = false;
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
+    } else {
+      toFixedFeeding();
     }
     ledSubsystem.setOff();
   }
@@ -529,12 +532,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case INTAKING:
         if (intakeSubsystem.getState() == IntakeState.HAS_PIECE) {
-          ledSubsystem.setYellowish();
+          ledSubsystem.setGreen();
         }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
-          ledSubsystem.setGreen();
+          ledSubsystem.setBlue();
           toStow();
         }
         if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
@@ -642,6 +645,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           curShot += 1;
           hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
           if (isAuto) {
             ledSubsystem.setBlue();
           }
@@ -658,7 +662,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.start();
           hasShootBeamUnbroken = true;
         }
-        if (hasShootBeamUnbroken) {
+        if (shootDelayTimer.hasElapsed(RobotStateConstants.kShootDelay) && !inWaitForUnbreakMode) {
+          inWaitForUnbreakMode = true;
+        }
+        if (hasShootBeamUnbroken && inWaitForUnbreakMode) {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           driveSubsystem.setIsFeeding(false);
@@ -668,6 +675,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           ledSubsystem.setOff();
           toIntake();
           magazineSubsystem.setEmpty();
+          inWaitForUnbreakMode = false;
         }
 
         break;

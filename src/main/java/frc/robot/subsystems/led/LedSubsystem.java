@@ -13,6 +13,7 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class LedSubsystem extends MeasurableSubsystem {
 
   private LedState currState = LedState.OFF;
+  private int flameCounter = 0;
 
   private AddressableLED ledR = new AddressableLED(LedConstants.kRightLedPort);
   private AddressableLEDBuffer ledBufferR = new AddressableLEDBuffer(LedConstants.kRightLedLength);
@@ -74,10 +75,6 @@ public class LedSubsystem extends MeasurableSubsystem {
     setColor(LedConstants.kGreen);
   }
 
-  public void setYellowish() {
-    setColor(LedConstants.kYellowish);
-  }
-
   public void setBlue() {
     setColor(LedConstants.kBlue);
   }
@@ -96,14 +93,18 @@ public class LedSubsystem extends MeasurableSubsystem {
 
     switch (currState) {
       case FLAMING:
-        for (var i = 0; i < ledBufferR.getLength(); i++) {
-          ledBufferR.setRGB(i, (int) (Math.random() * 185), 250, 0);
+        flameCounter++;
+        if (flameCounter >= 3) {
+          for (var i = 0; i < ledBufferR.getLength(); i++) {
+            ledBufferR.setRGB(i, (int) (Math.random() * 185), 250, 0);
+          }
+          // for (var i = 0; i < ledBufferL.getLength(); i++) {
+          //   ledBufferL.setRGB(i, 250, (int) (Math.random() * 185), 0);
+          // }
+          ledR.setData(ledBufferR);
+          // ledL.setData(ledBufferL);
+          flameCounter = 0;
         }
-        // for (var i = 0; i < ledBufferL.getLength(); i++) {
-        //   ledBufferL.setRGB(i, 250, (int) (Math.random() * 185), 0);
-        // }
-        ledR.setData(ledBufferR);
-        // ledL.setData(ledBufferL);
 
         break;
       case SOLID:

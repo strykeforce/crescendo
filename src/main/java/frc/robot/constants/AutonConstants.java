@@ -65,7 +65,8 @@ public final class AutonConstants {
         new Pose2d(1.47, 5.55, Rotation2d.fromDegrees(0.0)); // 1.34 on x
     public static final Pose2d AI1 = new Pose2d(1.09, 6.94, Rotation2d.fromDegrees(50));
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
-    public static final Pose2d AI3 = new Pose2d(1.45, 7.61, Rotation2d.fromDegrees(0.0)); //FIXME empty start location
+    public static final Pose2d AI3 =
+        new Pose2d(1.45, 7.61, Rotation2d.fromDegrees(0.0)); // FIXME empty start location
     public static final Pose2d NAI1 = new Pose2d(1.00, 4.19, Rotation2d.fromDegrees(-50));
     // 0.96 4.156
 
@@ -95,6 +96,6 @@ public final class AutonConstants {
   public static final double kAI1ToSpeakerDist = 1.2;
   public static final double kNAI1ToSpeakerDist =
       Math.hypot(Setpoints.NAI1.getX(), Setpoints.NAI1.getY() - RobotStateConstants.kSpeakerY);
-  
+
   public static final double kAutonLineX = 1.93294;
 }

@@ -12,5 +12,5 @@ target_yaw = -90.0 #degrees
     angle = 0
 
 [[internal_points]]
-    x = 
-    y = 
+    x = 3.225
+    y = 7.61
