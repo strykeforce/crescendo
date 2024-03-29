@@ -143,8 +143,6 @@ public final class DriveConstants {
     config.GyroTrim.GyroScalarY = 0.0;
     config.GyroTrim.GyroScalarZ = -2.12;
 
-    
-
     return config;
   }
 

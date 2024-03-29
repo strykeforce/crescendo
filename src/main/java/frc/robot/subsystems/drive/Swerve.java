@@ -15,11 +15,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.SPI;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import java.util.function.BooleanSupplier;
-import org.strykeforce.gyro.SF_PIGEON2;
+import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.healthcheck.Checkable;
 import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
@@ -35,7 +36,8 @@ public class Swerve implements SwerveIO, Checkable {
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;
 
-  private SF_PIGEON2 pigeon;
+  // private SF_PIGEON2 pigeon;
+  private SF_AHRS ahrs;
 
   private TalonFXConfigurator configurator;
 
@@ -86,9 +88,10 @@ public class Swerve implements SwerveIO, Checkable {
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
 
-    pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "*");
-    pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
-    swerveDrive = new SwerveDrive(false, 0.02, pigeon, swerveModules);
+    // pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "*");
+    // pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
+    ahrs = new SF_AHRS(SPI.Port.kMXP, 2_000_000, (byte) 200);
+    swerveDrive = new SwerveDrive(false, 0.02, ahrs, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
 
@@ -199,12 +202,12 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.odometryY = swerveDrive.getPoseMeters().getY();
     inputs.odometryRotation2D = swerveDrive.getPoseMeters().getRotation().getDegrees();
     inputs.gyroRotation2d = swerveDrive.getHeading();
-    inputs.gyroPitch = pigeon.getPitch();
-    inputs.gyroRoll = pigeon.getRoll();
+    inputs.gyroPitch = ahrs.getPitch();
+    inputs.gyroRoll = ahrs.getRoll();
     inputs.gyroRate = swerveDrive.getGyroRate();
-    inputs.isConnected = pigeon.getPigeon2().getUpTime().hasUpdated();
+    inputs.isConnected = ahrs.isConnected();
     inputs.poseMeters = swerveDrive.getPoseMeters();
-    inputs.updateCount = pigeon.getPigeon2().getTemperature().getValueAsDouble();
+    inputs.updateCount = ahrs.getUpdateCount();
     for (int i = 0; i < 4; ++i) {
       inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
       inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
@@ -214,6 +217,6 @@ public class Swerve implements SwerveIO, Checkable {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     swerveDrive.registerWith(telemetryService);
-    pigeon.registerWith(telemetryService);
+    // pigeon.registerWith(telemetryService);
   }
 }

@@ -45,8 +45,6 @@ import frc.robot.commands.elbow.ClosedLoopElbowOffsetCommand;
 import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
 import frc.robot.commands.elbow.OpenLoopElbowCommand;
-import frc.robot.commands.elbow.SetElbowHasZeroedCommand;
-import frc.robot.commands.elbow.SetTrustElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.elbow.ZeroRecoveryElbowCommand;
 import frc.robot.commands.intake.OpenLoopIntakeCommand;
@@ -354,10 +352,10 @@ public class RobotContainer {
         .add("Turn Intake Off", new OpenLoopIntakeCommand(intakeSubsystem, 0.0))
         .withSize(1, 1)
         .withPosition(5, 1);
-    Shuffleboard.getTab("Pit")
-        .add("Set Zero Elbow False", new SetElbowHasZeroedCommand(elbowSubsystem, false))
-        .withSize(1, 1)
-        .withPosition(5, 0);
+    // Shuffleboard.getTab("Pit")
+    //     .add("Set Zero Elbow False", new SetElbowHasZeroedCommand(elbowSubsystem, false))
+    //     .withSize(1, 1)
+    //     .withPosition(5, 0);
     Shuffleboard.getTab("Pit")
         .add(
             "Stow",
@@ -555,10 +553,10 @@ public class RobotContainer {
     //     .addBoolean("Elbow Limit Switch On", () -> elbowSubsystem.getRevLimitSwitch())
     //     .withSize(1, 1)
     //     .withPosition(7, 1);
-    Shuffleboard.getTab("Match")
-        .addDouble("Elbow Pos", () -> elbowSubsystem.getHighResPos())
-        .withSize(1, 1)
-        .withPosition(7, 1);
+    // Shuffleboard.getTab("Match")
+    //     .addDouble("Elbow Pos", () -> elbowSubsystem.getHighResPos())
+    //     .withSize(1, 1)
+    //     .withPosition(7, 1);
 
     Shuffleboard.getTab("Match")
         .addBoolean("Is NavX Connected", () -> driveSubsystem.isNavxWorking())
@@ -639,22 +637,22 @@ public class RobotContainer {
         .add(new WriteWristToStowCommand(wristSubsystem))
         .withSize(1, 1)
         .withPosition(4, 2);
-    Shuffleboard.getTab("Debug")
-        .addBoolean("Is Elbow Ok?", () -> elbowSubsystem.isElbowConnected())
-        .withSize(1, 1)
-        .withPosition(3, 0);
+    // Shuffleboard.getTab("Debug")
+    //     .addBoolean("Is Elbow Ok?", () -> elbowSubsystem.isElbowConnected())
+    //     .withSize(1, 1)
+    //     .withPosition(3, 0);
     Shuffleboard.getTab("Debug")
         .addDouble("ElbowPos", () -> elbowSubsystem.getPosition())
         .withSize(1, 1)
         .withPosition(3, 3);
-    Shuffleboard.getTab("Debug")
-        .add("STOP ELBOW", new SetTrustElbowCommand(elbowSubsystem, true))
-        .withSize(1, 1)
-        .withPosition(3, 1);
-    Shuffleboard.getTab("Debug")
-        .add("START ELBOW", new SetTrustElbowCommand(elbowSubsystem, false))
-        .withSize(1, 1)
-        .withPosition(3, 2);
+    // Shuffleboard.getTab("Debug")
+    //     .add("STOP ELBOW", new SetTrustElbowCommand(elbowSubsystem, true))
+    //     .withSize(1, 1)
+    //     .withPosition(3, 1);
+    // Shuffleboard.getTab("Debug")
+    //     .add("START ELBOW", new SetTrustElbowCommand(elbowSubsystem, false))
+    //     .withSize(1, 1)
+    //     .withPosition(3, 2);
   }
 
   public void configureTuningDashboard() {
