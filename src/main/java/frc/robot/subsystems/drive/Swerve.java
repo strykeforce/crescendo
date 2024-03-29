@@ -15,12 +15,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.SPI;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import java.util.function.BooleanSupplier;
-import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.gyro.SF_PIGEON2;
 import org.strykeforce.healthcheck.Checkable;
 import org.strykeforce.healthcheck.HealthCheck;
@@ -204,9 +202,9 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.gyroPitch = pigeon.getPitch();
     inputs.gyroRoll = pigeon.getRoll();
     inputs.gyroRate = swerveDrive.getGyroRate();
-    inputs.isConnected = pigeon.isConnected();
+    inputs.isConnected = pigeon.getPigeon2().getUpTime().hasUpdated();
     inputs.poseMeters = swerveDrive.getPoseMeters();
-    inputs.updateCount = pigeon.getTempC();
+    inputs.updateCount = pigeon.getPigeon2().getTemperature().getValueAsDouble();
     for (int i = 0; i < 4; ++i) {
       inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
       inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
