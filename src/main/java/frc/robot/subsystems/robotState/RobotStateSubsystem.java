@@ -20,7 +20,6 @@ import frc.robot.subsystems.led.LedSubsystem.LedState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
-import frc.robot.subsystems.superStructure.SuperStructure.SuperStructureStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
 import java.util.LinkedList;
@@ -70,6 +69,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean usingDistance = false;
   private boolean isAuto = false;
   private boolean shootKnownPos = false;
+  private boolean inDefense = false;
   private Pose2d shootPos;
   private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
@@ -226,6 +226,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return isAuto;
   }
 
+  public boolean getIsInDefense() {
+    return inDefense;
+  }
+
   public void setMagazineTune(double speed) {
     magazineTuneSpeed = speed;
   }
@@ -371,8 +375,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.setIsAligningShot(false);
     climbSubsystem.punchAir();
     ledSubsystem.setCandy();
-
-    setState(RobotStates.DEFENSE);
+    inDefense = true;
+    // setState(RobotStates.DEFENSE);
   }
 
   public void toPreparePodium() {
@@ -405,6 +409,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void prepareClimb() {
+    inDefense = false;
     magazineSubsystem.toPrepClimb();
     climbSubsystem.zero(true);
     climbSubsystem.extendForks();
@@ -414,6 +419,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void climb(boolean continueToTrap, boolean decendAfterTrap) {
+    inDefense = false;
     climbSubsystem.trapClimb();
     this.continueToTrap = continueToTrap;
     this.decendClimbAfterTrap = decendAfterTrap;
@@ -422,6 +428,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toTrap() {
+    inDefense = false;
     // climbSubsystem.extendTrapBar();
     superStructure.toTrap();
 
@@ -453,6 +460,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void postClimbStow() {
+    inDefense = false;
     toStow();
     climbSubsystem.retractForks();
     climbSubsystem.retractTrapBar();

@@ -72,7 +72,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   private void setRightPosition(double position) {
     climbIO.setRightPos(position);
-    leftSetpoint = position;
+    rightSetpoint = position;
     logger.info("Right climb moving to {} rotations", position);
   }
 
@@ -343,7 +343,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         if (proceedToPunching) {
           logger.info("ZEROED -> PUNCHING");
           curState = ClimbStates.PUNCHING;
-          setLeftPosition(ClimbConstants.kLeftClimbHighPrepPos);
+          setLeftPosition(ClimbConstants.kLeftClimbPunchHighPos);
           setRightPosition(ClimbConstants.kRightClimbPunchLowPos);
         }
         break;
@@ -396,10 +396,10 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
           if (isLeftGoingUp) {
             isLeftGoingUp = false;
             setLeftPosition(ClimbConstants.kLeftClimbPunchLowPos);
-            setRightPosition(ClimbConstants.kRightClimbHighPrepPos);
+            setRightPosition(ClimbConstants.kRightClimbPunchHighPos);
           } else {
             isLeftGoingUp = true;
-            setLeftPosition(ClimbConstants.kLeftClimbHighPrepPos);
+            setLeftPosition(ClimbConstants.kLeftClimbPunchHighPos);
             setRightPosition(ClimbConstants.kRightClimbPunchLowPos);
           }
         }
@@ -407,6 +407,8 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
       default:
         break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("leftSetpoint", leftSetpoint);
+    org.littletonrobotics.junction.Logger.recordOutput("rightSetpoint", rightSetpoint);
     org.littletonrobotics.junction.Logger.recordOutput("Climb State", curState);
   }
 

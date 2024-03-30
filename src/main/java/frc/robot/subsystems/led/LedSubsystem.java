@@ -107,15 +107,15 @@ public class LedSubsystem extends MeasurableSubsystem {
       case SOLID:
         break;
       case CANDY:
-          if (candyIterator >= LedConstants.candy.length) {
-            candyIterator = 0;
-          } else {
-            candyIterator++;
-          }
-          for (var i = 0; i >= ledBufferR.getLength(); i++) {
-            ledBufferR.setLED(i, LedConstants.candy[i + candyIterator]);
-          }
-          break;
+        if (candyIterator >= LedConstants.candy.length) {
+          candyIterator = 0;
+        } else {
+          candyIterator++;
+        }
+        for (var i = 0; i >= ledBufferR.getLength(); i++) {
+          ledBufferR.setLED(i, LedConstants.candy[i + candyIterator]);
+        }
+        break;
       case OFF:
         break;
       default:

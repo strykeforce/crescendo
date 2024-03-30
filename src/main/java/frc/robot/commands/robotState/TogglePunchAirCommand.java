@@ -14,11 +14,11 @@ public class TogglePunchAirCommand extends Command {
 
   @Override
   public void initialize() {
-    if (robotStateSubsystem.getState() != RobotStates.DEFENSE) {
+    if (!robotStateSubsystem.getIsInDefense()) {
       robotStateSubsystem.toDefense();
       isStowing = false;
     } else {
-      robotStateSubsystem.toStow();
+      robotStateSubsystem.postClimbStow();
       isStowing = true;
     }
   }
@@ -27,6 +27,7 @@ public class TogglePunchAirCommand extends Command {
   public boolean isFinished() {
     return isStowing
         ? robotStateSubsystem.getState() == RobotStates.STOW
-        : robotStateSubsystem.getState() == RobotStates.DEFENSE;
+            || robotStateSubsystem.getState() == RobotStates.INTAKING
+        : true;
   }
 }
