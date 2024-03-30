@@ -277,6 +277,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void setMoveAndShootVirtualPose(Pose2d virtualPose) {
+    org.littletonrobotics.junction.Logger.recordOutput("ShootingData/FuturePos", virtualPose);
     this.moveAndShootVirtualPose = virtualPose;
   }
 

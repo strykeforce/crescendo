@@ -46,9 +46,9 @@ public final class DriveConstants {
   // Move and shoot thresholds
   public static final double kMaxStableAccel = 0.1;
   public static final int kVelocityStableCounts = 5;
-  public static final double kMaxMoveShootVelocity = 1.0;
+  public static final double kMaxMoveShootVelocity = 2.0;
   public static final double kMaxMoveGyroRateThreshold = 10.0;
-  public static final double kMoveShootVelDetune = 0.2;
+  public static final double kMoveShootVelDetune = 0.3;
   public static final double kMoveShootTeleMaxVelX = 0.5;
   public static final double kMaxSpeakerDist = 8.0;
 
@@ -163,7 +163,7 @@ public final class DriveConstants {
   public static final double kIMin = 0.0;
   public static final double kIMax = 0.0;
 
-  public static final double kPOmegaSpin = 10.0; // 4.5
+  public static final double kPOmegaSpin = 9.0; // 4.5
   public static final double kPOmega = 4.5; // 4.5
   public static final double kIOmega = 0.0;
   public static final double kDOmega = 0.0; // 0.001

@@ -767,6 +767,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             ledSubsystem.setBlue();
           }
 
+          inWaitForUnbreakMode = false;
+          hasShootBeamUnbroken = false;
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+
           setState(RobotStates.SHOOTING);
         }
         break;

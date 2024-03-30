@@ -45,6 +45,8 @@ public class Swerve implements SwerveIO, Checkable {
 
   private V6TalonSwerveModule[] swerveModules;
   private SwerveDriveKinematics kinematics;
+  private double fieldY = 0.0;
+  private double fieldX = 0.0;
 
   public Swerve() {
 
@@ -149,12 +151,14 @@ public class Swerve implements SwerveIO, Checkable {
     ChassisSpeeds roboRelSpeed = kinematics.toChassisSpeeds(swerveModuleStates);
 
     Rotation2d heading = swerveDrive.getHeading().unaryMinus();
-    return new ChassisSpeeds(
+    fieldX =
         roboRelSpeed.vxMetersPerSecond * heading.getCos()
-            + roboRelSpeed.vyMetersPerSecond * heading.getSin(),
+            + roboRelSpeed.vyMetersPerSecond * heading.getSin();
+    fieldY =
         -roboRelSpeed.vxMetersPerSecond * heading.getSin()
-            + roboRelSpeed.vyMetersPerSecond * heading.getCos(),
-        roboRelSpeed.omegaRadiansPerSecond);
+            + roboRelSpeed.vyMetersPerSecond * heading.getCos();
+
+    return new ChassisSpeeds(fieldX, fieldY, roboRelSpeed.omegaRadiansPerSecond);
   }
 
   public SwerveDriveKinematics getKinematics() {
@@ -213,6 +217,8 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.isConnected = pigeon.getPigeon2().getUpTime().hasUpdated();
     inputs.poseMeters = swerveDrive.getPoseMeters();
     inputs.updateCount = pigeon.getPigeon2().getTemperature().getValueAsDouble();
+    inputs.fieldY = fieldY;
+    inputs.fieldX = fieldX;
     for (int i = 0; i < 4; ++i) {
       inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
       inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
