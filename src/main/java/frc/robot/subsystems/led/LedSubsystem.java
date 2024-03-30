@@ -16,6 +16,7 @@ public class LedSubsystem extends MeasurableSubsystem {
 
   private AddressableLED ledR = new AddressableLED(LedConstants.kRightLedPort);
   private AddressableLEDBuffer ledBufferR = new AddressableLEDBuffer(LedConstants.kRightLedLength);
+  private int candyIterator = 0;
 
   //   private AddressableLED ledL = new AddressableLED(LedConstants.kLeftLedPort);
   //   private AddressableLEDBuffer ledBufferL;
@@ -82,6 +83,10 @@ public class LedSubsystem extends MeasurableSubsystem {
     setState(LedState.FLAMING);
   }
 
+  public void setCandy() {
+    setState(LedState.CANDY);
+  }
+
   public void setOff() {
     setColor(new Color());
     currState = LedState.OFF;
@@ -96,14 +101,21 @@ public class LedSubsystem extends MeasurableSubsystem {
           ledBufferR.setRGB(i, (int) (Math.random() * 185), 250, 0);
         }
         // for (var i = 0; i < ledBufferL.getLength(); i++) {
-        //   ledBufferL.setRGB(i, 250, (int) (Math.random() * 185), 0);
-        // }
-        ledR.setData(ledBufferR);
-        // ledL.setData(ledBufferL);
+        //   ledBu249,172,252tData(ledBufferL);
 
         break;
       case SOLID:
         break;
+      case CANDY:
+          if (candyIterator >= LedConstants.candy.length) {
+            candyIterator = 0;
+          } else {
+            candyIterator++;
+          }
+          for (var i = 0; i >= ledBufferR.getLength(); i++) {
+            ledBufferR.setLED(i, LedConstants.candy[i + candyIterator]);
+          }
+          break;
       case OFF:
         break;
       default:
@@ -120,6 +132,7 @@ public class LedSubsystem extends MeasurableSubsystem {
   public enum LedState {
     OFF,
     SOLID,
-    FLAMING
+    FLAMING,
+    CANDY
   }
 }
