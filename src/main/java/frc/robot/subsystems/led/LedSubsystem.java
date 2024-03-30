@@ -14,6 +14,10 @@ public class LedSubsystem extends MeasurableSubsystem {
 
   private LedState currState = LedState.OFF;
   private int flameCounter = 0;
+  private int blinkCounter = 0; // 0 -> kBlinkOffCount -> kBlinkOnCount -> 0
+  private boolean blinking = false;
+
+  private Color currColor = new Color();
 
   private AddressableLED ledR = new AddressableLED(LedConstants.kRightLedPort);
   private AddressableLEDBuffer ledBufferR = new AddressableLEDBuffer(LedConstants.kRightLedLength);
@@ -44,6 +48,10 @@ public class LedSubsystem extends MeasurableSubsystem {
     currState = state;
   }
 
+  public void setBlinking(boolean blinking) {
+    this.blinking = blinking;
+  }
+
   public void setColor(int r, int g, int b) {
     setState(LedState.SOLID);
     for (var i = 0; i < ledBufferR.getLength(); i++) {
@@ -58,6 +66,7 @@ public class LedSubsystem extends MeasurableSubsystem {
   }
 
   public void setColor(Color color) {
+    currColor = color;
     setState(LedState.SOLID);
     for (var i = 0; i < ledBufferR.getLength(); i++) {
       ledBufferR.setRGB(
@@ -90,9 +99,18 @@ public class LedSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
-
     switch (currState) {
       case FLAMING:
+        if (blinking) {
+          if (blinkCounter == 0) {
+            setColor(new Color());
+          }
+          if (blinkCounter < LedConstants.kBlinkOffCount) {
+            break;
+          } else if (blinkCounter > LedConstants.kBlinkOnCount) {
+            blinkCounter = 0;
+          }
+        }
         flameCounter++;
         if (flameCounter >= 3) {
           for (var i = 0; i < ledBufferR.getLength(); i++) {
@@ -108,6 +126,16 @@ public class LedSubsystem extends MeasurableSubsystem {
 
         break;
       case SOLID:
+        if (blinking) {
+          if (blinkCounter == 0) {
+            setColor(new Color());
+          }
+          if (blinkCounter == LedConstants.kBlinkOffCount) {
+            setColor(currColor);
+          } else if (blinkCounter > LedConstants.kBlinkOnCount) {
+            blinkCounter = 0;
+          }
+        }
         break;
       case OFF:
         break;
@@ -115,6 +143,7 @@ public class LedSubsystem extends MeasurableSubsystem {
         setOff();
         break;
     }
+    if (blinking) blinkCounter++;
   }
 
   @Override
