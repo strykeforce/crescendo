@@ -92,6 +92,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DeadEye Pixel Distance", m_robotContainer.getCenterPixels());
     CommandScheduler.getInstance().run();
     if (!hasAlliance) {
       try {
@@ -116,8 +118,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    org.littletonrobotics.junction.Logger.recordOutput(
-        "DeadEye Pixel Distance", m_robotContainer.getCenterPixels());
     m_robotContainer.getAutoSwitch().checkSwitch();
     m_robotContainer.updateCanivoreStatus();
   }

@@ -22,6 +22,7 @@ import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
@@ -50,7 +51,8 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
       ElbowSubsystem elbowSubsystem,
-      DeadEyeSubsystem deadeye) {
+      DeadEyeSubsystem deadeye,
+      LedSubsystem ledSubsystem) {
     this.robotStateSubsystem = robotStateSubsystem;
     this.elbowSubsystem = elbowSubsystem;
     this.deadeye = deadeye;
@@ -65,7 +67,13 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
         new DriveAutonCommand(driveSubsystem, "WingNote2_WingNote1_A", true, false);
     wingNote1MidNote1 =
         new MiddleNoteDriveAutonCommand(
-            driveSubsystem, robotStateSubsystem, deadeye, "WingNote1_MiddleNote1", true, false);
+            driveSubsystem,
+            robotStateSubsystem,
+            deadeye,
+            ledSubsystem,
+            "WingNote1_MiddleNote1",
+            true,
+            false);
     midNote1ShootPos =
         new DriveAutonCommand(driveSubsystem, "MiddleNote1_MiddleShoot", true, false);
     midShootCommand =

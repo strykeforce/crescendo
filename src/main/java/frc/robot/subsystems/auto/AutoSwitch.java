@@ -19,6 +19,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -59,6 +60,7 @@ public class AutoSwitch extends MeasurableSubsystem {
   private int newAutoSwitchPos;
   private int autoSwitchStableCounts = 0;
   private DeadEyeSubsystem deadeye;
+  private LedSubsystem ledSubsystem;
 
   public AutoSwitch(
       RobotStateSubsystem robotStateSubsystem,
@@ -71,7 +73,8 @@ public class AutoSwitch extends MeasurableSubsystem {
       WristSubsystem wristSubsystem,
       ShooterSubsystem shooterSubsystem,
       PathHandler pathHandler,
-      DeadEyeSubsystem deadeye) {
+      DeadEyeSubsystem deadeye,
+      LedSubsystem ledSubsystem) {
     this.robotStateSubsystem = robotStateSubsystem;
     this.superStructure = superStructure;
     this.magazineSubsystem = magazineSubsystem;
@@ -83,6 +86,7 @@ public class AutoSwitch extends MeasurableSubsystem {
     this.shooterSubsystem = shooterSubsystem;
     this.pathHandler = pathHandler;
     this.deadeye = deadeye;
+    this.ledSubsystem = ledSubsystem;
 
     for (int i = RobotConstants.kMinAutoSwitchID; i <= RobotConstants.kMaxAutoSwitchID; i++) {
       switchInputs.add(new DigitalInput(i));
@@ -185,7 +189,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             magazineSubsystem,
             intakeSubsystem,
             elbowSubsystem,
-            deadeye);
+            deadeye,
+            ledSubsystem);
       case 0x12:
         return new FastAmpMid_5PieceM2Command(
             driveSubsystem,
@@ -194,7 +199,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             magazineSubsystem,
             intakeSubsystem,
             elbowSubsystem,
-            deadeye);
+            deadeye,
+            ledSubsystem);
       case 0x20:
         return new NonAmpAutoCommand(
             driveSubsystem,
@@ -229,6 +235,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             elbowSubsystem,
             pathHandler,
             deadeye,
+            ledSubsystem,
             "NonAmpInitial1_MiddleNote3",
             AutonConstants.kNonAmpPathMatrix,
             List.of(3, 4, 5),
@@ -244,6 +251,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             elbowSubsystem,
             pathHandler,
             deadeye,
+            ledSubsystem,
             "NonAmpInitial1_MiddleNote4",
             AutonConstants.kNonAmpPathMatrix,
             List.of(4, 3, 5),
@@ -259,6 +267,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             elbowSubsystem,
             pathHandler,
             deadeye,
+            ledSubsystem,
             "NonAmpInitial1_MiddleNote5",
             AutonConstants.kNonAmpPathMatrix,
             List.of(5, 4, 3),

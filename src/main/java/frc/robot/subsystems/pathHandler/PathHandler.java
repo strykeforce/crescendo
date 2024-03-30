@@ -12,6 +12,7 @@ import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.PathData;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class PathHandler extends MeasurableSubsystem {
   private ProfiledPIDController deadeyeYDrive;
   private PIDController deadeyeXDrive;
 
+  private LedSubsystem ledSubsystem;
   // NOTE NUMBERS ARE BASED ON THE STANDARDS DOCUMENT
   // A 6x6 array that stores all paths (0 is shootPos, 1 is first note, etc)
   // First index is the starting path and second index is ending path
@@ -62,6 +64,7 @@ public class PathHandler extends MeasurableSubsystem {
       DeadEyeSubsystem deadeye,
       RobotStateSubsystem robotStateSubsystem,
       DriveSubsystem driveSubsystem,
+      LedSubsystem ledSubsystem,
       List<Integer> order,
       String[][] pathNames,
       boolean useDeadeye,
@@ -74,6 +77,7 @@ public class PathHandler extends MeasurableSubsystem {
     this.numPieces = numPieces - 1.0;
     this.pathNames = pathNames;
     this.shotLoc = shotLoc;
+    this.ledSubsystem = ledSubsystem;
     noteOrder = new ArrayList<>(order);
 
     logger = LoggerFactory.getLogger(this.getClass());
@@ -212,6 +216,7 @@ public class PathHandler extends MeasurableSubsystem {
 
             // driveSubsystem.drive(0, 0, 0);
             logger.info("DRIVE_FETCH -> END_PATH");
+            ledSubsystem.setColor(120, 38, 109);
             deadeyeYDrive =
                 new ProfiledPIDController(
                     AutonConstants.kPDeadEyeYDrive,

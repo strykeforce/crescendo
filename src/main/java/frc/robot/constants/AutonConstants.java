@@ -6,17 +6,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public final class AutonConstants {
   public static final double kDelayForPickup = 0.15; // 0.2 -> 0.1 -> 0.15
   public static final double kDelayForDeadeye = 1.0;
-  public static final double kPDeadEyeYDrive = 0.02;
+  public static final double kPDeadEyeYDrive = 0.03; // 0.02
   public static final double kIDeadEyeYDrive = 0.0;
   public static final double kDDeadEyeYDrive = 0.0;
   public static final double kPDeadEyeXDrive = 0.03;
   public static final double kIDeadEyeXDrive = 0.0;
   public static final double kDDeadEyeXDrive = 0.0;
   public static final double kMaxVelDeadeyeDrive = 4.0;
-  public static final double kMaxAccelDeadeyeDrive = 2.5;
-  public static final double kXSpeed = 1.5;
+  public static final double kMaxAccelDeadeyeDrive = 3.5;
+  public static final double kXSpeed = 2.0;
   public static final double kMaxXOff = 1.0;
-  public static final double kSwitchXLine = 6.5;
+  public static final double kSwitchXLine = 6.75;
   public static final double kPercentLeft = 0.75;
 
   public static final int kSwitchStableCounts = 100;

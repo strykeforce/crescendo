@@ -26,6 +26,7 @@ import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.NonAmpInit_TravelNotesCommand;
 import frc.robot.commands.auton.NonAmpInitial_Note3Command;
+import frc.robot.commands.auton.TestDeadeyeCleanUpCommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
@@ -215,6 +216,7 @@ public class RobotContainer {
             deadEyeSubsystem,
             robotStateSubsystem,
             driveSubsystem,
+            ledSubsystem,
             List.of(),
             AutonConstants.kNonAmpPathMatrix,
             false,
@@ -233,7 +235,8 @@ public class RobotContainer {
             wristSubsystem,
             shooterSubsystem,
             pathHandler,
-            deadEyeSubsystem);
+            deadEyeSubsystem,
+            ledSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
     nonAmpAutonPath =
@@ -883,6 +886,27 @@ public class RobotContainer {
         .onTrue(new XLockCommand(driveSubsystem))
         .onFalse(new XLockCommand(driveSubsystem));
 
+    // Auto NotePickUp
+    new JoystickButton(driveJoystick, Button.M_RTRIM_DWN.id)
+        .onTrue(
+            new TestDeadeyeCleanUpCommand(
+                deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_RTRIM_L.id)
+        .onTrue(
+            new TestDeadeyeCleanUpCommand(
+                deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_RTRIM_R.id)
+        .onTrue(
+            new TestDeadeyeCleanUpCommand(
+                deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_RTRIM_UP.id)
+        .onTrue(
+            new TestDeadeyeCleanUpCommand(
+                deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
     // Stow Command
     new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(

@@ -13,6 +13,7 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.PathData;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import org.slf4j.Logger;
@@ -32,11 +33,13 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
   private ProfiledPIDController deadeyeYDrive;
   private DeadEyeSubsystem deadeye;
   private DriveState curState = DriveState.NORM_DRIVE;
+  private LedSubsystem ledSubsystem;
 
   public MiddleNoteDriveAutonCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       DeadEyeSubsystem deadeye,
+      LedSubsystem ledSubsystem,
       String trajectoryName,
       boolean lastPath,
       boolean resetOdometry) {
@@ -45,6 +48,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
     this.driveSubsystem = driveSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
     this.deadeye = deadeye;
+    this.ledSubsystem = ledSubsystem;
     this.lastPath = lastPath;
     this.resetOdometry = resetOdometry;
     this.trajectoryName = trajectoryName;
@@ -105,6 +109,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
                       && curX <= DriveConstants.kFieldMaxX - AutonConstants.kSwitchXLine))) {
             curState = DriveState.DEADEYE_DRIVE;
             driveSubsystem.setDeadEyeDrive(true);
+            ledSubsystem.setColor(120, 38, 109);
             logger.info("NORM_DRIVE -> DEADEYE_DRIVE");
           }
           break;

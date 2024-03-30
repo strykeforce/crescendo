@@ -13,6 +13,7 @@ import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
@@ -40,6 +41,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
       ElbowSubsystem elbowSubsystem,
       PathHandler pathHandler,
       DeadEyeSubsystem deadeye,
+      LedSubsystem ledSubsystem,
       String firstPathName,
       String[][] pathNames,
       List<Integer> preferences,
@@ -49,7 +51,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
     firstPath =
         new MiddleNoteDriveAutonCommand(
-            driveSubsystem, robotStateSubsystem, deadeye, firstPathName, false, true);
+            driveSubsystem, robotStateSubsystem, deadeye, ledSubsystem, firstPathName, false, true);
     this.pathHandler = pathHandler;
     this.robotStateSubsystem = robotStateSubsystem;
     this.pathNames = pathNames;
