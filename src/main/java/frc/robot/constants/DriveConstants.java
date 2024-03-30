@@ -43,6 +43,15 @@ public final class DriveConstants {
   public static final double kGyroRateStillThreshold = 0.5; // degrees per second
   public static final double kDegreesCloseEnough = 3;
 
+  // Move and shoot thresholds
+  public static final double kMaxStableAccel = 0.1;
+  public static final int kVelocityStableCounts = 5;
+  public static final double kMaxMoveShootVelocity = 1.0;
+  public static final double kMaxMoveGyroRateThreshold = 10.0;
+  public static final double kMoveShootVelDetune = 0.2;
+  public static final double kMoveShootTeleMaxVelX = 0.5;
+  public static final double kMaxSpeakerDist = 8.0;
+
   public static final double kDriveMotorOutputGear = 34; // 30
   public static final double kDriveInputGear = 42;
   public static final double kBevelInputGear = 15;
@@ -154,6 +163,7 @@ public final class DriveConstants {
   public static final double kIMin = 0.0;
   public static final double kIMax = 0.0;
 
+  public static final double kPOmegaSpin = 10.0; // 4.5
   public static final double kPOmega = 4.5; // 4.5
   public static final double kIOmega = 0.0;
   public static final double kDOmega = 0.0; // 0.001
@@ -164,6 +174,7 @@ public final class DriveConstants {
   // Default safety path constants
   public static final Pose2d startPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
   public static final Pose2d endPose2d = new Pose2d(1, 0, Rotation2d.fromDegrees(0));
+  public static final double kYawTuningTarget = 0;
 
   public static ArrayList<Translation2d> getDefaultInternalWaypoints() {
     ArrayList<Translation2d> waypoints = new ArrayList<>();

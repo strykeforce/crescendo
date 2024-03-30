@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants.Setpoints;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
@@ -43,6 +44,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final HolonomicDriveController holonomicController;
   private RobotStateSubsystem robotStateSubsystem;
 
+  private final ProfiledPIDController omegaShootTrackController;
   private final ProfiledPIDController omegaSpinController;
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
@@ -50,14 +52,27 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public DriveStates currDriveState = DriveStates.IDLE;
 
+  private double accelX = 0;
+  private double accelY = 0;
+  private double prevVelX = 0;
+  private double prevVelY = 0;
+  private double prevTimeStamp = Timer.getFPGATimestamp();
+  private int velXStableCounts = 0;
+  private int velYStableCounts = 0;
+  private Pose2d moveAndShootVirtualPose = new Pose2d();
+
   // Grapher stuff
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
-  private Double trajectoryActive = 0.0;
+  private double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
   private boolean isFeeding = false;
+  private boolean isMoveAndShoot = false;
+
+  private boolean tuningYaw = false;
+  private double trackingSetpoint = 0.0;
 
   private boolean updateVision = true;
 
@@ -65,9 +80,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
     this.io = io;
 
     // Setup omega Controller
+    omegaShootTrackController =
+        new ProfiledPIDController(
+            DriveConstants.kPOmegaSpin,
+            DriveConstants.kIOmega,
+            DriveConstants.kDOmega,
+            new TrapezoidProfile.Constraints(
+                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaSpin));
+    omegaShootTrackController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
     omegaSpinController =
         new ProfiledPIDController(
-            DriveConstants.kPOmega,
+            DriveConstants.kPOmegaSpin,
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
@@ -101,18 +124,25 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
-    if (!isAligningShot) {
+    if (!isAligningShot && !tuningYaw) {
       io.drive(vXmps, vYmps, vOmegaRadps, true);
     } else {
       double vOmegaRadpsNew;
       if (isFeeding) vOmegaRadpsNew = getvOmegaToFeedTarget();
-      else vOmegaRadpsNew = getvOmegaToGoal();
-      io.move(vXmps, vYmps, vOmegaRadpsNew, true);
+      else if (isMoveAndShoot) vOmegaRadpsNew = getvOmegaToGoal(moveAndShootVirtualPose);
+      else if (tuningYaw) {
+        vOmegaRadpsNew = getvOmegaToGoal();
+      } else vOmegaRadpsNew = getvOmegaToGoal();
+      io.move(
+          vXmps * (isMoveAndShoot ? DriveConstants.kMoveShootVelDetune : 1.0),
+          vYmps * (isMoveAndShoot ? DriveConstants.kMoveShootVelDetune : 1.0),
+          vOmegaRadpsNew,
+          true);
     }
   }
 
   public double getvOmegaToGoal() {
-    return omegaSpinController.calculate(
+    return omegaShootTrackController.calculate(
         getPoseMeters().getRotation().getRadians(),
         getPoseMeters().getRotation().getRadians() + getShooterAngleToSpeaker().getRadians());
   }
@@ -130,9 +160,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public double getvOmegaToGoal(Pose2d pos) {
-    return omegaController.calculate(
-        pos.getRotation().getRadians(),
-        pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians());
+    trackingSetpoint = pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians();
+    return omegaShootTrackController.calculate(pos.getRotation().getRadians(), trackingSetpoint);
   }
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
@@ -180,6 +209,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
+    omegaShootTrackController.reset(inputs.gyroRotation2d.getRadians());
   }
 
   public void setHolonomicControllerTranslationkP(double kP) {
@@ -190,6 +220,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void resetOmegaController() {
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
+    omegaShootTrackController.reset(inputs.gyroRotation2d.getRadians());
   }
 
   // Getters/Setters
@@ -243,6 +274,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
             robotStateSubsystem.getAllianceColor() == Alliance.Blue
                 ? RobotConstants.kBlueSpeakerPos
                 : RobotConstants.kRedSpeakerPos);
+  }
+
+  public void setMoveAndShootVirtualPose(Pose2d virtualPose) {
+    this.moveAndShootVirtualPose = virtualPose;
   }
 
   public Rotation2d getShooterAngleToFeedTarget() {
@@ -319,9 +354,21 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return velStill && gyroStill;
   }
 
+  public boolean isPointingAtGoal(Pose2d pos) {
+    return Math.abs(getShooterAngleToSpeaker(pos).getDegrees())
+        <= DriveConstants.kDegreesCloseEnough;
+  }
+
   public boolean isDriveStill() {
-    double vX = getFieldRelSpeed().vxMetersPerSecond;
-    double vY = getFieldRelSpeed().vyMetersPerSecond;
+    // logger.info(
+    //     "Timestamp Before FieldRel: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+    ChassisSpeeds cs = getFieldRelSpeed();
+    double vX = cs.vxMetersPerSecond;
+    double vY = cs.vyMetersPerSecond;
+    // logger.info(
+    //     "Timestamp After FieldRel: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
 
     // Take fieldRel Speed and get the magnitude of the vector
     double wheelSpeed = FastMath.hypot(vX, vY);
@@ -332,6 +379,27 @@ public class DriveSubsystem extends MeasurableSubsystem {
     boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
 
     return velStill && gyroStill;
+  }
+
+  public boolean isMoveShootAllowed(boolean isAuto) {
+    double vX = getFieldRelSpeed().vxMetersPerSecond;
+    double vY = getFieldRelSpeed().vyMetersPerSecond;
+
+    // Take fieldRel Speed and get the magnitude of the vector
+    double wheelSpeed = FastMath.hypot(vX, vY);
+
+    double gyroRate = inputs.gyroRate;
+
+    boolean velStill =
+        Math.abs(wheelSpeed) <= DriveConstants.kMaxMoveShootVelocity
+            && Math.abs(velXStableCounts) <= DriveConstants.kVelocityStableCounts
+            && Math.abs(velYStableCounts) <= DriveConstants.kVelocityStableCounts;
+    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kMaxMoveGyroRateThreshold;
+
+    return velStill
+        && gyroStill
+        && getDistanceToSpeaker() <= DriveConstants.kMaxSpeakerDist
+        && (isAuto || vX <= DriveConstants.kMoveShootTeleMaxVelX);
   }
 
   public boolean isNavxWorking() {
@@ -353,12 +421,26 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void setIsAligningShot(boolean isAligningShot) {
     this.isAligningShot = isAligningShot;
-    if (isAligningShot) resetOmegaController();
+    resetOmegaController();
   }
 
   public void setIsFeeding(boolean isFeeding) {
     this.isFeeding = isFeeding;
-    if (isFeeding) resetOmegaController();
+    resetOmegaController();
+  }
+
+  public void setIsMoveAndShoot(boolean isMoveAndShoot) {
+    this.isMoveAndShoot = isMoveAndShoot;
+    resetOmegaController();
+  }
+
+  public void setIsTuningYaw(boolean isTuningYaw) {
+    this.tuningYaw = isTuningYaw;
+    if (isTuningYaw) resetOmegaController();
+  }
+
+  public boolean getIsTuningYaw() {
+    return this.tuningYaw;
   }
 
   public void setDriveState(DriveStates driveStates) {
@@ -631,9 +713,33 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // Log Outputs FIXME
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Odometry", inputs.poseMeters);
     org.littletonrobotics.junction.Logger.recordOutput(
-        "ShootingData/AngleToGoal", getShooterAngleToSpeaker());
+        "ShootingData/AngleToGoal", getShooterAngleToSpeaker().getDegrees());
     org.littletonrobotics.junction.Logger.recordOutput(
         "ShootingData/DistanceToGoal", getDistanceToSpeaker());
+
+    // Compute acceleration
+    accelX =
+        (getFieldRelSpeed().vxMetersPerSecond - prevVelX)
+            / (Timer.getFPGATimestamp() - prevTimeStamp);
+    accelY =
+        (getFieldRelSpeed().vyMetersPerSecond - prevVelY)
+            / (Timer.getFPGATimestamp() - prevTimeStamp);
+
+    if (Math.abs(accelX) < DriveConstants.kMaxStableAccel) {
+      velXStableCounts++;
+    } else {
+      velXStableCounts = 0;
+    }
+
+    if (Math.abs(accelY) < DriveConstants.kMaxStableAccel) {
+      velYStableCounts++;
+    } else {
+      velYStableCounts = 0;
+    }
+
+    prevVelX = getFieldRelSpeed().vxMetersPerSecond;
+    prevVelY = getFieldRelSpeed().vyMetersPerSecond;
+    prevTimeStamp = Timer.getFPGATimestamp();
 
     switch (currDriveState) {
       case IDLE:
@@ -687,6 +793,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
         new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()),
-        new Measure("Distance to goal", () -> getDistanceToSpeaker()));
+        new Measure("Distance to goal", () -> getDistanceToSpeaker()),
+        new Measure("Is Yaw Tuning", () -> getIsTuningYaw() ? 1 : 0),
+        new Measure(
+            "Angle For Goal",
+            () ->
+                (getPoseMeters().getRotation().getDegrees()
+                    + getShooterAngleToSpeaker().getDegrees())),
+        new Measure("MoveShoot Angle", () -> trackingSetpoint));
   }
 }

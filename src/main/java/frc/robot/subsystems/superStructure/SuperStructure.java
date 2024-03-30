@@ -153,7 +153,7 @@ public class SuperStructure extends MeasurableSubsystem {
 
     wristSubsystem.setPosition(wristSetpoint);
 
-    logger.info("{} -> TRANSFER(SHOOTING)", curState);
+    // logger.info("{} -> TRANSFER(SHOOTING)", curState);
     isPrecise = true;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
