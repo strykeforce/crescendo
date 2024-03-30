@@ -704,6 +704,7 @@ public class RobotContainer {
     intakeSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     robotStateSubsystem.registerWith(telemetryService);
+    ledSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 

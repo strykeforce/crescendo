@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
@@ -544,8 +545,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Periodic
   @Override
   public void periodic() {
-    if (!isAuto && Timer.getMatchTime() <= 25.0) {
+    if (!isAuto && DriverStation.getMatchTime() <= 25.0 && DriverStation.isTeleopEnabled()) {
       ledSubsystem.setBlinking(true);
+    } else {
+      ledSubsystem.setBlinking(false);
     }
     switch (curState) {
       case TO_STOW:

@@ -92,8 +92,16 @@ public class LedSubsystem extends MeasurableSubsystem {
     setState(LedState.FLAMING);
   }
 
+  public void blinkOff() {
+    for (var i = 0; i < ledBufferR.getLength(); i++) {
+      ledBufferR.setRGB(i, 0, 0, 0);
+    }
+    ledR.setData(ledBufferR);
+  }
+
   public void setOff() {
     setColor(new Color());
+    logger.info("Set Off");
     currState = LedState.OFF;
   }
 
@@ -103,14 +111,19 @@ public class LedSubsystem extends MeasurableSubsystem {
       case FLAMING:
         if (blinking) {
           if (blinkCounter == 0) {
-            setColor(new Color());
+            blinkOff();
+            logger.info("Flame count = 0");
           }
           if (blinkCounter < LedConstants.kBlinkOffCount) {
+            logger.info("off time: {}", blinkCounter);
             break;
           } else if (blinkCounter > LedConstants.kBlinkOnCount) {
+            logger.info("Flame blink count > on: {}", blinkCounter);
             blinkCounter = 0;
+            blinkOff();
           }
         }
+        logger.info("Flaming: {}, Blinking: {}", flameCounter, blinkCounter);
         flameCounter++;
         if (flameCounter >= 3) {
           for (var i = 0; i < ledBufferR.getLength(); i++) {
@@ -128,12 +141,13 @@ public class LedSubsystem extends MeasurableSubsystem {
       case SOLID:
         if (blinking) {
           if (blinkCounter == 0) {
-            setColor(new Color());
+            blinkOff();
           }
           if (blinkCounter == LedConstants.kBlinkOffCount) {
             setColor(currColor);
           } else if (blinkCounter > LedConstants.kBlinkOnCount) {
             blinkCounter = 0;
+            blinkOff();
           }
         }
         break;
@@ -148,7 +162,10 @@ public class LedSubsystem extends MeasurableSubsystem {
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("State", () -> getState().ordinal()));
+    return Set.of(
+        new Measure("State", () -> getState().ordinal()),
+        new Measure("is Blinking", () -> blinking ? 1.0 : 0.0),
+        new Measure("Blink Count", () -> blinkCounter));
   }
 
   public enum LedState {
