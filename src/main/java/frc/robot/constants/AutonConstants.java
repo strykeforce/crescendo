@@ -59,6 +59,41 @@ public final class AutonConstants {
     }
   };
 
+  public static final String[][] kAmpPathMatrix = {
+    {
+      null, "AmpShoot2_MiddleNote1", "AmpShoot2_MiddleNote2", "AmpShoot2_MiddleNote3", null, null,
+    },
+    {
+      "MiddleNote1_AmpShoot2",
+      null,
+      "MiddleNote1_MiddleNote2",
+      "MiddleNote1_MiddleNote3",
+      null,
+      null,
+      null
+    },
+    {
+      "MiddleNote2_AmpShoot2",
+      "MiddleNote2_MiddleNote1",
+      null,
+      "MiddleNote2_MiddleNote3",
+      null,
+      null,
+    },
+    {
+      "MiddleNote3_AmpShoot2",
+      "MiddleNote3_MiddleNote1",
+      "MiddleNote3_MiddleNote2",
+      null,
+      null,
+      null
+    },
+    {
+      null, null, null, null, null,
+    },
+    {null, null, null, null, null, null}
+  };
+
   public final class Setpoints {
     // Starting Positions
     public static final Pose2d MI1 =
@@ -67,14 +102,14 @@ public final class AutonConstants {
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
     public static final Pose2d AI3 =
         new Pose2d(1.45, 7.61, Rotation2d.fromDegrees(0.0)); // FIXME empty start location
-    public static final Pose2d NAI1 = new Pose2d(1.00, 4.19, Rotation2d.fromDegrees(-50));
-    // 0.96 4.156
-
     public static final Pose2d AI4 =
         new Pose2d(
             kAutonLineX - DriveConstants.kRobotWidth,
             DriveConstants.kFieldMaxY - kAmpZoneWidth - DriveConstants.kRobotLength,
             Rotation2d.fromDegrees(-90));
+    public static final Pose2d NAI1 = new Pose2d(1.00, 4.19, Rotation2d.fromDegrees(-50));
+    // 0.96 4.156
+
 
     // Wing Notes
     public static final Pose2d W1 = new Pose2d(2.89, 7.0, Rotation2d.fromDegrees(0.0));
@@ -90,7 +125,7 @@ public final class AutonConstants {
 
     // Shooting Positions
     public static final Pose2d AS1 = new Pose2d(3.89, 5.55, Rotation2d.fromDegrees(0.0));
-    public static final Pose2d AS2 = new Pose2d(4.89, 5.78, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d AS2 = new Pose2d(4.0, 5.55, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS1 = new Pose2d(4.0, 5.55, Rotation2d.fromDegrees(0.0));
     public static final Pose2d NAS1 = new Pose2d(4.2, 2.8, Rotation2d.fromDegrees(-33.2));
     public static final Pose2d NAS2 = new Pose2d(4.0, 5.1, Rotation2d.fromDegrees(-6.7));

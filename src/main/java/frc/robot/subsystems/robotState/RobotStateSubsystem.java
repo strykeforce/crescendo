@@ -544,6 +544,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Periodic
   @Override
   public void periodic() {
+    if (!isAuto && Timer.getMatchTime() <= 25.0) {
+      ledSubsystem.setBlinking(true);
+    }
     switch (curState) {
       case TO_STOW:
         if (superStructure.isFinished()) {
@@ -942,6 +945,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case SCORE_TRAP:
         if (scoreTrapTimer.hasElapsed(RobotStateConstants.kTrapTimer)) {
+          climbSubsystem.trapClimbAdjust();
+          setState(RobotStates.ADJUST_TRAP);
+        }
+        break;
+      case ADJUST_TRAP:
+        if (climbSubsystem.isFinished()) {
           superStructure.toFold();
           setState(RobotStates.FOLDING_IN);
         }
@@ -1027,6 +1036,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_TRAP,
     TRAP,
     SCORE_TRAP,
+    ADJUST_TRAP,
     FOLDING_OUT,
     FOLDING_IN,
     DESCENDING,
