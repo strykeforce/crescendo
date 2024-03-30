@@ -369,9 +369,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toDefense() {
     driveSubsystem.setIsAligningShot(false);
-    superStructure.defense();
+    climbSubsystem.punchAir();
+    ledSubsystem.setCandy();
 
-    setState(RobotStates.TO_DEFENSE);
+    setState(RobotStates.DEFENSE);
   }
 
   public void toPreparePodium() {
@@ -838,12 +839,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case POST_CLIMB:
         break;
-      case TO_DEFENSE:
-        if (superStructure.isFinished()
-            && superStructure.getState() == SuperStructureStates.DEFENSE) {
-          setState(RobotStates.DEFENSE);
-        }
-        break;
       case DEFENSE:
         break;
       default:
@@ -852,7 +847,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState);
   }
-
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
@@ -895,7 +889,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     PREPPING_DECEND,
     CLIMBING,
     CLIMBED,
-    TO_DEFENSE,
     DEFENSE,
     TO_FEED
   }

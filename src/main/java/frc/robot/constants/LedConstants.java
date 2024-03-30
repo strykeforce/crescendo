@@ -1,6 +1,5 @@
 package frc.robot.constants;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class LedConstants {
