@@ -48,7 +48,7 @@ public final class DriveConstants {
   public static final int kVelocityStableCounts = 5;
   public static final double kMaxMoveShootVelocity = 2.0;
   public static final double kMaxMoveGyroRateThreshold = 10.0;
-  public static final double kMoveShootVelDetune = 0.3;
+  public static final double kMoveShootVelDetune = 0.2;
   public static final double kMoveShootTeleMaxVelX = 0.5;
   public static final double kMaxSpeakerDist = 8.0;
 
