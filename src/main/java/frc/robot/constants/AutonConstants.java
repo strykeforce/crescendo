@@ -70,6 +70,12 @@ public final class AutonConstants {
     public static final Pose2d NAI1 = new Pose2d(1.00, 4.19, Rotation2d.fromDegrees(-50));
     // 0.96 4.156
 
+    public static final Pose2d AI4 =
+        new Pose2d(
+            kAutonLineX - DriveConstants.kRobotWidth,
+            DriveConstants.kFieldMaxY - kAmpZoneWidth - DriveConstants.kRobotLength,
+            Rotation2d.fromDegrees(-90));
+
     // Wing Notes
     public static final Pose2d W1 = new Pose2d(2.89, 7.0, Rotation2d.fromDegrees(0.0));
     public static final Pose2d W2 = new Pose2d(2.89, 5.55, Rotation2d.fromDegrees(0.0));
@@ -84,12 +90,14 @@ public final class AutonConstants {
 
     // Shooting Positions
     public static final Pose2d AS1 = new Pose2d(3.89, 5.55, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d AS2 = new Pose2d(4.89, 5.78, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS1 = new Pose2d(4.0, 5.55, Rotation2d.fromDegrees(0.0));
     public static final Pose2d NAS1 = new Pose2d(4.2, 2.8, Rotation2d.fromDegrees(-33.2));
     public static final Pose2d NAS2 = new Pose2d(4.0, 5.1, Rotation2d.fromDegrees(-6.7));
 
     // Path Midpoints
     public static final Pose2d MP1 = new Pose2d(5, 7.61, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d MP2 = new Pose2d(3.89, 7.2, Rotation2d.fromDegrees(-90)); // AS4
   }
 
   // distances to speaker
@@ -98,4 +106,5 @@ public final class AutonConstants {
       Math.hypot(Setpoints.NAI1.getX(), Setpoints.NAI1.getY() - RobotStateConstants.kSpeakerY);
 
   public static final double kAutonLineX = 1.93294;
+  public static final double kAmpZoneWidth = 0.45085;
 }

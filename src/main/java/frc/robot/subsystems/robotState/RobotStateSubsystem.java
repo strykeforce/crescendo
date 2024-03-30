@@ -531,19 +531,23 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case INTAKING:
-        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE) {
-          ledSubsystem.setGreen();
-        }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
           ledSubsystem.setBlue();
           toStow();
         }
+        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE) {
+          ledSubsystem.setGreen();
+
+          if (!intakeSubsystem.isBeamBroken() && !magazineSubsystem.hasPiece()) {
+            magazineSubsystem.toIntaking(false);
+          }
+        }
         if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
             && (magazineSubsystem.getState() != MagazineStates.INTAKING)
             && magazineSubsystem.hasPiece() == false) {
-          magazineSubsystem.toIntaking();
+          magazineSubsystem.toIntaking(true);
         }
         break;
 
@@ -579,6 +583,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.reset();
           shootDelayTimer.start();
           hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
 
           setState(RobotStates.SHOOTING);
         }
@@ -650,6 +655,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             ledSubsystem.setBlue();
           }
 
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+          hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
+
           setState(RobotStates.SHOOTING);
         }
         break;
@@ -657,12 +668,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case SHOOTING:
         if (!hasShootBeamUnbroken && magazineSubsystem.isRevBeamOpen()) {
           logger.info("Note out of Magazine");
-          shootDelayTimer.stop();
-          shootDelayTimer.reset();
-          shootDelayTimer.start();
+          // shootDelayTimer.stop();
+          // shootDelayTimer.reset();
+          // shootDelayTimer.start();
           hasShootBeamUnbroken = true;
         }
-        if (shootDelayTimer.hasElapsed(RobotStateConstants.kShootDelay) && !inWaitForUnbreakMode) {
+        if (isAuto
+            || (shootDelayTimer.hasElapsed(RobotStateConstants.kShootDelay)
+                && !inWaitForUnbreakMode)) {
           inWaitForUnbreakMode = true;
         }
         if (hasShootBeamUnbroken && inWaitForUnbreakMode) {
@@ -725,6 +738,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.reset();
           shootDelayTimer.start();
           hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
 
           setState(RobotStates.SHOOTING);
         }
@@ -750,6 +764,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.reset();
           shootDelayTimer.start();
           hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
 
           setState(RobotStates.SHOOTING);
           hasDelayed = false;
