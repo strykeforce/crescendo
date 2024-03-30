@@ -31,6 +31,7 @@ import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
 import frc.robot.commands.climb.IncrementRequestPrepClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
+import frc.robot.commands.climb.TogglePunchAirCommand;
 import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
@@ -68,7 +69,6 @@ import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
-import frc.robot.commands.robotState.ToggleDefenseCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -806,7 +806,7 @@ public class RobotContainer {
 
     // Defense
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+        .onTrue(new TogglePunchAirCommand(climbSubsystem));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)

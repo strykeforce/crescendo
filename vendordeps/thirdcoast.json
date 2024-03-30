@@ -12,7 +12,7 @@
         {
             "groupId": "org.strykeforce",
             "artifactId": "thirdcoast",
-            "version": "24.0.5-SNAPSHOT"
+            "version": "24.0.5"
         }
     ],
     "jniDependencies": [],
