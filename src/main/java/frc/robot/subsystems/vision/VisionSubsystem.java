@@ -36,22 +36,37 @@ public class VisionSubsystem extends MeasurableSubsystem {
   Translation2d[] offsets = {
     VisionConstants.kCam1Pose.getTranslation().toTranslation2d(),
     VisionConstants.kCam2Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam3Pose.getTranslation().toTranslation2d()
+    VisionConstants.kCam3Pose.getTranslation().toTranslation2d(),
+    VisionConstants.kCam4Pose.getTranslation().toTranslation2d()
   };
 
   Rotation2d[] rotsOff = {
     VisionConstants.kCam1Pose.getRotation().toRotation2d(),
     VisionConstants.kCam2Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam3Pose.getRotation().toRotation2d()
+    VisionConstants.kCam3Pose.getRotation().toRotation2d(),
+    VisionConstants.kCam4Pose.getRotation().toRotation2d()
   };
 
   String[] names = {
-    VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name, VisionConstants.kCam4Name
+    VisionConstants.kCam1Name,
+    VisionConstants.kCam2Name,
+    VisionConstants.kCam3Name,
+    VisionConstants.kCam4Name
   };
 
-  String[] Pinames = {VisionConstants.kPi1Name, VisionConstants.kPi2Name, VisionConstants.kPi3Name, VisionConstants.kPi3Name};
+  String[] Pinames = {
+    VisionConstants.kPi1Name,
+    VisionConstants.kPi2Name,
+    VisionConstants.kPi3Name,
+    VisionConstants.kPi3Name
+  };
 
-  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx, VisionConstants.kCam3Idx, VisionConstants.kCam4Idx};
+  int[] camIndex = {
+    VisionConstants.kCam1Idx,
+    VisionConstants.kCam2Idx,
+    VisionConstants.kCam3Idx,
+    VisionConstants.kCam4Idx
+  };
 
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
   boolean visionUpdates = true;
