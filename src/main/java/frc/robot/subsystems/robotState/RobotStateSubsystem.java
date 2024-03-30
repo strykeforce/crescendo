@@ -586,6 +586,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           intakeSubsystem.setPercent(0);
           ledSubsystem.setBlue();
           toStow();
+          break;
         }
         if (intakeSubsystem.getState() == IntakeState.HAS_PIECE) {
           ledSubsystem.setGreen();
