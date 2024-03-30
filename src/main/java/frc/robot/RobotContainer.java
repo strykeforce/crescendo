@@ -900,11 +900,6 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
         .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
-    // Feeding Shoot
-    new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onTrue(
-            new FeedCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
         .onFalse(
             new FeedCommand(

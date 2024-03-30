@@ -12,6 +12,6 @@ public class RecoverMagazineCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    magazineSubsystem.toIntaking();
+    magazineSubsystem.toIntaking(false);
   }
 }
