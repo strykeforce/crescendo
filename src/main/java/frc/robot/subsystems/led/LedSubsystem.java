@@ -112,18 +112,14 @@ public class LedSubsystem extends MeasurableSubsystem {
         if (blinking) {
           if (blinkCounter == 0) {
             blinkOff();
-            logger.info("Flame count = 0");
           }
           if (blinkCounter < LedConstants.kBlinkOffCount) {
-            logger.info("off time: {}", blinkCounter);
             break;
           } else if (blinkCounter > LedConstants.kBlinkOnCount) {
-            logger.info("Flame blink count > on: {}", blinkCounter);
             blinkCounter = 0;
             blinkOff();
           }
         }
-        logger.info("Flaming: {}, Blinking: {}", flameCounter, blinkCounter);
         flameCounter++;
         if (flameCounter >= 3) {
           for (var i = 0; i < ledBufferR.getLength(); i++) {
