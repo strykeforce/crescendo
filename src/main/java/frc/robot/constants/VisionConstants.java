@@ -18,6 +18,7 @@ public final class VisionConstants {
   public static final double kMinStdDev = 0.01;
   public static final double kMaxAmbig = 0.5;
   public static final int kMaxTimesOffWheels = 5;
+  public static final double kBumperPixelLine = 100;
 
   // Velocity Filter
   public static final double kLinearCoeffOnVelFilter = 0.1;
@@ -32,39 +33,49 @@ public final class VisionConstants {
   public static final double singleTagCoeff = 25.0 / 100.0;
   public static final double multiTagCoeff = 18.0 / 100.0;
   public static final double baseNumber = Math.E;
-  public static final int powerNumber = 4;
+  public static final double powerNumber = 4.0;
+  public static final double FOV45MultiTagCoeff = 13.0 / 100.0;
+  public static final double FOV45powerNumber = 3.5;
+  public static final double FOV45SinlgeTagCoeff = 16.0 / 100.0;
 
   // Constants for cameras
-  public static final int kNumCams = 3;
+  public static final int kNumCams = 4;
 
   // Names
   public static final String kCam1Name = "Shooter";
   public static final String kCam2Name = "Intake";
-  public static final String kCam3Name = "SecondShooter";
+  public static final String kCam3Name = "AngledShooterLeft";
+  public static final String kCam4Name = "AngledShooterRight";
 
   public static final String kPi1Name = "Shooter";
   public static final String kPi2Name = "Intake";
+  public static final String kPi3Name = "AngledShooters";
 
   // Indexs
   public static final int kCam1Idx = 0;
-  public static final int kCam2Idx = 1;
+  public static final int kCam2Idx = 0;
   public static final int kCam3Idx = 0;
+  public static final int kCam4Idx = 1;
 
   public static final double kLoopTime = 0.02;
   public static final int kCircularBufferSize = 1000;
   // Poses
   public static final Pose3d kCam1Pose =
       new Pose3d(
-          new Translation3d(-0.20, 0.305, 0.58),
+          new Translation3d(-0.27, 0.055, 0.20),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(180.0)));
   public static final Pose3d kCam2Pose =
       new Pose3d(
-          new Translation3d(-0.18, -0.325, 0.44),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-15.0)));
+          new Translation3d(-0.21, -0.31, 0.44),
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(0.0)));
   public static final Pose3d kCam3Pose =
       new Pose3d(
-          new Translation3d(-0.18, -0.31, 0.36),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-173.0)));
+          new Translation3d(-0.23, 0.33, 0.56),
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-132.0)));
+  public static final Pose3d kCam4Pose =
+      new Pose3d(
+          new Translation3d(-0.23, -0.325, 0.50),
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(132.0)));
 
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.

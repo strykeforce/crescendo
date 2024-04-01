@@ -233,6 +233,11 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     curState = ClimbStates.CLIMBING;
   }
 
+  public void trapClimbAdjust() {
+    setPosition(ClimbConstants.kLeftClimbTrapAdjustPos);
+    curState = ClimbStates.CLIMBING;
+  }
+
   public void descend() {
     setPosition(ClimbConstants.kLeftClimbHighPrepPos);
     curState = ClimbStates.DESCENDING;

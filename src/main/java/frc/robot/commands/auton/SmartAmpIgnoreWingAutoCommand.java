@@ -4,35 +4,37 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
+import frc.robot.commands.intake.EjectPieceCommand;
 import frc.robot.commands.pathHandler.StartPathHandlerCommand;
-import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
-import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import java.util.List;
 
-public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements AutoCommandInterface {
+public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
+    implements AutoCommandInterface {
   private PathHandler pathHandler;
   private boolean hasGenerated = false;
-  MiddleNoteDriveAutonCommand firstPath;
-  List<Integer> preferences;
-  String[][] pathNames;
-  Double numPieces;
-  Alliance alliance = Alliance.Blue;
+  private DriveAutonCommand firstPath;
+  private DriveAutonCommand secondPath;
+  private List<Integer> preferences;
+  private String[][] pathNames;
+  private double numPieces;
+  private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
   private Pose2d shootPose;
 
-  public SmartNonAmpAutoCommand(
+  public SmartAmpIgnoreWingAutoCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       SuperStructure superStructure,
@@ -40,34 +42,34 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
       IntakeSubsystem intakeSubsystem,
       ElbowSubsystem elbowSubsystem,
       PathHandler pathHandler,
-      DeadEyeSubsystem deadeye,
-      LedSubsystem ledSubsystem,
       String firstPathName,
+      String secondPathName,
       String[][] pathNames,
       List<Integer> preferences,
-      Double numPieces,
+      double numPieces,
       Pose2d shootPose) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
-    firstPath =
-        new MiddleNoteDriveAutonCommand(
-            driveSubsystem, robotStateSubsystem, deadeye, ledSubsystem, firstPathName, false, true);
+    firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, true, true);
+    secondPath = new DriveAutonCommand(driveSubsystem, secondPathName, true, false);
     this.pathHandler = pathHandler;
     this.robotStateSubsystem = robotStateSubsystem;
     this.pathNames = pathNames;
     this.preferences = preferences;
     this.numPieces = numPieces;
     this.shootPose = shootPose;
+
     addCommands(
         new SequentialCommandGroup(
             new ResetGyroCommand(driveSubsystem),
             new ParallelCommandGroup(
-                new setAngleOffsetCommand(driveSubsystem, -50.0),
+                new setAngleOffsetCommand(driveSubsystem, -90.0),
                 new ZeroElbowCommand(elbowSubsystem)),
-            // new ToggleVisionUpdatesCommand(driveSubsystem),
-            // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-50)),
-            new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
             firstPath,
+            new EjectPieceCommand(intakeSubsystem),
+            new IntakeCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+            secondPath,
             new StartPathHandlerCommand(pathHandler)
             // new ToggleVisionUpdatesCommand(driveSubsystem)
             ));
@@ -80,6 +82,7 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
     pathHandler.generateTrajectory();
     pathHandler.setShotLoc(shootPose);
     firstPath.generateTrajectory();
+    secondPath.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }

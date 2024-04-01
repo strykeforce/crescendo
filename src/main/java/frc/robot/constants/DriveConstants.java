@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -25,12 +26,14 @@ public final class DriveConstants {
   public static final double kDeadbandAllStick = 0.075;
   public static final double kExpoScaleYawFactor = 0.75;
   public static final double kRateLimitFwdStr = 3.5;
-  public static final double kRateLimitYaw = 3.0;
+  public static final double kRateLimitYaw = 8.0;
 
   public static final double kFieldMaxX = 16.540988; // m
   public static final double kFieldMaxY = 8.21055; // m
 
   public static final int kTalonConfigTimeout = 10; // ms
+
+  public static final int kPigeonCanID = 4;
 
   public static final double kRobotLength = 0.5461;
   public static final double kRobotWidth = 0.6922;
@@ -39,6 +42,15 @@ public final class DriveConstants {
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 0.5; // degrees per second
   public static final double kDegreesCloseEnough = 3;
+
+  // Move and shoot thresholds
+  public static final double kMaxStableAccel = 0.1;
+  public static final int kVelocityStableCounts = 5;
+  public static final double kMaxMoveShootVelocity = 2.0;
+  public static final double kMaxMoveGyroRateThreshold = 10.0;
+  public static final double kMoveShootVelDetune = 0.2;
+  public static final double kMoveShootTeleMaxVelX = 0.5;
+  public static final double kMaxSpeakerDist = 8.0;
 
   public static final double kDriveMotorOutputGear = 34; // 30
   public static final double kDriveInputGear = 42;
@@ -129,6 +141,20 @@ public final class DriveConstants {
     return driveConfig;
   }
 
+  public static Pigeon2Configuration getPigeon2Configuration() {
+    Pigeon2Configuration config = new Pigeon2Configuration();
+
+    config.MountPose.MountPoseYaw = -90.0;
+    config.MountPose.MountPoseRoll = 0.0;
+    config.MountPose.MountPosePitch = 0.0;
+
+    config.GyroTrim.GyroScalarX = 0.0;
+    config.GyroTrim.GyroScalarY = 0.0;
+    config.GyroTrim.GyroScalarZ = -2.12;
+
+    return config;
+  }
+
   // Holonomic Controller Constants
   public static final double kXPHolonomic = 3.0; // was 3
   public static final double kYPHolonomic = 3.0; // was 3
@@ -137,6 +163,7 @@ public final class DriveConstants {
   public static final double kIMin = 0.0;
   public static final double kIMax = 0.0;
 
+  public static final double kPOmegaSpin = 9.0; // 4.5
   public static final double kPOmega = 4.5; // 4.5
   public static final double kIOmega = 0.0;
   public static final double kDOmega = 0.0; // 0.001
@@ -147,6 +174,7 @@ public final class DriveConstants {
   // Default safety path constants
   public static final Pose2d startPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
   public static final Pose2d endPose2d = new Pose2d(1, 0, Rotation2d.fromDegrees(0));
+  public static final double kYawTuningTarget = 0;
 
   public static ArrayList<Translation2d> getDefaultInternalWaypoints() {
     ArrayList<Translation2d> waypoints = new ArrayList<>();

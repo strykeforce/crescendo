@@ -81,15 +81,19 @@ public class Robot extends LoggedRobot {
       m_robotContainer.configureTelemetry();
       // m_robotContainer.configurePitDashboard();
     }
+    m_robotContainer.enableDeadeye();
     Shuffleboard.getTab("Match")
         .add(new ToggleAllianceColorCommand(m_robotContainer))
         .withSize(1, 1)
         .withPosition(2, 0);
     logger.info("robotinit");
+    m_robotContainer.enableDeadeye();
   }
 
   @Override
   public void robotPeriodic() {
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DeadEye Pixel Distance", m_robotContainer.getCenterPixels());
     CommandScheduler.getInstance().run();
     if (!hasAlliance) {
       try {
@@ -138,6 +142,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit() {
+    m_robotContainer.killPathHandler();
     m_robotContainer.stowRobot();
   }
 

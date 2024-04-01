@@ -13,6 +13,11 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class LedSubsystem extends MeasurableSubsystem {
 
   private LedState currState = LedState.OFF;
+  private int flameCounter = 0;
+  private int blinkCounter = 0; // 0 -> kBlinkOffCount -> kBlinkOnCount -> 0
+  private boolean blinking = false;
+
+  private Color currColor = new Color();
 
   private AddressableLED ledR = new AddressableLED(LedConstants.kRightLedPort);
   private AddressableLEDBuffer ledBufferR = new AddressableLEDBuffer(LedConstants.kRightLedLength);
@@ -45,6 +50,10 @@ public class LedSubsystem extends MeasurableSubsystem {
     currState = state;
   }
 
+  public void setBlinking(boolean blinking) {
+    this.blinking = blinking;
+  }
+
   // this has no data setting! only sets the buffer!
   private void setLED(int i, int r, int g, int b) {
       ledBufferR.setRGB(i, g, r, b);
@@ -70,6 +79,7 @@ public class LedSubsystem extends MeasurableSubsystem {
   }
 
   public void setColor(Color color) {
+    currColor = color;
     setState(LedState.SOLID);
     for (var i = 0; i < ledBufferR.getLength(); i++) {
       setLED(i, color);
@@ -99,25 +109,60 @@ public class LedSubsystem extends MeasurableSubsystem {
     candyIterator = 0;
   }
 
+  public void blinkOff() {
+    for (var i = 0; i < ledBufferR.getLength(); i++) {
+      setLED(i, 0, 0, 0);
+    }
+    ledR.setData(ledBufferR);
+  }
+
   public void setOff() {
     setColor(new Color());
+    logger.info("Set Off");
     currState = LedState.OFF;
   }
 
   @Override
   public void periodic() {
-
     switch (currState) {
       case FLAMING:
-        for (var i = 0; i < ledBufferR.getLength(); i++) {
-          setLED(i, 250, (int) (Math.random() * 185), 0);
-          ledR.setData(ledBufferR);
+        if (blinking) {
+          if (blinkCounter == 0) {
+            blinkOff();
+          }
+          if (blinkCounter < LedConstants.kBlinkOffCount) {
+            break;
+          } else if (blinkCounter > LedConstants.kBlinkOnCount) {
+            blinkCounter = 0;
+            blinkOff();
+          }
         }
-        // for (var i = 0; i < ledBufferL.getLength(); i++) {
-        //   ledBu249,172,252tData(ledBufferL);
+        flameCounter++;
+        if (flameCounter >= 3) {
+          for (var i = 0; i < ledBufferR.getLength(); i++) {
+            setLED(i, 250, (int) (Math.random() * 185), 0);
+          }
+          // for (var i = 0; i < ledBufferL.getLength(); i++) {
+          //   ledBufferL.setRGB(i, 250, (int) (Math.random() * 185), 0);
+          // }
+          ledR.setData(ledBufferR);
+          // ledL.setData(ledBufferL);
+          flameCounter = 0;
+        }
 
         break;
       case SOLID:
+        if (blinking) {
+          if (blinkCounter == 0) {
+            blinkOff();
+          }
+          if (blinkCounter == LedConstants.kBlinkOffCount) {
+            setColor(currColor);
+          } else if (blinkCounter > LedConstants.kBlinkOnCount) {
+            blinkCounter = 0;
+            blinkOff();
+          }
+        }
         break;
       case CANDY:
         for (var i = 0; i < ledBufferR.getLength(); i++) {
@@ -141,11 +186,15 @@ public class LedSubsystem extends MeasurableSubsystem {
         setOff();
         break;
     }
+    if (blinking) blinkCounter++;
   }
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("State", () -> getState().ordinal()));
+    return Set.of(
+        new Measure("State", () -> getState().ordinal()),
+        new Measure("is Blinking", () -> blinking ? 1.0 : 0.0),
+        new Measure("Blink Count", () -> blinkCounter));
   }
 
   public enum LedState {

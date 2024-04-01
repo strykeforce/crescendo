@@ -15,12 +15,11 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.SPI;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import java.util.function.BooleanSupplier;
-import org.strykeforce.gyro.SF_AHRS;
+import org.strykeforce.gyro.SF_PIGEON2;
 import org.strykeforce.healthcheck.Checkable;
 import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
@@ -36,13 +35,18 @@ public class Swerve implements SwerveIO, Checkable {
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;
 
-  private SF_AHRS ahrs;
+  private SF_PIGEON2 pigeon;
 
   private TalonFXConfigurator configurator;
 
   private BooleanSupplier azimuth1FwdLimitSupplier = () -> false;
 
   private TalonSRX[] azimuths = new TalonSRX[4];
+
+  private V6TalonSwerveModule[] swerveModules;
+  private SwerveDriveKinematics kinematics;
+  private double fieldY = 0.0;
+  private double fieldX = 0.0;
 
   public Swerve() {
 
@@ -53,7 +57,7 @@ public class Swerve implements SwerveIO, Checkable {
             .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond)
             .latencyCompensation(true);
 
-    V6TalonSwerveModule[] swerveModules = new V6TalonSwerveModule[4];
+    swerveModules = new V6TalonSwerveModule[4];
     Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
 
     for (int i = 0; i < 4; i++) {
@@ -76,6 +80,7 @@ public class Swerve implements SwerveIO, Checkable {
       configurator.apply(DriveConstants.getDriveTalonConfig());
       driveTalon.getSupplyVoltage().setUpdateFrequency(100);
       driveTalon.getSupplyCurrent().setUpdateFrequency(100);
+      driveTalon.getClosedLoopReference().setUpdateFrequency(200);
 
       swerveModules[i] =
           moduleBuilder
@@ -87,10 +92,13 @@ public class Swerve implements SwerveIO, Checkable {
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
 
-    ahrs = new SF_AHRS(SPI.Port.kMXP, 2_000_000, (byte) 200);
-    swerveDrive = new SwerveDrive(false, 0.02, ahrs, swerveModules);
+    pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "*");
+    pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
+    swerveDrive = new SwerveDrive(false, 0.02, pigeon, swerveModules);
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
+
+    kinematics = swerveDrive.getKinematics();
 
     odometryStrategy =
         new PoseEstimatorOdometryStrategy(
@@ -133,20 +141,34 @@ public class Swerve implements SwerveIO, Checkable {
     return swerveModuleStates;
   }
 
-  public ChassisSpeeds getFieldRelSpeed() {
+  public ChassisSpeeds getRobotRelSpeed() {
     SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
     SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
     for (int i = 0; i < 4; ++i) {
       swerveModuleStates[i] = swerveModules[i].getState();
     }
+    return kinematics.toChassisSpeeds(swerveModuleStates);
+  }
+
+  public ChassisSpeeds getFieldRelSpeed() {
+    // SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
+    // SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
+    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
+    for (int i = 0; i < 4; ++i) {
+      swerveModuleStates[i] = swerveModules[i].getState();
+    }
     ChassisSpeeds roboRelSpeed = kinematics.toChassisSpeeds(swerveModuleStates);
-    return new ChassisSpeeds(
-        roboRelSpeed.vxMetersPerSecond * swerveDrive.getHeading().unaryMinus().getCos()
-            + roboRelSpeed.vyMetersPerSecond * swerveDrive.getHeading().unaryMinus().getSin(),
-        -roboRelSpeed.vxMetersPerSecond * swerveDrive.getHeading().unaryMinus().getSin()
-            + roboRelSpeed.vyMetersPerSecond * swerveDrive.getHeading().unaryMinus().getCos(),
-        roboRelSpeed.omegaRadiansPerSecond);
+
+    Rotation2d heading = swerveDrive.getHeading().unaryMinus();
+    fieldX =
+        roboRelSpeed.vxMetersPerSecond * heading.getCos()
+            + roboRelSpeed.vyMetersPerSecond * heading.getSin();
+    fieldY =
+        -roboRelSpeed.vxMetersPerSecond * heading.getSin()
+            + roboRelSpeed.vyMetersPerSecond * heading.getCos();
+
+    return new ChassisSpeeds(fieldX, fieldY, roboRelSpeed.omegaRadiansPerSecond);
   }
 
   public SwerveDriveKinematics getKinematics() {
@@ -199,12 +221,14 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.odometryY = swerveDrive.getPoseMeters().getY();
     inputs.odometryRotation2D = swerveDrive.getPoseMeters().getRotation().getDegrees();
     inputs.gyroRotation2d = swerveDrive.getHeading();
-    inputs.gyroPitch = ahrs.getPitch();
-    inputs.gyroRoll = ahrs.getRoll();
+    inputs.gyroPitch = pigeon.getPitch();
+    inputs.gyroRoll = pigeon.getRoll();
     inputs.gyroRate = swerveDrive.getGyroRate();
-    inputs.isConnected = ahrs.isConnected();
+    inputs.isConnected = pigeon.getPigeon2().getUpTime().hasUpdated();
     inputs.poseMeters = swerveDrive.getPoseMeters();
-    inputs.updateCount = ahrs.getTempC();
+    inputs.updateCount = pigeon.getPigeon2().getTemperature().getValueAsDouble();
+    inputs.fieldY = fieldY;
+    inputs.fieldX = fieldX;
     for (int i = 0; i < 4; ++i) {
       inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
       inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
@@ -214,5 +238,6 @@ public class Swerve implements SwerveIO, Checkable {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     swerveDrive.registerWith(telemetryService);
+    pigeon.registerWith(telemetryService);
   }
 }
