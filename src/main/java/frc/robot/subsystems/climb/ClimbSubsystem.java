@@ -335,12 +335,14 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         break;
       case ZEROED:
         if (proceedToClimb) {
+          proceedToClimb = false;
           logger.info("ZEROED -> PREPPING");
           curState = ClimbStates.PREPPING;
           extendForks();
           setPosition(ClimbConstants.kLeftClimbPrepPos);
         }
         if (proceedToPunching) {
+          proceedToPunching = false;
           logger.info("ZEROED -> PUNCHING");
           curState = ClimbStates.PUNCHING;
           setLeftPosition(ClimbConstants.kLeftClimbPunchHighPos);
