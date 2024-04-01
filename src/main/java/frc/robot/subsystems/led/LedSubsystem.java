@@ -17,6 +17,7 @@ public class LedSubsystem extends MeasurableSubsystem {
   private AddressableLED ledR = new AddressableLED(LedConstants.kRightLedPort);
   private AddressableLEDBuffer ledBufferR = new AddressableLEDBuffer(LedConstants.kRightLedLength);
   private int candyIterator = 0;
+  private int loopCounter = 0;
 
   //   private AddressableLED ledL = new AddressableLED(LedConstants.kLeftLedPort);
   //   private AddressableLEDBuffer ledBufferL;
@@ -44,10 +45,21 @@ public class LedSubsystem extends MeasurableSubsystem {
     currState = state;
   }
 
+  // this has no data setting! only sets the buffer!
+  private void setLED(int i, int r, int g, int b) {
+      ledBufferR.setRGB(i, g, r, b);
+  }
+
+  // this has no data setting! only sets the buffer!
+  private void setLED(int i, Color color) {
+      ledBufferR.setRGB(
+          i, (int) (color.green * 255.0), (int) (color.red * 255.0), (int) (color.blue * 255.0));
+  }
+
   public void setColor(int r, int g, int b) {
     setState(LedState.SOLID);
     for (var i = 0; i < ledBufferR.getLength(); i++) {
-      ledBufferR.setRGB(i, g, r, b);
+      setLED(i, g, r, b);
     }
     // for (var i = 0; i < ledBufferL.getLength(); i++) {
     //   ledBufferL.setRGB(i, r, g, b);
@@ -60,8 +72,7 @@ public class LedSubsystem extends MeasurableSubsystem {
   public void setColor(Color color) {
     setState(LedState.SOLID);
     for (var i = 0; i < ledBufferR.getLength(); i++) {
-      ledBufferR.setRGB(
-          i, (int) (color.green * 255.0), (int) (color.red * 255.0), (int) (color.blue * 255.0));
+      setLED(i, color);
     }
     // for (var i = 0; i < ledBufferL.getLength(); i++) {
     //   ledBufferL.setLED(i, color);
@@ -85,6 +96,7 @@ public class LedSubsystem extends MeasurableSubsystem {
 
   public void setCandy() {
     setState(LedState.CANDY);
+    candyIterator = 0;
   }
 
   public void setOff() {
@@ -98,7 +110,8 @@ public class LedSubsystem extends MeasurableSubsystem {
     switch (currState) {
       case FLAMING:
         for (var i = 0; i < ledBufferR.getLength(); i++) {
-          ledBufferR.setRGB(i, (int) (Math.random() * 185), 250, 0);
+          setLED(i, 250, (int) (Math.random() * 185), 0);
+          ledR.setData(ledBufferR);
         }
         // for (var i = 0; i < ledBufferL.getLength(); i++) {
         //   ledBu249,172,252tData(ledBufferL);
@@ -107,13 +120,19 @@ public class LedSubsystem extends MeasurableSubsystem {
       case SOLID:
         break;
       case CANDY:
-        if (candyIterator >= LedConstants.candy.length) {
-          candyIterator = 0;
-        } else {
-          candyIterator++;
+        for (var i = 0; i < ledBufferR.getLength(); i++) {
+          setLED(i, LedConstants.candy[(i + candyIterator) % 5]);
         }
-        for (var i = 0; i >= ledBufferR.getLength(); i++) {
-          ledBufferR.setLED(i, LedConstants.candy[i + candyIterator]);
+        ledR.setData(ledBufferR);
+        if (loopCounter >= LedConstants.kLoopCounterCandy) {
+          if (candyIterator >= LedConstants.candy.length - 1) {
+            candyIterator = 0;
+          } else {
+            candyIterator++;
+          }
+          loopCounter = 0;
+        } else {
+          loopCounter++;
         }
         break;
       case OFF:
