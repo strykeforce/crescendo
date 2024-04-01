@@ -55,7 +55,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     }
     isPrecise = precise;
 
-    if (setpoint != position) logger.info("Elbow moving to {} rotations", position);
+    // if (setpoint != position) logger.info("Elbow moving to {} rotations", position);
 
     setpoint = position;
     curState = ElbowStates.MOVING;
