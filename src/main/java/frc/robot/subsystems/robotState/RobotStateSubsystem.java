@@ -152,7 +152,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public boolean hasNote() {
-    return magazineSubsystem.hasPiece() || intakeSubsystem.isBeamBroken();
+    return magazineSubsystem.hasPiece()
+        || intakeSubsystem.isBeamBroken()
+        || intakeSubsystem.hasNote();
   }
 
   public boolean intakeHasNote() {
