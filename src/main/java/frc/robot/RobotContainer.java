@@ -834,7 +834,7 @@ public class RobotContainer {
     // Defense
     new JoystickButton(xboxController, XboxController.Button.kB.value)
         .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
-        
+
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure,
     // magazineSubsystem));

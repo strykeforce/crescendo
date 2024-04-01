@@ -56,13 +56,13 @@ public class LedSubsystem extends MeasurableSubsystem {
 
   // this has no data setting! only sets the buffer!
   private void setLED(int i, int r, int g, int b) {
-      ledBufferR.setRGB(i, g, r, b);
+    ledBufferR.setRGB(i, g, r, b);
   }
 
   // this has no data setting! only sets the buffer!
   private void setLED(int i, Color color) {
-      ledBufferR.setRGB(
-          i, (int) (color.green * 255.0), (int) (color.red * 255.0), (int) (color.blue * 255.0));
+    ledBufferR.setRGB(
+        i, (int) (color.green * 255.0), (int) (color.red * 255.0), (int) (color.blue * 255.0));
   }
 
   public void setColor(int r, int g, int b) {
