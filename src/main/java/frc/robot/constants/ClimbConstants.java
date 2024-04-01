@@ -51,6 +51,10 @@ public final class ClimbConstants {
       12.056; // 10.268 12.056 <- 13.844 <- 17.42 <- 11.46 <- 5.5
   public static final double kRightClimbTrapPos = 12.056; // 5.5
 
+  // TRAP ADJUST
+  public static final double kLeftClimbTrapAdjustPos = kLeftClimbTrapPos + kRevsPerInch;
+  public static final double kRightClimbTrapAdjustPos = kLeftClimbTrapPos + kRevsPerInch;
+
   public static final double kLeftStowPos = 2.5;
   public static final double kRightStowPos = 2.5;
 

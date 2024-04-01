@@ -38,6 +38,8 @@ public class MagazineIOFX implements MagazineIO, Checkable {
   public MagazineIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     magazine = new TalonFX(MagazineConstants.kMagazineFalconID);
+    magazine.getClosedLoopReference().setUpdateFrequency(200);
+    magazine.getMotionMagicIsRunning().setUpdateFrequency(200);
 
     configurator = magazine.getConfigurator();
     configurator.apply(new TalonFXConfiguration());
