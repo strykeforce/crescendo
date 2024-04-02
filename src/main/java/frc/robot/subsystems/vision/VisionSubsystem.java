@@ -212,7 +212,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
                 FastMath.pow(
                     VisionConstants.FOV58MJPGMultiTagCoeff * distance,
                     VisionConstants.FOV58MJPGPowerNumber));
-        case "Shooter":
+      case "Shooter":
         if (numTags == 1)
           return 1
               / FastMath.pow(
