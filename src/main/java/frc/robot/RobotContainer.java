@@ -421,10 +421,26 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Pit")
         .add(
-            "Set to Shoot Positon",
+            "Shoot FAR",
+            new ClosedLoopElbowOffsetCommand(
+                elbowSubsystem, 0.07, () -> robotStateSubsystem.getElbowOffset()))
+        .withPosition(7, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Shoot MEDIUM",
             new ClosedLoopElbowOffsetCommand(
                 elbowSubsystem, 0.08119, () -> robotStateSubsystem.getElbowOffset()))
-        .withPosition(7, 0)
+        .withPosition(7, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Shoot CLOSE",
+            new ClosedLoopElbowOffsetCommand(
+                elbowSubsystem, 0.09, () -> robotStateSubsystem.getElbowOffset()))
+        .withPosition(7, 2)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
     // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))()
