@@ -67,9 +67,9 @@ public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
                 new ZeroElbowCommand(elbowSubsystem)),
             firstPath,
             new EjectPieceCommand(intakeSubsystem),
-            new IntakeCommand(
+            new ParallelCommandGroup(new IntakeCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-            secondPath,
+            secondPath),
             new StartPathHandlerCommand(pathHandler)
             // new ToggleVisionUpdatesCommand(driveSubsystem)
             ));
