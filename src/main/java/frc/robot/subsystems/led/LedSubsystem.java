@@ -165,10 +165,17 @@ public class LedSubsystem extends MeasurableSubsystem {
         }
         break;
       case CANDY:
-        for (var i = 0; i < ledBufferR.getLength(); i++) {
-          setLED(i, LedConstants.candy[(i + candyIterator) % 5]);
+        if (blinking) {
+          if (blinkCounter == 0) {
+            blinkOff();
+          }
+          if (blinkCounter < LedConstants.kBlinkOffCount) {
+            break;
+          } else if (blinkCounter > LedConstants.kBlinkOnCount) {
+            blinkCounter = 0;
+            blinkOff();
+          }
         }
-        ledR.setData(ledBufferR);
         if (loopCounter >= LedConstants.kLoopCounterCandy) {
           if (candyIterator >= LedConstants.candy.length - 1) {
             candyIterator = 0;
@@ -176,6 +183,10 @@ public class LedSubsystem extends MeasurableSubsystem {
             candyIterator++;
           }
           loopCounter = 0;
+          for (var i = 0; i < ledBufferR.getLength(); i++) {
+            setLED(i, LedConstants.candy[(i + candyIterator) % 5]);
+          }
+          ledR.setData(ledBufferR);
         } else {
           loopCounter++;
         }
