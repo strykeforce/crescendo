@@ -34,6 +34,7 @@ import frc.robot.commands.climb.IncrementRequestPrepClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
 import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
+import frc.robot.commands.climb.TrapClimbAdjustCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
@@ -425,6 +426,11 @@ public class RobotContainer {
             new ClosedLoopElbowOffsetCommand(
                 elbowSubsystem, 0.08119, () -> robotStateSubsystem.getElbowOffset()))
         .withPosition(7, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Adjusted Climb Pos", new TrapClimbAdjustCommand(climbSubsystem))
+        .withPosition(8, 0)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
     // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))()
