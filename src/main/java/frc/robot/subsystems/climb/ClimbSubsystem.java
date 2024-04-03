@@ -38,6 +38,8 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private boolean hasLeftForkZeroed = false;
   private boolean hasRightForkZeroed = false;
   private boolean hasClimbZeroed = false;
+  private boolean isLeftGoingUp = true;
+  private boolean proceedToPunching = false;
   private int prepClimbRequestCount = 0;
 
   private ClimbStates curState = ClimbStates.IDLE;
@@ -60,6 +62,18 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     leftSetpoint = position;
     rightSetpoint = position;
     logger.info("Climb moving to {} rotations", position);
+  }
+
+  private void setLeftPosition(double position) {
+    climbIO.setLeftPos(position);
+    leftSetpoint = position;
+    logger.info("Left climb moving to {} rotations", position);
+  }
+
+  private void setRightPosition(double position) {
+    climbIO.setRightPos(position);
+    rightSetpoint = position;
+    logger.info("Right climb moving to {} rotations", position);
   }
 
   public void toggleTrapBar() {
@@ -236,6 +250,12 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     curState = ClimbStates.STOWING;
   }
 
+  public void punchAir() {
+    isLeftGoingUp = true;
+    proceedToPunching = true;
+    zero();
+  }
+
   @Override
   public void periodic() {
     climbIO.updateInputs(climbInputs);
@@ -320,10 +340,18 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         break;
       case ZEROED:
         if (proceedToClimb) {
+          proceedToClimb = false;
           logger.info("ZEROED -> PREPPING");
           curState = ClimbStates.PREPPING;
           extendForks();
           setPosition(ClimbConstants.kLeftClimbPrepPos);
+        }
+        if (proceedToPunching) {
+          proceedToPunching = false;
+          logger.info("ZEROED -> PUNCHING");
+          curState = ClimbStates.PUNCHING;
+          setLeftPosition(ClimbConstants.kLeftClimbPunchHighPos);
+          setRightPosition(ClimbConstants.kRightClimbPunchLowPos);
         }
         break;
       case PREPPING:
@@ -370,9 +398,24 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         break;
       case STOWED:
         break;
+      case PUNCHING:
+        if (isFinished()) {
+          if (isLeftGoingUp) {
+            isLeftGoingUp = false;
+            setLeftPosition(ClimbConstants.kLeftClimbPunchLowPos);
+            setRightPosition(ClimbConstants.kRightClimbPunchHighPos);
+          } else {
+            isLeftGoingUp = true;
+            setLeftPosition(ClimbConstants.kLeftClimbPunchHighPos);
+            setRightPosition(ClimbConstants.kRightClimbPunchLowPos);
+          }
+        }
+        break;
       default:
         break;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("leftSetpoint", leftSetpoint);
+    org.littletonrobotics.junction.Logger.recordOutput("rightSetpoint", rightSetpoint);
     org.littletonrobotics.junction.Logger.recordOutput("Climb State", curState);
   }
 
@@ -405,6 +448,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     DESCENDING,
     DOWN,
     STOWING,
-    STOWED
+    STOWED,
+    PUNCHING
   }
 }

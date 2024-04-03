@@ -70,6 +70,7 @@ import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.TogglePunchAirCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -847,6 +848,9 @@ public class RobotContainer {
     //     .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Defense
+    new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
+
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure,
     // magazineSubsystem));
