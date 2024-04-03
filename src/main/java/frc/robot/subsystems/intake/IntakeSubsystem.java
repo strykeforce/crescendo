@@ -45,6 +45,10 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     setState(IntakeState.INTAKING);
   }
 
+  public void toEmpty() {
+    setState(IntakeState.NONE);
+  }
+
   public void toReversing() {
     setPercent(IntakeConstants.kIntakeReversePercentOutput);
     setState(IntakeState.REVERSING);

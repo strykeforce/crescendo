@@ -40,7 +40,7 @@ public final class DriveConstants {
 
   public static final double kSpeedStillFeedThreshold = 0.5;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
-  public static final double kGyroRateStillThreshold = 0.5; // degrees per second
+  public static final double kGyroRateStillThreshold = 5.0; // degrees per second
   public static final double kDegreesCloseEnough = 3;
 
   // Move and shoot thresholds
@@ -119,8 +119,8 @@ public final class DriveConstants {
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
-    currentConfig.SupplyCurrentLimit = 40;
-    currentConfig.SupplyCurrentThreshold = 45;
+    currentConfig.SupplyCurrentLimit = 50;
+    currentConfig.SupplyCurrentThreshold = 55;
     currentConfig.SupplyTimeThreshold = 0.0;
     currentConfig.SupplyCurrentLimitEnable = true;
     currentConfig.StatorCurrentLimitEnable = false;

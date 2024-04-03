@@ -201,11 +201,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
       case "AngledShooterRight":
         if (numTags == 1)
           return 1
-              / FastMath.pow(
-                  VisionConstants.baseNumber,
-                  FastMath.pow(
-                      VisionConstants.FOV58MJPGSingleTagCoeff * distance,
-                      VisionConstants.FOV58MJPGPowerNumber));
+              / (3
+                  * FastMath.pow(
+                      VisionConstants.baseNumber,
+                      FastMath.pow(
+                          VisionConstants.FOV58MJPGSingleTagCoeff * distance,
+                          VisionConstants.FOV58MJPGPowerNumber)));
         return 1
             / FastMath.pow(
                 VisionConstants.baseNumber,

@@ -338,6 +338,10 @@ public class RobotContainer {
     climbSubsystem.zeroAll();
   }
 
+  public void noNote() {
+    robotStateSubsystem.toIntake();
+  }
+
   public void configurePitDashboard() {
 
     Shuffleboard.getTab("Pit")

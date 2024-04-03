@@ -68,7 +68,7 @@ public class LedSubsystem extends MeasurableSubsystem {
   public void setColor(int r, int g, int b) {
     setState(LedState.SOLID);
     for (var i = 0; i < ledBufferR.getLength(); i++) {
-      setLED(i, g, r, b);
+      setLED(i, r, g, b);
     }
     // for (var i = 0; i < ledBufferL.getLength(); i++) {
     //   ledBufferL.setRGB(i, r, g, b);
