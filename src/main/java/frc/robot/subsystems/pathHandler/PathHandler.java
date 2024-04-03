@@ -216,6 +216,7 @@ public class PathHandler extends MeasurableSubsystem {
 
             // driveSubsystem.drive(0, 0, 0);
             logger.info("DRIVE_FETCH -> END_PATH");
+            driveSubsystem.setDeadEyeDrive(true);
             ledSubsystem.setColor(120, 38, 109);
             deadeyeYDrive =
                 new ProfiledPIDController(
@@ -243,6 +244,7 @@ public class PathHandler extends MeasurableSubsystem {
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
             driveSubsystem.drive(0, 0, 0);
             logger.info("END_PATH -> FETCH");
+            driveSubsystem.setDeadEyeDrive(false);
             timer.reset();
             timer.start();
             curState = PathStates.FETCH;

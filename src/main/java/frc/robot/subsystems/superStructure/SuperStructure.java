@@ -323,7 +323,7 @@ public class SuperStructure extends MeasurableSubsystem {
     isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
-    nextState = SuperStructureStates.SUBWOOFER;
+    nextState = SuperStructureStates.FEEDING;
   }
 
   public void preparePodium() {

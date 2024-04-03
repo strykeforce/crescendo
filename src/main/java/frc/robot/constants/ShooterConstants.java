@@ -11,7 +11,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 public final class ShooterConstants {
   public static final int kLeftShooterTalonID = 40;
   public static final int kRightShooterTalonID = 41;
-  public static final double kCloseEnough = 2.0; // 0.75
+  public static final double kCloseEnough = 3.0; // 0.75
   public static final double kShootTime = 0.04; // 0.2 - now delay after beam unbroken
   public static final double kPodiumShootTime = 0.5;
   public static final double kPodiumSpeed = 0;

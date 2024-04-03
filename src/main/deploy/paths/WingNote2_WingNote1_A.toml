@@ -3,7 +3,7 @@ max_acceleration = 3.0 #m/s
 start_velocity = 0.0 #m/s
 end_velocity = 0.0 #m/s 
 is_reversed = false
-target_yaw = 30.0 #degrees
+target_yaw = 22.0 #degrees
 
 [start_pose]
     dataPoint "W2"
@@ -12,7 +12,7 @@ target_yaw = 30.0 #degrees
     
 [end_pose]
     dataPoint = "W1"
-    dY = -0.05
+    dY = 0.1
     dX = 1.0
     angle = 0.0
 
@@ -21,7 +21,5 @@ target_yaw = 30.0 #degrees
     y = 6.1
 
 [[internal_points]]
-    dataPoint = "W1"
-    dY = -0.05
-    dX = 0.2
-    angle = 0.0
+    x = 3.09
+    y = 6.95
