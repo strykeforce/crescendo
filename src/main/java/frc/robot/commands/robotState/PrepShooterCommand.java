@@ -20,6 +20,6 @@ public class PrepShooterCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.spinUpShotSolution(shootPos);
+    if (robotStateSubsystem.hasNote()) robotStateSubsystem.spinUpShotSolution(shootPos);
   }
 }

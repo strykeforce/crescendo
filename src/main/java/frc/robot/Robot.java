@@ -161,6 +161,7 @@ public class Robot extends LoggedRobot {
       m_robotContainer.getClimbZeroCommand().schedule();
     }
     m_robotContainer.ledTestFunction();
+    m_robotContainer.noNote();
   }
 
   @Override

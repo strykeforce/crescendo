@@ -108,9 +108,15 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-        wingNote2WingNote1,
-        // new WaitCommand(0.05),
-        new AutoWaitNoteStagedCommand(robotStateSubsystem),
+        new ParallelCommandGroup(
+            wingNote2WingNote1,
+            // new WaitCommand(0.05),
+            new SequentialCommandGroup(
+                new AutoWaitNoteStagedCommand(robotStateSubsystem),
+                new PrepShooterCommand(
+                    superStructure,
+                    robotStateSubsystem,
+                    new Pose2d(new Translation2d(3.89, 7.1), new Rotation2d())))),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         new SetHoloContKPCommand(driveSubsystem, 3.0),
@@ -123,7 +129,7 @@ public class FastAmpMid_5PieceCommand extends SequentialCommandGroup
                     superStructure,
                     robotStateSubsystem,
                     new Pose2d(
-                        new Translation2d(4.0 - RobotStateConstants.kDistanceOffset, 5.55),
+                        new Translation2d(4.3 - RobotStateConstants.kDistanceOffset, 6.5),
                         new Rotation2d())))),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));

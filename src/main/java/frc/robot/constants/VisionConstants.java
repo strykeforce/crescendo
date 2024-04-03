@@ -16,9 +16,9 @@ public final class VisionConstants {
   public static final double kTimeToDecayDev = 10;
   public static final double kStdDevDecayCoeff = -0.005;
   public static final double kMinStdDev = 0.01;
-  public static final double kMaxAmbig = 0.5;
+  public static final double kMaxAmbig = 1.0;
   public static final int kMaxTimesOffWheels = 5;
-  public static final double kBumperPixelLine = 100;
+  public static final double kBumperPixelLine = 87; // 100
 
   // Velocity Filter
   public static final double kLinearCoeffOnVelFilter = 0.1;
@@ -34,9 +34,15 @@ public final class VisionConstants {
   public static final double multiTagCoeff = 18.0 / 100.0;
   public static final double baseNumber = Math.E;
   public static final double powerNumber = 4.0;
-  public static final double FOV45MultiTagCoeff = 13.0 / 100.0;
-  public static final double FOV45powerNumber = 3.5;
-  public static final double FOV45SinlgeTagCoeff = 16.0 / 100.0;
+  public static final double FOV45MultiTagCoeff = 15.0 / 100.0;
+  public static final double FOV45powerNumber = 4.0;
+  public static final double FOV45SinlgeTagCoeff = 19.0 / 100.0;
+  public static final double FOV58MJPGMultiTagCoeff = 16.0 / 100.0;
+  public static final double FOV58MJPGPowerNumber = 3.5;
+  public static final double FOV58MJPGSingleTagCoeff = 21.0 / 100.0;
+  public static final double FOV58YUYVMultiTagCoeff = 15.0 / 100.0;
+  public static final double FOV58YUYVPowerNumber = 3.5;
+  public static final double FOV58YUYVSingleTagCoeff = 19.0 / 100.0;
 
   // Constants for cameras
   public static final int kNumCams = 4;

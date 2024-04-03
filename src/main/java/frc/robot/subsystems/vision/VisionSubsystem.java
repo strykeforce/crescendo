@@ -197,7 +197,37 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   private double getStdDevFactor(double distance, int numTags, String camName) {
     switch (camName) {
-      case "SecondShooter":
+      case "AngledShooterLeft":
+      case "AngledShooterRight":
+        if (numTags == 1)
+          return 1
+              / (3
+                  * FastMath.pow(
+                      VisionConstants.baseNumber,
+                      FastMath.pow(
+                          VisionConstants.FOV58MJPGSingleTagCoeff * distance,
+                          VisionConstants.FOV58MJPGPowerNumber)));
+        return 1
+            / FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV58MJPGMultiTagCoeff * distance,
+                    VisionConstants.FOV58MJPGPowerNumber));
+      case "Shooter":
+        if (numTags == 1)
+          return 1
+              / FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.FOV58YUYVSingleTagCoeff * distance,
+                      VisionConstants.FOV58YUYVPowerNumber));
+        return 1
+            / FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV58YUYVMultiTagCoeff * distance,
+                    VisionConstants.FOV58YUYVPowerNumber));
+      case "Intake":
         if (numTags == 1)
           return 1
               / FastMath.pow(

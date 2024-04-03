@@ -58,6 +58,8 @@ public class ShooterIOFX implements ShooterIO, Checkable {
     configurator = shooterLeft.getConfigurator();
     configurator.apply(new TalonFXConfiguration()); // factory default
     configurator.apply(ShooterConstants.getLeftShooterConfig());
+    // shooterLeft.getClosedLoopError().setUpdateFrequency(200.0);
+    // shooterLeft.getClosedLoopReference().setUpdateFrequency(200.0);
 
     configurator = shooterRight.getConfigurator();
     configurator.apply(new TalonFXConfiguration()); // factory default

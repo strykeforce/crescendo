@@ -21,6 +21,8 @@ public class LedSubsystem extends MeasurableSubsystem {
 
   private AddressableLED ledR = new AddressableLED(LedConstants.kRightLedPort);
   private AddressableLEDBuffer ledBufferR = new AddressableLEDBuffer(LedConstants.kRightLedLength);
+  private int candyIterator = 0;
+  private int loopCounter = 0;
 
   //   private AddressableLED ledL = new AddressableLED(LedConstants.kLeftLedPort);
   //   private AddressableLEDBuffer ledBufferL;
@@ -52,10 +54,21 @@ public class LedSubsystem extends MeasurableSubsystem {
     this.blinking = blinking;
   }
 
+  // this has no data setting! only sets the buffer!
+  private void setLED(int i, int r, int g, int b) {
+    ledBufferR.setRGB(i, g, r, b);
+  }
+
+  // this has no data setting! only sets the buffer!
+  private void setLED(int i, Color color) {
+    ledBufferR.setRGB(
+        i, (int) (color.green * 255.0), (int) (color.red * 255.0), (int) (color.blue * 255.0));
+  }
+
   public void setColor(int r, int g, int b) {
     setState(LedState.SOLID);
     for (var i = 0; i < ledBufferR.getLength(); i++) {
-      ledBufferR.setRGB(i, g, r, b);
+      setLED(i, r, g, b);
     }
     // for (var i = 0; i < ledBufferL.getLength(); i++) {
     //   ledBufferL.setRGB(i, r, g, b);
@@ -69,8 +82,7 @@ public class LedSubsystem extends MeasurableSubsystem {
     currColor = color;
     setState(LedState.SOLID);
     for (var i = 0; i < ledBufferR.getLength(); i++) {
-      ledBufferR.setRGB(
-          i, (int) (color.green * 255.0), (int) (color.red * 255.0), (int) (color.blue * 255.0));
+      setLED(i, color);
     }
     // for (var i = 0; i < ledBufferL.getLength(); i++) {
     //   ledBufferL.setLED(i, color);
@@ -92,9 +104,14 @@ public class LedSubsystem extends MeasurableSubsystem {
     setState(LedState.FLAMING);
   }
 
+  public void setCandy() {
+    setState(LedState.CANDY);
+    candyIterator = 0;
+  }
+
   public void blinkOff() {
     for (var i = 0; i < ledBufferR.getLength(); i++) {
-      ledBufferR.setRGB(i, 0, 0, 0);
+      setLED(i, 0, 0, 0);
     }
     ledR.setData(ledBufferR);
   }
@@ -123,7 +140,7 @@ public class LedSubsystem extends MeasurableSubsystem {
         flameCounter++;
         if (flameCounter >= 3) {
           for (var i = 0; i < ledBufferR.getLength(); i++) {
-            ledBufferR.setRGB(i, (int) (Math.random() * 185), 250, 0);
+            setLED(i, 250, (int) (Math.random() * 185), 0);
           }
           // for (var i = 0; i < ledBufferL.getLength(); i++) {
           //   ledBufferL.setRGB(i, 250, (int) (Math.random() * 185), 0);
@@ -147,6 +164,33 @@ public class LedSubsystem extends MeasurableSubsystem {
           }
         }
         break;
+      case CANDY:
+        if (blinking) {
+          if (blinkCounter == 0) {
+            blinkOff();
+          }
+          if (blinkCounter < LedConstants.kBlinkOffCount) {
+            break;
+          } else if (blinkCounter > LedConstants.kBlinkOnCount) {
+            blinkCounter = 0;
+            blinkOff();
+          }
+        }
+        if (loopCounter >= LedConstants.kLoopCounterCandy) {
+          if (candyIterator >= LedConstants.candy.length - 1) {
+            candyIterator = 0;
+          } else {
+            candyIterator++;
+          }
+          loopCounter = 0;
+          for (var i = 0; i < ledBufferR.getLength(); i++) {
+            setLED(i, LedConstants.candy[(i + candyIterator) % 5]);
+          }
+          ledR.setData(ledBufferR);
+        } else {
+          loopCounter++;
+        }
+        break;
       case OFF:
         break;
       default:
@@ -167,6 +211,7 @@ public class LedSubsystem extends MeasurableSubsystem {
   public enum LedState {
     OFF,
     SOLID,
-    FLAMING
+    FLAMING,
+    CANDY
   }
 }
