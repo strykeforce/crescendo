@@ -751,6 +751,7 @@ public class RobotContainer {
     magazineSubsystem.registerWith(telemetryService);
     robotStateSubsystem.registerWith(telemetryService);
     ledSubsystem.registerWith(telemetryService);
+    deadEyeSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 

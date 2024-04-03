@@ -18,7 +18,7 @@ public final class VisionConstants {
   public static final double kMinStdDev = 0.01;
   public static final double kMaxAmbig = 1.0;
   public static final int kMaxTimesOffWheels = 5;
-  public static final double kBumperPixelLine = 100;
+  public static final double kBumperPixelLine = 87; // 100
 
   // Velocity Filter
   public static final double kLinearCoeffOnVelFilter = 0.1;

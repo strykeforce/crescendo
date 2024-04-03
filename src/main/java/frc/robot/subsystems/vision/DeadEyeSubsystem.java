@@ -49,6 +49,14 @@ public class DeadEyeSubsystem extends MeasurableSubsystem {
     return 0.0;
   }
 
+  private double getTargetY() {
+    double lastValidTargY = 2767.0;
+    for (Rect targ : data.targets) {
+      lastValidTargY = targ.center().y;
+    }
+    return lastValidTargY;
+  }
+
   public int getNumTargets() {
     return data.targets.size();
   }
@@ -92,7 +100,9 @@ public class DeadEyeSubsystem extends MeasurableSubsystem {
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("Is deadeye enabled", () -> cam.getEnabled() ? 1 : 0));
+    return Set.of(
+        new Measure("Is deadeye enabled", () -> cam.getEnabled() ? 1 : 0),
+        new Measure("Y Pixel", () -> getTargetY()));
   }
 
   @Override
