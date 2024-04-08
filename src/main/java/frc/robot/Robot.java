@@ -81,13 +81,11 @@ public class Robot extends LoggedRobot {
       m_robotContainer.configureTelemetry();
       // m_robotContainer.configurePitDashboard();
     }
-    m_robotContainer.enableDeadeye();
     Shuffleboard.getTab("Match")
         .add(new ToggleAllianceColorCommand(m_robotContainer))
         .withSize(1, 1)
         .withPosition(2, 0);
     logger.info("robotinit");
-    m_robotContainer.enableDeadeye();
   }
 
   @Override
@@ -127,6 +125,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.enableDeadeye();
     logger.info("Auto Init");
     m_robotContainer.setIsAuto(true);
     // if (!m_robotContainer.hasElbowZeroed()) m_robotContainer.zeroElbow();
@@ -148,6 +147,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.enableDeadeye();
     logger.info("Teleop Init | Match #{}", DriverStation.getMatchNumber());
     m_robotContainer.setIsAuto(false);
     if (m_autonomousCommand != null) {

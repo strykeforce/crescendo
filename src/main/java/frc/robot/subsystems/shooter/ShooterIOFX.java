@@ -23,7 +23,7 @@ public class ShooterIOFX implements ShooterIO, Checkable {
 
   @HealthCheck
   @Timed(
-      percentOutput = {0.2, -0.2, 0.8, -0.8},
+      percentOutput = {0.2, -0.2, 0.8, 0.0, -0.8},
       duration = 3)
   private TalonFX shooterLeft;
 

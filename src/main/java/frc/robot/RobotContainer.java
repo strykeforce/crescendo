@@ -34,7 +34,7 @@ import frc.robot.commands.climb.IncrementRequestPrepClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
 import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
-import frc.robot.commands.climb.TrapClimbAdjustCommand;
+import frc.robot.commands.climb.TrapClimbCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
@@ -62,7 +62,6 @@ import frc.robot.commands.robotState.DecendCommand;
 import frc.robot.commands.robotState.FeedCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
-import frc.robot.commands.robotState.MovingVisionShootCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.PodiumCommand;
 import frc.robot.commands.robotState.PositionShootCommand;
@@ -76,6 +75,7 @@ import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.UpdateElbowOffsetCommand;
+import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.commands.wrist.WriteWristToStowCommand;
@@ -392,7 +392,7 @@ public class RobotContainer {
         .withPosition(0, 0);
 
     Shuffleboard.getTab("Pit")
-        .add("Elbow Pos Zero ", new ClosedLoopElbowCommand(elbowSubsystem, 0.0))
+        .add("Elbow Pos Zero ", new ClosedLoopElbowOffsetCommand(elbowSubsystem, 0.0, () -> 0.0))
         .withSize(1, 1)
         .withPosition(1, 0);
     Shuffleboard.getTab("Pit")
@@ -450,7 +450,7 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
-        .add("Adjusted Climb Pos", new TrapClimbAdjustCommand(climbSubsystem))
+        .add("Adjusted Climb Pos", new TrapClimbCommand(climbSubsystem))
         .withPosition(8, 0)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
@@ -972,7 +972,7 @@ public class RobotContainer {
     // Vision Shoot
     new JoystickButton(driveJoystick, Button.M_SWH.id)
         .onTrue(
-            new MovingVisionShootCommand(
+            new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Release Game Piece Command
