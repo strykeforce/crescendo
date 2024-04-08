@@ -4,7 +4,6 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -306,6 +305,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     getShootSolution(driveSubsystem.getDistanceToSpeaker(pos));
 
+    intakeSubsystem.toEjecting();
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     ledSubsystem.setOff();
@@ -340,6 +340,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     shootKnownPos = false;
     movingShoot = false;
 
+    intakeSubsystem.toEjecting();
     driveSubsystem.setIsAligningShot(true);
 
     getShootSolution(driveSubsystem.getDistanceToSpeaker());
@@ -358,6 +359,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     getShootSolution(distance);
 
+    intakeSubsystem.toEjecting();
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     ledSubsystem.setOff();
@@ -373,9 +375,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.setIsAligningShot(true);
     driveSubsystem.setIsMoveAndShoot(true);
 
+    intakeSubsystem.toEjecting();
     Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
     ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
-    getShootSolution(driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
+    getShootSolution(
+        driveSubsystem.getDistanceToSpeaker(
+            new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
 
     for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
       virtualT =
@@ -383,7 +388,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
               new Translation2d(
                   speeds.vxMetersPerSecond * shootSolution[3],
                   speeds.vyMetersPerSecond * shootSolution[3]));
-      getShootSolution(driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
+      getShootSolution(
+          driveSubsystem.getDistanceToSpeaker(
+              new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
     }
     driveSubsystem.setMoveAndShootVirtualPose(
         new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation()));
@@ -751,7 +758,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
         ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
         getShootSolution(
-            driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
+            driveSubsystem.getDistanceToSpeaker(
+                new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
 
         for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
           virtualT =
@@ -760,7 +768,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                       speeds.vxMetersPerSecond * shootSolution[3],
                       speeds.vyMetersPerSecond * shootSolution[3]));
           getShootSolution(
-              driveSubsystem.getDistanceToSpeaker(new Pose2d(virtualT, new Rotation2d())));
+              driveSubsystem.getDistanceToSpeaker(
+                  new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
         }
 
         superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);

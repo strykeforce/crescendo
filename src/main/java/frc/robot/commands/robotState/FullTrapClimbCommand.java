@@ -21,7 +21,8 @@ public class FullTrapClimbCommand extends Command {
 
   @Override
   public void initialize() {
-    if (robotStateSubsystem.getState() == RobotStates.CLIMB_PREPPED) {
+    if (robotStateSubsystem.getState() == RobotStates.CLIMB_PREPPED
+        || robotStateSubsystem.getState() == RobotStates.POST_CLIMB) {
       robotStateSubsystem.climb(true, false);
     } else {
       climbAllowed = false;
