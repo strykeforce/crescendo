@@ -26,6 +26,7 @@ import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.NonAmpInit_TravelNotesCommand;
 import frc.robot.commands.auton.NonAmpInitial_Note3Command;
+import frc.robot.commands.auton.TestDeadeyeCleanUpCommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
@@ -33,6 +34,7 @@ import frc.robot.commands.climb.IncrementRequestPrepClimbCommand;
 import frc.robot.commands.climb.JogClimbClosedLoopCommand;
 import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
+import frc.robot.commands.climb.TrapClimbCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
@@ -68,7 +70,7 @@ import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
-import frc.robot.commands.robotState.ToggleDefenseCommand;
+import frc.robot.commands.robotState.TogglePunchAirCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -105,6 +107,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.shooter.ShooterIOFX;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
@@ -131,9 +134,11 @@ public class RobotContainer {
   private final LedSubsystem ledSubsystem;
   private final AutoSwitch autoSwitch;
   private final PathHandler pathHandler;
+  private final DeadEyeSubsystem deadEyeSubsystem;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
+  private final FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
 
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
@@ -178,6 +183,7 @@ public class RobotContainer {
     magazineIO = new MagazineIOFX();
     climbIO = new ClimbIOFX();
     forkIO = new ForkIOSRX();
+    deadEyeSubsystem = new DeadEyeSubsystem();
     robotConstants = new RobotConstants();
     driveSubsystem = new DriveSubsystem(swerve);
     visionSubsystem = new VisionSubsystem(driveSubsystem);
@@ -209,9 +215,10 @@ public class RobotContainer {
 
     pathHandler =
         new PathHandler(
-            null,
+            deadEyeSubsystem,
             robotStateSubsystem,
             driveSubsystem,
+            ledSubsystem,
             List.of(),
             AutonConstants.kNonAmpPathMatrix,
             false,
@@ -229,7 +236,9 @@ public class RobotContainer {
             elbowSubsystem,
             wristSubsystem,
             shooterSubsystem,
-            pathHandler);
+            pathHandler,
+            deadEyeSubsystem,
+            ledSubsystem);
 
     // visionSubsystem.setVisionUpdates(false);
     nonAmpAutonPath =
@@ -283,7 +292,7 @@ public class RobotContainer {
 
     // calibrateWheelSize = new DriveAutonCommand(driveSubsystem, "5mTestPath", true, true);
     // calibrateWheelSize.generateTrajectory();
-
+    // visionSubsystem.setVisionUpdates(false);
     configureDriverBindings();
     configureOperatorBindings();
     // configureClimbTestBindings();
@@ -295,6 +304,18 @@ public class RobotContainer {
 
     // configureTelemetry();
     // configurePitDashboard();
+  }
+
+  public void enableDeadeye() {
+    deadEyeSubsystem.setCamEnabled(true);
+  }
+
+  public double getCenterPixels() {
+    return deadEyeSubsystem.getDistanceToCamCenter();
+  }
+
+  public void killPathHandler() {
+    pathHandler.killPathHandler();
   }
 
   public boolean hasElbowZeroed() {
@@ -315,6 +336,10 @@ public class RobotContainer {
 
   public void zeroClimb() {
     climbSubsystem.zeroAll();
+  }
+
+  public void noNote() {
+    robotStateSubsystem.toIntake();
   }
 
   public void configurePitDashboard() {
@@ -367,7 +392,7 @@ public class RobotContainer {
         .withPosition(0, 0);
 
     Shuffleboard.getTab("Pit")
-        .add("Elbow Pos Zero ", new ClosedLoopElbowCommand(elbowSubsystem, 0.0))
+        .add("Elbow Pos Zero ", new ClosedLoopElbowOffsetCommand(elbowSubsystem, 0.0, () -> 0.0))
         .withSize(1, 1)
         .withPosition(1, 0);
     Shuffleboard.getTab("Pit")
@@ -402,10 +427,31 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Pit")
         .add(
-            "Set to Shoot Positon",
+            "Shoot FAR",
+            new ClosedLoopElbowOffsetCommand(
+                elbowSubsystem, 0.07, () -> robotStateSubsystem.getElbowOffset()))
+        .withPosition(7, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Shoot MEDIUM",
             new ClosedLoopElbowOffsetCommand(
                 elbowSubsystem, 0.08119, () -> robotStateSubsystem.getElbowOffset()))
-        .withPosition(7, 0)
+        .withPosition(7, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Shoot CLOSE",
+            new ClosedLoopElbowOffsetCommand(
+                elbowSubsystem, 0.09, () -> robotStateSubsystem.getElbowOffset()))
+        .withPosition(7, 2)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Adjusted Climb Pos", new TrapClimbCommand(climbSubsystem))
+        .withPosition(8, 0)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
     // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))()
@@ -704,6 +750,8 @@ public class RobotContainer {
     intakeSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     robotStateSubsystem.registerWith(telemetryService);
+    ledSubsystem.registerWith(telemetryService);
+    deadEyeSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -788,6 +836,12 @@ public class RobotContainer {
         .onTrue(
             new AmpCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(xboxController,
+    // XboxController.Button.kA.value).onTrue(calibrateWheelSize);
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .onTrue(
+    //         new TestDeadeyeCleanUpCommand(deadEyeSubsystem, driveSubsystem, robotStateSubsystem))
+    //     .onFalse(new XLockCommand(driveSubsystem));
     // new JoystickButton(xboxController, XboxController.Button.kA.value)
     //     .onTrue(new DriveSpeedSpinCommand(driveSubsystem, xboxController));
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
@@ -801,12 +855,28 @@ public class RobotContainer {
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // SubWoofer
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //     .onTrue(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
     // Defense
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+        .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
+
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure,
+    // magazineSubsystem));
+
+    // Yaw Tuning
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .onTrue(
+    //         new TuneYawCommand(
+    //             () -> flysky.getFwd(),
+    //             () -> flysky.getStr(),
+    //             () -> flysky.getYaw(),
+    //             driveSubsystem,
+    //             robotStateSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //     .onTrue(new StopTuningYawCommand(driveSubsystem));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -836,8 +906,6 @@ public class RobotContainer {
   }
 
   private void configureDriverBindings() {
-    FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
-
     driveSubsystem.setDefaultCommand(
         new DriveTeleopCommand(
             () -> flysky.getFwd(),
@@ -863,6 +931,27 @@ public class RobotContainer {
         .onTrue(new XLockCommand(driveSubsystem))
         .onFalse(new XLockCommand(driveSubsystem));
 
+    // Auto NotePickUp
+    new JoystickButton(driveJoystick, Button.M_RTRIM_DWN.id)
+        .onTrue(
+            new TestDeadeyeCleanUpCommand(
+                deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_RTRIM_L.id)
+        .onTrue(
+            new TestDeadeyeCleanUpCommand(
+                deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_RTRIM_R.id)
+        .onTrue(
+            new TestDeadeyeCleanUpCommand(
+                deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_RTRIM_UP.id)
+        .onTrue(
+            new TestDeadeyeCleanUpCommand(
+                deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
     // Stow Command
     new JoystickButton(driveJoystick, Button.SWA.id)
         .onTrue(
@@ -880,7 +969,7 @@ public class RobotContainer {
                 intakeSubsystem,
                 climbSubsystem));
 
-    // // Vision Shoot
+    // Vision Shoot
     new JoystickButton(driveJoystick, Button.M_SWH.id)
         .onTrue(
             new VisionShootCommand(
@@ -900,11 +989,6 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
         .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
-    // Feeding Shoot
-    new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onTrue(
-            new FeedCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
         .onFalse(
             new FeedCommand(

@@ -69,11 +69,11 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   // Helper Methods
-  public void toIntaking() {
+  public void toIntaking(boolean isFast) {
     resetRevBeamCounts();
     io.enableRevLimitSwitch(true);
     setState(MagazineStates.INTAKING);
-    setSpeed(MagazineConstants.kIntakingSpeed);
+    setSpeed(isFast ? MagazineConstants.kFastIntakingSpeed : MagazineConstants.kIntakingSpeed);
   }
 
   public void toEmptying() {
@@ -81,6 +81,10 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     io.enableRevLimitSwitch(false);
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EMPTYING);
+  }
+
+  public void toEmpty() {
+    setState(MagazineStates.EMPTY);
   }
 
   public void toEmptying(double speed) {

@@ -37,7 +37,7 @@ public class RobotConstants {
   public static final Translation2d kBlueFeedTargetPos =
       new Translation2d(kBlueSpeakerXPos + 1, kBlueSpeakerYPos + 1);
 
-  public static final double kDegreeShootOffset = Units.degreesToRadians(-3.5);
+  public static final double kDegreeShootOffset = Units.degreesToRadians(-3.5); // -3.5
 
   // Robot Sizes
   public static final double kShooterOffset = 0.2; // meters
@@ -100,13 +100,13 @@ public class RobotConstants {
 
   public static class CompConstants {
     // Drive
-    public static final double kWheelDiameterInches = 3.0 * 504.0 / 500.0;
+    public static final double kWheelDiameterInches = 3.0 * 502.0 / 500.0;
 
     // Elbow
     public static final double kElbowZero = 0.01465; // 0.0105
     public static final double kElbowRecoveryZero = -0.2656;
     public static final double kElbowZeroPos = 30.45;
-    public static final double kElbowSetpointOffset = 0.00409;
+    public static final double kElbowSetpointOffset = 0.00488; // 0.00409
 
     // Wrist
     public static final double kWristZero = 2243.0; // 2223

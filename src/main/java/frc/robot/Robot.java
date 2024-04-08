@@ -90,6 +90,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DeadEye Pixel Distance", m_robotContainer.getCenterPixels());
     CommandScheduler.getInstance().run();
     if (!hasAlliance) {
       try {
@@ -123,6 +125,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.enableDeadeye();
     logger.info("Auto Init");
     m_robotContainer.setIsAuto(true);
     // if (!m_robotContainer.hasElbowZeroed()) m_robotContainer.zeroElbow();
@@ -138,11 +141,13 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit() {
+    m_robotContainer.killPathHandler();
     m_robotContainer.stowRobot();
   }
 
   @Override
   public void teleopInit() {
+    m_robotContainer.enableDeadeye();
     logger.info("Teleop Init | Match #{}", DriverStation.getMatchNumber());
     m_robotContainer.setIsAuto(false);
     if (m_autonomousCommand != null) {
@@ -156,6 +161,7 @@ public class Robot extends LoggedRobot {
       m_robotContainer.getClimbZeroCommand().schedule();
     }
     m_robotContainer.ledTestFunction();
+    m_robotContainer.noNote();
   }
 
   @Override

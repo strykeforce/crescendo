@@ -8,7 +8,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class VisionShootCommand extends Command {
-  RobotStateSubsystem robotStateSubsystem;
+  private RobotStateSubsystem robotStateSubsystem;
   boolean flag = false;
 
   public VisionShootCommand(

@@ -36,22 +36,37 @@ public class VisionSubsystem extends MeasurableSubsystem {
   Translation2d[] offsets = {
     VisionConstants.kCam1Pose.getTranslation().toTranslation2d(),
     VisionConstants.kCam2Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam3Pose.getTranslation().toTranslation2d()
+    VisionConstants.kCam3Pose.getTranslation().toTranslation2d(),
+    VisionConstants.kCam4Pose.getTranslation().toTranslation2d()
   };
 
   Rotation2d[] rotsOff = {
     VisionConstants.kCam1Pose.getRotation().toRotation2d(),
     VisionConstants.kCam2Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam3Pose.getRotation().toRotation2d()
+    VisionConstants.kCam3Pose.getRotation().toRotation2d(),
+    VisionConstants.kCam4Pose.getRotation().toRotation2d()
   };
 
   String[] names = {
-    VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name
+    VisionConstants.kCam1Name,
+    VisionConstants.kCam2Name,
+    VisionConstants.kCam3Name,
+    VisionConstants.kCam4Name
   };
 
-  String[] Pinames = {VisionConstants.kPi1Name, VisionConstants.kPi2Name, VisionConstants.kPi2Name};
+  String[] Pinames = {
+    VisionConstants.kPi1Name,
+    VisionConstants.kPi2Name,
+    VisionConstants.kPi3Name,
+    VisionConstants.kPi3Name
+  };
 
-  int[] camIndex = {VisionConstants.kCam1Idx, VisionConstants.kCam2Idx, VisionConstants.kCam3Idx};
+  int[] camIndex = {
+    VisionConstants.kCam1Idx,
+    VisionConstants.kCam2Idx,
+    VisionConstants.kCam3Idx,
+    VisionConstants.kCam4Idx
+  };
 
   ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>(); // <Result, Cam #>
   boolean visionUpdates = true;
@@ -180,16 +195,66 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return avg;
   }
 
-  private double getStdDevFactor(double distance, int numTags) {
-    if (numTags == 1)
-      return 1
-          / FastMath.pow(
-              VisionConstants.baseNumber,
-              FastMath.pow(VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber));
-    return 1
-        / FastMath.pow(
-            VisionConstants.baseNumber,
-            FastMath.pow(VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
+  private double getStdDevFactor(double distance, int numTags, String camName) {
+    switch (camName) {
+      case "AngledShooterLeft":
+      case "AngledShooterRight":
+        if (numTags == 1)
+          return 1
+              / (3
+                  * FastMath.pow(
+                      VisionConstants.baseNumber,
+                      FastMath.pow(
+                          VisionConstants.FOV58MJPGSingleTagCoeff * distance,
+                          VisionConstants.FOV58MJPGPowerNumber)));
+        return 1
+            / FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV58MJPGMultiTagCoeff * distance,
+                    VisionConstants.FOV58MJPGPowerNumber));
+      case "Shooter":
+        if (numTags == 1)
+          return 1
+              / FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.FOV58YUYVSingleTagCoeff * distance,
+                      VisionConstants.FOV58YUYVPowerNumber));
+        return 1
+            / FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV58YUYVMultiTagCoeff * distance,
+                    VisionConstants.FOV58YUYVPowerNumber));
+      case "Intake":
+        if (numTags == 1)
+          return 1
+              / FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.FOV45SinlgeTagCoeff * distance,
+                      VisionConstants.FOV45powerNumber));
+        return 1
+            / FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV45MultiTagCoeff * distance,
+                    VisionConstants.FOV45powerNumber));
+
+      default:
+        if (numTags == 1)
+          return 1
+              / FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber));
+        return 1
+            / FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
+    }
   }
 
   private Pose2d getCloserPose(Pose2d pose1, Pose2d pose2, double rotation) {
@@ -274,7 +339,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
               adaptiveVisionMatrix.get(0, 0)
                   / getStdDevFactor(
                       result.getNumTags() == 1 ? minTagDistance(result) : avgTagDistance(result),
-                      result.getNumTags()));
+                      result.getNumTags(),
+                      names[idx]));
 
       Pose2d cameraPose;
       Translation2d centerPos;
@@ -323,8 +389,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
         updatesToWheels++;
 
         fedStdDevs = scaledStdDev.get(0, 0);
-        driveSubsystem.addVisionMeasurement(
-            new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);
+        if (visionUpdates)
+          driveSubsystem.addVisionMeasurement(
+              new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);
 
       } else {
 

@@ -23,7 +23,7 @@ public class ShooterIOFX implements ShooterIO, Checkable {
 
   @HealthCheck
   @Timed(
-      percentOutput = {0.2, -0.2, 0.8, -0.8},
+      percentOutput = {0.2, -0.2, 0.8, 0.0, -0.8},
       duration = 3)
   private TalonFX shooterLeft;
 
@@ -58,6 +58,8 @@ public class ShooterIOFX implements ShooterIO, Checkable {
     configurator = shooterLeft.getConfigurator();
     configurator.apply(new TalonFXConfiguration()); // factory default
     configurator.apply(ShooterConstants.getLeftShooterConfig());
+    // shooterLeft.getClosedLoopError().setUpdateFrequency(200.0);
+    // shooterLeft.getClosedLoopReference().setUpdateFrequency(200.0);
 
     configurator = shooterRight.getConfigurator();
     configurator.apply(new TalonFXConfiguration()); // factory default

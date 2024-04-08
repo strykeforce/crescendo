@@ -94,7 +94,7 @@ public final class ElbowConstants {
 
     Slot1Configs slot1 = new Slot1Configs();
     slot1.kP = 150.0; // 1.2
-    slot1.kI = 135.0;
+    slot1.kI = 75.0;
     slot1.kD = 0.0;
     slot1.kS = 0.0;
     slot1.kV = 20.0;

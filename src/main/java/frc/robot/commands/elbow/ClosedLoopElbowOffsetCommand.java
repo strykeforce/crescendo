@@ -19,7 +19,7 @@ public class ClosedLoopElbowOffsetCommand extends Command {
 
   @Override
   public void initialize() {
-    elbowSubsystem.setPosition(setpoint + offset.getAsDouble());
+    elbowSubsystem.setPosition(setpoint + offset.getAsDouble(), true);
   }
 
   @Override

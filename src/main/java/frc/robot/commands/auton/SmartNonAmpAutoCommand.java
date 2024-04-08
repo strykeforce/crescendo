@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
@@ -14,16 +13,18 @@ import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import java.util.List;
 
 public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements AutoCommandInterface {
   private PathHandler pathHandler;
   private boolean hasGenerated = false;
-  DriveAutonCommand firstPath;
+  MiddleNoteDriveAutonCommand firstPath;
   List<Integer> preferences;
   String[][] pathNames;
   Double numPieces;
@@ -39,6 +40,8 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
       IntakeSubsystem intakeSubsystem,
       ElbowSubsystem elbowSubsystem,
       PathHandler pathHandler,
+      DeadEyeSubsystem deadeye,
+      LedSubsystem ledSubsystem,
       String firstPathName,
       String[][] pathNames,
       List<Integer> preferences,
@@ -46,7 +49,9 @@ public class SmartNonAmpAutoCommand extends SequentialCommandGroup implements Au
       Pose2d shootPose) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
-    firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, true, true);
+    firstPath =
+        new MiddleNoteDriveAutonCommand(
+            driveSubsystem, robotStateSubsystem, deadeye, ledSubsystem, firstPathName, false, true);
     this.pathHandler = pathHandler;
     this.robotStateSubsystem = robotStateSubsystem;
     this.pathNames = pathNames;

@@ -34,10 +34,15 @@ public class MagazineIOFX implements MagazineIO, Checkable {
   private StatusSignal<Double> currVelocity;
   private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
   private StatusSignal<ReverseLimitValue> revLimitSwitch;
+  private StatusSignal<Double> supplyCurrent;
 
   public MagazineIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     magazine = new TalonFX(MagazineConstants.kMagazineFalconID);
+    magazine.getClosedLoopReference().setUpdateFrequency(200);
+    magazine.getMotionMagicIsRunning().setUpdateFrequency(200);
+    magazine.getStatorCurrent().setUpdateFrequency(200.0);
+    magazine.getSupplyCurrent().setUpdateFrequency(200.0);
 
     configurator = magazine.getConfigurator();
     configurator.apply(new TalonFXConfiguration());
@@ -46,6 +51,7 @@ public class MagazineIOFX implements MagazineIO, Checkable {
     currVelocity = magazine.getVelocity();
     fwdLimitSwitch = magazine.getForwardLimit();
     revLimitSwitch = magazine.getReverseLimit();
+    supplyCurrent = magazine.getSupplyCurrent();
   }
 
   @Override
@@ -59,6 +65,7 @@ public class MagazineIOFX implements MagazineIO, Checkable {
     inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
     inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 0;
     inputs.setpoint = setpoint;
+    inputs.current = supplyCurrent.refresh().getValueAsDouble();
   }
 
   @Override

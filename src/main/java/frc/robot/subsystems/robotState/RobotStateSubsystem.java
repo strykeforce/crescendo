@@ -4,7 +4,9 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
@@ -20,7 +22,6 @@ import frc.robot.subsystems.led.LedSubsystem.LedState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
-import frc.robot.subsystems.superStructure.SuperStructure.SuperStructureStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
 import java.util.LinkedList;
@@ -49,8 +50,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
 
-  private String[][] shootingLookupTable;
-  private String[][] feedingLookupTable;
+  private double[][] shootingLookupTable;
+  private double[][] feedingLookupTable;
 
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
@@ -62,6 +63,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double shootDelay = 0.0;
   private boolean hasShootBeamUnbroken = false;
 
+  private double[] shootSolution = new double[4];
+
   private Alliance allianceColor = Alliance.Blue;
 
   private boolean safeStow = false;
@@ -70,6 +73,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean usingDistance = false;
   private boolean isAuto = false;
   private boolean shootKnownPos = false;
+  private boolean inWaitForUnbreakMode = false;
+  private boolean movingShoot = false;
+  private boolean inDefense = false;
   private Pose2d shootPos;
   private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
@@ -145,7 +151,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public boolean hasNote() {
-    return magazineSubsystem.hasPiece() || intakeSubsystem.isBeamBroken();
+    return magazineSubsystem.hasPiece()
+        || intakeSubsystem.isBeamBroken()
+        || intakeSubsystem.hasNote();
   }
 
   public boolean intakeHasNote() {
@@ -164,36 +172,49 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   // Order of Columns: dist meters, left shoot, right shoot, elbow, time of flight
-  private String[][] parseLookupTable(String path) {
-    String[][] lookupTable;
+  private double[][] parseLookupTable(String path) {
+    double[][] lookupTable;
     List<String[]> list = new LinkedList<>();
-
+    List<double[]> listD = new LinkedList<>();
     try {
       CSVReader csvReader = new CSVReader(new FileReader(path));
       list = csvReader.readAll();
+      int line = 0;
+      for (String[] sArr : list) {
+        if (line == 0) {
+          line++;
+          continue;
+        }
+        double[] dArr = new double[sArr.length];
+        for (int i = 0; i < sArr.length; ++i) dArr[i] = Double.parseDouble(sArr[i]);
+        listD.add(dArr);
+      }
+
     } catch (Exception e) {
       logger.warn("Failed to read lookup table at {} due to {}", path, e);
     }
 
-    String[][] strArr = new String[list.size()][];
-    lookupTable = list.toArray(strArr);
+    double[][] doubleArr = new double[listD.size()][];
+    lookupTable = listD.toArray(doubleArr);
 
     return lookupTable;
   }
 
-  private double[] getShootSolution(double distance, String[][] lookupTable) {
-    double[] shootSolution = new double[3];
+  private void getShootSolution(double distance) {
+    // logger.info(
+    //     "Timestamp Before Starting Parse: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
     int index;
     distance += RobotStateConstants.kDistanceOffset;
     grabbedShotDistance = distance;
     if (distance < RobotStateConstants.kLookupMinDistance) {
-      index = 1;
+      index = 0;
       logger.warn(
           "Distance {} is less than min distance in table {}",
           distance,
           RobotStateConstants.kLookupMinDistance);
     } else if (distance > RobotStateConstants.kLookupMaxDistance) {
-      index = lookupTable.length - 1;
+      index = shootingLookupTable.length - 1;
       logger.warn(
           "Distance {} is more than max distance in table {}",
           distance,
@@ -203,9 +224,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           (int)
               ((distance - RobotStateConstants.kLookupMinDistance)
                       / RobotStateConstants.kDistanceIncrement
-                  + 1.0);
-      logger.info(
-          "Distance: {} | Measured {}", Double.parseDouble(lookupTable[index][0]), distance);
+                  + 0.0);
+      //   logger.info("Distance: {} | Measured {}", shootingLookupTable[index][0], distance);
       /*
        * index =
        * (int) (Math.round(distance) - RobotStateConstants.kLookupMinDistance)
@@ -213,17 +233,26 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
        */
     }
 
-    logger.info("Left Shooter: {}", lookupTable[index][1]);
+    // logger.info("Left Shooter: {}", shootingLookupTable[index][1]);
 
-    shootSolution[0] = Double.parseDouble(lookupTable[index][1]); // Left Shooter
-    shootSolution[1] = Double.parseDouble(lookupTable[index][2]); // Right Shooter
-    shootSolution[2] = Double.parseDouble(lookupTable[index][3]) + elbowOffset; // Elbow
-
-    return shootSolution;
+    // logger.info(
+    //     "Timestamp Before Parsing Doubles: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+    shootSolution[0] = shootingLookupTable[index][1]; // Left Shooter
+    shootSolution[1] = shootingLookupTable[index][2]; // Right Shooter
+    shootSolution[2] = shootingLookupTable[index][3] + elbowOffset; // Elbow
+    shootSolution[3] = shootingLookupTable[index][4];
+    // logger.info(
+    //     "Timestamp AFter Parsing Doubles: {}",
+    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
   }
 
   public boolean getIsAuto() {
     return isAuto;
+  }
+
+  public boolean getIsInDefense() {
+    return inDefense;
   }
 
   public void setMagazineTune(double speed) {
@@ -274,9 +303,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     driveSubsystem.setIsAligningShot(false);
 
-    double[] shootSolution =
-        getShootSolution(driveSubsystem.getDistanceToSpeaker(pos), shootingLookupTable);
+    getShootSolution(driveSubsystem.getDistanceToSpeaker(pos));
 
+    intakeSubsystem.toEjecting();
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     ledSubsystem.setOff();
@@ -301,8 +330,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void spinUpShotSolution(Pose2d pose) {
     shootPos = pose;
-    double[] shootSolution =
-        getShootSolution(driveSubsystem.getDistanceToSpeaker(pose), shootingLookupTable);
+    getShootSolution(driveSubsystem.getDistanceToSpeaker(pose));
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     setState(RobotStates.SPIN_UP);
   }
@@ -310,10 +338,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void startShoot() {
     usingDistance = false;
     shootKnownPos = false;
+    movingShoot = false;
+
+    intakeSubsystem.toEjecting();
     driveSubsystem.setIsAligningShot(true);
 
-    double[] shootSolution =
-        getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
+    getShootSolution(driveSubsystem.getDistanceToSpeaker());
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -325,14 +355,49 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void startShootDistance(double distance) {
     usingDistance = true;
     shootKnownPos = false;
+    movingShoot = false;
 
-    double[] shootSolution = getShootSolution(distance, shootingLookupTable);
+    getShootSolution(distance);
 
+    intakeSubsystem.toEjecting();
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     ledSubsystem.setOff();
 
     setState(RobotStates.TO_SHOOT);
+  }
+
+  public void startMovingShoot() {
+    usingDistance = false;
+    shootKnownPos = false;
+    movingShoot = true;
+
+    driveSubsystem.setIsAligningShot(true);
+    driveSubsystem.setIsMoveAndShoot(true);
+
+    intakeSubsystem.toEjecting();
+    Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
+    ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+    getShootSolution(
+        driveSubsystem.getDistanceToSpeaker(
+            new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
+
+    for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
+      virtualT =
+          virtualT.plus(
+              new Translation2d(
+                  speeds.vxMetersPerSecond * shootSolution[3],
+                  speeds.vyMetersPerSecond * shootSolution[3]));
+      getShootSolution(
+          driveSubsystem.getDistanceToSpeaker(
+              new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
+    }
+    driveSubsystem.setMoveAndShootVirtualPose(
+        new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation()));
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+    setState(RobotStates.TO_MOVING_SHOOT);
   }
 
   public void toStowSafe() {
@@ -369,9 +434,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toDefense() {
     driveSubsystem.setIsAligningShot(false);
-    superStructure.defense();
-
-    setState(RobotStates.TO_DEFENSE);
+    climbSubsystem.punchAir();
+    ledSubsystem.setCandy();
+    inDefense = true;
+    // setState(RobotStates.DEFENSE);
   }
 
   public void toPreparePodium() {
@@ -404,6 +470,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void prepareClimb() {
+    inDefense = false;
     magazineSubsystem.toPrepClimb();
     climbSubsystem.zero(true);
     climbSubsystem.extendForks();
@@ -413,6 +480,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void climb(boolean continueToTrap, boolean decendAfterTrap) {
+    inDefense = false;
     climbSubsystem.trapClimb();
     this.continueToTrap = continueToTrap;
     this.decendClimbAfterTrap = decendAfterTrap;
@@ -421,6 +489,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toTrap() {
+    inDefense = false;
     // climbSubsystem.extendTrapBar();
     superStructure.toTrap();
 
@@ -452,6 +521,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void postClimbStow() {
+    inDefense = false;
     toStow();
     climbSubsystem.retractForks();
     climbSubsystem.retractTrapBar();
@@ -470,10 +540,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineShootDelayTimer.start();
 
       setState(RobotStates.PODIUM_SHOOTING);
-    } else {
+    } else if (curState == RobotStates.AMP) {
       safeStow = false;
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
+    } else {
+      toFixedFeeding();
     }
     ledSubsystem.setOff();
   }
@@ -491,6 +563,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Periodic
   @Override
   public void periodic() {
+    if (!isAuto && DriverStation.getMatchTime() <= 25.0 && DriverStation.isTeleopEnabled()) {
+      ledSubsystem.setBlinking(true);
+    } else {
+      ledSubsystem.setBlinking(false);
+    }
     switch (curState) {
       case TO_STOW:
         if (superStructure.isFinished()) {
@@ -528,18 +605,24 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
 
       case INTAKING:
-        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE) {
-          ledSubsystem.setGreen();
-        }
         if (magazineSubsystem.hasPiece()) {
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
+          ledSubsystem.setBlue();
           toStow();
+          break;
+        }
+        if (intakeSubsystem.getState() == IntakeState.HAS_PIECE) {
+          ledSubsystem.setGreen();
+
+          if (!intakeSubsystem.isBeamBroken() && !magazineSubsystem.hasPiece()) {
+            magazineSubsystem.toIntaking(false);
+          }
         }
         if (intakeSubsystem.getState() == IntakeState.HAS_PIECE
             && (magazineSubsystem.getState() != MagazineStates.INTAKING)
             && magazineSubsystem.hasPiece() == false) {
-          magazineSubsystem.toIntaking();
+          magazineSubsystem.toIntaking(true);
         }
         break;
 
@@ -575,6 +658,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.reset();
           shootDelayTimer.start();
           hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
 
           setState(RobotStates.SHOOTING);
         }
@@ -603,27 +687,40 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_SHOOT:
         if (!usingDistance && !shootKnownPos) {
-          double[] shootSolution =
-              getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
+          //   logger.info(
+          //       "Timestamp Before Shot Sol: {}",
+          //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
+          getShootSolution(driveSubsystem.getDistanceToSpeaker());
+          //   logger.info(
+          //       "Timestamp After Shot Sol Before Shoot: {}",
+          //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+          //   logger.info(
+          //       "Timestamp After Shoot: {}",
+          //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
         }
 
         if (shootKnownPos) {
-          double[] shootSolution =
-              getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos), shootingLookupTable);
+          getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos));
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
           double vomega = driveSubsystem.getvOmegaToGoal(shootPos);
           driveSubsystem.move(0, 0, vomega, true);
         }
 
         if (isAuto && !usingDistance) {
+
           double vomega = driveSubsystem.getvOmegaToGoal();
           driveSubsystem.move(0, 0, vomega, true);
         }
-
+        // logger.info(
+        //     "Timestamp Before Conditions: {}",
+        //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
         if (driveSubsystem.isDriveStill()
             && (usingDistance ? true : driveSubsystem.isPointingAtGoal())
             && superStructure.isFinished()) {
+          //   logger.info(
+          //       "Timestamp After Conditions: {}",
+          //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
 
           if (!shootKnownPos) {
             org.littletonrobotics.junction.Logger.recordOutput(
@@ -641,9 +738,67 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           curShot += 1;
           hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
           if (isAuto) {
             ledSubsystem.setBlue();
           }
+
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+          hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
+
+          setState(RobotStates.SHOOTING);
+        }
+        break;
+
+      case TO_MOVING_SHOOT:
+        // Approximate future position of robot
+        Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
+        ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+        getShootSolution(
+            driveSubsystem.getDistanceToSpeaker(
+                new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
+
+        for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
+          virtualT =
+              virtualT.plus(
+                  new Translation2d(
+                      speeds.vxMetersPerSecond * shootSolution[3],
+                      speeds.vyMetersPerSecond * shootSolution[3]));
+          getShootSolution(
+              driveSubsystem.getDistanceToSpeaker(
+                  new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
+        }
+
+        superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+        Pose2d virtualPos = new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation());
+        driveSubsystem.setMoveAndShootVirtualPose(virtualPos);
+
+        if (driveSubsystem.isPointingAtGoal(virtualPos)
+            && superStructure.isFinished()
+            && driveSubsystem.isMoveShootAllowed(isAuto)) {
+
+          org.littletonrobotics.junction.Logger.recordOutput(
+              "ShootingData/shot" + Integer.toString(curShot) + "/Position", virtualPos);
+          org.littletonrobotics.junction.Logger.recordOutput(
+              "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+
+          magazineSubsystem.toEmptying();
+
+          curShot += 1;
+          hasShootBeamUnbroken = false;
+          if (isAuto) {
+            ledSubsystem.setBlue();
+          }
+
+          inWaitForUnbreakMode = false;
+          hasShootBeamUnbroken = false;
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
 
           setState(RobotStates.SHOOTING);
         }
@@ -652,21 +807,28 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case SHOOTING:
         if (!hasShootBeamUnbroken && magazineSubsystem.isRevBeamOpen()) {
           logger.info("Note out of Magazine");
-          shootDelayTimer.stop();
-          shootDelayTimer.reset();
-          shootDelayTimer.start();
+          // shootDelayTimer.stop();
+          // shootDelayTimer.reset();
+          // shootDelayTimer.start();
           hasShootBeamUnbroken = true;
         }
-        if (hasShootBeamUnbroken) {
+        if (isAuto
+            || (shootDelayTimer.hasElapsed(RobotStateConstants.kShootDelay)
+                && !inWaitForUnbreakMode)) {
+          inWaitForUnbreakMode = true;
+        }
+        if (hasShootBeamUnbroken && inWaitForUnbreakMode) {
           shootDelayTimer.stop();
           driveSubsystem.setIsAligningShot(false);
           driveSubsystem.setIsFeeding(false);
+          driveSubsystem.setIsMoveAndShoot(false);
           magazineSubsystem.setSpeed(0);
 
           superStructure.stopShoot();
           ledSubsystem.setOff();
           toIntake();
           magazineSubsystem.setEmpty();
+          inWaitForUnbreakMode = false;
         }
 
         break;
@@ -716,6 +878,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.reset();
           shootDelayTimer.start();
           hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
 
           setState(RobotStates.SHOOTING);
         }
@@ -741,6 +904,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           shootDelayTimer.reset();
           shootDelayTimer.start();
           hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
 
           setState(RobotStates.SHOOTING);
           hasDelayed = false;
@@ -804,6 +968,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case SCORE_TRAP:
         if (scoreTrapTimer.hasElapsed(RobotStateConstants.kTrapTimer)) {
+          climbSubsystem.trapClimbAdjust();
+          setState(RobotStates.ADJUST_TRAP);
+        }
+        break;
+      case ADJUST_TRAP:
+        if (climbSubsystem.isFinished()) {
           superStructure.toFold();
           setState(RobotStates.FOLDING_IN);
         }
@@ -838,12 +1008,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case POST_CLIMB:
         break;
-      case TO_DEFENSE:
-        if (superStructure.isFinished()
-            && superStructure.getState() == SuperStructureStates.DEFENSE) {
-          setState(RobotStates.DEFENSE);
-        }
-        break;
       case DEFENSE:
         break;
       default:
@@ -852,7 +1016,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState);
   }
-
   // Grapher
   @Override
   public Set<Measure> getMeasures() {
@@ -877,6 +1040,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     STOW,
     SPIN_UP,
     TO_SHOOT,
+    TO_MOVING_SHOOT,
     SHOOTING,
     TO_PODIUM,
     PODIUM_SHOOTING,
@@ -888,6 +1052,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_TRAP,
     TRAP,
     SCORE_TRAP,
+    ADJUST_TRAP,
     FOLDING_OUT,
     FOLDING_IN,
     DESCENDING,
@@ -895,7 +1060,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     PREPPING_DECEND,
     CLIMBING,
     CLIMBED,
-    TO_DEFENSE,
     DEFENSE,
     TO_FEED
   }
