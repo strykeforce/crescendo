@@ -79,6 +79,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Pose2d shootPos;
   private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
+    private boolean speedUpPass = false;
 
   private RobotStates desiredState = RobotStates.STOW;
   private int curShot = 1;
@@ -560,6 +561,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     shootDelay = delay;
   }
 
+  public void togglePassSpeedUp() {
+    speedUpPass = !speedUpPass;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -568,6 +573,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     } else {
       ledSubsystem.setBlinking(false);
     }
+    
+    if (speedUpPass) {
+        ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+        superStructure.fixedFeeding(FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+    }
+
     switch (curState) {
       case TO_STOW:
         if (superStructure.isFinished()) {

@@ -210,7 +210,8 @@ public class PathHandler extends MeasurableSubsystem {
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
           double curX = driveSubsystem.getPoseMeters().getX();
 
-          if (!timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * 0.50) && robotStateSubsystem.hasNote()) {
+          if (!timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * 0.50)
+              && robotStateSubsystem.hasNote()) {
             numPieces -= 0.5;
             logger.info("FETCH -> DRIVE_SHOOT");
             nextPath = paths[lastNote][0];
@@ -261,7 +262,7 @@ public class PathHandler extends MeasurableSubsystem {
             curState = PathStates.DRIVE_SHOOT;
             isSpinningUp = false;
             startNewPath(nextPath);
-          }\
+          }
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
             driveSubsystem.drive(0, 0, 0);
             logger.info("END_PATH -> FETCH");
