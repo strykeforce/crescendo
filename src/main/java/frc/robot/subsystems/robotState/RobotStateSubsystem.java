@@ -533,7 +533,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // FIXME
   public void releaseGamePiece() {
-    if (curState == RobotStates.TO_PODIUM) {
+    if (curState == RobotStates.TO_PODIUM|| curState == RobotStates.TO_PODIUM) {
       superStructure.podiumShoot();
 
       magazineShootDelayTimer.stop();
@@ -541,7 +541,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineShootDelayTimer.start();
 
       setState(RobotStates.PODIUM_SHOOTING);
-    } else if (curState == RobotStates.AMP) {
+    } else if (curState == RobotStates.AMP || curState == RobotStates.TO_AMP) {
       safeStow = false;
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
@@ -573,7 +573,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     } else {
       ledSubsystem.setBlinking(false);
     }
-    
+
     if (speedUpPass) {
         ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
         superStructure.fixedFeeding(FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
