@@ -81,7 +81,7 @@ public final class AutonConstants {
       null,
       "MiddleNote1_MiddleNote2",
       "MiddleNote1_MiddleNote3",
-      null,
+      "MiddleNote1_MiddleNote4",
       null,
       null
     },
@@ -137,7 +137,7 @@ public final class AutonConstants {
 
     // Shooting Positions
     public static final Pose2d AS1 = new Pose2d(3.89, 5.55, Rotation2d.fromDegrees(0.0));
-    public static final Pose2d AS2 = new Pose2d(4.0, 5.55, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d AS2 = new Pose2d(4.3, 6.5, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS1 = new Pose2d(4.3, 5.55, Rotation2d.fromDegrees(0.0));
     public static final Pose2d NAS1 = new Pose2d(4.2, 2.8, Rotation2d.fromDegrees(-33.2));
     public static final Pose2d NAS2 =

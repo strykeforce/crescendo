@@ -11,14 +11,18 @@ import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.intake.EjectPieceCommand;
 import frc.robot.commands.pathHandler.StartPathHandlerCommand;
 import frc.robot.commands.robotState.IntakeCommand;
+import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.vision.DeadEyeSubsystem;
+
 import java.util.List;
 
 public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
@@ -66,12 +70,17 @@ public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
                 new setAngleOffsetCommand(driveSubsystem, -90.0),
                 new ZeroElbowCommand(elbowSubsystem)),
             firstPath,
-            new EjectPieceCommand(intakeSubsystem),
-            new IntakeCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-            secondPath,
+            new ParallelCommandGroup(
+              new SequentialCommandGroup(
+                new EjectPieceCommand(intakeSubsystem),
+                new IntakeCommand(
+                    robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)),
+              secondPath),
             new StartPathHandlerCommand(pathHandler)
-            // new ToggleVisionUpdatesCommand(driveSubsystem)
+            // new ToggleVisionUpdatesCommand(driveSubsystem),
+            // thirdPath,
+            // new TestDeadeyeCleanUpCommand(deadEyeSubsystem, driveSubsystem, robotStateSubsystem, ledSubsystem),
+            // new VisionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)
             ));
   }
 
