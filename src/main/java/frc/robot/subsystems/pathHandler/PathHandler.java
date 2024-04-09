@@ -42,6 +42,7 @@ public class PathHandler extends MeasurableSubsystem {
   private Rotation2d robotHeading;
   private Trajectory curTrajectory;
   private boolean deadeyeFlag = false;
+  private int lastNote = 0;
 
   private ProfiledPIDController deadeyeYDrive;
   private PIDController deadeyeXDrive;
@@ -208,6 +209,17 @@ public class PathHandler extends MeasurableSubsystem {
         case DRIVE_FETCH:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
           double curX = driveSubsystem.getPoseMeters().getX();
+
+          if (!timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * 0.50) && robotStateSubsystem.hasNote()) {
+            numPieces -= 0.5;
+            logger.info("FETCH -> DRIVE_SHOOT");
+            nextPath = paths[lastNote][0];
+            logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
+            curState = PathStates.DRIVE_SHOOT;
+            isSpinningUp = false;
+            startNewPath(nextPath);
+          }
+
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * AutonConstants.kPercentLeft)
               && ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
                       && curX >= AutonConstants.kSwitchXLine)
@@ -241,6 +253,15 @@ public class PathHandler extends MeasurableSubsystem {
                 curTrajectory.sample(timer.get()), robotHeading, yVel);
           else driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
 
+          if (robotStateSubsystem.hasNote()) {
+            numPieces -= 0.5;
+            logger.info("END_PATH -> DRIVE_SHOOT");
+            nextPath = paths[lastNote][0];
+            logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
+            curState = PathStates.DRIVE_SHOOT;
+            isSpinningUp = false;
+            startNewPath(nextPath);
+          }\
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
             driveSubsystem.drive(0, 0, 0);
             logger.info("END_PATH -> FETCH");
@@ -275,6 +296,7 @@ public class PathHandler extends MeasurableSubsystem {
           String nextPathName;
 
           if (robotStateSubsystem.hasNote() && numPieces > 0.51) {
+            lastNote = noteOrder.get(0);
             numPieces -= 0.5;
             logger.info("FETCH -> DRIVE_SHOOT");
             nextPath = paths[noteOrder.get(0)][0];
