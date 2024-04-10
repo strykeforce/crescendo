@@ -76,20 +76,28 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setSpeed(isFast ? MagazineConstants.kFastIntakingSpeed : MagazineConstants.kIntakingSpeed);
   }
 
+  public void toAmp() {
+    io.enableFwdLimitSwitch(true);
+    setSpeed(MagazineConstants.kReversingSpeed);
+  }
+
   public void toEmptying() {
     resetRevBeamCounts();
     io.enableRevLimitSwitch(false);
+    io.enableFwdLimitSwitch(false);
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EMPTYING);
   }
 
   public void toEmpty() {
     setState(MagazineStates.EMPTY);
+    io.enableFwdLimitSwitch(false);
   }
 
   public void toEmptying(double speed) {
     resetRevBeamCounts();
     io.enableRevLimitSwitch(false);
+    io.enableFwdLimitSwitch(false);
     setSpeed(speed);
     setState(MagazineStates.EMPTYING);
   }
@@ -98,29 +106,34 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     releaseTimer.stop();
     releaseTimer.reset();
     releaseTimer.start();
+    io.enableFwdLimitSwitch(false);
     setSpeed(MagazineConstants.kAmpReleaseSpeed);
     setState(MagazineStates.RELEASE);
   }
 
   public void setEmpty() {
     io.enableRevLimitSwitch(true);
+    io.enableFwdLimitSwitch(false);
     io.setPct(0.0);
     setState(MagazineStates.EMPTY);
   }
 
   public void preparePodium() {
     io.enableRevLimitSwitch(false);
+    io.enableFwdLimitSwitch(false);
     resetRevBeamCounts();
     setSpeed(MagazineConstants.kPodiumPrepareSpeed);
     setState(MagazineStates.PREP_PODIUM);
   }
 
   public void toPrepClimb() {
+    io.enableFwdLimitSwitch(false);
     setSpeed(MagazineConstants.kReversingSpeed);
     setState(MagazineStates.REVERSING);
   }
 
   public void trap() {
+    io.enableFwdLimitSwitch(false);
     setSpeed(MagazineConstants.kTrapReleaseSpeed);
 
     releaseTimer.reset();

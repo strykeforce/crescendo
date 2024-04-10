@@ -201,7 +201,11 @@ public class SuperStructure extends MeasurableSubsystem {
       shooterSubsystem.setSpeed(rightShooterSpeed);
     }
     wristSubsystem.setPosition(wristSetpoint);
-    elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    if (elbowSubsystem.getPosition() < SuperStructureConstants.kElbowMinToMoveWrist) {
+      elbowSubsystem.setPosition(elbowSetpoint);
+    } else {
+      elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    }
 
     logger.info("{} -> TRANSFER(INTAKE)", curState);
     isPrecise = false;
@@ -270,7 +274,7 @@ public class SuperStructure extends MeasurableSubsystem {
     }
 
     wristSubsystem.setPosition(wristSetpoint);
-    if (elbowSubsystem.getPosition() >= SuperStructureConstants.kElbowMinToMoveWrist) {
+    if (elbowSubsystem.getPosition() < SuperStructureConstants.kElbowMinToMoveWrist) {
       elbowSubsystem.setPosition(elbowSetpoint);
     } else {
       elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
@@ -291,7 +295,7 @@ public class SuperStructure extends MeasurableSubsystem {
 
     shooterSubsystem.setSpeed(leftShooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
-    if (elbowSubsystem.getPosition() >= SuperStructureConstants.kElbowMinToMoveWrist) {
+    if (elbowSubsystem.getPosition() < SuperStructureConstants.kElbowMinToMoveWrist) {
       elbowSubsystem.setPosition(elbowSetpoint);
     } else {
       elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
@@ -413,7 +417,7 @@ public class SuperStructure extends MeasurableSubsystem {
       case TRANSFER:
         // Logic to determine how to move axis based on what the final position is
         if (flipMagazineOut) {
-          if (elbowSubsystem.getPosition() < SuperStructureConstants.kElbowMinToMoveWrist) {
+          if (elbowSubsystem.getPosition() > SuperStructureConstants.kElbowMinToMoveWrist) {
             wristSubsystem.setPosition(wristSetpoint);
           }
         } else {
