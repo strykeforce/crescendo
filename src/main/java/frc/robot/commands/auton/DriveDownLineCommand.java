@@ -8,15 +8,15 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.DeadEyeSubsystem;
 
 public class DriveDownLineCommand extends Command {
-    private DeadEyeSubsystem deadeye;
-    private DriveSubsystem driveSubsystem;
-    private ProfiledPIDController deadeyeYDrive;
-    
-    public DriveDownLineCommand(DeadEyeSubsystem deadeye, DriveSubsystem driveSubsystem) {
-        addRequirements(driveSubsystem);
-        this.driveSubsystem = driveSubsystem;
-        this.deadeye = deadeye;
-        
+  private DeadEyeSubsystem deadeye;
+  private DriveSubsystem driveSubsystem;
+  private ProfiledPIDController deadeyeYDrive;
+
+  public DriveDownLineCommand(DeadEyeSubsystem deadeye, DriveSubsystem driveSubsystem) {
+    addRequirements(driveSubsystem);
+    this.driveSubsystem = driveSubsystem;
+    this.deadeye = deadeye;
+
     deadeyeYDrive =
         new ProfiledPIDController(
             AutonConstants.kPDeadEyeYDrive,
@@ -24,13 +24,12 @@ public class DriveDownLineCommand extends Command {
             AutonConstants.kDDeadEyeYDrive,
             new Constraints(
                 AutonConstants.kMaxVelDeadeyeDrive, AutonConstants.kMaxAccelDeadeyeDrive));
-    }
+  }
 
-    @Override
-    public void initialize() {
-        double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
-        driveSubsystem.recordYVel(ySpeed);
-        driveSubsystem.move(AutonConstants.kForwardVel, ySpeed, 0.0, false);
-    }
-    
+  @Override
+  public void initialize() {
+    double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
+    driveSubsystem.recordYVel(ySpeed);
+    driveSubsystem.move(AutonConstants.kForwardVel, ySpeed, 0.0, false);
+  }
 }

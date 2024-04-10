@@ -582,6 +582,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
       superStructure.fixedFeeding(
           FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+    } else {
+      superStructure.stopShoot();
     }
 
     switch (curState) {
@@ -607,6 +609,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (magazineHasNote()
             && driveSubsystem.getDistanceToSpeaker() < RobotStateConstants.kLookupMaxDistance) {
           superStructure.spinUp();
+        } else if (speedUpPass) {
+          ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+          superStructure.fixedFeeding(
+              FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
         } else {
           superStructure.stopShoot();
         }

@@ -62,6 +62,7 @@ import frc.robot.commands.robotState.DecendCommand;
 import frc.robot.commands.robotState.FeedCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
+import frc.robot.commands.robotState.MovingVisionShootCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.PodiumCommand;
 import frc.robot.commands.robotState.PositionShootCommand;
@@ -76,7 +77,6 @@ import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
 import frc.robot.commands.robotState.UpdateElbowOffsetCommand;
-import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.commands.wrist.ClosedLoopWristCommand;
 import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.commands.wrist.WriteWristToStowCommand;
@@ -860,7 +860,7 @@ public class RobotContainer {
             new PodiumCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
-    // SubWoofer
+    // Speed Up Pass
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(new SpeedUpPassCommand(robotStateSubsystem, superStructure));
 
@@ -978,7 +978,7 @@ public class RobotContainer {
     // Vision Shoot
     new JoystickButton(driveJoystick, Button.M_SWH.id)
         .onTrue(
-            new VisionShootCommand(
+            new MovingVisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     // Release Game Piece Command

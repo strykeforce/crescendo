@@ -73,9 +73,9 @@ public final class ElbowConstants {
     config.HardwareLimitSwitch.ForwardLimitEnable = false;
 
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.14691; // 0.151
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.3; // 0.14691
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.26409; // -0.26
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.001; // -0.26409
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     config.Feedback.FeedbackRemoteSensorID = ElbowConstants.kHighResCANcoderID;
