@@ -430,7 +430,7 @@ public class RobotContainer {
         .add(
             "Shoot FAR",
             new ClosedLoopElbowOffsetCommand(
-                elbowSubsystem, 0.07, () -> robotStateSubsystem.getElbowOffset()))
+                elbowSubsystem, 0.075, () -> robotStateSubsystem.getElbowOffset()))
         .withPosition(7, 0)
         .withSize(1, 1);
 
@@ -438,7 +438,7 @@ public class RobotContainer {
         .add(
             "Shoot MEDIUM",
             new ClosedLoopElbowOffsetCommand(
-                elbowSubsystem, 0.08119, () -> robotStateSubsystem.getElbowOffset()))
+                elbowSubsystem, 0.065, () -> robotStateSubsystem.getElbowOffset()))
         .withPosition(7, 1)
         .withSize(1, 1);
 
@@ -446,7 +446,7 @@ public class RobotContainer {
         .add(
             "Shoot CLOSE",
             new ClosedLoopElbowOffsetCommand(
-                elbowSubsystem, 0.09, () -> robotStateSubsystem.getElbowOffset()))
+                elbowSubsystem, 0.055, () -> robotStateSubsystem.getElbowOffset()))
         .withPosition(7, 2)
         .withSize(1, 1);
 
@@ -576,6 +576,11 @@ public class RobotContainer {
     Shuffleboard.getTab("Match")
         .addDouble("Elbow Offset", () -> robotStateSubsystem.getElbowOffset())
         .withPosition(8, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Speed Up Pass", () -> robotStateSubsystem.isPassSpeedUp())
+        .withPosition(5, 2)
         .withSize(1, 1);
 
     allianceColor =
@@ -857,7 +862,7 @@ public class RobotContainer {
 
     // SubWoofer
     new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .onTrue(new SpeedUpPassCommand(robotStateSubsystem, shooterSubsystem));
+        .onTrue(new SpeedUpPassCommand(robotStateSubsystem, superStructure));
 
     // Defense
     new JoystickButton(xboxController, XboxController.Button.kB.value)

@@ -57,7 +57,7 @@ public final class ElbowConstants {
   public static CANcoderConfiguration getHighResCANcoderConfig() {
     CANcoderConfiguration config = new CANcoderConfiguration();
 
-    config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
 
     return config;
@@ -80,7 +80,7 @@ public final class ElbowConstants {
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     config.Feedback.FeedbackRemoteSensorID = ElbowConstants.kHighResCANcoderID;
     config.Feedback.RotorToSensorRatio = 52.0833;
-    config.Feedback.SensorToMechanismRatio = 4.0;
+    config.Feedback.SensorToMechanismRatio = 8.0;
 
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 

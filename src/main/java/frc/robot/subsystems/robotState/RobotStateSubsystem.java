@@ -79,7 +79,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Pose2d shootPos;
   private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
-    private boolean speedUpPass = false;
+  private boolean speedUpPass = false;
 
   private RobotStates desiredState = RobotStates.STOW;
   private int curShot = 1;
@@ -288,7 +288,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toAmp() {
     driveSubsystem.setIsAligningShot(false);
-    magazineSubsystem.setSpeed(0.0);
+    magazineSubsystem.toAmp();
     superStructure.amp();
     intakeSubsystem.toEjecting();
     // intakeSubsystem.setPercent(0.0);
@@ -533,7 +533,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // FIXME
   public void releaseGamePiece() {
-    if (curState == RobotStates.TO_PODIUM|| curState == RobotStates.TO_PODIUM) {
+    if (curState == RobotStates.TO_PODIUM || curState == RobotStates.TO_PODIUM) {
       superStructure.podiumShoot();
 
       magazineShootDelayTimer.stop();
@@ -565,6 +565,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     speedUpPass = !speedUpPass;
   }
 
+  public boolean isPassSpeedUp() {
+    return speedUpPass;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -575,8 +579,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
 
     if (speedUpPass) {
-        ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
-        superStructure.fixedFeeding(FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+      ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+      superStructure.fixedFeeding(
+          FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
     }
 
     switch (curState) {
