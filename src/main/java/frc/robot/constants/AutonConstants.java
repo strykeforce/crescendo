@@ -21,6 +21,8 @@ public final class AutonConstants {
 
   public static final int kSwitchStableCounts = 100;
 
+  public static final double kForwardVel = 1.5;
+
   public static final String[][] kNonAmpPathMatrix = {
     {
       null,

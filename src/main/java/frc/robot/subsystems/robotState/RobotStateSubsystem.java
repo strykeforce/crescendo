@@ -79,6 +79,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Pose2d shootPos;
   private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
+  private boolean speedUpPass = false;
 
   private RobotStates desiredState = RobotStates.STOW;
   private int curShot = 1;
@@ -287,7 +288,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toAmp() {
     driveSubsystem.setIsAligningShot(false);
-    magazineSubsystem.setSpeed(0.0);
+    magazineSubsystem.toAmp();
     superStructure.amp();
     intakeSubsystem.toEjecting();
     // intakeSubsystem.setPercent(0.0);
@@ -532,7 +533,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   // FIXME
   public void releaseGamePiece() {
-    if (curState == RobotStates.TO_PODIUM) {
+    if (curState == RobotStates.TO_PODIUM || curState == RobotStates.TO_PODIUM) {
       superStructure.podiumShoot();
 
       magazineShootDelayTimer.stop();
@@ -540,7 +541,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       magazineShootDelayTimer.start();
 
       setState(RobotStates.PODIUM_SHOOTING);
-    } else if (curState == RobotStates.AMP) {
+    } else if (curState == RobotStates.AMP || curState == RobotStates.TO_AMP) {
       safeStow = false;
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
@@ -560,6 +561,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     shootDelay = delay;
   }
 
+  public void togglePassSpeedUp() {
+    speedUpPass = !speedUpPass;
+  }
+
+  public boolean isPassSpeedUp() {
+    return speedUpPass;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -568,6 +577,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     } else {
       ledSubsystem.setBlinking(false);
     }
+
+    if (speedUpPass) {
+      ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+      superStructure.fixedFeeding(
+          FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+    } else {
+      superStructure.stopShoot();
+    }
+
     switch (curState) {
       case TO_STOW:
         if (superStructure.isFinished()) {
@@ -591,6 +609,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (magazineHasNote()
             && driveSubsystem.getDistanceToSpeaker() < RobotStateConstants.kLookupMaxDistance) {
           superStructure.spinUp();
+        } else if (speedUpPass) {
+          ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+          superStructure.fixedFeeding(
+              FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
         } else {
           superStructure.stopShoot();
         }
