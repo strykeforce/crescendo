@@ -31,7 +31,7 @@ public final class MagazineConstants {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 0.4;
+    slot0.kP = 0.2;
     slot0.kI = 0.0;
     slot0.kD = 0.0;
     slot0.kS = 0.0;
@@ -41,7 +41,7 @@ public final class MagazineConstants {
     config.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs().withMotionMagicAcceleration(300).withMotionMagicJerk(5000);
+        new MotionMagicConfigs().withMotionMagicAcceleration(500).withMotionMagicJerk(5000);
     config.MotionMagic = motionMagic;
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
