@@ -80,6 +80,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
   private boolean speedUpPass = false;
+  private boolean hasStoppedWheels = false;
 
   private RobotStates desiredState = RobotStates.STOW;
   private int curShot = 1;
@@ -579,11 +580,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
 
     if (speedUpPass) {
+      hasStoppedWheels = false;
       ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
       superStructure.fixedFeeding(
           FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
     } else {
-      superStructure.stopShoot();
+      if (!hasStoppedWheels) superStructure.stopShoot();
+      hasStoppedWheels = true;
     }
 
     switch (curState) {
