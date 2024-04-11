@@ -585,6 +585,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       superStructure.fixedFeeding(
           FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
     } else {
+      //   superStructure.stopShoot();
       if (!hasStoppedWheels) superStructure.stopShoot();
       hasStoppedWheels = true;
     }
