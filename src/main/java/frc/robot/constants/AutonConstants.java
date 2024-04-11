@@ -100,8 +100,8 @@ public final class AutonConstants {
       "MiddleNote3_MiddleNote1",
       "MiddleNote3_MiddleNote2",
       null,
-      null,
-      null
+      "MiddleNote3_MiddleNote4",
+      "MiddleNote3_MiddleNote5"
     },
     {
       null, null, null, null, null,
@@ -116,7 +116,7 @@ public final class AutonConstants {
     public static final Pose2d AI1 = new Pose2d(1.09, 6.94, Rotation2d.fromDegrees(50));
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
     public static final Pose2d AI3 =
-        new Pose2d(1.45, 7.61, Rotation2d.fromDegrees(0.0)); // FIXME empty start location
+        new Pose2d(1.43764, 7.33425, Rotation2d.fromDegrees(90.0));
     public static final Pose2d AI4 =
         new Pose2d(
             kAutonLineX - DriveConstants.kRobotWidth,
