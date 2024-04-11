@@ -178,7 +178,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     nextState = RobotStates.STOW;
   }
 
-
   // Order of Columns: dist meters, left shoot, right shoot, elbow, time of flight
   private double[][] parseLookupTable(String path) {
     double[][] lookupTable;
@@ -575,7 +574,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public boolean isPassSpeedUp() {
     return speedUpPass;
   }
-  
+
   public void logTemperature() {
     org.littletonrobotics.junction.Logger.recordOutput("Temperature", breakerTemp.getValue());
   }
