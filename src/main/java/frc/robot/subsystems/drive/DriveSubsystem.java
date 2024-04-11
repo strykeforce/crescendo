@@ -172,6 +172,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
+  public void recordXVel(double val) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/XVelSpeed", val);
+  }
+
   public void recordYVel(double val) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", val);
   }
@@ -202,6 +206,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // logger.info("input: {}, output: {}, angle: {}", holoContInput,
     // holoContOutput, desiredAngle);
     io.move(holoContOutput.vxMetersPerSecond, driveY, holoContOutput.omegaRadiansPerSecond, false);
+  }
+
+  public void driveAutonYController(State desiredState, Rotation2d desiredAngle, double driveX) {
+    holoContInput = desiredState;
+    holoContAngle = desiredAngle;
+    holoContOutput = holonomicController.calculate(inputs.poseMeters, desiredState, desiredAngle);
+    // logger.info("input: {}, output: {}, angle: {}", holoContInput,
+    // holoContOutput, desiredAngle);
+    io.move(driveX, holoContOutput.vyMetersPerSecond, holoContOutput.omegaRadiansPerSecond, false);
   }
 
   public void resetOdometry(Pose2d pose) {
