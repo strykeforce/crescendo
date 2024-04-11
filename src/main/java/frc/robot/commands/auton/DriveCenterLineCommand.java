@@ -28,7 +28,7 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
   private boolean resetOdometry;
   private boolean trajectoryGenerated = false;
   private RobotStateSubsystem robotStateSubsystem;
-  private ProfiledPIDController deadeyeXDrive;
+  private ProfiledPIDController deadeyeYDrive;
   private DeadEyeSubsystem deadeye;
   private LedSubsystem ledSubsystem;
 
@@ -51,11 +51,11 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
     this.trajectoryName = trajectoryName;
     generateTrajectory();
     timer.start();
-    deadeyeXDrive =
+    deadeyeYDrive =
         new ProfiledPIDController(
-            AutonConstants.kPDeadEyeXDrive,
-            AutonConstants.kIDeadEyeXDrive,
-            AutonConstants.kDDeadEyeXDrive,
+            AutonConstants.kPDeadEyeYDrive,
+            AutonConstants.kIDeadEyeYDrive,
+            AutonConstants.kDDeadEyeYDrive,
             new Constraints(
                 AutonConstants.kMaxVelDeadeyeDrive, AutonConstants.kMaxAccelDeadeyeDrive));
   }
@@ -95,9 +95,9 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
     if (trajectoryGenerated) {
       Trajectory.State desiredState = trajectory.sample(timer.get());
 
-      double xVel = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
-      driveSubsystem.recordXVel(xVel);
-      driveSubsystem.driveAutonYController(desiredState, robotHeading, xVel);
+      double yVel = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
+      driveSubsystem.recordYVel(yVel);
+      driveSubsystem.driveAutonXController(desiredState, robotHeading, yVel);
 
     } else logger.error("trajectory not generated");
   }

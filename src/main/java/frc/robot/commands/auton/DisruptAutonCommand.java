@@ -2,16 +2,19 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.TurnToAngleCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
-import frc.robot.commands.robotState.DistanceShootCommand;
+import frc.robot.commands.robotState.PrepShooterCommand;
 import frc.robot.commands.robotState.ToDisruptCommand;
+import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -59,30 +62,28 @@ public class DisruptAutonCommand extends SequentialCommandGroup implements AutoC
 
     this.robotStateSubsystem = robotStateSubsystem;
 
-    deadeyeXDrive =
-        new ProfiledPIDController(
-            AutonConstants.kPDeadEyeXDrive,
-            AutonConstants.kIDeadEyeXDrive,
-            AutonConstants.kDDeadEyeXDrive,
-            new Constraints(
-                AutonConstants.kMaxVelDeadeyeDrive, AutonConstants.kMaxAccelDeadeyeDrive));
-
     addCommands(
         new SequentialCommandGroup(
             new ResetGyroCommand(driveSubsystem),
             new ParallelCommandGroup(
                 new setAngleOffsetCommand(driveSubsystem, 0.0),
                 new ZeroElbowCommand(elbowSubsystem)),
-            firstPath,
-            new DistanceShootCommand(
-                robotStateSubsystem,
-                superStructure,
-                magazineSubsystem,
-                intakeSubsystem,
-                AutonConstants.kNAS3ToSpeakerDist),
+            new ParallelCommandGroup(
+                firstPath,
+                new PrepShooterCommand(
+                    superStructure, robotStateSubsystem, AutonConstants.Setpoints.NAS3)),
+            // new DistanceShootCommand(
+            //     robotStateSubsystem,
+            //     superStructure,
+            //     magazineSubsystem,
+            //     intakeSubsystem,
+            //     AutonConstants.kNAS3ToSpeakerDist),
+            new VisionShootCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
             secondPath,
             new ToDisruptCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+            new TurnToAngleCommand(driveSubsystem, new Rotation2d(Units.degreesToRadians(90.0))),
             new DriveCenterLineCommand(
                 driveSubsystem,
                 robotStateSubsystem,
