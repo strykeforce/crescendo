@@ -7,10 +7,11 @@ target_yaw = -90.0 #degrees
 
 [start_pose]
     dataPoint = "AI3"
+
 [end_pose]
     dataPoint = "MP1"
-    angle = 0
+    angle = 0.0
 
 [[internal_points]]
-    x = 3.225
+    x = 1.93
     y = 7.61

@@ -17,6 +17,9 @@ public class RobotConstants {
   // Joysticks
   public static final double kJoystickDeadband = 0.1;
 
+  // robot dimensions
+  public static final double klengthIncludingBumpers = 0.8509;
+
   // Roborio ID's
   public static final int kMinAutoSwitchID = 0;
   public static final int kMaxAutoSwitchID = 5;
