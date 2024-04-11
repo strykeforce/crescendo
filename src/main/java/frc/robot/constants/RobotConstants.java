@@ -43,6 +43,9 @@ public class RobotConstants {
   public static final double kShooterOffset = 0.2; // meters
   public static final Rotation2d kShooterHeading = Rotation2d.fromDegrees(180);
 
+  // Analog Input Channels
+  public static final int kBreakerTempChannel = 0;
+
   // Constants Different between Comp and Proto
   public static double kWheelDiameterInches = 3.0;
   public static double kElbowZero = 0.11206;

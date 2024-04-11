@@ -6,6 +6,7 @@ import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
@@ -53,6 +54,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double[][] shootingLookupTable;
   private double[][] feedingLookupTable;
 
+  private AnalogInput breakerTemp;
+
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
   private Timer ampStowTimer = new Timer();
@@ -95,7 +98,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       MagazineSubsystem magazineSubsystem,
       SuperStructure superStructure,
       ClimbSubsystem climbSubsystem,
-      LedSubsystem ledSubsystem) {
+      LedSubsystem ledSubsystem,
+      AnalogInput breakerTemp) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
@@ -105,6 +109,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.ledSubsystem = ledSubsystem;
 
     this.canBus = new CANBus();
+    this.breakerTemp = breakerTemp;
     grabElbowOffsetPreferences();
 
     shootingLookupTable = parseLookupTable(RobotStateConstants.kShootingLookupTablePath);
@@ -172,6 +177,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     nextState = RobotStates.STOW;
   }
+
 
   // Order of Columns: dist meters, left shoot, right shoot, elbow, time of flight
   private double[][] parseLookupTable(String path) {
@@ -568,6 +574,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public boolean isPassSpeedUp() {
     return speedUpPass;
+  }
+  
+  public void logTemperature() {
+    org.littletonrobotics.junction.Logger.recordOutput("Temperature", breakerTemp.getValue());
   }
 
   // Periodic
