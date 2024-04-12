@@ -576,7 +576,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void logTemperature() {
-    org.littletonrobotics.junction.Logger.recordOutput("Temperature", breakerTemp.getValue());
+    org.littletonrobotics.junction.Logger.recordOutput("Breaker Temperature", breakerTemp.getValue());
   }
 
   // Periodic

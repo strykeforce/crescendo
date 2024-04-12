@@ -327,7 +327,8 @@ public class PathHandler extends MeasurableSubsystem {
             startNewPath(nextPath);
           }
           break;
-
+        case WALL_FETCH:
+          break;
         case DRIVE_SHOOT:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
 
@@ -376,6 +377,7 @@ public class PathHandler extends MeasurableSubsystem {
     END_PATH,
     DRIVE_FETCH,
     DRIVE_SHOOT,
-    DONE
+    DONE,
+    WALL_FETCH
   }
 }
