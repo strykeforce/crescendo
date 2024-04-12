@@ -66,7 +66,7 @@ public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
         new SequentialCommandGroup(
             new ResetGyroCommand(driveSubsystem),
             new ParallelCommandGroup(
-                new setAngleOffsetCommand(driveSubsystem, -90.0),
+                new setAngleOffsetCommand(driveSubsystem, 90.0),
                 new ZeroElbowCommand(elbowSubsystem)),
             firstPath,
             new ParallelCommandGroup(

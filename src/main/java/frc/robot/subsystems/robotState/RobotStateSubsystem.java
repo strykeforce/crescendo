@@ -574,8 +574,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ejectPiecesTimer.stop();
     ejectPiecesTimer.reset();
     ejectPiecesTimer.start();
-    intakeSubsystem.toEjecting();
+    // intakeSubsystem.toEjecting();
     magazineSubsystem.toEjecting();
+    superStructure.ejecting();
     setState(RobotStates.EJECTING);
   }
 

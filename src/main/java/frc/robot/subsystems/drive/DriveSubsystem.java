@@ -231,6 +231,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
     omegaShootTrackController.reset(inputs.gyroRotation2d.getRadians());
+    logger.info("Holonomic Controller Reset: {}", inputs.gyroRotation2d.getRadians());
   }
 
   public void setHolonomicControllerTranslationkP(double kP) {
