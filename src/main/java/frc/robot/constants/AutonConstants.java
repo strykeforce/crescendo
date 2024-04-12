@@ -146,7 +146,7 @@ public final class AutonConstants {
         new Pose2d(4.55, 4.6, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
 
     // Path Midpoints
-    public static final Pose2d MP1 = new Pose2d(5, 7.61, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d MP1 = new Pose2d(5, 7.61, Rotation2d.fromDegrees(0.0)); // 5,7.61
     public static final Pose2d MP2 = new Pose2d(3.89, 7.2, Rotation2d.fromDegrees(-90)); // AS4
   }
 

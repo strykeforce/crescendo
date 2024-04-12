@@ -288,13 +288,11 @@ public class SuperStructure extends MeasurableSubsystem {
   }
 
   public void ejecting() {
-    elbowSetpoint = SuperStructureConstants.kElbowStowSetPoint;
-    wristSetpoint = SuperStructureConstants.kWristStowSetPoint;
-    rightShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
-    leftShooterSpeed = SuperStructureConstants.kShooterStowSetPoint;
-    if (!isAuto) {
-      shooterSubsystem.setSpeed(leftShooterSpeed);
-    }
+    elbowSetpoint = SuperStructureConstants.kElbowEjectingSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristEjectingSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterEjectingSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterEjectingSetPoint;
+    shooterSubsystem.setSpeed(leftShooterSpeed);
 
     wristSubsystem.setPosition(wristSetpoint);
     if (elbowSubsystem.getPosition() < SuperStructureConstants.kElbowMinToMoveWrist) {

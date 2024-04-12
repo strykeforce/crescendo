@@ -65,8 +65,8 @@ public final class SuperStructureConstants {
   public static final double kRightShooterFeedingSetPoint = 40;
 
   // EJECTING
-  public static final double kWristEjectingSetPoint = -2195.0; // -2245
-  public static final double kElbowEjectingSetPoint = 0.00122; // 0.14691
+  public static final double kWristEjectingSetPoint = kWristStowSetPoint; // -2245
+  public static final double kElbowEjectingSetPoint = kElbowStowSetPoint; // 0.14691
   public static final double kShooterEjectingSetPoint = 20.0;
 
   // SPINUP
