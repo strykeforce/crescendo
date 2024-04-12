@@ -11,6 +11,8 @@ import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.TurnToAngleCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
+import frc.robot.commands.intake.SetHasPieceCommand;
+import frc.robot.commands.magazine.SetFullCommand;
 import frc.robot.commands.robotState.PrepShooterCommand;
 import frc.robot.commands.robotState.ToDisruptCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
@@ -75,15 +77,17 @@ public class DisruptAutonCommand extends SequentialCommandGroup implements AutoC
             new ResetGyroCommand(driveSubsystem),
             new ParallelCommandGroup(
                 new setAngleOffsetCommand(driveSubsystem, 0.0),
-                new ZeroElbowCommand(elbowSubsystem)),
+                new ZeroElbowCommand(elbowSubsystem),
+                new SetFullCommand(magazineSubsystem),
+                new SetHasPieceCommand(intakeSubsystem)),
             new PrepShooterCommand(
                 superStructure, robotStateSubsystem, AutonConstants.Setpoints.NAS3),
             firstPath,
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-            secondPath,
             new ToDisruptCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+            secondPath,
             new TurnToAngleCommand(driveSubsystem, Rotation2d.fromDegrees(90)),
             new DriveCenterLineCommand(
                 driveSubsystem,

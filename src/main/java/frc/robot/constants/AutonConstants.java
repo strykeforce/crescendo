@@ -166,4 +166,8 @@ public final class AutonConstants {
 
   public static final double kAutonLineX = 1.93294;
   public static final double kAmpZoneWidth = 0.45085;
+
+  public static final double kDisruptIntakingYBlue = 6.0;
+  public static final double kDisruptIntakingYRed =
+      DriveConstants.kFieldMaxY - kDisruptIntakingYBlue;
 }
