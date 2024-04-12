@@ -59,6 +59,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private Timer startShootDelay = new Timer();
   private Timer climbTrapTimer = new Timer();
   private Timer scoreTrapTimer = new Timer();
+  private Timer ejectPiecesTimer = new Timer();
   private boolean hasDelayed = false;
   private double shootDelay = 0.0;
   private boolean hasShootBeamUnbroken = false;
@@ -569,6 +570,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return speedUpPass;
   }
 
+  public void toEjecting() {
+    ejectPiecesTimer.stop();
+    ejectPiecesTimer.reset();
+    ejectPiecesTimer.start();
+    intakeSubsystem.toEjecting();
+    magazineSubsystem.toEjecting();
+    setState(RobotStates.EJECTING);
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -1032,6 +1042,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case DEFENSE:
         break;
+      case EJECTING:
+        if (ejectPiecesTimer.hasElapsed(RobotStateConstants.kEjectTimer)) {
+          toIntake();
+        }
+        break;
       default:
         break;
     }
@@ -1083,6 +1098,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     CLIMBING,
     CLIMBED,
     DEFENSE,
-    TO_FEED
+    TO_FEED,
+    EJECTING
   }
 }

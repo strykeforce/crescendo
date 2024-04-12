@@ -51,6 +51,7 @@ import frc.robot.commands.elbow.SetElbowHasZeroedCommand;
 import frc.robot.commands.elbow.SetTrustElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.elbow.ZeroRecoveryElbowCommand;
+import frc.robot.commands.intake.EjectPieceCommand;
 import frc.robot.commands.intake.OpenLoopIntakeCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.magazine.RecoverMagazineCommand;
@@ -707,6 +708,10 @@ public class RobotContainer {
         .add("START ELBOW", new SetTrustElbowCommand(elbowSubsystem, false))
         .withSize(1, 1)
         .withPosition(3, 2);
+    Shuffleboard.getTab("Debug")
+        .add("eject piece", new EjectPieceCommand(robotStateSubsystem))
+        .withSize(1, 1)
+        .withPosition(1, 1);
   }
 
   public void configureTuningDashboard() {

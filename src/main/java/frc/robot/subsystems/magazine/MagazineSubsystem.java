@@ -208,6 +208,12 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     return atEdgeOne && isRevBeamOpen();
   }
 
+  public void toEjecting() {
+    io.enableFwdLimitSwitch(false);
+    setSpeed(MagazineConstants.kAmpReleaseSpeed);
+    setState(MagazineStates.EJECTING);
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -257,6 +263,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case TRAP:
         break;
+      case EJECTING:
+        break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("Magazine State", curState);
   }
@@ -284,6 +292,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     SHOOT,
     RELEASE,
     TRAP,
-    REVERSING
+    REVERSING,
+    EJECTING
   }
 }

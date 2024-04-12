@@ -185,6 +185,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             pathHandler,
             "AmpInitial3_MiddleNote1_Part1",
             "AmpInitial3_MiddleNote1_Part2",
+            // "NonAmpShoot2_DroppedNote",
             AutonConstants.kAmpPathMatrix,
             List.of(1, 2, 3),
             3.0,

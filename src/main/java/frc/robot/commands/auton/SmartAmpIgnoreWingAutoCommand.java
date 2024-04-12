@@ -27,6 +27,7 @@ public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
   private boolean hasGenerated = false;
   private DriveAutonCommand firstPath;
   private DriveAutonCommand secondPath;
+  private DriveAutonCommand thirdPath;
   private List<Integer> preferences;
   private String[][] pathNames;
   private double numPieces;
@@ -44,14 +45,16 @@ public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
       PathHandler pathHandler,
       String firstPathName,
       String secondPathName,
+      // String thirdPathName,
       String[][] pathNames,
       List<Integer> preferences,
       double numPieces,
       Pose2d shootPose) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
-    firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, true, true);
+    firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, false, true);
     secondPath = new DriveAutonCommand(driveSubsystem, secondPathName, true, false);
+    // thirdPath = new DriveAutonCommand(driveSubsystem, thirdPathName, true, false);
     this.pathHandler = pathHandler;
     this.robotStateSubsystem = robotStateSubsystem;
     this.pathNames = pathNames;
@@ -68,7 +71,7 @@ public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
             firstPath,
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
-                    new EjectPieceCommand(intakeSubsystem),
+                    new EjectPieceCommand(robotStateSubsystem),
                     new IntakeCommand(
                         robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)),
                 secondPath),
