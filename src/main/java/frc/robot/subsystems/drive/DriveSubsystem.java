@@ -819,6 +819,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Holonomic Cont Vx", () -> holoContOutput.vxMetersPerSecond),
         new Measure("Holonomic Cont Vy", () -> holoContOutput.vyMetersPerSecond),
         new Measure("Holonomic Cont Vomega", () -> holoContOutput.omegaRadiansPerSecond),
+        new Measure(
+            "Holo Controller Omega Err",
+            () -> holonomicController.getThetaController().getPositionError()),
         new Measure("Trajectory Active", () -> trajectoryActive),
         new Measure("Wheel 0 Angle", () -> io.getSwerveModuleStates()[0].angle.getDegrees()),
         new Measure("Wheel 0 Speed", () -> io.getSwerveModuleStates()[0].speedMetersPerSecond),
