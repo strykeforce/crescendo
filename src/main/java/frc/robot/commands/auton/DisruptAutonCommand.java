@@ -1,6 +1,7 @@
 package frc.robot.commands.auton;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -32,6 +33,8 @@ public class DisruptAutonCommand extends SequentialCommandGroup implements AutoC
 
   private DriveAutonCommand firstPath;
   private MiddleNoteDriveAutonCommand secondPath;
+  private DriveCenterLineCommand thirdPath;
+  private DriveAutonCommand shootPath;
   private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
 
@@ -48,7 +51,9 @@ public class DisruptAutonCommand extends SequentialCommandGroup implements AutoC
       LedSubsystem ledSubsystem,
       String firstPathName,
       String secondPathName,
-      String thirdPathName) {
+      String thirdPathName,
+      String shootPathName,
+      Pose2d shootPose) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
     firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, false, true);
@@ -61,6 +66,18 @@ public class DisruptAutonCommand extends SequentialCommandGroup implements AutoC
             secondPathName,
             false,
             false);
+
+    thirdPath =
+        new DriveCenterLineCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            deadeye,
+            ledSubsystem,
+            thirdPathName,
+            false,
+            false);
+
+    shootPath = new DriveAutonCommand(driveSubsystem, shootPathName, true, false);
 
     this.robotStateSubsystem = robotStateSubsystem;
 
@@ -85,23 +102,26 @@ public class DisruptAutonCommand extends SequentialCommandGroup implements AutoC
             firstPath,
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-            new ToDisruptCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-            secondPath,
+            new ParallelCommandGroup(
+                secondPath,
+                new ToDisruptCommand(
+                    robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)),
             new TurnToAngleCommand(driveSubsystem, Rotation2d.fromDegrees(90)),
-            new DriveCenterLineCommand(
-                driveSubsystem,
-                robotStateSubsystem,
-                deadeye,
-                ledSubsystem,
-                thirdPathName,
-                false,
-                false)));
+            thirdPath,
+            new ParallelCommandGroup(
+                shootPath,
+                new SequentialCommandGroup(
+                    new AutoWaitNoteStagedCommand(robotStateSubsystem),
+                    new PrepShooterCommand(superStructure, robotStateSubsystem, shootPose))),
+            new VisionShootCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)));
   }
 
   public void generateTrajectory() {
     firstPath.generateTrajectory();
     secondPath.generateTrajectory();
+    thirdPath.generateTrajectory();
+    shootPath.generateTrajectory();
 
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();

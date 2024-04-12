@@ -670,6 +670,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "MS1":
           pose = Setpoints.MS1;
           break;
+        case "MS2":
+          pose = Setpoints.MS2;
+          break;
         case "NAS1":
           pose = Setpoints.NAS1;
           break;

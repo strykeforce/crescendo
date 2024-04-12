@@ -323,7 +323,9 @@ public class AutoSwitch extends MeasurableSubsystem {
             ledSubsystem,
             "NonAmpInitial2_NonAmpShoot3",
             "NonAmpShoot3_MiddleNote5",
-            "MiddleNote5_MiddleNote1");
+            "MiddleNote5_MiddleNote1",
+            "MiddleNote1_MiddleShoot",
+            AutonConstants.Setpoints.MS2);
 
       default:
         String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);

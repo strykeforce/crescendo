@@ -106,7 +106,7 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
       if (robotStateSubsystem.getState() == RobotStates.AUTO_DISRUPT) {
         Alliance alliance = robotStateSubsystem.getAllianceColor();
         if (alliance == Alliance.Blue && currY > AutonConstants.kDisruptIntakingYBlue
-            || alliance == Alliance.Red && currY < AutonConstants.kDisruptIntakingYRed) {
+            || alliance == Alliance.Red && currY > AutonConstants.kDisruptIntakingYRed) {
           robotStateSubsystem.toIntake();
         }
       }
