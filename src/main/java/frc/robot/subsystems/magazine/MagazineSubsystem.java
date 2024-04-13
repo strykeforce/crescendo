@@ -83,9 +83,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   public void toEmptying() {
     resetRevBeamCounts();
-    io.enableRevLimitSwitch(false);
-    io.enableFwdLimitSwitch(false);
     setSpeed(MagazineConstants.kEmptyingSpeed);
+    io.enableLimitSwitches(false, false);
     setState(MagazineStates.EMPTYING);
   }
 
@@ -96,9 +95,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   public void toEmptying(double speed) {
     resetRevBeamCounts();
-    io.enableRevLimitSwitch(false);
-    io.enableFwdLimitSwitch(false);
     setSpeed(speed);
+    io.enableLimitSwitches(false, false);
     setState(MagazineStates.EMPTYING);
   }
 
@@ -112,15 +110,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   public void setEmpty() {
-    io.enableRevLimitSwitch(true);
-    io.enableFwdLimitSwitch(false);
+    io.enableLimitSwitches(false, true);
     io.setPct(0.0);
     setState(MagazineStates.EMPTY);
   }
 
   public void preparePodium() {
-    io.enableRevLimitSwitch(false);
-    io.enableFwdLimitSwitch(false);
+    io.enableLimitSwitches(false, false);
     resetRevBeamCounts();
     setSpeed(MagazineConstants.kPodiumPrepareSpeed);
     setState(MagazineStates.PREP_PODIUM);
@@ -195,8 +191,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
   }
 
   public void enableLimitSwitches(boolean enabled) {
-    io.enableFwdLimitSwitch(enabled);
-    io.enableRevLimitSwitch(enabled);
+    io.enableLimitSwitches(enabled, enabled);
   }
 
   public boolean isNotePrepped() {
@@ -210,8 +205,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   public void toEjecting() {
     resetRevBeamCounts();
-    io.enableRevLimitSwitch(false);
-    io.enableFwdLimitSwitch(false);
+    io.enableLimitSwitches(false, false);
     setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EJECTING);
   }
@@ -266,8 +260,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case TRAP:
         break;
       case EJECTING:
-        io.enableRevLimitSwitch(false);
-        io.enableFwdLimitSwitch(false);
+        io.enableLimitSwitches(false, false);
         break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("Magazine State", curState);

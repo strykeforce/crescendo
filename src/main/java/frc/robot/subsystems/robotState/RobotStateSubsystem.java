@@ -84,7 +84,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double grabbedShotDistance = 0.0;
   private double magazineTuneSpeed = 0.0;
   private boolean speedUpPass = false;
-  private boolean hasStoppedWheels = false;
+  private boolean hasStoppedWheels = true;
 
   private RobotStates desiredState = RobotStates.STOW;
   private int curShot = 1;
