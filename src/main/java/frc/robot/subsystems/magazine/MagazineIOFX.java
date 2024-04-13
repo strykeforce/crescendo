@@ -90,7 +90,13 @@ public class MagazineIOFX implements MagazineIO, Checkable {
 
   @Override
   public void enableLimitSwitches(boolean fwdEnable, boolean revEnable) {
-      magazine.getConfigurator().apply(MagazineConstants.getMagazineConfig().HardwareLimitSwitch.withForwardLimitEnable(fwdEnable).withReverseLimitEnable(revEnable));
+    magazine
+        .getConfigurator()
+        .apply(
+            MagazineConstants.getMagazineConfig()
+                .HardwareLimitSwitch
+                .withForwardLimitEnable(fwdEnable)
+                .withReverseLimitEnable(revEnable));
   }
 
   @Override
