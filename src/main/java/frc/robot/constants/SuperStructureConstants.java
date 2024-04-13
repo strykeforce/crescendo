@@ -80,4 +80,9 @@ public final class SuperStructureConstants {
 
   // SHOOT
   public static final double kWristShootSetPoint = kWristStowSetPoint;
+
+  // DISRUPT
+  public static final double kWristDisruptSetPoint = kWristStowSetPoint;
+  public static final double kElbowDisruptSetPoint = kElbowStowSetPoint;
+  public static final double kShooterDisruptSetPoint = 10.0;
 }

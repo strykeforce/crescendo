@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superStructure;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.SuperStructureConstants;
@@ -457,6 +458,26 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.PODIUM;
   }
 
+  public void autoDisrupt(Alliance alliance) {
+    elbowSetpoint = SuperStructureConstants.kElbowDisruptSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristDisruptSetPoint;
+    leftShooterSpeed =
+        alliance == Alliance.Blue ? 0 : SuperStructureConstants.kShooterDisruptSetPoint;
+    rightShooterSpeed =
+        alliance == Alliance.Blue ? SuperStructureConstants.kShooterDisruptSetPoint : 0;
+
+    shooterSubsystem.setLeftSpeed(leftShooterSpeed);
+    shooterSubsystem.setRightSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
+
+    logger.info("{} -> TRANSFER(AUTO_DISRUPT)", curState);
+    isPrecise = false;
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.AUTO_DISRUPT;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -525,6 +546,8 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case POST_CLIMB:
         break;
+      case AUTO_DISRUPT:
+        break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("States/SuperStructState", curState);
     org.littletonrobotics.junction.Logger.recordOutput(
@@ -567,6 +590,7 @@ public class SuperStructure extends MeasurableSubsystem {
     SAFE_TRANSFER_WRIST,
     FEEDING,
     EJECTING,
-    LOW_FEEDING
+    LOW_FEEDING,
+    AUTO_DISRUPT
   }
 }

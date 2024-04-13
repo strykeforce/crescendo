@@ -605,6 +605,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ledSubsystem.setOff();
   }
 
+  public void autoDisrupt() {
+    superStructure.autoDisrupt(allianceColor);
+    intakeSubsystem.toIntaking();
+    magazineSubsystem.toEmptying();
+
+    setState(RobotStates.AUTO_DISRUPT);
+  }
+
   public void toTune() {
     setState(RobotStates.TO_TUNE);
     superStructure.shootTune(elbowOffset);
@@ -1155,6 +1163,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toIntake();
         }
         break;
+      case AUTO_DISRUPT:
+        break;
       default:
         break;
     }
@@ -1209,6 +1219,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     DEFENSE,
     TO_FEED,
     EJECTING,
-    TO_MOVING_FEED
+    TO_MOVING_FEED,
+    AUTO_DISRUPT
   }
 }
