@@ -212,7 +212,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     resetRevBeamCounts();
     io.enableRevLimitSwitch(false);
     io.enableFwdLimitSwitch(false);
-    setSpeed(-MagazineConstants.kAmpReleaseSpeed);
+    setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EJECTING);
   }
 
@@ -266,6 +266,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
       case TRAP:
         break;
       case EJECTING:
+        io.enableRevLimitSwitch(false);
+        io.enableFwdLimitSwitch(false);
         break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("Magazine State", curState);

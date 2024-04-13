@@ -115,7 +115,7 @@ public final class AutonConstants {
         new Pose2d(1.47, 5.55, Rotation2d.fromDegrees(0.0)); // 1.34 on x
     public static final Pose2d AI1 = new Pose2d(1.09, 6.94, Rotation2d.fromDegrees(50));
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
-    public static final Pose2d AI3 = new Pose2d(1.43764, 7.33425, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d AI3 = new Pose2d(1.43764, 7.33425, Rotation2d.fromDegrees(90.0));
     public static final Pose2d AI4 =
         new Pose2d(
             kAutonLineX - DriveConstants.kRobotWidth,
@@ -146,7 +146,7 @@ public final class AutonConstants {
         new Pose2d(4.55, 4.6, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
 
     // Path Midpoints
-    public static final Pose2d MP1 = new Pose2d(5, 7.61, Rotation2d.fromDegrees(0.0)); // 5,7.61
+    public static final Pose2d MP1 = new Pose2d(2.5, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
     public static final Pose2d MP2 = new Pose2d(3.89, 7.2, Rotation2d.fromDegrees(-90)); // AS4
   }
 

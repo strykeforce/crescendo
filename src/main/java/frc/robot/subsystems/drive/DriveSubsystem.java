@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants.Setpoints;
@@ -225,12 +226,30 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
+  public void setOmegaKP(double kP, double accel) {
+    holonomicController.getThetaController().setP(kP);
+    holonomicController
+        .getThetaController()
+        .setConstraints(new Constraints(DriveConstants.kMaxOmega, accel));
+  }
+
+  public void resetHolonomicController(double yaw) {
+    xController.reset();
+    yController.reset();
+    omegaController.reset(yaw);
+    omegaSpinController.reset(yaw);
+    omegaShootTrackController.reset(yaw);
+    holonomicController.getThetaController().reset(yaw);
+    logger.info("Holonomic Controller Reset: {}", yaw);
+  }
+
   public void resetHolonomicController() {
     xController.reset();
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
     omegaShootTrackController.reset(inputs.gyroRotation2d.getRadians());
+    holonomicController.getThetaController().reset(inputs.gyroRotation2d.getRadians());
     logger.info("Holonomic Controller Reset: {}", inputs.gyroRotation2d.getRadians());
   }
 
@@ -822,6 +841,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure(
             "Holo Controller Omega Err",
             () -> holonomicController.getThetaController().getPositionError()),
+        new Measure(
+            "Holo Controller Omega Goal",
+            () -> holonomicController.getThetaController().getGoal().position),
+        new Measure(
+            "Holo Controller Omega Setpoint",
+            () -> holonomicController.getThetaController().getSetpoint().position),
         new Measure("Trajectory Active", () -> trajectoryActive),
         new Measure("Wheel 0 Angle", () -> io.getSwerveModuleStates()[0].angle.getDegrees()),
         new Measure("Wheel 0 Speed", () -> io.getSwerveModuleStates()[0].speedMetersPerSecond),

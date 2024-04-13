@@ -709,7 +709,9 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(3, 2);
     Shuffleboard.getTab("Debug")
-        .add("eject piece", new EjectPieceCommand(robotStateSubsystem))
+        .add(
+            "eject piece",
+            new EjectPieceCommand(robotStateSubsystem, magazineSubsystem, superStructure))
         .withSize(1, 1)
         .withPosition(1, 1);
   }

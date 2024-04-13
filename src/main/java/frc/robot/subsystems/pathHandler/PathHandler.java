@@ -199,7 +199,7 @@ public class PathHandler extends MeasurableSubsystem {
             } else {
               nextPath = paths[0][noteOrder.get(0)];
             }
-
+            logger.info("" + noteOrder.toString());
             logger.info("Begin Trajectory " + pathNames[0][noteOrder.get(0)]);
             startNewPath(nextPath);
             logger.info("SHOOT -> DRIVE_FETCH");
@@ -215,7 +215,7 @@ public class PathHandler extends MeasurableSubsystem {
             numPieces -= 0.5;
             logger.info("FETCH -> DRIVE_SHOOT");
             nextPath = paths[lastNote][0];
-            logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
+            logger.info("Begin Trajectory " + pathNames[lastNote][0]);
             curState = PathStates.DRIVE_SHOOT;
             isSpinningUp = false;
             startNewPath(nextPath);
@@ -257,10 +257,12 @@ public class PathHandler extends MeasurableSubsystem {
           if (robotStateSubsystem.hasNote()) {
             numPieces -= 0.5;
             logger.info("END_PATH -> DRIVE_SHOOT");
-            nextPath = paths[lastNote][0];
+            logger.info("" + noteOrder.toString());
+            nextPath = paths[noteOrder.get(0)][0];
             logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
             curState = PathStates.DRIVE_SHOOT;
             isSpinningUp = false;
+            noteOrder.remove(0);
             startNewPath(nextPath);
           }
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
@@ -300,6 +302,8 @@ public class PathHandler extends MeasurableSubsystem {
             lastNote = noteOrder.get(0);
             numPieces -= 0.5;
             logger.info("FETCH -> DRIVE_SHOOT");
+            logger.info("" + noteOrder.toString());
+            deadeyeFlag = false;
             nextPath = paths[noteOrder.get(0)][0];
             logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
             noteOrder.remove(0);
@@ -320,6 +324,8 @@ public class PathHandler extends MeasurableSubsystem {
               curState = PathStates.DONE;
               break;
             }
+            logger.info("" + noteOrder.toString());
+            lastNote = noteOrder.get(0);
             logger.info("FETCH -> DRIVE_FETCH");
             logger.info("Begin Trajectory " + nextPathName);
             noteOrder.remove(0);
@@ -345,6 +351,7 @@ public class PathHandler extends MeasurableSubsystem {
             curState = PathStates.SHOOT;
             startShot();
             driveSubsystem.setEnableHolo(false);
+            driveSubsystem.move(0.0, 0.0, 0.0, false);
             driveSubsystem.grapherTrajectoryActive(false);
           }
 
