@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AutonConstants;
@@ -13,6 +14,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.PathData;
 import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +100,16 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
       double yVel = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       driveSubsystem.recordYVel(yVel);
       driveSubsystem.driveAutonXController(desiredState, robotHeading, yVel);
+
+      double currY = driveSubsystem.getPoseMeters().getY();
+
+      if (robotStateSubsystem.getState() == RobotStates.AUTO_DISRUPT) {
+        Alliance alliance = robotStateSubsystem.getAllianceColor();
+        if (alliance == Alliance.Blue && currY > AutonConstants.kDisruptIntakingYBlue
+            || alliance == Alliance.Red && currY > AutonConstants.kDisruptIntakingYRed) {
+          robotStateSubsystem.toIntake();
+        }
+      }
 
     } else logger.error("trajectory not generated");
   }

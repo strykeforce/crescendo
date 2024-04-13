@@ -173,10 +173,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
-  public void recordXVel(double val) {
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/XVelSpeed", val);
-  }
-
   public void recordYVel(double val) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", val);
   }
@@ -207,15 +203,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // logger.info("input: {}, output: {}, angle: {}", holoContInput,
     // holoContOutput, desiredAngle);
     io.move(holoContOutput.vxMetersPerSecond, driveY, holoContOutput.omegaRadiansPerSecond, false);
-  }
-
-  public void driveAutonYController(State desiredState, Rotation2d desiredAngle, double driveX) {
-    holoContInput = desiredState;
-    holoContAngle = desiredAngle;
-    holoContOutput = holonomicController.calculate(inputs.poseMeters, desiredState, desiredAngle);
-    // logger.info("input: {}, output: {}, angle: {}", holoContInput,
-    // holoContOutput, desiredAngle);
-    io.move(driveX, holoContOutput.vyMetersPerSecond, holoContOutput.omegaRadiansPerSecond, false);
   }
 
   public void resetOdometry(Pose2d pose) {
@@ -657,6 +644,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "NAI1":
           pose = Setpoints.NAI1;
           break;
+        case "NAI2":
+          pose = Setpoints.NAI2;
+          break;
         case "AI1":
           pose = Setpoints.AI1;
           break;
@@ -708,6 +698,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "MS1":
           pose = Setpoints.MS1;
           break;
+        case "MS2":
+          pose = Setpoints.MS2;
+          break;
         case "NAS1":
           pose = Setpoints.NAS1;
           break;
@@ -719,6 +712,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
           break;
         case "MP2":
           pose = Setpoints.MP2;
+          break;
+        case "NAS3":
+          pose = Setpoints.NAS3;
           break;
 
         default:

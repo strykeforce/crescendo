@@ -351,7 +351,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
 
-    magazineSubsystem.setSpeed(0.0);
+    // magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     ledSubsystem.setOff();
 
@@ -402,7 +402,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
     driveSubsystem.setMoveAndShootVirtualPose(
         new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation()));
-    magazineSubsystem.setSpeed(0.0);
+    // magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
     setState(RobotStates.TO_MOVING_SHOOT);

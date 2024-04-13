@@ -84,5 +84,5 @@ public final class SuperStructureConstants {
   // DISRUPT
   public static final double kWristDisruptSetPoint = kWristStowSetPoint;
   public static final double kElbowDisruptSetPoint = kElbowStowSetPoint;
-  public static final double kShooterDisruptSetPoint = 10.0;
+  public static final double kShooterDisruptSetPoint = 40.0;
 }
