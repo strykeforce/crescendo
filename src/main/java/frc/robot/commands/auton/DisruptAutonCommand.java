@@ -54,7 +54,8 @@ public class DisruptAutonCommand extends SequentialCommandGroup implements AutoC
       String secondPathName,
       String thirdPathName,
       String shootPathName,
-      Pose2d shootPose) {
+      Pose2d shootPose,
+      double startIntakingY) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
     firstPath = new DriveAutonCommand(driveSubsystem, firstPathName, false, true);
@@ -75,6 +76,7 @@ public class DisruptAutonCommand extends SequentialCommandGroup implements AutoC
             deadeye,
             ledSubsystem,
             thirdPathName,
+            startIntakingY,
             false,
             false);
 

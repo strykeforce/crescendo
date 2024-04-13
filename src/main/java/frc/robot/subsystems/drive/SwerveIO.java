@@ -78,6 +78,8 @@ public interface SwerveIO {
   public default void move(
       double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {}
 
+  public default void setAzimuthVel(double vel) {}
+
   public default void updateInputs(SwerveIOInputs inputs) {}
 
   public default void registerWith(TelemetryService telemetryService) {}

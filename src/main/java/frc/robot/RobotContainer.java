@@ -40,6 +40,7 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.SetAzimuthVelocityCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
@@ -453,6 +454,16 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add("Adjusted Climb Pos", new TrapClimbCommand(climbSubsystem))
         .withPosition(8, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Run Azimuths 20%", new SetAzimuthVelocityCommand(driveSubsystem, 0.2))
+        .withPosition(9, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Stop Azimuths", new SetAzimuthVelocityCommand(driveSubsystem, 0.0))
+        .withPosition(9, 1)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
     // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))()
