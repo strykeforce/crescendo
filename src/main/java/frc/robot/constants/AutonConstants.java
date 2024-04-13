@@ -162,12 +162,9 @@ public final class AutonConstants {
   public static final double kAI1ToSpeakerDist = 1.2;
   public static final double kNAI1ToSpeakerDist =
       Math.hypot(Setpoints.NAI1.getX(), Setpoints.NAI1.getY() - RobotStateConstants.kSpeakerY);
-  public static final double kNAS3ToSpeakerDist =
-      Math.hypot(Setpoints.NAS3.getX(), Setpoints.NAS3.getY() - RobotStateConstants.kSpeakerY);
-
   public static final double kAutonLineX = 1.93294;
   public static final double kAmpZoneWidth = 0.45085;
 
-  public static final double kDisruptIntakingYBlue = 7.0;
-  public static final double kDisruptIntakingYRed = kDisruptIntakingYBlue;
+  public static final double kDisruptIntakingMiddleNote1Y = 7.0;
+  public static final double kDisruptIntakingMiddleNote2Y = 5.2;
 }

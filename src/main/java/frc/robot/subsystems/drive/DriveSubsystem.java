@@ -145,6 +145,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void setAzimuthVel(double vel) {
+    io.setAzimuthVel(vel);
+  }
+
   public double getvOmegaToGoal() {
     return omegaShootTrackController.calculate(
         getPoseMeters().getRotation().getRadians(),
