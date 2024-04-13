@@ -77,9 +77,9 @@ public final class SuperStructureConstants {
 
   // HIGH FEEDING
   public static final double kWristHighFeedShotSetPoint = kWristIntakeSetPoint;
-  public static final double kElbowHighFeedShotSetPoint = 0.03;
-  public static final double kLeftShooterHighFeedShotSetPoint = 80;
-  public static final double kRightShooterHighFeedShotSetPoint = 25;
+  public static final double kElbowHighFeedShotSetPoint = 0.02; // 0.03
+  public static final double kLeftShooterHighFeedShotSetPoint = 85; // 77
+  public static final double kRightShooterHighFeedShotSetPoint = 20; // 17
 
   // SOURCE INTAKE
   public static final double kWristSourceIntakeSetPoint = kWristIntakeSetPoint;

@@ -341,11 +341,11 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed =
         isBlue
             ? SuperStructureConstants.kLeftShooterLowFeedShotSetPoint
-            : SuperStructureConstants.kRightShooterFeedingSetPoint;
+            : SuperStructureConstants.kRightShooterLowFeedShotSetPoint;
     rightShooterSpeed =
         isBlue
             ? SuperStructureConstants.kRightShooterLowFeedShotSetPoint
-            : SuperStructureConstants.kLeftShooterFeedingSetPoint;
+            : SuperStructureConstants.kLeftShooterLowFeedShotSetPoint;
 
     shooterSubsystem.setLeftSpeed(leftShooterSpeed);
     shooterSubsystem.setRightSpeed(rightShooterSpeed);
@@ -365,11 +365,11 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed =
         isBlue
             ? SuperStructureConstants.kLeftShooterHighFeedShotSetPoint
-            : SuperStructureConstants.kRightShooterFeedingSetPoint;
+            : SuperStructureConstants.kRightShooterHighFeedShotSetPoint;
     rightShooterSpeed =
         isBlue
             ? SuperStructureConstants.kRightShooterHighFeedShotSetPoint
-            : SuperStructureConstants.kLeftShooterFeedingSetPoint;
+            : SuperStructureConstants.kLeftShooterHighFeedShotSetPoint;
 
     shooterSubsystem.setLeftSpeed(leftShooterSpeed);
     shooterSubsystem.setRightSpeed(rightShooterSpeed);
@@ -389,11 +389,11 @@ public class SuperStructure extends MeasurableSubsystem {
     leftShooterSpeed =
         isBlue
             ? SuperStructureConstants.kLeftShooterHighFeedShotSetPoint
-            : SuperStructureConstants.kRightShooterFeedingSetPoint;
+            : SuperStructureConstants.kRightShooterHighFeedShotSetPoint;
     rightShooterSpeed =
         isBlue
             ? SuperStructureConstants.kRightShooterHighFeedShotSetPoint
-            : SuperStructureConstants.kLeftShooterFeedingSetPoint;
+            : SuperStructureConstants.kLeftShooterHighFeedShotSetPoint;
 
     shooterSubsystem.setLeftSpeed(leftShooterSpeed);
     shooterSubsystem.setRightSpeed(rightShooterSpeed);
