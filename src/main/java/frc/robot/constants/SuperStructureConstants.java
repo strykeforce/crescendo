@@ -17,7 +17,7 @@ public final class SuperStructureConstants {
 
   // PRE-CLIMB
   public static final double kWristPreClimbSetPoint = kWristStowSetPoint;
-  public static final double kElbowPreClimbSetPoint = 0.28069;
+  public static final double kElbowPreClimbSetPoint = 0.38069;
   public static final double kShooterPreClimbSetPoint = 0.0;
 
   // TRAP
@@ -68,11 +68,24 @@ public final class SuperStructureConstants {
   public static final double kWristEjectingSetPoint = kWristStowSetPoint; // -2245
   public static final double kElbowEjectingSetPoint = kElbowStowSetPoint; // 0.14691
   public static final double kShooterEjectingSetPoint = 8.0;
+
   // LOW FEEDING
   public static final double kWristLowFeedShotSetPoint = kWristIntakeSetPoint;
-  public static final double kElbowLowFeedShotSetPoint = kElbowIntakeSetPoint;
-  public static final double kLeftShooterLowFeedShotSetPoint = 40;
-  public static final double kRightShooterLowFeedShotSetPoint = 20;
+  public static final double kElbowLowFeedShotSetPoint = 0.13;
+  public static final double kLeftShooterLowFeedShotSetPoint = 80;
+  public static final double kRightShooterLowFeedShotSetPoint = 40;
+
+  // HIGH FEEDING
+  public static final double kWristHighFeedShotSetPoint = kWristIntakeSetPoint;
+  public static final double kElbowHighFeedShotSetPoint = 0.03;
+  public static final double kLeftShooterHighFeedShotSetPoint = 80;
+  public static final double kRightShooterHighFeedShotSetPoint = 25;
+
+  // SOURCE INTAKE
+  public static final double kWristSourceIntakeSetPoint = kWristIntakeSetPoint;
+  public static final double kElbowSourceIntakeSetPoint = 0.22852;
+  public static final double kLeftShooterSourceIntakeSetPoint = 0.0;
+  public static final double kRightShooterSourceIntakeSetPoint = 0.0;
 
   // SPINUP
   public static final double kShooterSpinUpLeftSetPoint = 60;

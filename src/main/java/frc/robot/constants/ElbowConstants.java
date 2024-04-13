@@ -73,7 +73,7 @@ public final class ElbowConstants {
     config.HardwareLimitSwitch.ForwardLimitEnable = false;
 
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.3; // 0.14691
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.4; // 0.14691
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.001; // -0.26409
 

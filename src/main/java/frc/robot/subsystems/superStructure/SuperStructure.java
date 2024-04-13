@@ -71,6 +71,10 @@ public class SuperStructure extends MeasurableSubsystem {
     return curState;
   }
 
+  public SuperStructureStates getNextState() {
+    return nextState;
+  }
+
   public void setIsAuto(boolean val) {
     isAuto = val;
   }
@@ -331,27 +335,76 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.SUBWOOFER;
   }
 
-  public void lowFeedShot() {
+  public void lowFeedShot(Boolean isBlue) {
     elbowSetpoint = SuperStructureConstants.kElbowLowFeedShotSetPoint;
     wristSetpoint = SuperStructureConstants.kWristLowFeedShotSetPoint;
-    leftShooterSpeed = SuperStructureConstants.kLeftShooterLowFeedShotSetPoint;
-    rightShooterSpeed = SuperStructureConstants.kRightShooterLowFeedShotSetPoint;
+    leftShooterSpeed =
+        isBlue
+            ? SuperStructureConstants.kLeftShooterLowFeedShotSetPoint
+            : SuperStructureConstants.kRightShooterFeedingSetPoint;
+    rightShooterSpeed =
+        isBlue
+            ? SuperStructureConstants.kRightShooterLowFeedShotSetPoint
+            : SuperStructureConstants.kLeftShooterFeedingSetPoint;
 
     shooterSubsystem.setLeftSpeed(leftShooterSpeed);
     shooterSubsystem.setRightSpeed(rightShooterSpeed);
     wristSubsystem.setPosition(wristSetpoint);
-
-    if (elbowSubsystem.getPosition() < SuperStructureConstants.kElbowMinToMoveWrist) {
-      elbowSubsystem.setPosition(elbowSetpoint);
-    } else {
-      elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
-    }
+    elbowSubsystem.setPosition(elbowSetpoint);
 
     logger.info("{} -> TRANSFER(LOW_FEEDING)", curState);
     isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
     nextState = SuperStructureStates.LOW_FEEDING;
+  }
+
+  public void highFeedShot(Boolean isBlue) {
+    elbowSetpoint = SuperStructureConstants.kElbowHighFeedShotSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristHighFeedShotSetPoint;
+    leftShooterSpeed =
+        isBlue
+            ? SuperStructureConstants.kLeftShooterHighFeedShotSetPoint
+            : SuperStructureConstants.kRightShooterFeedingSetPoint;
+    rightShooterSpeed =
+        isBlue
+            ? SuperStructureConstants.kRightShooterHighFeedShotSetPoint
+            : SuperStructureConstants.kLeftShooterFeedingSetPoint;
+
+    shooterSubsystem.setLeftSpeed(leftShooterSpeed);
+    shooterSubsystem.setRightSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
+
+    logger.info("{} -> TRANSFER(HIGH_FEEDING)", curState);
+    isPrecise = false;
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.HIGH_FEEDING;
+  }
+
+  public void sourceIntake(Boolean isBlue) {
+    elbowSetpoint = SuperStructureConstants.kElbowSourceIntakeSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristSourceIntakeSetPoint;
+    leftShooterSpeed =
+        isBlue
+            ? SuperStructureConstants.kLeftShooterHighFeedShotSetPoint
+            : SuperStructureConstants.kRightShooterFeedingSetPoint;
+    rightShooterSpeed =
+        isBlue
+            ? SuperStructureConstants.kRightShooterHighFeedShotSetPoint
+            : SuperStructureConstants.kLeftShooterFeedingSetPoint;
+
+    shooterSubsystem.setLeftSpeed(leftShooterSpeed);
+    shooterSubsystem.setRightSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
+
+    logger.info("{} -> TRANSFER(SOURCE_INTAKE", curState);
+    isPrecise = false;
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.SOURCE_INTAKE;
   }
 
   public void fixedFeeding(double wheelSpeed) {
@@ -591,6 +644,8 @@ public class SuperStructure extends MeasurableSubsystem {
     FEEDING,
     EJECTING,
     LOW_FEEDING,
-    AUTO_DISRUPT
+    AUTO_DISRUPT,
+    HIGH_FEEDING,
+    SOURCE_INTAKE
   }
 }

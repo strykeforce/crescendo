@@ -46,7 +46,6 @@ import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowOffsetCommand;
 import frc.robot.commands.elbow.HoldElbowCommand;
 import frc.robot.commands.elbow.JogElbowClosedLoopCommand;
-import frc.robot.commands.elbow.OpenLoopElbowCommand;
 import frc.robot.commands.elbow.SetElbowHasZeroedCommand;
 import frc.robot.commands.elbow.SetTrustElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
@@ -70,6 +69,7 @@ import frc.robot.commands.robotState.PositionShootCommand;
 import frc.robot.commands.robotState.PostClimbStowCommand;
 import frc.robot.commands.robotState.PrepClimbCommand;
 import frc.robot.commands.robotState.ReleaseNoteCommand;
+import frc.robot.commands.robotState.SourceIntakeCommand;
 import frc.robot.commands.robotState.SpeedUpPassCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
@@ -810,13 +810,18 @@ public class RobotContainer {
 
   private void configureOperatorBindings() {
     // Open Loop Wrist
-    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.2))
-        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
-    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.2))
-        .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+    // new Trigger((() -> xboxController.getLeftY() > RobotConstants.kJoystickDeadband))
+    //     .onTrue(new OpenLoopWristCommand(wristSubsystem, 0.2))
+    //     .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
+    // new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kJoystickDeadband))
+    //     .onTrue(new OpenLoopWristCommand(wristSubsystem, -0.2))
+    //     .onFalse(new OpenLoopWristCommand(wristSubsystem, 0.0));
 
+    // Source Intake
+    new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
+        .onTrue(
+            new SourceIntakeCommand(
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
     new Trigger(() -> robotStateSubsystem.hasNote())
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
 
@@ -827,12 +832,12 @@ public class RobotContainer {
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
 
     // Open Loop Elbow
-    new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, 0.1))
-        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
-    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
-        .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
-        .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+    // new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
+    //     .onTrue(new OpenLoopElbowCommand(elbowSubsystem, 0.1))
+    //     .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
+    // new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
+    //     .onTrue(new OpenLoopElbowCommand(elbowSubsystem, -0.1))
+    //     .onFalse(new OpenLoopElbowCommand(elbowSubsystem, 0));
 
     // Climb
     new Trigger((() -> xboxController.getLeftTriggerAxis() > 0.5))

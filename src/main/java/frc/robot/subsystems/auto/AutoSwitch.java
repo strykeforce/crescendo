@@ -328,6 +328,40 @@ public class AutoSwitch extends MeasurableSubsystem {
             4.0,
             AutonConstants.Setpoints.NAS2);
 
+      case 0x26:
+        return new SmartNonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial1_MiddleNote3",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(4, 5, 3),
+            4.0,
+            AutonConstants.Setpoints.NAS2);
+
+      case 0x27:
+        return new SmartNonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial1_MiddleNote3",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(5, 3, 4),
+            4.0,
+            AutonConstants.Setpoints.NAS2);
+
       case 0x30:
         return new DoNothingCommand(
             robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);

@@ -24,6 +24,7 @@ import frc.robot.subsystems.led.LedSubsystem.LedState;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.magazine.MagazineSubsystem.MagazineStates;
 import frc.robot.subsystems.superStructure.SuperStructure;
+import frc.robot.subsystems.superStructure.SuperStructure.SuperStructureStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.io.FileReader;
 import java.util.LinkedList;
@@ -85,6 +86,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private double magazineTuneSpeed = 0.0;
   private boolean speedUpPass = false;
   private boolean hasStoppedWheels = true;
+  private boolean hasSpunWheels = false;
 
   private RobotStates desiredState = RobotStates.STOW;
   private int curShot = 1;
@@ -293,14 +295,23 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toAmp() {
-    driveSubsystem.setIsAligningShot(false);
-    magazineSubsystem.toAmp();
-    superStructure.amp();
-    intakeSubsystem.toEjecting();
-    // intakeSubsystem.setPercent(0.0);
-    ledSubsystem.setOff();
+    if (speedUpPass) {
+      driveSubsystem.setIsAligningShot(false);
+      superStructure.lowFeedShot(allianceColor == Alliance.Blue);
+      intakeSubsystem.toEjecting();
+      ledSubsystem.setOff();
+      setState(RobotStates.TO_FEED);
 
-    setState(RobotStates.TO_AMP);
+    } else {
+      driveSubsystem.setIsAligningShot(false);
+      magazineSubsystem.toAmp();
+      superStructure.amp();
+      intakeSubsystem.toEjecting();
+      // intakeSubsystem.setPercent(0.0);
+      ledSubsystem.setOff();
+
+      setState(RobotStates.TO_AMP);
+    }
   }
 
   public void startShootKnownPos(Pose2d pos) {
@@ -484,34 +495,42 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toPreparePodium() {
-    driveSubsystem.setIsAligningShot(false);
-    intakeSubsystem.setPercent(0.0);
-    superStructure.preparePodium();
-    ledSubsystem.setOff();
+    if (speedUpPass) {
+      driveSubsystem.setIsAligningShot(false);
+      superStructure.highFeedShot(allianceColor == Alliance.Blue);
+      intakeSubsystem.toEjecting();
+      ledSubsystem.setOff();
+      setState(RobotStates.TO_FEED);
 
-    setState(RobotStates.TO_PODIUM);
+    } else {
+      driveSubsystem.setIsAligningShot(false);
+      intakeSubsystem.setPercent(0.0);
+      superStructure.preparePodium();
+      ledSubsystem.setOff();
+
+      setState(RobotStates.TO_PODIUM);
+    }
+  }
+
+  public void toSourceIntake() {
+    driveSubsystem.setIsAligningShot(false);
+    superStructure.sourceIntake(allianceColor == Alliance.Blue);
+    intakeSubsystem.toEjecting();
+    ledSubsystem.setOff();
+    magazineSubsystem.toIntaking(true);
+
+    setState(RobotStates.SOURCE_INTAKE);
   }
 
   public void toSubwoofer() {
-    if (speedUpPass) {
-      // Low Feed shot
-      driveSubsystem.setIsAligningShot(false);
-      intakeSubsystem.setPercent(0.0);
-      superStructure.lowFeedShot();
-      intakeSubsystem.setPercent(0.0);
-      ledSubsystem.setOff();
+    // Subwoofer
+    driveSubsystem.setIsAligningShot(false);
+    intakeSubsystem.setPercent(0.0);
+    superStructure.subwoofer();
+    intakeSubsystem.setPercent(0.0);
+    ledSubsystem.setOff();
 
-      setState(RobotStates.TO_FEED);
-    } else {
-      // Subwoofer
-      driveSubsystem.setIsAligningShot(false);
-      intakeSubsystem.setPercent(0.0);
-      superStructure.subwoofer();
-      intakeSubsystem.setPercent(0.0);
-      ledSubsystem.setOff();
-
-      setState(RobotStates.TO_SUBWOOFER);
-    }
+    setState(RobotStates.TO_SUBWOOFER);
   }
 
   public void toFixedFeeding() {
@@ -651,10 +670,27 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
 
     if (speedUpPass) {
-      hasStoppedWheels = false;
-      ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
-      superStructure.fixedFeeding(
-          FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+      if (superStructure.getNextState() == SuperStructureStates.INTAKE
+          || superStructure.getNextState() == SuperStructureStates.STOW
+          || superStructure.getNextState() == SuperStructureStates.LOW_FEEDING
+          || superStructure.getNextState() == SuperStructureStates.FEEDING
+          || superStructure.getNextState() == SuperStructureStates.HIGH_FEEDING) {
+
+        hasStoppedWheels = false;
+        if (superStructure.getNextState() == SuperStructureStates.INTAKE
+            || superStructure.getNextState() == SuperStructureStates.STOW
+            || superStructure.getNextState() == SuperStructureStates.FEEDING) {
+          ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+          superStructure.fixedFeeding(
+              FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+        }
+      }
+      if (superStructure.getNextState() == SuperStructureStates.LOW_FEEDING) {
+        superStructure.lowFeedShot(allianceColor == Alliance.Blue);
+      }
+      if (superStructure.getNextState() == SuperStructureStates.HIGH_FEEDING) {
+        superStructure.highFeedShot(allianceColor == Alliance.Blue);
+      }
     } else {
       //   superStructure.stopShoot();
       if (!hasStoppedWheels) superStructure.stopShoot();
@@ -1165,6 +1201,51 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case AUTO_DISRUPT:
         break;
+      case SOURCE_INTAKE:
+        if (magazineSubsystem.hasPiece()) {
+          setState(RobotStates.TO_HIGH_FEED);
+          ledSubsystem.setBlue();
+          superStructure.highFeedShot(allianceColor == Alliance.Blue);
+        }
+        break;
+      case TO_HIGH_FEED:
+        if (superStructure.isFinished()) {
+
+          magazineSubsystem.toEmptying();
+
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+          hasShootBeamUnbroken = false;
+          inWaitForUnbreakMode = false;
+          setState(RobotStates.HIGH_FEED);
+        }
+        break;
+      case HIGH_FEED:
+        if (!hasShootBeamUnbroken && magazineSubsystem.isRevBeamOpen()) {
+          logger.info("Note out of Magazine");
+          // shootDelayTimer.stop();
+          // shootDelayTimer.reset();
+          // shootDelayTimer.start();
+          hasShootBeamUnbroken = true;
+        }
+        if (isAuto
+            || (shootDelayTimer.hasElapsed(RobotStateConstants.kShootDelay)
+                && !inWaitForUnbreakMode)) {
+          inWaitForUnbreakMode = true;
+        }
+        if (hasShootBeamUnbroken && inWaitForUnbreakMode) {
+          shootDelayTimer.stop();
+          driveSubsystem.setIsAligningShot(false);
+          driveSubsystem.setIsFeeding(false);
+          driveSubsystem.setIsMoveAndShoot(false);
+
+          ledSubsystem.setOff();
+          toSourceIntake();
+          inWaitForUnbreakMode = false;
+        }
+
+        break;
       default:
         break;
     }
@@ -1220,6 +1301,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_FEED,
     EJECTING,
     TO_MOVING_FEED,
-    AUTO_DISRUPT
+    AUTO_DISRUPT,
+    SOURCE_INTAKE,
+    TO_HIGH_FEED,
+    HIGH_FEED
   }
 }
