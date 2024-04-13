@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AutonConstants;
@@ -29,6 +28,7 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
   private String trajectoryName;
   private boolean resetOdometry;
   private boolean trajectoryGenerated = false;
+  private double startIntakingY;
   private RobotStateSubsystem robotStateSubsystem;
   private ProfiledPIDController deadeyeYDrive;
   private DeadEyeSubsystem deadeye;
@@ -40,6 +40,7 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
       DeadEyeSubsystem deadeye,
       LedSubsystem ledSubsystem,
       String trajectoryName,
+      double startIntakingY,
       boolean lastPath,
       boolean resetOdometry) {
 
@@ -48,6 +49,7 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
     this.robotStateSubsystem = robotStateSubsystem;
     this.deadeye = deadeye;
     this.ledSubsystem = ledSubsystem;
+    this.startIntakingY = startIntakingY;
     this.lastPath = lastPath;
     this.resetOdometry = resetOdometry;
     this.trajectoryName = trajectoryName;
@@ -104,9 +106,7 @@ public class DriveCenterLineCommand extends Command implements AutoCommandInterf
       double currY = driveSubsystem.getPoseMeters().getY();
 
       if (robotStateSubsystem.getState() == RobotStates.AUTO_DISRUPT) {
-        Alliance alliance = robotStateSubsystem.getAllianceColor();
-        if (alliance == Alliance.Blue && currY > AutonConstants.kDisruptIntakingYBlue
-            || alliance == Alliance.Red && currY > AutonConstants.kDisruptIntakingYRed) {
+        if (currY > startIntakingY) {
           robotStateSubsystem.toIntake();
         }
       }

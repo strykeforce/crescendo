@@ -325,7 +325,25 @@ public class AutoSwitch extends MeasurableSubsystem {
             "NonAmpShoot3_MiddleNote5",
             "MiddleNote5_MiddleNote1",
             "MiddleNote1_MiddleShoot",
-            AutonConstants.Setpoints.MS2);
+            AutonConstants.Setpoints.MS2,
+            AutonConstants.kDisruptIntakingMiddleNote1Y);
+
+      case 0x32:
+        return new DisruptAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial2_NonAmpShoot3",
+            "NonAmpShoot3_MiddleNote5",
+            "MiddleNote5_MiddleNote2",
+            "MiddleNote2_MiddleShoot",
+            AutonConstants.Setpoints.MS2,
+            AutonConstants.kDisruptIntakingMiddleNote2Y);
 
       default:
         String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);
