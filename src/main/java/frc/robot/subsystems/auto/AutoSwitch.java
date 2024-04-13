@@ -8,6 +8,7 @@ import frc.robot.commands.auto.DefaultAutoCommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.AmpMid_5PieceCommand;
+import frc.robot.commands.auton.DisruptAutonCommand;
 import frc.robot.commands.auton.DoNothingCommand;
 import frc.robot.commands.auton.FastAmpMid_5PieceCommand;
 import frc.robot.commands.auton.FastAmpMid_5PieceM2Command;
@@ -305,9 +306,26 @@ public class AutoSwitch extends MeasurableSubsystem {
             List.of(3, 5, 4),
             4.0,
             AutonConstants.Setpoints.NAS2);
+
       case 0x30:
         return new DoNothingCommand(
             robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
+
+      case 0x31:
+        return new DisruptAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial2_NonAmpShoot3",
+            "NonAmpShoot3_MiddleNote5",
+            "MiddleNote5_MiddleNote1",
+            "MiddleNote1_MiddleShoot",
+            AutonConstants.Setpoints.MS2);
 
       default:
         String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);

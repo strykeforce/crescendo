@@ -118,6 +118,10 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.EMPTY);
   }
 
+  public void setFull() {
+    setState(MagazineStates.FULL);
+  }
+
   public void preparePodium() {
     io.enableRevLimitSwitch(false);
     io.enableFwdLimitSwitch(false);
