@@ -309,6 +309,29 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.SUBWOOFER;
   }
 
+  public void lowFeedShot() {
+    elbowSetpoint = SuperStructureConstants.kElbowLowFeedShotSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristLowFeedShotSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kLeftShooterLowFeedShotSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kRightShooterLowFeedShotSetPoint;
+
+    shooterSubsystem.setLeftSpeed(leftShooterSpeed);
+    shooterSubsystem.setRightSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+
+    if (elbowSubsystem.getPosition() < SuperStructureConstants.kElbowMinToMoveWrist) {
+      elbowSubsystem.setPosition(elbowSetpoint);
+    } else {
+      elbowSubsystem.setPosition(SuperStructureConstants.kElbowMinToMoveWrist);
+    }
+
+    logger.info("{} -> TRANSFER(LOW_FEEDING)", curState);
+    isPrecise = false;
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.LOW_FEEDING;
+  }
+
   public void fixedFeeding(double wheelSpeed) {
     elbowSetpoint = SuperStructureConstants.kElbowSubwooferSetPoint;
     wristSetpoint = SuperStructureConstants.kWristSubwooferSetPoint;
@@ -455,6 +478,8 @@ public class SuperStructure extends MeasurableSubsystem {
 
       case SHOOTING:
         break;
+      case LOW_FEEDING:
+        break;
       case AMP:
         break;
       case INTAKE:
@@ -519,6 +544,7 @@ public class SuperStructure extends MeasurableSubsystem {
     SUBWOOFER,
     SAFE_TRANSFER_ELBOW,
     SAFE_TRANSFER_WRIST,
-    FEEDING
+    FEEDING,
+    LOW_FEEDING
   }
 }

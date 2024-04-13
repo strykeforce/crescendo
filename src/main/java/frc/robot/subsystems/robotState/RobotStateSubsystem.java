@@ -207,7 +207,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return lookupTable;
   }
 
-  private void getShootSolution(double distance) {
+  private void getShootSolution(double distance, double[][] table) {
     // logger.info(
     //     "Timestamp Before Starting Parse: {}",
     //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
@@ -245,10 +245,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     // logger.info(
     //     "Timestamp Before Parsing Doubles: {}",
     //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
-    shootSolution[0] = shootingLookupTable[index][1]; // Left Shooter
-    shootSolution[1] = shootingLookupTable[index][2]; // Right Shooter
-    shootSolution[2] = shootingLookupTable[index][3] + elbowOffset; // Elbow
-    shootSolution[3] = shootingLookupTable[index][4];
+    shootSolution[0] = table[index][1]; // Left Shooter
+    shootSolution[1] = table[index][2]; // Right Shooter
+    shootSolution[2] = table[index][3] + elbowOffset; // Elbow
+    shootSolution[3] = table[index][4];
     // logger.info(
     //     "Timestamp AFter Parsing Doubles: {}",
     //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
@@ -310,7 +310,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     driveSubsystem.setIsAligningShot(false);
 
-    getShootSolution(driveSubsystem.getDistanceToSpeaker(pos));
+    getShootSolution(driveSubsystem.getDistanceToSpeaker(pos), shootingLookupTable);
 
     intakeSubsystem.toEjecting();
     magazineSubsystem.setSpeed(0.0);
@@ -320,24 +320,23 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_SHOOT);
   }
 
-  // public void startFeed() {
-  //   usingDistance = false;
-  //   shootKnownPos = false;
-  //   driveSubsystem.setIsAligningShot(true);
-  //   driveSubsystem.setIsFeeding(true);
+  public void startFeed() {
+    usingDistance = false;
+    shootKnownPos = false;
+    driveSubsystem.setIsAligningShot(true);
+    driveSubsystem.setIsFeeding(true);
 
-  //   double[] feedSolution =
-  //       getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
+    getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
 
-  //   magazineSubsystem.setSpeed(0.0);
-  //   superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
-  //   setState(RobotStates.TO_FEED);
-  // }
+    setState(RobotStates.TO_FEED);
+  }
 
   public void spinUpShotSolution(Pose2d pose) {
     shootPos = pose;
-    getShootSolution(driveSubsystem.getDistanceToSpeaker(pose));
+    getShootSolution(driveSubsystem.getDistanceToSpeaker(pose), shootingLookupTable);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
     setState(RobotStates.SPIN_UP);
   }
@@ -350,7 +349,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.toEjecting();
     driveSubsystem.setIsAligningShot(true);
 
-    getShootSolution(driveSubsystem.getDistanceToSpeaker());
+    getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
 
     magazineSubsystem.setSpeed(0.0);
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
@@ -364,7 +363,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     shootKnownPos = false;
     movingShoot = false;
 
-    getShootSolution(distance);
+    getShootSolution(distance, shootingLookupTable);
 
     intakeSubsystem.toEjecting();
     magazineSubsystem.setSpeed(0.0);
@@ -387,7 +386,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
     getShootSolution(
         driveSubsystem.getDistanceToSpeaker(
-            new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
+            new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
+        shootingLookupTable);
 
     for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
       virtualT =
@@ -397,7 +397,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                   speeds.vyMetersPerSecond * shootSolution[3]));
       getShootSolution(
           driveSubsystem.getDistanceToSpeaker(
-              new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
+              new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
+          shootingLookupTable);
     }
     driveSubsystem.setMoveAndShootVirtualPose(
         new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation()));
@@ -405,6 +406,41 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
     setState(RobotStates.TO_MOVING_SHOOT);
+  }
+
+  public void startMovingFeed() {
+    usingDistance = false;
+    shootKnownPos = false;
+    movingShoot = true;
+
+    driveSubsystem.setIsAligningShot(true);
+    driveSubsystem.setIsMoveAndShoot(true);
+
+    intakeSubsystem.toEjecting();
+    Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
+    ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+    getShootSolution(
+        driveSubsystem.getDistanceToSpeaker(
+            new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
+        feedingLookupTable);
+
+    for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
+      virtualT =
+          virtualT.plus(
+              new Translation2d(
+                  speeds.vxMetersPerSecond * shootSolution[3],
+                  speeds.vyMetersPerSecond * shootSolution[3]));
+      getShootSolution(
+          driveSubsystem.getDistanceToSpeaker(
+              new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
+          feedingLookupTable);
+    }
+    driveSubsystem.setMoveAndShootVirtualPose(
+        new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation()));
+    magazineSubsystem.setSpeed(0.0);
+    superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+    setState(RobotStates.TO_MOVING_FEED);
   }
 
   public void toStowSafe() {
@@ -457,13 +493,25 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toSubwoofer() {
-    driveSubsystem.setIsAligningShot(false);
-    intakeSubsystem.setPercent(0.0);
-    superStructure.subwoofer();
-    intakeSubsystem.setPercent(0.0);
-    ledSubsystem.setOff();
+    if (speedUpPass) {
+      // Low Feed shot
+      driveSubsystem.setIsAligningShot(false);
+      intakeSubsystem.setPercent(0.0);
+      superStructure.lowFeedShot();
+      intakeSubsystem.setPercent(0.0);
+      ledSubsystem.setOff();
 
-    setState(RobotStates.TO_SUBWOOFER);
+      setState(RobotStates.TO_FEED);
+    } else {
+      // Subwoofer
+      driveSubsystem.setIsAligningShot(false);
+      intakeSubsystem.setPercent(0.0);
+      superStructure.subwoofer();
+      intakeSubsystem.setPercent(0.0);
+      ledSubsystem.setOff();
+
+      setState(RobotStates.TO_SUBWOOFER);
+    }
   }
 
   public void toFixedFeeding() {
@@ -697,9 +745,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
           setState(RobotStates.SHOOTING);
         }
-        // double[] feedSolution =
-        //     getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
-        // superStructure.shoot(feedSolution[0], feedSolution[1], feedSolution[2]);
+        // getShootSolution(driveSubsystem.getDistanceToFeedTarget(), feedingLookupTable);
+        // superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
         // if (driveSubsystem.isDriveStillFeed()
         //     && driveSubsystem.isPointingAtFeedTarget()
@@ -720,12 +767,62 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         // }
         break;
 
+      case TO_MOVING_FEED:
+        // Approximate future position of robot
+        Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
+        ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+        getShootSolution(
+            driveSubsystem.getDistanceToSpeaker(
+                new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
+            feedingLookupTable);
+
+        for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
+          virtualT =
+              virtualT.plus(
+                  new Translation2d(
+                      speeds.vxMetersPerSecond * shootSolution[3],
+                      speeds.vyMetersPerSecond * shootSolution[3]));
+          getShootSolution(
+              driveSubsystem.getDistanceToSpeaker(
+                  new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
+              feedingLookupTable);
+        }
+
+        superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
+
+        Pose2d virtualPos = new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation());
+        driveSubsystem.setMoveAndShootVirtualPose(virtualPos);
+
+        if (driveSubsystem.isPointingAtGoal(virtualPos)
+            && superStructure.isFinished()
+            && driveSubsystem.isDriveStillFeed()) {
+
+          org.littletonrobotics.junction.Logger.recordOutput(
+              "ShootingData/shot" + Integer.toString(curShot) + "/Position", virtualPos);
+          org.littletonrobotics.junction.Logger.recordOutput(
+              "ShootingData/shot" + Integer.toString(curShot) + "/Distance", grabbedShotDistance);
+
+          magazineSubsystem.toEmptying();
+
+          curShot += 1;
+          hasShootBeamUnbroken = false;
+
+          inWaitForUnbreakMode = false;
+          hasShootBeamUnbroken = false;
+          shootDelayTimer.stop();
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
+
+          setState(RobotStates.SHOOTING);
+        }
+        break;
+
       case TO_SHOOT:
         if (!usingDistance && !shootKnownPos) {
           //   logger.info(
           //       "Timestamp Before Shot Sol: {}",
           //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
-          getShootSolution(driveSubsystem.getDistanceToSpeaker());
+          getShootSolution(driveSubsystem.getDistanceToSpeaker(), shootingLookupTable);
           //   logger.info(
           //       "Timestamp After Shot Sol Before Shoot: {}",
           //       org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
@@ -736,7 +833,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
 
         if (shootKnownPos) {
-          getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos));
+          getShootSolution(driveSubsystem.getDistanceToSpeaker(shootPos), shootingLookupTable);
           superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
           double vomega = driveSubsystem.getvOmegaToGoal(shootPos);
           driveSubsystem.move(0, 0, vomega, true);
@@ -790,11 +887,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_MOVING_SHOOT:
         // Approximate future position of robot
-        Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
-        ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+        virtualT = driveSubsystem.getPoseMeters().getTranslation();
+        speeds = driveSubsystem.getFieldRelSpeed();
         getShootSolution(
             driveSubsystem.getDistanceToSpeaker(
-                new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
+                new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
+            shootingLookupTable);
 
         for (int i = 0; i < RobotStateConstants.kMoveWhileShootIterations; i++) {
           virtualT =
@@ -804,12 +902,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                       speeds.vyMetersPerSecond * shootSolution[3]));
           getShootSolution(
               driveSubsystem.getDistanceToSpeaker(
-                  new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())));
+                  new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
+              shootingLookupTable);
         }
 
         superStructure.shoot(shootSolution[0], shootSolution[1], shootSolution[2]);
 
-        Pose2d virtualPos = new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation());
+        virtualPos = new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation());
         driveSubsystem.setMoveAndShootVirtualPose(virtualPos);
 
         if (driveSubsystem.isPointingAtGoal(virtualPos)
@@ -1096,6 +1195,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     CLIMBING,
     CLIMBED,
     DEFENSE,
-    TO_FEED
+    TO_FEED,
+    TO_MOVING_FEED
   }
 }
