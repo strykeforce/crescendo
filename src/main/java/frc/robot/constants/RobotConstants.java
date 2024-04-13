@@ -109,7 +109,7 @@ public class RobotConstants {
     public static final double kElbowZero = 0.01465; // 0.0105
     public static final double kElbowRecoveryZero = -0.2656;
     public static final double kElbowZeroPos = 30.45;
-    public static final double kElbowSetpointOffset = 0.00354; // 0.00488
+    public static final double kElbowSetpointOffset = 0.00357; // 0.00354
 
     // Wrist
     public static final double kWristZero = 2287.0; // 2243
