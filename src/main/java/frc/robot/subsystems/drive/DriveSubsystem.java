@@ -402,7 +402,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public boolean isPointingAtGoal(Pose2d pos) {
     return Math.abs(getShooterAngleToSpeaker(pos).getDegrees())
-        <= DriveConstants.kDegreesCloseEnough;
+        <= (isFeeding
+            ? DriveConstants.kDegreesCloseEnoughFeeding
+            : DriveConstants.kDegreesCloseEnough);
   }
 
   public boolean isDriveStill() {
