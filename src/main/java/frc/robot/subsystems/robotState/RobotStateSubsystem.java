@@ -1208,7 +1208,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     CLIMBED,
     DEFENSE,
     TO_FEED,
-    EJECTING
+    EJECTING,
     TO_MOVING_FEED
   }
 }

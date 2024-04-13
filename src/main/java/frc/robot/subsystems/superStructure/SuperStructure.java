@@ -566,7 +566,7 @@ public class SuperStructure extends MeasurableSubsystem {
     SAFE_TRANSFER_ELBOW,
     SAFE_TRANSFER_WRIST,
     FEEDING,
-    EJECTING
+    EJECTING,
     LOW_FEEDING
   }
 }
