@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.MagazineConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -47,14 +48,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private ClimbSubsystem climbSubsystem;
   private LedSubsystem ledSubsystem;
   private static CANBus canBus;
+  private AnalogInput breakerTemp;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
 
   private double[][] shootingLookupTable;
   private double[][] feedingLookupTable;
-
-  private AnalogInput breakerTemp;
 
   private Timer shootDelayTimer = new Timer();
   private Timer magazineShootDelayTimer = new Timer();
@@ -99,8 +99,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       MagazineSubsystem magazineSubsystem,
       SuperStructure superStructure,
       ClimbSubsystem climbSubsystem,
-      LedSubsystem ledSubsystem,
-      AnalogInput breakerTemp) {
+      LedSubsystem ledSubsystem) {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
@@ -110,7 +109,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.ledSubsystem = ledSubsystem;
 
     this.canBus = new CANBus();
-    this.breakerTemp = breakerTemp;
+    this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
     grabElbowOffsetPreferences();
 
     shootingLookupTable = parseLookupTable(RobotStateConstants.kShootingLookupTablePath);
@@ -584,10 +583,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     magazineSubsystem.toEjecting();
     superStructure.ejecting();
     setState(RobotStates.EJECTING);
-  }
-
-  public void logTemperature() {
-    org.littletonrobotics.junction.Logger.recordOutput("Temperature", breakerTemp.getValue());
   }
 
   // Periodic
@@ -1065,7 +1060,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
     }
 
-    org.littletonrobotics.junction.Logger.recordOutput("Robot State", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("States/Robot State", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("BreakerTemp", breakerTemp.getValue());
   }
   // Grapher
   @Override

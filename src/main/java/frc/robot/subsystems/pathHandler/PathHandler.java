@@ -179,7 +179,7 @@ public class PathHandler extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
-    org.littletonrobotics.junction.Logger.recordOutput("PathHandler State", curState.name());
+    org.littletonrobotics.junction.Logger.recordOutput("States/PathHandler State", curState.name());
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/NumPieces", numPieces);
     org.littletonrobotics.junction.Logger.recordOutput(
         "PathHandler/noteOrderSize", noteOrder.size());

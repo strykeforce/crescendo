@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
@@ -139,7 +138,6 @@ public class RobotContainer {
   private final PathHandler pathHandler;
   private final DeadEyeSubsystem deadEyeSubsystem;
 
-  private final AnalogInput breakerTemp;
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
   private final FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
@@ -198,8 +196,6 @@ public class RobotContainer {
     magazineSubsystem = new MagazineSubsystem(magazineIO);
     ledSubsystem = new LedSubsystem();
 
-    breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
-
     climbSubsystem =
         new ClimbSubsystem(climbIO, new ClimbRatchetIOServo(), new TrapBarIOServo(), forkIO);
 
@@ -216,8 +212,7 @@ public class RobotContainer {
             magazineSubsystem,
             superStructure,
             climbSubsystem,
-            ledSubsystem,
-            breakerTemp);
+            ledSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 

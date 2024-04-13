@@ -501,13 +501,13 @@ public class SuperStructure extends MeasurableSubsystem {
       case POST_CLIMB:
         break;
     }
-    org.littletonrobotics.junction.Logger.recordOutput("SuperStructState", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("States/SuperStructState", curState);
     org.littletonrobotics.junction.Logger.recordOutput(
-        "Elbow Finished", elbowSubsystem.isFinished());
+        "States/Elbow Finished", elbowSubsystem.isFinished());
     org.littletonrobotics.junction.Logger.recordOutput(
-        "Wrist Finished", wristSubsystem.isFinished());
+        "States/Wrist Finished", wristSubsystem.isFinished());
     org.littletonrobotics.junction.Logger.recordOutput(
-        "Shooter Finished", shooterSubsystem.atSpeed());
+        "States/Shooter Finished", shooterSubsystem.atSpeed());
     org.littletonrobotics.junction.Logger.recordOutput("SuperStructure Is Precise", isPrecise);
   }
 
