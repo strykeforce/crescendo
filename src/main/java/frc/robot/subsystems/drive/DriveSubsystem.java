@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants.Setpoints;
@@ -144,6 +145,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void setAzimuthVel(double vel) {
+    io.setAzimuthVel(vel);
+  }
+
   public double getvOmegaToGoal() {
     return omegaShootTrackController.calculate(
         getPoseMeters().getRotation().getRadians(),
@@ -225,12 +230,31 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
+  public void setOmegaKP(double kP, double accel) {
+    holonomicController.getThetaController().setP(kP);
+    holonomicController
+        .getThetaController()
+        .setConstraints(new Constraints(DriveConstants.kMaxOmega, accel));
+  }
+
+  public void resetHolonomicController(double yaw) {
+    xController.reset();
+    yController.reset();
+    omegaController.reset(yaw);
+    omegaSpinController.reset(yaw);
+    omegaShootTrackController.reset(yaw);
+    holonomicController.getThetaController().reset(yaw);
+    logger.info("Holonomic Controller Reset: {}", yaw);
+  }
+
   public void resetHolonomicController() {
     xController.reset();
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     omegaSpinController.reset(inputs.gyroRotation2d.getRadians());
     omegaShootTrackController.reset(inputs.gyroRotation2d.getRadians());
+    holonomicController.getThetaController().reset(inputs.gyroRotation2d.getRadians());
+    logger.info("Holonomic Controller Reset: {}", inputs.gyroRotation2d.getRadians());
   }
 
   public void setHolonomicControllerTranslationkP(double kP) {
@@ -382,7 +406,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public boolean isPointingAtGoal(Pose2d pos) {
     return Math.abs(getShooterAngleToSpeaker(pos).getDegrees())
-        <= DriveConstants.kDegreesCloseEnough;
+        <= (isFeeding
+            ? DriveConstants.kDegreesCloseEnoughFeeding
+            : DriveConstants.kDegreesCloseEnough);
   }
 
   public boolean isDriveStill() {
@@ -622,6 +648,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "NAI1":
           pose = Setpoints.NAI1;
           break;
+        case "NAI2":
+          pose = Setpoints.NAI2;
+          break;
         case "AI1":
           pose = Setpoints.AI1;
           break;
@@ -664,14 +693,32 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "AS1":
           pose = Setpoints.AS1;
           break;
+        case "AS2":
+          pose = Setpoints.AS2;
+          break;
+        case "AS3":
+          pose = Setpoints.AS3;
+          break;
         case "MS1":
           pose = Setpoints.MS1;
+          break;
+        case "MS2":
+          pose = Setpoints.MS2;
           break;
         case "NAS1":
           pose = Setpoints.NAS1;
           break;
         case "NAS2":
           pose = Setpoints.NAS2;
+          break;
+        case "MP1":
+          pose = Setpoints.MP1;
+          break;
+        case "MP2":
+          pose = Setpoints.MP2;
+          break;
+        case "NAS3":
+          pose = Setpoints.NAS3;
           break;
 
         default:
@@ -806,6 +853,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Holonomic Cont Vx", () -> holoContOutput.vxMetersPerSecond),
         new Measure("Holonomic Cont Vy", () -> holoContOutput.vyMetersPerSecond),
         new Measure("Holonomic Cont Vomega", () -> holoContOutput.omegaRadiansPerSecond),
+        new Measure(
+            "Holo Controller Omega Err",
+            () -> holonomicController.getThetaController().getPositionError()),
+        new Measure(
+            "Holo Controller Omega Goal",
+            () -> holonomicController.getThetaController().getGoal().position),
+        new Measure(
+            "Holo Controller Omega Setpoint",
+            () -> holonomicController.getThetaController().getSetpoint().position),
         new Measure("Trajectory Active", () -> trajectoryActive),
         new Measure("Wheel 0 Angle", () -> io.getSwerveModuleStates()[0].angle.getDegrees()),
         new Measure("Wheel 0 Speed", () -> io.getSwerveModuleStates()[0].speedMetersPerSecond),

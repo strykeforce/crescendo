@@ -8,6 +8,7 @@ import frc.robot.commands.auto.DefaultAutoCommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.AmpMid_5PieceCommand;
+import frc.robot.commands.auton.DisruptAutonCommand;
 import frc.robot.commands.auton.DoNothingCommand;
 import frc.robot.commands.auton.FastAmpMid_5PieceCommand;
 import frc.robot.commands.auton.FastAmpMid_5PieceM2Command;
@@ -183,11 +184,32 @@ public class AutoSwitch extends MeasurableSubsystem {
             intakeSubsystem,
             elbowSubsystem,
             pathHandler,
-            "AmpInitial4_MiddleNote1_Part1",
-            "AmpInitial4_MiddleNote1_Part2",
+            deadeye,
+            ledSubsystem,
+            "AmpInitial3_MiddleNote1_Part1",
+            "AmpInitial3_MiddleNote1_Part2",
+            // "NonAmpShoot2_DroppedNote",
             AutonConstants.kAmpPathMatrix,
             List.of(1, 2, 3),
-            3.0,
+            4.0,
+            AutonConstants.Setpoints.AS2);
+      case 0x03:
+        return new SmartAmpIgnoreWingAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "AmpInitial3_MiddleNote1_Part1",
+            "AmpInitial3_MiddleNote2_Part2",
+            // "NonAmpShoot2_DroppedNote",
+            AutonConstants.kAmpPathMatrix,
+            List.of(2, 1, 3),
+            4.0,
             AutonConstants.Setpoints.AS2);
       case 0x10:
         return new AmpMid_5PieceCommand(
@@ -305,9 +327,78 @@ public class AutoSwitch extends MeasurableSubsystem {
             List.of(3, 5, 4),
             4.0,
             AutonConstants.Setpoints.NAS2);
+
+      case 0x26:
+        return new SmartNonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial1_MiddleNote4",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(4, 5, 3),
+            4.0,
+            AutonConstants.Setpoints.NAS2);
+
+      case 0x27:
+        return new SmartNonAmpAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial1_MiddleNote5",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(5, 3, 4),
+            4.0,
+            AutonConstants.Setpoints.NAS2);
+
       case 0x30:
         return new DoNothingCommand(
             robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
+
+      case 0x31:
+        return new DisruptAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial2_NonAmpShoot3",
+            "NonAmpShoot3_MiddleNote5",
+            "MiddleNote5_MiddleNote1",
+            "MiddleNote1_MiddleShoot",
+            AutonConstants.Setpoints.MS2,
+            AutonConstants.kDisruptIntakingMiddleNote1Y);
+
+      case 0x32:
+        return new DisruptAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial2_NonAmpShoot3",
+            "NonAmpShoot3_MiddleNote5",
+            "MiddleNote5_MiddleNote2",
+            "MiddleNote2_MiddleShoot",
+            AutonConstants.Setpoints.MS2,
+            AutonConstants.kDisruptIntakingMiddleNote2Y);
 
       default:
         String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);

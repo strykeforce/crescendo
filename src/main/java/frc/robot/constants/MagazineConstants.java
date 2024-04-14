@@ -14,24 +14,24 @@ public final class MagazineConstants {
   public static final double kShootCloseEnough = 10;
   // public static final double kFeedingSpeed = 0.5;
   public static final int kMinBeamBreaks = 0; // 3
-  public static final double kIntakingSpeed = -25; // -46
-  public static final double kFastIntakingSpeed = -25; // -90
-  public static final double kEmptyingSpeed = -70; // -90
-  public static final double kReversingSpeed = 4.8; // TODO do testing to determine correct speed
+  public static final double kIntakingSpeed = -50; // -46
+  public static final double kFastIntakingSpeed = -50; // -90
+  public static final double kEmptyingSpeed = -50; // -90 -> -70
+  public static final double kReversingSpeed = 9.6; // 4.8
 
   public static final double kReleaseTime = 0.75;
-  public static final double kPodiumPrepareSpeed = -10;
+  public static final double kPodiumPrepareSpeed = -20; // -10
   public static final double kPodiumShootSpeed = 105; // 90
-  public static final double kTrapReleaseSpeed = -20.0; // -30.0
+  public static final double kTrapReleaseSpeed = -40.0; // -20.0
   public static final double kTrapReleaseTime = 0.75;
-  public static final double kAmpReleaseSpeed = 20.0;
+  public static final double kAmpReleaseSpeed = 40.0; // 20.0
   public static final double kPodiumRumbleSpeed = 80;
 
   public static final TalonFXConfiguration getMagazineConfig() {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 0.4;
+    slot0.kP = 0.2;
     slot0.kI = 0.0;
     slot0.kD = 0.0;
     slot0.kS = 0.0;
@@ -41,7 +41,7 @@ public final class MagazineConstants {
     config.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs().withMotionMagicAcceleration(300).withMotionMagicJerk(5000);
+        new MotionMagicConfigs().withMotionMagicAcceleration(500).withMotionMagicJerk(5000);
     config.MotionMagic = motionMagic;
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;

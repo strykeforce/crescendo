@@ -40,6 +40,10 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     return (curState == IntakeState.HAS_PIECE) || curState == IntakeState.REVERSING;
   }
 
+  public void setHasNote() {
+    setState(IntakeState.HAS_PIECE);
+  }
+
   public void toIntaking() {
     setPercent(IntakeConstants.kIntakePercentOutput);
     setState(IntakeState.INTAKING);
@@ -111,7 +115,7 @@ public class IntakeSubsystem extends MeasurableSubsystem implements OpenLoopSubs
         break;
     }
 
-    org.littletonrobotics.junction.Logger.recordOutput("Intake State", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("States/Intake State", curState);
   }
 
   public Set<Measure> getMeasures() {

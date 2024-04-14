@@ -1,24 +1,29 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.magazine.MagazineSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
+import frc.robot.subsystems.superStructure.SuperStructure;
 
 public class EjectPieceCommand extends Command {
-  private IntakeSubsystem intakeSubsystem;
+  private RobotStateSubsystem robotStateSubsystem;
 
-  public EjectPieceCommand(IntakeSubsystem intakeSubsystem) {
-    this.intakeSubsystem = intakeSubsystem;
-
-    addRequirements(intakeSubsystem);
+  public EjectPieceCommand(
+      RobotStateSubsystem robotStateSubsystem,
+      MagazineSubsystem magazineSubsystem,
+      SuperStructure superStructure) {
+    addRequirements(magazineSubsystem, superStructure);
+    this.robotStateSubsystem = robotStateSubsystem;
   }
 
   @Override
   public void initialize() {
-    intakeSubsystem.toEjecting();
+    robotStateSubsystem.toEjecting();
   }
 
   @Override
   public boolean isFinished() {
-    return !intakeSubsystem.isBeamBroken();
+    return robotStateSubsystem.getState() != RobotStates.EJECTING;
   }
 }

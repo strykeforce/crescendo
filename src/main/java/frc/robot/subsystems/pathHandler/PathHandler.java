@@ -42,6 +42,7 @@ public class PathHandler extends MeasurableSubsystem {
   private Rotation2d robotHeading;
   private Trajectory curTrajectory;
   private boolean deadeyeFlag = false;
+  private int lastNote = 0;
 
   private ProfiledPIDController deadeyeYDrive;
   private PIDController deadeyeXDrive;
@@ -178,7 +179,7 @@ public class PathHandler extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
-    org.littletonrobotics.junction.Logger.recordOutput("PathHandler State", curState.name());
+    org.littletonrobotics.junction.Logger.recordOutput("States/PathHandler State", curState.name());
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/NumPieces", numPieces);
     org.littletonrobotics.junction.Logger.recordOutput(
         "PathHandler/noteOrderSize", noteOrder.size());
@@ -198,7 +199,7 @@ public class PathHandler extends MeasurableSubsystem {
             } else {
               nextPath = paths[0][noteOrder.get(0)];
             }
-
+            logger.info("" + noteOrder.toString());
             logger.info("Begin Trajectory " + pathNames[0][noteOrder.get(0)]);
             startNewPath(nextPath);
             logger.info("SHOOT -> DRIVE_FETCH");
@@ -208,6 +209,18 @@ public class PathHandler extends MeasurableSubsystem {
         case DRIVE_FETCH:
           driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
           double curX = driveSubsystem.getPoseMeters().getX();
+
+          if (!timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * 0.50)
+              && robotStateSubsystem.hasNote()) {
+            numPieces -= 0.5;
+            logger.info("FETCH -> DRIVE_SHOOT");
+            nextPath = paths[lastNote][0];
+            logger.info("Begin Trajectory " + pathNames[lastNote][0]);
+            curState = PathStates.DRIVE_SHOOT;
+            isSpinningUp = false;
+            startNewPath(nextPath);
+          }
+
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds() * AutonConstants.kPercentLeft)
               && ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
                       && curX >= AutonConstants.kSwitchXLine)
@@ -241,6 +254,17 @@ public class PathHandler extends MeasurableSubsystem {
                 curTrajectory.sample(timer.get()), robotHeading, yVel);
           else driveSubsystem.calculateController(curTrajectory.sample(timer.get()), robotHeading);
 
+          if (robotStateSubsystem.hasNote()) {
+            numPieces -= 0.5;
+            logger.info("END_PATH -> DRIVE_SHOOT");
+            logger.info("" + noteOrder.toString());
+            nextPath = paths[noteOrder.get(0)][0];
+            logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
+            curState = PathStates.DRIVE_SHOOT;
+            isSpinningUp = false;
+            noteOrder.remove(0);
+            startNewPath(nextPath);
+          }
           if (timer.hasElapsed(curTrajectory.getTotalTimeSeconds())) {
             driveSubsystem.drive(0, 0, 0);
             logger.info("END_PATH -> FETCH");
@@ -275,8 +299,11 @@ public class PathHandler extends MeasurableSubsystem {
           String nextPathName;
 
           if (robotStateSubsystem.hasNote() && numPieces > 0.51) {
+            lastNote = noteOrder.get(0);
             numPieces -= 0.5;
             logger.info("FETCH -> DRIVE_SHOOT");
+            logger.info("" + noteOrder.toString());
+            deadeyeFlag = false;
             nextPath = paths[noteOrder.get(0)][0];
             logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
             noteOrder.remove(0);
@@ -297,6 +324,8 @@ public class PathHandler extends MeasurableSubsystem {
               curState = PathStates.DONE;
               break;
             }
+            logger.info("" + noteOrder.toString());
+            lastNote = noteOrder.get(0);
             logger.info("FETCH -> DRIVE_FETCH");
             logger.info("Begin Trajectory " + nextPathName);
             noteOrder.remove(0);
@@ -322,6 +351,7 @@ public class PathHandler extends MeasurableSubsystem {
             curState = PathStates.SHOOT;
             startShot();
             driveSubsystem.setEnableHolo(false);
+            driveSubsystem.move(0.0, 0.0, 0.0, false);
             driveSubsystem.grapherTrajectoryActive(false);
           }
 

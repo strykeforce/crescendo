@@ -28,4 +28,6 @@ public interface MagazineIO {
   public default void enableFwdLimitSwitch(boolean enabled) {}
 
   public default void enableRevLimitSwitch(boolean enabled) {}
+
+  public default void enableLimitSwitches(boolean fwdEnable, boolean revEnable) {}
 }

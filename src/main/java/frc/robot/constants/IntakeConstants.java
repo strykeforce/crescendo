@@ -17,7 +17,7 @@ public final class IntakeConstants {
   public static final int kIntakeFxId = 20;
   public static final int kAutoBeamBreakStableCounts = 0; // 2
   public static final int kTeleBeamBreakStableCounts = 2; // 2
-  public static final double kEjectPercent = 0.5;
+  public static final double kEjectPercent = 1.0;
 
   public static TalonFXConfiguration getFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();

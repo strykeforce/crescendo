@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -72,14 +73,16 @@ public final class ElbowConstants {
     config.HardwareLimitSwitch.ForwardLimitEnable = false;
 
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.14691; // 0.151
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.4; // 0.14691
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.26409; // -0.26
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.001; // -0.26409
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     config.Feedback.FeedbackRemoteSensorID = ElbowConstants.kHighResCANcoderID;
     config.Feedback.RotorToSensorRatio = 52.0833;
-    config.Feedback.SensorToMechanismRatio = 4.0;
+    config.Feedback.SensorToMechanismRatio = 8.0;
+
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     Slot0Configs slot0 = new Slot0Configs();
     slot0.kP = 150.0; // 1.2
@@ -94,7 +97,7 @@ public final class ElbowConstants {
 
     Slot1Configs slot1 = new Slot1Configs();
     slot1.kP = 150.0; // 1.2
-    slot1.kI = 75.0;
+    slot1.kI = 175.0;
     slot1.kD = 0.0;
     slot1.kS = 0.0;
     slot1.kV = 20.0;
@@ -118,8 +121,8 @@ public final class ElbowConstants {
   public static MotionMagicConfigs getPreciseMMConfig() {
     MotionMagicConfigs config = new MotionMagicConfigs();
 
-    config.MotionMagicCruiseVelocity = 0.15;
-    config.MotionMagicAcceleration = 0.3;
+    config.MotionMagicCruiseVelocity = 0.40;
+    config.MotionMagicAcceleration = 0.60;
     config.MotionMagicJerk = 5;
 
     return config;
@@ -129,7 +132,7 @@ public final class ElbowConstants {
     MotionMagicConfigs config = new MotionMagicConfigs();
 
     config.MotionMagicCruiseVelocity = 0.4;
-    config.MotionMagicAcceleration = 0.75;
+    config.MotionMagicAcceleration = 2.0;
     config.MotionMagicJerk = 5;
 
     return config;

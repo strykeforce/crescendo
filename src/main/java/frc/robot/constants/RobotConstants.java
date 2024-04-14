@@ -17,6 +17,9 @@ public class RobotConstants {
   // Joysticks
   public static final double kJoystickDeadband = 0.1;
 
+  // robot dimensions
+  public static final double klengthIncludingBumpers = 0.8509;
+
   // Roborio ID's
   public static final int kMinAutoSwitchID = 0;
   public static final int kMaxAutoSwitchID = 5;
@@ -42,6 +45,9 @@ public class RobotConstants {
   // Robot Sizes
   public static final double kShooterOffset = 0.2; // meters
   public static final Rotation2d kShooterHeading = Rotation2d.fromDegrees(180);
+
+  // Analog Input Channels
+  public static final int kBreakerTempChannel = 0;
 
   // Constants Different between Comp and Proto
   public static double kWheelDiameterInches = 3.0;
@@ -106,10 +112,10 @@ public class RobotConstants {
     public static final double kElbowZero = 0.01465; // 0.0105
     public static final double kElbowRecoveryZero = -0.2656;
     public static final double kElbowZeroPos = 30.45;
-    public static final double kElbowSetpointOffset = 0.00488; // 0.00409
+    public static final double kElbowSetpointOffset = 0.00357; // 0.00354
 
     // Wrist
-    public static final double kWristZero = 2243.0; // 2223
+    public static final double kWristZero = 2287.0; // 2243
 
     // Climb
     public static final double kLeftTrapBarExtend = 0.5;

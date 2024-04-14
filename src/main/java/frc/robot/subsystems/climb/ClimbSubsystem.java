@@ -416,7 +416,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     }
     org.littletonrobotics.junction.Logger.recordOutput("leftSetpoint", leftSetpoint);
     org.littletonrobotics.junction.Logger.recordOutput("rightSetpoint", rightSetpoint);
-    org.littletonrobotics.junction.Logger.recordOutput("Climb State", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("States/Climb State", curState);
   }
 
   @Override

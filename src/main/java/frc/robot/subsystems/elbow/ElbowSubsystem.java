@@ -190,7 +190,7 @@ public class ElbowSubsystem extends MeasurableSubsystem implements ClosedLoopPos
       case ZEROED:
         break;
     }
-    org.littletonrobotics.junction.Logger.recordOutput("Elbow State", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("States/Elbow State", curState);
   }
 
   @Override

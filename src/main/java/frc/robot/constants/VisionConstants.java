@@ -80,8 +80,8 @@ public final class VisionConstants {
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-132.0)));
   public static final Pose3d kCam4Pose =
       new Pose3d(
-          new Translation3d(-0.23, -0.325, 0.50),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(132.0)));
+          new Translation3d(-0.22, -0.335, 0.50),
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
 
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.

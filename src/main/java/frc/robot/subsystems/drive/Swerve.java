@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -213,6 +214,12 @@ public class Swerve implements SwerveIO, Checkable {
 
   public void move(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
     swerveDrive.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
+  }
+
+  public void setAzimuthVel(double vel) {
+    for (int i = 0; i < 4; i++) {
+      azimuths[i].set(TalonSRXControlMode.Velocity, vel);
+    }
   }
 
   @Override

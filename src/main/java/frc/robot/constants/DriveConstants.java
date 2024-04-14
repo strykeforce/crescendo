@@ -40,16 +40,17 @@ public final class DriveConstants {
 
   public static final double kSpeedStillFeedThreshold = 0.5;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
-  public static final double kGyroRateStillThreshold = 5.0; // degrees per second
+  public static final double kGyroRateStillThreshold = 25.0; // 5 degrees per second
   public static final double kDegreesCloseEnough = 3;
+  public static final double kDegreesCloseEnoughFeeding = 5;
 
   // Move and shoot thresholds
   public static final double kMaxStableAccel = 0.1;
   public static final int kVelocityStableCounts = 5;
   public static final double kMaxMoveShootVelocity = 2.0;
-  public static final double kMaxMoveGyroRateThreshold = 10.0;
+  public static final double kMaxMoveGyroRateThreshold = 25.0; // 10
   public static final double kMoveShootVelDetune = 0.2;
-  public static final double kMoveShootTeleMaxVelX = 0.5;
+  public static final double kMoveShootTeleMaxVelX = 2.0;
   public static final double kMaxSpeakerDist = 8.0;
 
   public static final double kDriveMotorOutputGear = 34; // 30
