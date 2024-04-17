@@ -13,6 +13,8 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
+
+import frc.robot.Robot;
 import frc.robot.constants.ElbowConstants;
 import frc.robot.constants.RobotConstants;
 import org.slf4j.Logger;

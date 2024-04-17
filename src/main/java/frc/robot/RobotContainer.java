@@ -87,6 +87,7 @@ import frc.robot.constants.AutonConstants;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
+import frc.robot.constants.SuperStructureConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.auto.AutoSwitch;
@@ -347,6 +348,19 @@ public class RobotContainer {
   }
 
   public void configurePitDashboard() {
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Trap Elbow Loc",
+            new ClosedLoopElbowCommand(elbowSubsystem, SuperStructureConstants.kElbowTrapSetPoint))
+        .withPosition(1, 2)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Trap Wrist Loc",
+            new ClosedLoopWristCommand(wristSubsystem, SuperStructureConstants.kWristTrapSetPoint))
+        .withPosition(2, 2)
+        .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
         .add(
