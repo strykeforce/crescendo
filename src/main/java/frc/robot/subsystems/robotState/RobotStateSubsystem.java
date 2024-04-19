@@ -6,17 +6,16 @@ import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.MagazineConstants;
-import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem.DriveStates;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
 import frc.robot.subsystems.led.LedSubsystem;
@@ -49,7 +48,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private ClimbSubsystem climbSubsystem;
   private LedSubsystem ledSubsystem;
   private static CANBus canBus;
-  private AnalogInput breakerTemp;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
@@ -111,7 +109,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.ledSubsystem = ledSubsystem;
 
     this.canBus = new CANBus();
-    this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
     grabElbowOffsetPreferences();
 
     shootingLookupTable = parseLookupTable(RobotStateConstants.kShootingLookupTablePath);
@@ -490,6 +487,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toDefense() {
     driveSubsystem.setIsAligningShot(false);
     climbSubsystem.punchAir();
+    // superStructure.block();
     ledSubsystem.setCandy();
     inDefense = true;
     // setState(RobotStates.DEFENSE);
@@ -1255,8 +1253,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
     }
 
+    if (driveSubsystem.getDriveState() == DriveStates.SAFE
+        || driveSubsystem.getDriveState() == DriveStates.SAFE_HOLD) {
+      ledSubsystem.setColor(255, 0, 0);
+    }
     org.littletonrobotics.junction.Logger.recordOutput("States/Robot State", curState);
-    org.littletonrobotics.junction.Logger.recordOutput("BreakerTemp", breakerTemp.getValue());
   }
   // Grapher
   @Override

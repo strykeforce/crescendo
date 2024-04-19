@@ -16,6 +16,8 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants.Setpoints;
@@ -53,6 +55,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public DriveStates currDriveState = DriveStates.IDLE;
 
+  private CircularBuffer<Integer> temps = new CircularBuffer<Integer>(DriveConstants.kTempAvgCount);
   private double accelX = 0;
   private double accelY = 0;
   private double prevVelX = 0;
@@ -73,15 +76,20 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private boolean deadEYEAutoDrive = false;
   private boolean isMoveAndShoot = false;
 
+  private AnalogInput breakerTemp;
+
   private boolean tuningYaw = false;
   private double trackingSetpoint = 0.0;
 
   private boolean updateVision = true;
+  private double avgTemp = 0.0;
 
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
     this.io = io;
+
+    this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
 
     // Setup omega Controller
     omegaShootTrackController =
@@ -776,10 +784,37 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void toSafeHold() {
+    setDriveState(DriveStates.SAFE_HOLD);
+    io.configDriveCurrents(DriveConstants.getSafeDriveLimits());
+  }
+
+  public void toIdle() {
+    setDriveState(DriveStates.IDLE);
+    io.configDriveCurrents(DriveConstants.getNormDriveLimits());
+  }
+
+  public double getTemp() {
+    return avgTemp;
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    int temp = breakerTemp.getValue();
+    temps.addFirst(temp);
+    double avg = 0;
+    if (temps.size() == DriveConstants.kTempAvgCount)
+      for (int i = 0; i < DriveConstants.kTempAvgCount; ++i) avg += temps.get(i);
+
+    avg /= DriveConstants.kTempAvgCount;
+
+    avgTemp = avg;
+
     org.littletonrobotics.junction.Logger.processInputs("Swerve", inputs);
+    org.littletonrobotics.junction.Logger.recordOutput("BreakerTemp", temp);
+    org.littletonrobotics.junction.Logger.recordOutput("Avg Breaker Temp", avg);
+    org.littletonrobotics.junction.Logger.recordOutput("States/Drive State", getDriveState());
     // Update swerve module states every robot loop
     io.updateSwerve();
 
@@ -816,6 +851,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     switch (currDriveState) {
       case IDLE:
+        if (avg > DriveConstants.kTripTemp) {
+          io.configDriveCurrents(DriveConstants.getSafeDriveLimits());
+          setDriveState(DriveStates.SAFE);
+        }
+        break;
+      case SAFE:
+        if (avg < DriveConstants.kRecoverTemp) {
+          io.configDriveCurrents(DriveConstants.getNormDriveLimits());
+          setDriveState(DriveStates.IDLE);
+        }
+        break;
+      case SAFE_HOLD:
         break;
       default:
         break;
@@ -824,6 +871,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public enum DriveStates {
     IDLE,
+    SAFE,
+    SAFE_HOLD
   }
 
   @Override

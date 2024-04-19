@@ -40,7 +40,7 @@ public final class DriveConstants {
 
   public static final double kSpeedStillFeedThreshold = 0.5;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
-  public static final double kGyroRateStillThreshold = 25.0; // 5 degrees per second
+  public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second
   public static final double kDegreesCloseEnough = 3;
   public static final double kDegreesCloseEnoughFeeding = 5;
 
@@ -71,6 +71,14 @@ public final class DriveConstants {
   public static final double kPlaceYawPercent = 0.2;
   public static final double kIntakeYawPercent = .75;
   public static final double kIntakeMovePercent = .75;
+
+  public static final int kTempAvgCount = 25;
+  public static final double kTripTemp = 1300;
+  public static final double kRecoverTemp = 1290;
+  public static final double kNotifyTemp = 1295;
+
+  public static final double supplyCurrentLimitNorm = 50.0;
+  public static final double supplyCurrentThreshold = 55.0;
 
   public static Translation2d[] getWheelLocationMeters() {
     final double x = kRobotLength / 2.0; // front-back, was ROBOT_LENGTH
@@ -120,8 +128,8 @@ public final class DriveConstants {
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
-    currentConfig.SupplyCurrentLimit = 50; // 40
-    currentConfig.SupplyCurrentThreshold = 55; // 45
+    currentConfig.SupplyCurrentLimit = 45; // 40
+    currentConfig.SupplyCurrentThreshold = 50; // 45
     currentConfig.SupplyTimeThreshold = 0.0;
     currentConfig.SupplyCurrentLimitEnable = true;
     currentConfig.StatorCurrentLimitEnable = false;
@@ -140,6 +148,26 @@ public final class DriveConstants {
     driveConfig.MotorOutput = motorConfigs;
 
     return driveConfig;
+  }
+
+  public static CurrentLimitsConfigs getSafeDriveLimits() {
+    CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
+    currentConfig.SupplyCurrentLimit = 30; // 40
+    currentConfig.SupplyCurrentThreshold = 35; // 45
+    currentConfig.SupplyTimeThreshold = 0.0;
+    currentConfig.SupplyCurrentLimitEnable = true;
+    currentConfig.StatorCurrentLimitEnable = false;
+    return currentConfig;
+  }
+
+  public static CurrentLimitsConfigs getNormDriveLimits() {
+    CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
+    currentConfig.SupplyCurrentLimit = 45; // 40
+    currentConfig.SupplyCurrentThreshold = 50; // 45
+    currentConfig.SupplyTimeThreshold = 0.0;
+    currentConfig.SupplyCurrentLimitEnable = true;
+    currentConfig.StatorCurrentLimitEnable = false;
+    return currentConfig;
   }
 
   public static Pigeon2Configuration getPigeon2Configuration() {
