@@ -33,8 +33,8 @@ public final class ClimbConstants {
   public static final double kZeroForkMaxVel = 0.5;
   public static final int kForkZeroStableCounts = 5;
   public static final double kCloseEnoughForks = 25; // 100
-  public static final double kLeftExtendPos = 460; // 500 -> 400
-  public static final double kRightExtendPos = 460; // 500 -> 400
+  public static final double kLeftExtendPos = 500; // 500 -> 400
+  public static final double kRightExtendPos = 500; // 500 -> 400
   public static final double kLeftRetractPos = 20; // 10
   public static final double kRightRetractPos = 20; // 10
   public static final double kRevsPerInch = 1.788; // 1.192 -> 2.98

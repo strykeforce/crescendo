@@ -218,7 +218,7 @@ public class Swerve implements SwerveIO, Checkable {
 
   public void setAzimuthVel(double vel) {
     for (int i = 0; i < 4; i++) {
-      azimuths[i].set(TalonSRXControlMode.Velocity, vel);
+      azimuths[i].set(TalonSRXControlMode.PercentOutput, vel);
     }
   }
 

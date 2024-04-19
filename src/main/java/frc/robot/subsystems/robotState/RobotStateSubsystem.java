@@ -290,6 +290,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.intake();
     // magazineSubsystem.toIntaking();
     magazineSubsystem.setEmpty();
+
     ledSubsystem.setFlaming();
     setState(RobotStates.TO_INTAKING);
   }
@@ -546,6 +547,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void prepareClimb() {
     inDefense = false;
     magazineSubsystem.toPrepClimb();
+    driveSubsystem.setIsAligningShot(false);
     climbSubsystem.zero(true);
     climbSubsystem.extendForks();
     superStructure.toPrepClimb();
@@ -556,6 +558,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void climb(boolean continueToTrap, boolean decendAfterTrap) {
     inDefense = false;
     climbSubsystem.trapClimb();
+    driveSubsystem.setIsAligningShot(false);
     this.continueToTrap = continueToTrap;
     this.decendClimbAfterTrap = decendAfterTrap;
 
@@ -597,6 +600,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void postClimbStow() {
     inDefense = false;
     toStow();
+    driveSubsystem.setIsAligningShot(false);
     climbSubsystem.retractForks();
     climbSubsystem.retractTrapBar();
     climbSubsystem.stow();
@@ -733,6 +737,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case TO_INTAKING:
         if (superStructure.isFinished()) {
           intakeSubsystem.toIntaking();
+          magazineSubsystem.idle();
           setState(RobotStates.INTAKING);
         }
         break;

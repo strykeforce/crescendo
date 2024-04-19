@@ -2,7 +2,7 @@ package frc.robot.constants;
 
 public final class SuperStructureConstants {
   // STOW
-  public static final double kWristStowSetPoint = -2195.0; // -2245
+  public static final double kWristStowSetPoint = -2345.0; // -2195
   public static final double kElbowStowSetPoint = 0.00122; // 0.14691
   public static final double kShooterStowSetPoint = 0.0;
 
@@ -23,7 +23,7 @@ public final class SuperStructureConstants {
   // TRAP
   public static final double kElbowFoldedSetPoint = 0.20111556; // -13.94
   public static final double kWristFoldedSetPoint = kWristStowSetPoint;
-  public static final double kWristTrapSetPoint = 1020.0; // 1070 1120
+  public static final double kWristTrapSetPoint = 970.0; // 1020 1070 1120
   public static final double kElbowTrapSetPoint = kElbowFoldedSetPoint;
   public static final double kShooterTrapSetPoint = 0.0;
 

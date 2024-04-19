@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -55,6 +56,7 @@ import frc.robot.commands.intake.EjectPieceCommand;
 import frc.robot.commands.intake.OpenLoopIntakeCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.magazine.RecoverMagazineCommand;
+import frc.robot.commands.magazine.UnJamUpperNoteCommand;
 import frc.robot.commands.robotState.AirwaveHealthCheck;
 import frc.robot.commands.robotState.AmpCommand;
 import frc.robot.commands.robotState.ClimbCommand;
@@ -307,6 +309,8 @@ public class RobotContainer {
     configureTuningDashboard();
     robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
+    RobotController.setBrownoutVoltage(6.3);
+
     // configureTelemetry();
     // configurePitDashboard();
   }
@@ -393,6 +397,11 @@ public class RobotContainer {
                 climbSubsystem))
         .withSize(1, 1)
         .withPosition(4, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Turn Mag Off", new OpenLoopMagazineCommand(magazineSubsystem, 0.0))
+        .withPosition(5, 2)
+        .withSize(1, 1);
     Shuffleboard.getTab("Pit")
         .add("Turn Intake Off", new OpenLoopIntakeCommand(intakeSubsystem, 0.0))
         .withSize(1, 1)
@@ -855,6 +864,10 @@ public class RobotContainer {
                 (robotStateSubsystem.getState() == RobotStates.TO_PODIUM
                     && magazineSubsystem.getSpeed() >= MagazineConstants.kPodiumRumbleSpeed))
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+
+    // UnJam Note
+    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+        .onTrue(new UnJamUpperNoteCommand(magazineSubsystem));
 
     // Open Loop Elbow
     // new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
