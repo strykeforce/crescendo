@@ -84,17 +84,17 @@ public class FallBack4PieceCommand extends SequentialCommandGroup implements Aut
         // new WaitCommand(0.05),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
+        midInitWingNote1,
+        wingNote1MidInit,
         new ParallelCommandGroup(
-            midInitWingNote1,
-            wingNote1MidInit,
             // new WaitCommand(0.05),
             new SequentialCommandGroup(
                 new AutoWaitNoteStagedCommand(robotStateSubsystem),
                 new SpinUpWheelsCommand(
                     superStructure,
                     SuperStructureConstants.kShooterSubwooferSetPoint,
-                    SuperStructureConstants.kShooterSubwooferSetPoint)),
-            new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem)));
+                    SuperStructureConstants.kShooterSubwooferSetPoint))),
+        new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
   }
 
   public void generateTrajectory() {

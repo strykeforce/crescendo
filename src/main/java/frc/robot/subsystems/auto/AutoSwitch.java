@@ -270,8 +270,16 @@ public class AutoSwitch extends MeasurableSubsystem {
             elbowSubsystem,
             deadeye,
             ledSubsystem);
-    case 0x14:
-    return new FallBack4PieceCommand(driveSubsystem, robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem, deadeye, ledSubsystem);
+      case 0x14:
+        return new FallBack4PieceCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadeye,
+            ledSubsystem);
       case 0x20:
         return new NonAmpAutoCommand(
             driveSubsystem,
