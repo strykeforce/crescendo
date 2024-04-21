@@ -226,10 +226,28 @@ public class AutoSwitch extends MeasurableSubsystem {
             deadeye,
             ledSubsystem,
             "AmpInitial3_MiddleNote1_Part1",
-            "AmpInitial3_MiddleNote2_Part2",
+            "AmpInitial3_MiddleNote1_Part2",
             // "NonAmpShoot2_DroppedNote",
             AutonConstants.kAmpPathMatrix,
             List.of(1, 3, 2),
+            4.0,
+            AutonConstants.Setpoints.AS2);
+      case 0x05:
+        return new SmartAmpIgnoreWingAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "AmpInitial3_MiddleNote1_Part1",
+            "AmpInitial3_MiddleNote2_Part2",
+            // "NonAmpShoot2_DroppedNote",
+            AutonConstants.kAmpPathMatrix,
+            List.of(2, 3, 1),
             4.0,
             AutonConstants.Setpoints.AS2);
       case 0x10:
