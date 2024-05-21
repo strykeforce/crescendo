@@ -40,9 +40,9 @@ public final class VisionConstants {
   public static final double FOV58MJPGMultiTagCoeff = 16.0 / 100.0;
   public static final double FOV58MJPGPowerNumber = 3.5;
   public static final double FOV58MJPGSingleTagCoeff = 21.0 / 100.0;
-  public static final double FOV58YUYVMultiTagCoeff = 15.0 / 100.0;
-  public static final double FOV58YUYVPowerNumber = 3.5;
-  public static final double FOV58YUYVSingleTagCoeff = 19.0 / 100.0;
+  public static final double FOV58YUYVMultiTagCoeff = 17.0 / 100.0;
+  public static final double FOV58YUYVPowerNumber = 4.0;
+  public static final double FOV58YUYVSingleTagCoeff = 22.0 / 100.0;
 
   // Constants for cameras
   public static final int kNumCams = 4;

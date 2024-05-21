@@ -15,6 +15,7 @@ public final class MagazineConstants {
   // public static final double kFeedingSpeed = 0.5;
   public static final int kMinBeamBreaks = 0; // 3
   public static final double kIntakingSpeed = -50; // -46
+  public static final double kIdleIntakingSpeed = -25;
   public static final double kFastIntakingSpeed = -50; // -90
   public static final double kEmptyingSpeed = -50; // -90 -> -70
   public static final double kReversingSpeed = 9.6; // 4.8

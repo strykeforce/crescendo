@@ -19,7 +19,7 @@ public final class WristConstants {
     config.forwardSoftLimitThreshold = 1515;
     config.forwardSoftLimitEnable = true; // fixme
 
-    config.reverseSoftLimitThreshold = -2200.0;
+    config.reverseSoftLimitThreshold = -2400.0;
     config.reverseSoftLimitEnable = true; // fixme
 
     config.continuousCurrentLimit = 10;

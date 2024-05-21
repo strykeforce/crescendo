@@ -29,7 +29,7 @@ public class ElbowIOFX implements ElbowIO, Checkable {
 
   @HealthCheck
   @Position(
-      percentOutput = {0.1, -0.1},
+      percentOutput = {-0.1, 0.1},
       encoderChange = 0.13)
   private TalonFX elbow;
 
@@ -241,8 +241,9 @@ public class ElbowIOFX implements ElbowIO, Checkable {
   @BeforeHealthCheck
   @AfterHealthCheck
   public boolean goToZero() {
-    setPosition(0.0, 0);
-    return Math.abs(currPosition.refresh().getValue() - setpointOffset)
+    setPosition(ElbowConstants.kElbowStraightOut, 0);
+    return Math.abs(
+            currPosition.refresh().getValue() - ElbowConstants.kElbowStraightOut - setpointOffset)
         <= ElbowConstants.kCloseEnoughRots;
   }
 }

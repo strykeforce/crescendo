@@ -3,6 +3,7 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -43,6 +44,7 @@ public class Swerve implements SwerveIO, Checkable {
   private BooleanSupplier azimuth1FwdLimitSupplier = () -> false;
 
   private TalonSRX[] azimuths = new TalonSRX[4];
+  private TalonFX[] drives = new TalonFX[4];
 
   private V6TalonSwerveModule[] swerveModules;
   private SwerveDriveKinematics kinematics;
@@ -76,6 +78,7 @@ public class Swerve implements SwerveIO, Checkable {
             () -> azimuthTalon.getSensorCollection().isFwdLimitSwitchClosed();
 
       var driveTalon = new TalonFX(i + 10);
+      drives[i] = driveTalon;
       configurator = driveTalon.getConfigurator();
       configurator.apply(new TalonFXConfiguration()); // factory default
       configurator.apply(DriveConstants.getDriveTalonConfig());
@@ -218,7 +221,13 @@ public class Swerve implements SwerveIO, Checkable {
 
   public void setAzimuthVel(double vel) {
     for (int i = 0; i < 4; i++) {
-      azimuths[i].set(TalonSRXControlMode.Velocity, vel);
+      azimuths[i].set(TalonSRXControlMode.PercentOutput, vel);
+    }
+  }
+
+  public void configDriveCurrents(CurrentLimitsConfigs config) {
+    for (int i = 0; i < 4; i++) {
+      drives[i].getConfigurator().apply(config);
     }
   }
 

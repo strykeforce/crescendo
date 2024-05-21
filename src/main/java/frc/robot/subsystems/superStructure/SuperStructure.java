@@ -165,6 +165,22 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.SHOOTING;
   }
 
+  public void block() {
+    elbowSetpoint = SuperStructureConstants.kElbowBlockSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristBlockSetPoint;
+    leftShooterSpeed = SuperStructureConstants.kShooterBlockSetPoint;
+    rightShooterSpeed = SuperStructureConstants.kShooterBlockSetPoint;
+
+    shooterSubsystem.setSpeed(leftShooterSpeed);
+    elbowSubsystem.setPosition(elbowSetpoint);
+
+    logger.info("{} -> TRANSFER(BLOCK)", curState);
+    isPrecise = false;
+    flipMagazineOut = true;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.BLOCK;
+  }
+
   public void amp() {
     elbowSetpoint = SuperStructureConstants.kElbowAmpSetPoint;
     wristSetpoint = SuperStructureConstants.kWristAmpSetPoint;
@@ -601,6 +617,8 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case AUTO_DISRUPT:
         break;
+      case BLOCK:
+        break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("States/SuperStructState", curState);
     org.littletonrobotics.junction.Logger.recordOutput(
@@ -646,6 +664,7 @@ public class SuperStructure extends MeasurableSubsystem {
     LOW_FEEDING,
     AUTO_DISRUPT,
     HIGH_FEEDING,
-    SOURCE_INTAKE
+    SOURCE_INTAKE,
+    BLOCK
   }
 }

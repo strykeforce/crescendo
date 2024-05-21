@@ -20,6 +20,7 @@ public final class ElbowConstants {
   public static final int kRemoteEncoderID = 31;
   public static final int kHighResCANcoderID = 32;
   public static final double kCloseEnoughRots = 0.0048; // 0.0048 -> 0.000833
+  public static final double kCloseEnoughPrecise = 0.0010;
   // public static final double kMaxPivotTicks = 0;
   // public static final double kMinPivotTicks = 1000;
   public static final double kElbowResetPos =
@@ -37,6 +38,8 @@ public final class ElbowConstants {
 
   public static final int kPreciseSlot = 1;
   public static final int kNormalSlot = 0;
+
+  public static final double kElbowStraightOut = 0.14556;
 
   // Zero Recovery Constants
   public static final double kZeroRecoveryVelocity = 0.05;

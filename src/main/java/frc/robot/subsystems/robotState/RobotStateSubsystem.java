@@ -6,17 +6,16 @@ import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.MagazineConstants;
-import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem.DriveStates;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem.IntakeState;
 import frc.robot.subsystems.led.LedSubsystem;
@@ -49,7 +48,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private ClimbSubsystem climbSubsystem;
   private LedSubsystem ledSubsystem;
   private static CANBus canBus;
-  private AnalogInput breakerTemp;
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
@@ -111,7 +109,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.ledSubsystem = ledSubsystem;
 
     this.canBus = new CANBus();
-    this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
     grabElbowOffsetPreferences();
 
     shootingLookupTable = parseLookupTable(RobotStateConstants.kShootingLookupTablePath);
@@ -290,6 +287,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     superStructure.intake();
     // magazineSubsystem.toIntaking();
     magazineSubsystem.setEmpty();
+
     ledSubsystem.setFlaming();
     setState(RobotStates.TO_INTAKING);
   }
@@ -489,6 +487,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toDefense() {
     driveSubsystem.setIsAligningShot(false);
     climbSubsystem.punchAir();
+    // superStructure.block();
     ledSubsystem.setCandy();
     inDefense = true;
     // setState(RobotStates.DEFENSE);
@@ -546,6 +545,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void prepareClimb() {
     inDefense = false;
     magazineSubsystem.toPrepClimb();
+    driveSubsystem.setIsAligningShot(false);
     climbSubsystem.zero(true);
     climbSubsystem.extendForks();
     superStructure.toPrepClimb();
@@ -556,6 +556,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void climb(boolean continueToTrap, boolean decendAfterTrap) {
     inDefense = false;
     climbSubsystem.trapClimb();
+    driveSubsystem.setIsAligningShot(false);
     this.continueToTrap = continueToTrap;
     this.decendClimbAfterTrap = decendAfterTrap;
 
@@ -597,6 +598,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void postClimbStow() {
     inDefense = false;
     toStow();
+    driveSubsystem.setIsAligningShot(false);
     climbSubsystem.retractForks();
     climbSubsystem.retractTrapBar();
     climbSubsystem.stow();
@@ -733,6 +735,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case TO_INTAKING:
         if (superStructure.isFinished()) {
           intakeSubsystem.toIntaking();
+          magazineSubsystem.idle();
           setState(RobotStates.INTAKING);
         }
         break;
@@ -1250,8 +1253,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
     }
 
+    if (driveSubsystem.getDriveState() == DriveStates.SAFE
+        || driveSubsystem.getDriveState() == DriveStates.SAFE_HOLD) {
+      ledSubsystem.setColor(255, 0, 0);
+    }
     org.littletonrobotics.junction.Logger.recordOutput("States/Robot State", curState);
-    org.littletonrobotics.junction.Logger.recordOutput("BreakerTemp", breakerTemp.getValue());
   }
   // Grapher
   @Override

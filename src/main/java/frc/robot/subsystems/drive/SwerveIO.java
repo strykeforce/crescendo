@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -83,6 +84,8 @@ public interface SwerveIO {
   public default void updateInputs(SwerveIOInputs inputs) {}
 
   public default void registerWith(TelemetryService telemetryService) {}
+
+  public default void configDriveCurrents(CurrentLimitsConfigs config) {}
 
   public default BooleanSupplier getAzimuth1FwdLimitSwitch() {
     return () -> false;

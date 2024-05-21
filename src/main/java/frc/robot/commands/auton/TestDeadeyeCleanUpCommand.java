@@ -51,6 +51,7 @@ public class TestDeadeyeCleanUpCommand extends Command {
     timeOut.stop();
     timeOut.reset();
     timeOut.start();
+    driveSubsystem.setIsAligningShot(false);
     if (deadeye.getNumTargets() > 0) {
       double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);

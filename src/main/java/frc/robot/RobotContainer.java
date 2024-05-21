@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -38,6 +39,8 @@ import frc.robot.commands.climb.TrapClimbCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.HoldDriveSafeCommand;
+import frc.robot.commands.drive.IdleDriveCommand;
 import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetAzimuthVelocityCommand;
@@ -55,8 +58,10 @@ import frc.robot.commands.intake.EjectPieceCommand;
 import frc.robot.commands.intake.OpenLoopIntakeCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.magazine.RecoverMagazineCommand;
+import frc.robot.commands.magazine.UnJamUpperNoteCommand;
 import frc.robot.commands.robotState.AirwaveHealthCheck;
 import frc.robot.commands.robotState.AmpCommand;
+import frc.robot.commands.robotState.BlockCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
@@ -84,9 +89,11 @@ import frc.robot.commands.wrist.OpenLoopWristCommand;
 import frc.robot.commands.wrist.WriteWristToStowCommand;
 import frc.robot.commands.wrist.ZeroWristCommand;
 import frc.robot.constants.AutonConstants;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.MagazineConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
+import frc.robot.constants.SuperStructureConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.auto.AutoSwitch;
@@ -306,6 +313,8 @@ public class RobotContainer {
     configureTuningDashboard();
     robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
+    RobotController.setBrownoutVoltage(6.3);
+
     // configureTelemetry();
     // configurePitDashboard();
   }
@@ -349,6 +358,23 @@ public class RobotContainer {
   public void configurePitDashboard() {
 
     Shuffleboard.getTab("Pit")
+        .add("Block Shot", new BlockCommand(superStructure))
+        .withPosition(3, 2)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Trap Elbow Loc",
+            new ClosedLoopElbowCommand(elbowSubsystem, SuperStructureConstants.kElbowTrapSetPoint))
+        .withPosition(1, 2)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Trap Wrist Loc",
+            new ClosedLoopWristCommand(wristSubsystem, SuperStructureConstants.kWristTrapSetPoint))
+        .withPosition(2, 2)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
         .add(
             "Position Shot Location",
             new PositionShootCommand(
@@ -379,6 +405,11 @@ public class RobotContainer {
                 climbSubsystem))
         .withSize(1, 1)
         .withPosition(4, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Turn Mag Off", new OpenLoopMagazineCommand(magazineSubsystem, 0.0))
+        .withPosition(5, 2)
+        .withSize(1, 1);
     Shuffleboard.getTab("Pit")
         .add("Turn Intake Off", new OpenLoopIntakeCommand(intakeSubsystem, 0.0))
         .withSize(1, 1)
@@ -668,6 +699,11 @@ public class RobotContainer {
         .addBoolean("CANivore Connected", () -> canivoreStatus)
         .withSize(1, 1)
         .withPosition(8, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean(
+            "BREAKER TEMP GOOD", () -> (driveSubsystem.getTemp() < DriveConstants.kNotifyTemp))
+        .withSize(3, 1)
+        .withPosition(7, 2);
     // Shuffleboard.getTab("Match")
     //     .add("ZeroRecoveryElbowCommand", new ZeroRecoveryElbowCommand(elbowSubsystem))
     //     .withSize(1, 1)
@@ -675,6 +711,19 @@ public class RobotContainer {
   }
 
   public void configureDebugDashboard() {
+    Shuffleboard.getTab("Debug")
+        .add("Drive SAFE", new HoldDriveSafeCommand(driveSubsystem))
+        .withPosition(6, 0)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Debug")
+        .add("Drive IDLE", new IdleDriveCommand(driveSubsystem))
+        .withPosition(6, 1)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Debug")
+        .addDouble("Breaker Temp", () -> driveSubsystem.getTemp())
+        .withPosition(6, 2)
+        .withSize(1, 1);
+
     Shuffleboard.getTab("Debug")
         .add(new OperatorRumbleCommand(robotStateSubsystem, xboxController))
         .withSize(1, 1)
@@ -841,6 +890,10 @@ public class RobotContainer {
                 (robotStateSubsystem.getState() == RobotStates.TO_PODIUM
                     && magazineSubsystem.getSpeed() >= MagazineConstants.kPodiumRumbleSpeed))
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+
+    // UnJam Note
+    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+        .onTrue(new UnJamUpperNoteCommand(magazineSubsystem));
 
     // Open Loop Elbow
     // new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))

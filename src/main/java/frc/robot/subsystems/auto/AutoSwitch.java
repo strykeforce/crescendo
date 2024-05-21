@@ -10,8 +10,11 @@ import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.AmpMid_5PieceCommand;
 import frc.robot.commands.auton.DisruptAutonCommand;
 import frc.robot.commands.auton.DoNothingCommand;
+import frc.robot.commands.auton.FallBack4PieceCommand;
 import frc.robot.commands.auton.FastAmpMid_5PieceCommand;
 import frc.robot.commands.auton.FastAmpMid_5PieceM2Command;
+import frc.robot.commands.auton.FastSmartSourceCommand;
+import frc.robot.commands.auton.MiddleFourPieceCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.SmartAmpIgnoreWingAutoCommand;
 import frc.robot.commands.auton.SmartNonAmpAutoCommand;
@@ -211,6 +214,42 @@ public class AutoSwitch extends MeasurableSubsystem {
             List.of(2, 1, 3),
             4.0,
             AutonConstants.Setpoints.AS2);
+      case 0x04:
+        return new SmartAmpIgnoreWingAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "AmpInitial3_MiddleNote1_Part1",
+            "AmpInitial3_MiddleNote1_Part2",
+            // "NonAmpShoot2_DroppedNote",
+            AutonConstants.kAmpPathMatrix,
+            List.of(1, 3, 2),
+            4.0,
+            AutonConstants.Setpoints.AS2);
+      case 0x05:
+        return new SmartAmpIgnoreWingAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "AmpInitial3_MiddleNote1_Part1",
+            "AmpInitial3_MiddleNote2_Part2",
+            // "NonAmpShoot2_DroppedNote",
+            AutonConstants.kAmpPathMatrix,
+            List.of(2, 3, 1),
+            4.0,
+            AutonConstants.Setpoints.AS2);
       case 0x10:
         return new AmpMid_5PieceCommand(
             driveSubsystem,
@@ -231,6 +270,26 @@ public class AutoSwitch extends MeasurableSubsystem {
             ledSubsystem);
       case 0x12:
         return new FastAmpMid_5PieceM2Command(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadeye,
+            ledSubsystem);
+      case 0x13:
+        return new MiddleFourPieceCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadeye,
+            ledSubsystem);
+      case 0x14:
+        return new FallBack4PieceCommand(
             driveSubsystem,
             robotStateSubsystem,
             superStructure,
@@ -278,7 +337,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonAmpPathMatrix,
             List.of(3, 4, 5),
             4.0,
-            AutonConstants.Setpoints.NAS2);
+            AutonConstants.Setpoints.NAS2_SPIN);
       case 0x23:
         return new SmartNonAmpAutoCommand(
             driveSubsystem,
@@ -294,7 +353,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonAmpPathMatrix,
             List.of(4, 3, 5),
             4.0,
-            AutonConstants.Setpoints.NAS2);
+            AutonConstants.Setpoints.NAS2_SPIN);
       case 0x24:
         return new SmartNonAmpAutoCommand(
             driveSubsystem,
@@ -310,7 +369,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonAmpPathMatrix,
             List.of(5, 4, 3),
             4.0,
-            AutonConstants.Setpoints.NAS2);
+            AutonConstants.Setpoints.NAS2_SPIN);
       case 0x25:
         return new SmartNonAmpAutoCommand(
             driveSubsystem,
@@ -326,7 +385,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonAmpPathMatrix,
             List.of(3, 5, 4),
             4.0,
-            AutonConstants.Setpoints.NAS2);
+            AutonConstants.Setpoints.NAS2_SPIN);
 
       case 0x26:
         return new SmartNonAmpAutoCommand(
@@ -343,7 +402,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonAmpPathMatrix,
             List.of(4, 5, 3),
             4.0,
-            AutonConstants.Setpoints.NAS2);
+            AutonConstants.Setpoints.NAS2_SPIN);
 
       case 0x27:
         return new SmartNonAmpAutoCommand(
@@ -360,8 +419,25 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonAmpPathMatrix,
             List.of(5, 3, 4),
             4.0,
-            AutonConstants.Setpoints.NAS2);
+            AutonConstants.Setpoints.NAS2_SPIN);
 
+      case 0x28:
+        return new FastSmartSourceCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial2_NonAmpShoot3",
+            "NonAmpShoot3_MiddleNote5",
+            AutonConstants.kNonAmpPathMatrix,
+            List.of(5, 4, 3),
+            4.0,
+            AutonConstants.Setpoints.NAS2_SPIN);
       case 0x30:
         return new DoNothingCommand(
             robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
