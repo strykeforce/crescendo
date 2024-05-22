@@ -54,7 +54,6 @@ import frc.robot.commands.elbow.SetElbowHasZeroedCommand;
 import frc.robot.commands.elbow.SetTrustElbowCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.elbow.ZeroRecoveryElbowCommand;
-import frc.robot.commands.intake.EjectPieceCommand;
 import frc.robot.commands.intake.OpenLoopIntakeCommand;
 import frc.robot.commands.magazine.OpenLoopMagazineCommand;
 import frc.robot.commands.magazine.RecoverMagazineCommand;
@@ -65,6 +64,7 @@ import frc.robot.commands.robotState.BlockCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
+import frc.robot.commands.robotState.EjectPieceCommand;
 import frc.robot.commands.robotState.FeedCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
@@ -497,6 +497,13 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add("Stop Azimuths", new SetAzimuthVelocityCommand(driveSubsystem, 0.0))
         .withPosition(9, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Eject Note",
+            new EjectPieceCommand(robotStateSubsystem, magazineSubsystem, superStructure))
+        .withPosition(3, 1)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
     // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))()

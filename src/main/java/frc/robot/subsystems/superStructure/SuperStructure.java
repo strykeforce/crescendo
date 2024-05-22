@@ -416,7 +416,7 @@ public class SuperStructure extends MeasurableSubsystem {
     wristSubsystem.setPosition(wristSetpoint);
     elbowSubsystem.setPosition(elbowSetpoint);
 
-    logger.info("{} -> TRANSFER(SOURCE_INTAKE", curState);
+    logger.info("{} -> TRANSFER(SOURCE_INTAKE)", curState);
     isPrecise = false;
     flipMagazineOut = false;
     curState = SuperStructureStates.TRANSFER;
@@ -618,6 +618,14 @@ public class SuperStructure extends MeasurableSubsystem {
       case AUTO_DISRUPT:
         break;
       case BLOCK:
+        break;
+      case EJECTING:
+        break;
+      case HIGH_FEEDING:
+        break;
+      case SOURCE_INTAKE:
+        break;
+      default:
         break;
     }
     org.littletonrobotics.junction.Logger.recordOutput("States/SuperStructState", curState);

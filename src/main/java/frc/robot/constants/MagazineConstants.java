@@ -18,6 +18,7 @@ public final class MagazineConstants {
   public static final double kIdleIntakingSpeed = -25;
   public static final double kFastIntakingSpeed = -50; // -90
   public static final double kEmptyingSpeed = -50; // -90 -> -70
+  public static final double kEjectingSpeed = 50;
   public static final double kReversingSpeed = 9.6; // 4.8
 
   public static final double kReleaseTime = 0.75;

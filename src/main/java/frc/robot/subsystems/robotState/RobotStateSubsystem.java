@@ -653,13 +653,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toEjecting() {
-    ejectPiecesTimer.stop();
-    ejectPiecesTimer.reset();
-    ejectPiecesTimer.start();
     // intakeSubsystem.toEjecting();
-    magazineSubsystem.toEjecting();
     superStructure.ejecting();
-    setState(RobotStates.EJECTING);
+    setState(RobotStates.TO_EJECTING);
   }
 
   // Periodic
@@ -1197,6 +1193,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case DEFENSE:
         break;
+      case TO_EJECTING:
+        if (superStructure.isFinished()) {
+          magazineSubsystem.toEjecting();
+          ejectPiecesTimer.stop();
+          ejectPiecesTimer.reset();
+          ejectPiecesTimer.start();
+          setState(RobotStates.EJECTING);
+        }
+        break;
       case EJECTING:
         if (ejectPiecesTimer.hasElapsed(RobotStateConstants.kEjectTimer)) {
           toIntake();
@@ -1305,6 +1310,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     CLIMBED,
     DEFENSE,
     TO_FEED,
+    TO_EJECTING,
     EJECTING,
     TO_MOVING_FEED,
     AUTO_DISRUPT,

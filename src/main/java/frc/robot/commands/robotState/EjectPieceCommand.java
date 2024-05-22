@@ -1,4 +1,4 @@
-package frc.robot.commands.intake;
+package frc.robot.commands.robotState;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.magazine.MagazineSubsystem;

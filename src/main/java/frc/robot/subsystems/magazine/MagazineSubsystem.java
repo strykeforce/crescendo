@@ -221,8 +221,8 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   public void toEjecting() {
     resetRevBeamCounts();
+    setSpeed(MagazineConstants.kEjectingSpeed);
     io.enableLimitSwitches(false, false);
-    setSpeed(MagazineConstants.kEmptyingSpeed);
     setState(MagazineStates.EJECTING);
   }
 
@@ -275,6 +275,11 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
         break;
       case TRAP:
         break;
+      case TO_EJECTING:
+        if (!isFwdBeamOpen()) {
+          
+        }
+        break;
       case EJECTING:
         io.enableLimitSwitches(false, false);
         break;
@@ -308,6 +313,7 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     RELEASE,
     TRAP,
     REVERSING,
+    TO_EJECTING,
     EJECTING,
     IDLE
   }
