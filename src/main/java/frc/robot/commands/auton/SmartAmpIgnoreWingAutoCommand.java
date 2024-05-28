@@ -11,6 +11,7 @@ import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.pathHandler.StartPathHandlerCommand;
+import frc.robot.commands.robotState.EjectPieceCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.auto.AutoCommandInterface;
@@ -88,8 +89,8 @@ public class SmartAmpIgnoreWingAutoCommand extends SequentialCommandGroup
                 new SetOmegaContKPCommand(
                     driveSubsystem, DriveConstants.kPOmegaSpin, DriveConstants.kMaxAccelOmegaSpin),
                 new SequentialCommandGroup(
-                    // new EjectPieceCommand(robotStateSubsystem, magazineSubsystem,
-                    // superStructure),
+                    new EjectPieceCommand(robotStateSubsystem, magazineSubsystem,
+                    superStructure),
                     new IntakeCommand(
                         robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)),
                 secondPath),
