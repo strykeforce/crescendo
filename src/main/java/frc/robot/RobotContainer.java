@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
+import frc.robot.commands.auton.BackAndForthCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.NonAmpInit_TravelNotesCommand;
 import frc.robot.commands.auton.NonAmpInitial_Note3Command;
@@ -807,6 +808,10 @@ public class RobotContainer {
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     tab.add("start", new TunedShotCommand(robotStateSubsystem, superStructure, magazineSubsystem));
+    tab.add(
+        "back and forth",
+        new BackAndForthCommand(
+            driveSubsystem, robotStateSubsystem, "11.8745mTestPath", "-11.8745mTestPath"));
   }
 
   public void zeroWrist() {
