@@ -185,6 +185,8 @@ public class RobotContainer {
 
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  public BackAndForthCommand backAndForthCommand;
+
   public RobotContainer() {
     swerve = new Swerve();
     wristIO = new WristIOSRX();
@@ -315,6 +317,18 @@ public class RobotContainer {
     robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
     RobotController.setBrownoutVoltage(6.3);
+
+    backAndForthCommand =
+        new BackAndForthCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "neg11.8745mTestPath",
+            "11.8745mTestPath");
+
+    backAndForthCommand.generateTrajectory();
 
     // configureTelemetry();
     // configurePitDashboard();
@@ -808,10 +822,7 @@ public class RobotContainer {
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
     tab.add("start", new TunedShotCommand(robotStateSubsystem, superStructure, magazineSubsystem));
-    tab.add(
-        "back and forth",
-        new BackAndForthCommand(
-            driveSubsystem, robotStateSubsystem, "11.8745mTestPath", "-11.8745mTestPath"));
+    tab.add("back and forth", backAndForthCommand);
   }
 
   public void zeroWrist() {
