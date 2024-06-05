@@ -164,6 +164,7 @@ public class RobotContainer {
   private NonAmpInit_TravelNotesCommand nonAmpTravelNotes;
   private AmpInitial_WingNotes_BCommand ampInitial_WingNotes_BCommand;
   private AmpInitial_WingNotes_ACommand ampInitial_WingNotes_ACommand;
+  private BackAndForthCommand backAndForthCommand;
   // private HoloContTuningCommand holoContTuningCommand;
   private DriveAutonCommand calibrateWheelSize;
   public GenericEntry lShooterSpeed;
@@ -184,8 +185,6 @@ public class RobotContainer {
   private ForkIOSRX forkIO;
 
   private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-  public BackAndForthCommand backAndForthCommand;
 
   public RobotContainer() {
     swerve = new Swerve();
@@ -301,6 +300,18 @@ public class RobotContainer {
             "MiddleNote4_NonAmpShoot2_B");
     nonAmpAutoNote3.generateTrajectory();
 
+    backAndForthCommand =
+        new BackAndForthCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            "JerrysTestPath",
+            "Jerry");
+    // "JerrysReverseTestPath");
+    backAndForthCommand.generateTrajectory();
+
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
 
@@ -317,18 +328,6 @@ public class RobotContainer {
     robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
     RobotController.setBrownoutVoltage(6.3);
-
-    backAndForthCommand =
-        new BackAndForthCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem,
-            "neg11.8745mTestPath",
-            "11.8745mTestPath");
-
-    backAndForthCommand.generateTrajectory();
 
     // configureTelemetry();
     // configurePitDashboard();

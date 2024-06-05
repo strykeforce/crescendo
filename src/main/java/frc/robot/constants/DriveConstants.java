@@ -128,8 +128,8 @@ public final class DriveConstants {
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
-    currentConfig.SupplyCurrentLimit = 45; // 40
-    currentConfig.SupplyCurrentThreshold = 50; // 45
+    currentConfig.SupplyCurrentLimit = 100; // 40
+    currentConfig.SupplyCurrentThreshold = 100; // 45
     currentConfig.SupplyTimeThreshold = 0.0;
     currentConfig.SupplyCurrentLimitEnable = true;
     currentConfig.StatorCurrentLimitEnable = false;
