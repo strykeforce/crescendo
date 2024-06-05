@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
+import frc.robot.commands.auton.MiddleNote3AndWingNotesCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.NonAmpInit_TravelNotesCommand;
 import frc.robot.commands.auton.NonAmpInitial_Note3Command;
@@ -79,7 +80,6 @@ import frc.robot.commands.robotState.SourceIntakeCommand;
 import frc.robot.commands.robotState.SpeedUpPassCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
-import frc.robot.commands.robotState.TogglePunchAirCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -163,6 +163,8 @@ public class RobotContainer {
   private NonAmpInit_TravelNotesCommand nonAmpTravelNotes;
   private AmpInitial_WingNotes_BCommand ampInitial_WingNotes_BCommand;
   private AmpInitial_WingNotes_ACommand ampInitial_WingNotes_ACommand;
+
+  private MiddleNote3AndWingNotesCommand testAuto;
   // private HoloContTuningCommand holoContTuningCommand;
   private DriveAutonCommand calibrateWheelSize;
   public GenericEntry lShooterSpeed;
@@ -297,6 +299,18 @@ public class RobotContainer {
             "NonAmpShoot2_MiddleNote4_B",
             "MiddleNote4_NonAmpShoot2_B");
     nonAmpAutoNote3.generateTrajectory();
+    
+    testAuto =
+        new MiddleNote3AndWingNotesCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadEyeSubsystem,
+            ledSubsystem);
+    testAuto.generateTrajectory();
 
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
@@ -942,8 +956,10 @@ public class RobotContainer {
         .onTrue(new SpeedUpPassCommand(robotStateSubsystem, superStructure));
 
     // Defense
-    new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
+
+    new JoystickButton(xboxController, XboxController.Button.kB.value).onTrue(testAuto);
 
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure,
