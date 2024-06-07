@@ -113,6 +113,7 @@ public final class AutonConstants {
     // Starting Positions
     public static final Pose2d MI1 =
         new Pose2d(1.47, 5.55, Rotation2d.fromDegrees(0.0)); // 1.34 on x
+    public static final Pose2d MI2 = new Pose2d(1.47, 4.905, Rotation2d.fromDegrees(0.0));
     public static final Pose2d AI1 = new Pose2d(1.09, 6.94, Rotation2d.fromDegrees(50));
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
     public static final Pose2d AI3 = new Pose2d(1.43764, 7.33425, Rotation2d.fromDegrees(90.0));

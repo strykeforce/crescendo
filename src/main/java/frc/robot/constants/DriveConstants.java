@@ -38,6 +38,9 @@ public final class DriveConstants {
   public static final double kRobotLength = 0.5461;
   public static final double kRobotWidth = 0.6922;
 
+  public static final double kBumperRobotLength = 0.84;
+  public static final double kBumperRobotWidth = 1.0;
+
   public static final double kSpeedStillFeedThreshold = 0.5;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second

@@ -299,7 +299,7 @@ public class RobotContainer {
             "NonAmpShoot2_MiddleNote4_B",
             "MiddleNote4_NonAmpShoot2_B");
     nonAmpAutoNote3.generateTrajectory();
-    
+
     testAuto =
         new MiddleNote3AndWingNotesCommand(
             driveSubsystem,

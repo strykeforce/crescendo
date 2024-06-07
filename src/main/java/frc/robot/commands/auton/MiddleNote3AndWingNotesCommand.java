@@ -1,12 +1,17 @@
 package frc.robot.commands.auton;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
+import frc.robot.commands.robotState.IgnoreNotesCommand;
+import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.PositionShootCommand;
+import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
@@ -58,20 +63,24 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
     //     new DriveAutonCommand(driveSubsystem, "MiddleNote3_MiddleShoot3", true, false);
     // middleShoot3WingNote3 =
     //     new DriveAutonCommand(driveSubsystem, "MiddleShoot3_WingNote3", true, false);
-    // wingNote3WingNote1 =
-    //     new DriveAutonCommand(driveSubsystem, "WingNote3_WingNote1", true, false);
-    // wingNote1Hunt =
-    //     new DriveAutonCommand(driveSubsystem, "WingNote1_Hunt", true, false);
-    // huntMiddleShoot3 = new DriveAutonCommand(driveSubsystem, "MiddleShoot3_WingNote3", true,
+    // wingNote3WingNote1 = new DriveAutonCommand(driveSubsystem, "WingNote3_WingNote1", true,
     // false);
+    // wingNote1Hunt = new DriveAutonCommand(driveSubsystem, "WingNote1_Hunt", true, false);
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
-        new setAngleOffsetCommand(driveSubsystem, 0.0),
-        new ZeroElbowCommand(elbowSubsystem),
-        // new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
-
-        midInitMiddleNote3
+        new ParallelCommandGroup(
+            new setAngleOffsetCommand(driveSubsystem, 0.0),
+            new ZeroElbowCommand(elbowSubsystem),
+            new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem)),
+        new ParallelCommandGroup(
+            midInitMiddleNote3,
+            new SequentialCommandGroup(
+                new IgnoreNotesCommand(
+                    robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+                new WaitCommand(1.5),
+                new IntakeCommand(
+                    robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)))
 
         // new ParallelCommandGroup(
         //     middleNote3MiddleShoot3,
@@ -83,7 +92,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
         //             AutonConstants.Setpoints.MS3))),
 
         // new VisionShootCommand(robotStateSubsystem, superStructure, magazineSubsystem,
-        // intakeSubsystem),
+        //     intakeSubsystem),
 
         // middleShoot3WingNote3,
         // new AutoWaitNoteStagedCommand(robotStateSubsystem),

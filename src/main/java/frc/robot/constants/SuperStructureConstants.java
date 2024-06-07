@@ -103,4 +103,10 @@ public final class SuperStructureConstants {
   public static final double kElbowBlockSetPoint = 0.2144476;
   public static final double kWristBlockSetPoint = 798;
   public static final double kShooterBlockSetPoint = 0.0;
+
+  // Auto Ignore Note
+  public static final double kElbowIgnoreNoteSetPoint = kElbowSubwooferSetPoint;
+  public static final double kBlueLeftShooterIgnoreNoteSetPoint = 10;
+  public static final double kBlueRightShooterIgnoreNoteSetPoint = 50;
+  public static final double kWristIgnoreNoteSetPoint = kWristSubwooferSetPoint;
 }
