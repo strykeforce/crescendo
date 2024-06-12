@@ -53,6 +53,7 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   @Override
   public void initialize() {
     driveSubsystem.setEnableHolo(true);
+    driveSubsystem.recordAutoTrajectory(trajectory);
     Pose2d initialPose = trajectory.getInitialPose();
     if (resetOdometry)
       driveSubsystem.resetOdometry(

@@ -19,7 +19,7 @@ import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandInterface {
+public class WingNoteDriveAutonCommand extends Command implements AutoCommandInterface {
   private final DriveSubsystem driveSubsystem;
   private Trajectory trajectory;
   private final Timer timer = new Timer();
@@ -35,7 +35,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
   private DriveState curState = DriveState.NORM_DRIVE;
   private LedSubsystem ledSubsystem;
 
-  public MiddleNoteDriveAutonCommand(
+  public WingNoteDriveAutonCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       DeadEyeSubsystem deadeye,
