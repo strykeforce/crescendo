@@ -53,15 +53,15 @@ public final class DriveConstants {
   public static final double kMoveShootTeleMaxVelX = 2.0;
   public static final double kMaxSpeakerDist = 8.0;
 
-  public static final double kDriveMotorOutputGear = 34; // 30
-  public static final double kDriveInputGear = 42;
+  public static final double kDriveMotorOutputGear = 28; // 34
+  public static final double kDriveInputGear = 44; // 42
   public static final double kBevelInputGear = 15;
   public static final double kBevelOutputGear = 45;
 
   public static final double kDriveGearRatio =
       (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
   //   public static final double kWheelDiameterInches = 3.0 * 506.0 / 500.0;
-  public static final double kMaxSpeedMetersPerSecond = 6.495;
+  public static final double kMaxSpeedMetersPerSecond = 5.09; // 6.495
 
   public static final double kMaxOmega =
       (kMaxSpeedMetersPerSecond / Math.hypot(kRobotWidth / 2.0, kRobotLength / 2.0))
@@ -128,11 +128,15 @@ public final class DriveConstants {
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
-    currentConfig.SupplyCurrentLimit = 100; // 40
-    currentConfig.SupplyCurrentThreshold = 100; // 45
+    currentConfig.SupplyCurrentLimit = 60; // 100; // 40
+    currentConfig.SupplyCurrentThreshold = 60; // 100; // 45
     currentConfig.SupplyTimeThreshold = 0.0;
+
+    currentConfig.StatorCurrentLimit = 140;
+
     currentConfig.SupplyCurrentLimitEnable = true;
-    currentConfig.StatorCurrentLimitEnable = false;
+    currentConfig.StatorCurrentLimitEnable = true;
+
     driveConfig.CurrentLimits = currentConfig;
 
     Slot0Configs slot0Config = new Slot0Configs();

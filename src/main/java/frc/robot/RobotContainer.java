@@ -25,6 +25,7 @@ import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
 import frc.robot.commands.auton.BackAndForthCommand;
+import frc.robot.commands.auton.GenerateTrajectories;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.NonAmpInit_TravelNotesCommand;
 import frc.robot.commands.auton.NonAmpInitial_Note3Command;
@@ -822,6 +823,7 @@ public class RobotContainer {
 
     tab.add("start", new TunedShotCommand(robotStateSubsystem, superStructure, magazineSubsystem));
     tab.add("back and forth", backAndForthCommand);
+    tab.add("regenerate back and forth", new GenerateTrajectories(backAndForthCommand));
   }
 
   public void zeroWrist() {
