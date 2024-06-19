@@ -18,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants.Setpoints;
@@ -56,6 +57,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public DriveStates currDriveState = DriveStates.IDLE;
 
   private CircularBuffer<Integer> temps = new CircularBuffer<Integer>(DriveConstants.kTempAvgCount);
+  private DigitalInput tofSensor = new DigitalInput(9);
   private double accelX = 0;
   private double accelY = 0;
   private double prevVelX = 0;
@@ -166,7 +168,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public double getvOmegaToFeedTarget() {
     return omegaSpinController.calculate(
         getPoseMeters().getRotation().getRadians(),
-        getPoseMeters().getRotation().getRadians() + getShooterAngleToFeedTarget().getRadians());
+        getPoseMeters().getRotation().getRadians() + getShooterAngleToFeedGoal().getRadians());
   }
 
   public double getvOmegaToTarget(Rotation2d target) {
@@ -317,6 +319,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
                 : RobotConstants.kRedFeedTargetPos);
   }
 
+  public double getDistanceToFeedTarget(Pose2d pos) {
+    return getShooterPos(pos)
+        .getDistance(
+            robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                ? RobotConstants.kBlueFeedTargetPos
+                : RobotConstants.kRedFeedTargetPos);
+  }
+
   public double getDistanceToSpeaker() {
     return getShooterPos()
         .getDistance(
@@ -336,20 +346,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void setMoveAndShootVirtualPose(Pose2d virtualPose) {
     org.littletonrobotics.junction.Logger.recordOutput("ShootingData/FuturePos", virtualPose);
     this.moveAndShootVirtualPose = virtualPose;
-  }
-
-  public Rotation2d getShooterAngleToFeedTarget() {
-    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
-      return RobotConstants.kBlueFeedTargetPos
-          .minus(getPoseMeters().getTranslation())
-          .getAngle()
-          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
-          .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
-    return RobotConstants.kRedFeedTargetPos
-        .minus(getPoseMeters().getTranslation())
-        .getAngle()
-        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
-        .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
   }
 
   public Rotation2d getShooterAngleToSpeaker() {
@@ -380,6 +376,34 @@ public class DriveSubsystem extends MeasurableSubsystem {
         .rotateBy(new Rotation2d(RobotConstants.kDegreeShootOffset));
   }
 
+  public Rotation2d getShooterAngleToFeedGoal() {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
+      return RobotConstants.kBlueFeedTargetPos
+          .minus(getPoseMeters().getTranslation())
+          .getAngle()
+          .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+          .rotateBy(new Rotation2d(RobotConstants.kDegreeFeedOffset));
+    return RobotConstants.kRedFeedTargetPos
+        .minus(getPoseMeters().getTranslation())
+        .getAngle()
+        .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
+        .rotateBy(new Rotation2d(RobotConstants.kDegreeFeedOffset));
+  }
+
+  public Rotation2d getShooterAngleToFeedPose(Pose2d robotPose) {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
+      return RobotConstants.kBlueFeedTargetPos
+          .minus(robotPose.getTranslation())
+          .getAngle()
+          .minus(robotPose.getRotation().rotateBy(RobotConstants.kShooterHeading))
+          .rotateBy(new Rotation2d(RobotConstants.kDegreeFeedOffset));
+    return RobotConstants.kRedFeedTargetPos
+        .minus(robotPose.getTranslation())
+        .getAngle()
+        .minus(robotPose.getRotation().rotateBy(RobotConstants.kShooterHeading))
+        .rotateBy(new Rotation2d(RobotConstants.kDegreeFeedOffset));
+  }
+
   public DriveStates getDriveState() {
     return currDriveState;
   }
@@ -388,9 +412,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return io.getAzimuth1FwdLimitSwitch();
   }
 
-  public boolean isPointingAtFeedTarget() {
-    return Math.abs(getShooterAngleToFeedTarget().getDegrees())
-        <= DriveConstants.kDegreesCloseEnough;
+  public boolean isPointingAtFeedGoal() {
+    return Math.abs(getShooterAngleToFeedGoal().getDegrees())
+        <= DriveConstants.kDegreesCloseEnoughFeeding;
   }
 
   public boolean isPointingAtGoal() {
@@ -414,6 +438,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public boolean isPointingAtGoal(Pose2d pos) {
     return Math.abs(getShooterAngleToSpeaker(pos).getDegrees())
+        <= (isFeeding
+            ? DriveConstants.kDegreesCloseEnoughFeeding
+            : DriveConstants.kDegreesCloseEnough);
+  }
+
+  public boolean isPointingAtFeedGoal(Pose2d pos) {
+    return Math.abs(getShooterAngleToFeedPose(pos).getDegrees())
         <= (isFeeding
             ? DriveConstants.kDegreesCloseEnoughFeeding
             : DriveConstants.kDegreesCloseEnough);
@@ -459,6 +490,27 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return velStill
         && gyroStill
         && getDistanceToSpeaker() <= DriveConstants.kMaxSpeakerDist
+        && (isAuto || vX <= DriveConstants.kMoveShootTeleMaxVelX);
+  }
+
+  public boolean isMoveFeedAllowed(boolean isAuto) {
+    double vX = getFieldRelSpeed().vxMetersPerSecond;
+    double vY = getFieldRelSpeed().vyMetersPerSecond;
+
+    // Take fieldRel Speed and get the magnitude of the vector
+    double wheelSpeed = FastMath.hypot(vX, vY);
+
+    double gyroRate = inputs.gyroRate;
+
+    boolean velStill =
+        Math.abs(wheelSpeed) <= DriveConstants.kMaxMoveShootVelocity
+            && Math.abs(velXStableCounts) <= DriveConstants.kVelocityStableCounts
+            && Math.abs(velYStableCounts) <= DriveConstants.kVelocityStableCounts;
+    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kMaxMoveGyroRateThreshold;
+
+    return velStill
+        && gyroStill
+        && getDistanceToFeedTarget() <= DriveConstants.kMaxFeedDist
         && (isAuto || vX <= DriveConstants.kMoveShootTeleMaxVelX);
   }
 
@@ -815,6 +867,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput("BreakerTemp", temp);
     org.littletonrobotics.junction.Logger.recordOutput("Avg Breaker Temp", avg);
     org.littletonrobotics.junction.Logger.recordOutput("States/Drive State", getDriveState());
+    org.littletonrobotics.junction.Logger.recordOutput("TOF", tofSensor.get());
     // Update swerve module states every robot loop
     io.updateSwerve();
 
@@ -931,6 +984,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
             () ->
                 (getPoseMeters().getRotation().getDegrees()
                     + getShooterAngleToSpeaker().getDegrees())),
-        new Measure("MoveShoot Angle", () -> trackingSetpoint));
+        new Measure("MoveShoot Angle", () -> trackingSetpoint),
+        new Measure("AngleToFeed", () -> getShooterAngleToFeedGoal().getDegrees()),
+        new Measure("TOF Sensor", () -> tofSensor.get() ? 1.0 : 0.0));
   }
 }

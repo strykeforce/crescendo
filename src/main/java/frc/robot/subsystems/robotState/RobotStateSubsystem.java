@@ -825,7 +825,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         Translation2d virtualT = driveSubsystem.getPoseMeters().getTranslation();
         ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
         getShootSolution(
-            driveSubsystem.getDistanceToSpeaker(
+            driveSubsystem.getDistanceToFeedTarget(
                 new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
             feedingLookupTable);
 
@@ -836,7 +836,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                       speeds.vxMetersPerSecond * shootSolution[3],
                       speeds.vyMetersPerSecond * shootSolution[3]));
           getShootSolution(
-              driveSubsystem.getDistanceToSpeaker(
+              driveSubsystem.getDistanceToFeedTarget(
                   new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation())),
               feedingLookupTable);
         }
@@ -846,9 +846,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         Pose2d virtualPos = new Pose2d(virtualT, driveSubsystem.getPoseMeters().getRotation());
         driveSubsystem.setMoveAndShootVirtualPose(virtualPos);
 
-        if (driveSubsystem.isPointingAtGoal(virtualPos)
+        if (driveSubsystem.isPointingAtFeedGoal(virtualPos)
             && superStructure.isFinished()
-            && driveSubsystem.isDriveStillFeed()) {
+            && driveSubsystem.isMoveShootAllowed(isAuto)) {
 
           org.littletonrobotics.junction.Logger.recordOutput(
               "ShootingData/shot" + Integer.toString(curShot) + "/Position", virtualPos);

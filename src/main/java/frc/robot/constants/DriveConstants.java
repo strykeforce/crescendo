@@ -52,9 +52,10 @@ public final class DriveConstants {
   public static final double kMoveShootVelDetune = 0.2;
   public static final double kMoveShootTeleMaxVelX = 2.0;
   public static final double kMaxSpeakerDist = 8.0;
+  public static final double kMaxFeedDist = 11.5;
 
-  public static final double kDriveMotorOutputGear = 34; // 30
-  public static final double kDriveInputGear = 42;
+  public static final double kDriveMotorOutputGear = 28; // 34
+  public static final double kDriveInputGear = 44; // 42
   public static final double kBevelInputGear = 15;
   public static final double kBevelOutputGear = 45;
 
@@ -128,11 +129,12 @@ public final class DriveConstants {
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
-    currentConfig.SupplyCurrentLimit = 45; // 40
-    currentConfig.SupplyCurrentThreshold = 50; // 45
+    currentConfig.SupplyCurrentLimit = 60; // 45
+    currentConfig.SupplyCurrentThreshold = 60; // 50
     currentConfig.SupplyTimeThreshold = 0.0;
     currentConfig.SupplyCurrentLimitEnable = true;
-    currentConfig.StatorCurrentLimitEnable = false;
+    currentConfig.StatorCurrentLimit = 140;
+    currentConfig.StatorCurrentLimitEnable = true;
     driveConfig.CurrentLimits = currentConfig;
 
     Slot0Configs slot0Config = new Slot0Configs();
