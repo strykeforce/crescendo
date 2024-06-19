@@ -173,4 +173,5 @@ public final class AutonConstants {
 
   public static final double kDisruptIntakingMiddleNote1Y = 7.0;
   public static final double kDisruptIntakingMiddleNote2Y = 5.2;
+public static final double kHuntTurnSpeed = 0.01;
 }
