@@ -110,6 +110,50 @@ public final class AutonConstants {
     {null, null, null, null, null, null}
   };
 
+  public static final String[][] kNonAmpSpecialPathMatrix = {
+    {null, null, null, null, "NonAmpShoot4_MiddleNote4", "NonAmpShoot4_MiddleNote5"},
+    {
+      null,
+      null,
+      "MiddleNote1_MiddleNote2",
+      "MiddleNote1_MiddleNote3",
+      "MiddleNote1_MiddleNote4",
+      "MiddleNote1_MiddleNote5"
+    },
+    {
+      null,
+      "MiddleNote2_MiddleNote1",
+      null,
+      "MiddleNote2_MiddleNote3",
+      "MiddleNote2_MiddleNote4",
+      "MiddleNote2_MiddleNote5"
+    },
+    {
+      null,
+      "MiddleNote3_MiddleNote1",
+      "MiddleNote3_MiddleNote2",
+      null,
+      "MiddleNote3_MiddleNote4",
+      "MiddleNote3_MiddleNote5"
+    },
+    {
+      "MiddleNote4_NonAmpShoot4",
+      "MiddleNote4_MiddleNote1",
+      "MiddleNote4_MiddleNote2",
+      "MiddleNote4_MiddleNote3",
+      null,
+      "MiddleNote4_MiddleNote5"
+    },
+    {
+      "MiddleNote5_NonAmpShoot4",
+      "MiddleNote5_MiddleNote1",
+      "MiddleNote5_MiddleNote2",
+      "MiddleNote5_MiddleNote3",
+      "MiddleNote5_MiddleNote4",
+      null
+    }
+  };
+
   public final class Setpoints {
     // Starting Positions
     public static final Pose2d MI1 =
@@ -158,6 +202,9 @@ public final class AutonConstants {
         new Pose2d(4.36, 4.74, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
     public static final Pose2d NAS3 =
         new Pose2d(3.052, 3.063, Rotation2d.fromDegrees(-47.39)); // Disrupt auto
+    public static final Pose2d NAS4 =
+        new Pose2d(
+          1.93, 4.11, Rotation2d.fromDegrees(-47.39)); // TODO figure out correct location
 
     // Path Midpoints
     public static final Pose2d MP1 = new Pose2d(2.5, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
@@ -173,5 +220,7 @@ public final class AutonConstants {
 
   public static final double kDisruptIntakingMiddleNote1Y = 7.0;
   public static final double kDisruptIntakingMiddleNote2Y = 5.2;
-public static final double kHuntTurnSpeed = 0.01;
+  public static final Rotation2d kHuntStartAngle = new Rotation2d().fromDegrees(210);
+  public static final Rotation2d kHuntEndAngle = new Rotation2d().fromDegrees(150);
+  public static final double kHuntTurnSpeed = 0.01;
 }

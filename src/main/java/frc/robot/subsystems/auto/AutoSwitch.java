@@ -17,6 +17,7 @@ import frc.robot.commands.auton.FastSmartSourceCommand;
 import frc.robot.commands.auton.MiddleFourPieceCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.SmartAmpIgnoreWingAutoCommand;
+import frc.robot.commands.auton.SmartMidFourOrFiveThenSearch;
 import frc.robot.commands.auton.SmartNonAmpAutoCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
@@ -438,6 +439,43 @@ public class AutoSwitch extends MeasurableSubsystem {
             List.of(5, 4, 3),
             4.0,
             AutonConstants.Setpoints.NAS2_SPIN);
+
+      case 0x29:
+        return new SmartMidFourOrFiveThenSearch(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial1_MiddleNote4",
+            "NonAmpShoot4_WingNote3",
+            AutonConstants.kNonAmpSpecialPathMatrix,
+            List.of(4, 5),
+            2.0,
+            AutonConstants.Setpoints.NAS4);
+
+      case 0x2A:
+        return new SmartMidFourOrFiveThenSearch(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            pathHandler,
+            deadeye,
+            ledSubsystem,
+            "NonAmpInitial1_MiddleNote5",
+            "NonAmpShoot4_WingNote3",
+            AutonConstants.kNonAmpSpecialPathMatrix,
+            List.of(5, 4),
+            2.0,
+            AutonConstants.Setpoints.NAS4);
+
       case 0x30:
         return new DoNothingCommand(
             robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
