@@ -184,6 +184,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
   public void move(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move X", vXmps);
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move Y", vYmps);
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move Omega", vOmegaRadps);
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 

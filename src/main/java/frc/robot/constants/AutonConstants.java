@@ -150,7 +150,7 @@ public final class AutonConstants {
     public static final Pose2d MS1 = new Pose2d(4.3, 5.55, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS2 = new Pose2d(4.3, 6.5, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS3 =
-        new Pose2d(1.57, 4.737, Rotation2d.fromDegrees(0.0)); // y = 5.05
+        MI1; // new Pose2d(1.57, 4.737, Rotation2d.fromDegrees(0.0)); // y = 5.05
     public static final Pose2d NAS1 = new Pose2d(4.2, 2.8, Rotation2d.fromDegrees(-33.2));
     public static final Pose2d NAS2 =
         new Pose2d(4.55, 4.6, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7

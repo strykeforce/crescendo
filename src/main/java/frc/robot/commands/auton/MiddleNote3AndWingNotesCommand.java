@@ -105,8 +105,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
                 new AutoWaitNoteStagedCommand(robotStateSubsystem),
                 new PrepShooterCommand(
                     superStructure, robotStateSubsystem, AutonConstants.Setpoints.MS3))),
-        new VisionShootCommand(
-            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+        new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         middleShoot3WingNote3,
         wingNote3MidInit,
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
@@ -114,7 +113,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-        wingNote1Hunt,
+        // wingNote1Hunt,
         new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
