@@ -31,7 +31,6 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
   private WingNoteDriveAutonCommand middleShoot3WingNote3;
   private DriveAutonCommand wingNote3MidInit;
   private WingNoteDriveAutonCommand midInitWingNote1;
-  private DriveAutonCommand wingNote1Hunt;
 
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
@@ -83,7 +82,6 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
             "MiddleInitial1_WingNote1",
             true,
             false);
-    wingNote1Hunt = new DriveAutonCommand(driveSubsystem, "WingNote1_WingNote2Hunt", false, false);
 
     addCommands(
         new ResetGyroCommand(driveSubsystem),
@@ -107,13 +105,17 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
                     superStructure, robotStateSubsystem, AutonConstants.Setpoints.MS3))),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         middleShoot3WingNote3,
-        wingNote3MidInit,
+        new ParallelCommandGroup(
+            wingNote3MidInit,
+            new SequentialCommandGroup(
+                new AutoWaitNoteStagedCommand(robotStateSubsystem),
+                new PrepShooterCommand(
+                    superStructure, robotStateSubsystem, AutonConstants.Setpoints.MI1))),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         midInitWingNote1,
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-        // wingNote1Hunt,
         new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
@@ -126,7 +128,6 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
     middleShoot3WingNote3.generateTrajectory();
     wingNote3MidInit.generateTrajectory();
     midInitWingNote1.generateTrajectory();
-    wingNote1Hunt.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }

@@ -52,7 +52,7 @@ public class DeadeyeHuntCommand extends Command {
       double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
     } else {
-      driveSubsystem.move(0.0, 0.0, -3.0, false);
+      driveSubsystem.move(0.0, 0.0, -4.0, false);
     }
   }
 
@@ -64,7 +64,7 @@ public class DeadeyeHuntCommand extends Command {
       driveSubsystem.recordYVel(ySpeed);
       driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
     } else {
-      driveSubsystem.move(0.0, 0.0, -3.0, false);
+      driveSubsystem.move(0.0, 0.0, -4.0, false);
     }
   }
 

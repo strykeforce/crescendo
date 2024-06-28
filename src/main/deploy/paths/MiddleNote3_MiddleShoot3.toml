@@ -1,5 +1,5 @@
 max_velocity = 5.0 #m/s
-max_acceleration = 4.7 #m/s
+max_acceleration = 4.6 #m/s
 start_velocity = 0.0 #m/s
 end_velocity = 0.0 #m/s 
 is_reversed = false
@@ -7,10 +7,14 @@ target_yaw = 0.0 #degrees
 
 [start_pose]
     dataPoint = "M3"
+    dX = 0.1
+    dY = 0.0
     angle = 180.0
 
 [end_pose]
     dataPoint = "MS3"
+    dX = 0.9
+    dY = 0.0
     angle = 180.0 # 200.0
 
 [[internal_points]]

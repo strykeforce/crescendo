@@ -105,9 +105,9 @@ public class WingNoteDriveAutonCommand extends Command implements AutoCommandInt
           if (deadeye.getNumTargets() > 0
               && timer.hasElapsed(trajectory.getTotalTimeSeconds() * AutonConstants.kPercentLeft)
               && ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
-                      && curX >= AutonConstants.kSwitchXLine)
+                      && curX >= AutonConstants.kWingSwitchXLine)
                   || (robotStateSubsystem.getAllianceColor() == Alliance.Red
-                      && curX <= DriveConstants.kFieldMaxX - AutonConstants.kSwitchXLine))) {
+                      && curX <= DriveConstants.kFieldMaxX - AutonConstants.kWingSwitchXLine))) {
             curState = DriveState.DEADEYE_DRIVE;
             driveSubsystem.setDeadEyeDrive(true);
             ledSubsystem.setColor(120, 38, 109);
@@ -126,7 +126,8 @@ public class WingNoteDriveAutonCommand extends Command implements AutoCommandInt
 
   @Override
   public boolean isFinished() {
-    return timer.hasElapsed(trajectory.getTotalTimeSeconds());
+    return timer.hasElapsed(trajectory.getTotalTimeSeconds())
+        || robotStateSubsystem.intakeHasNote();
   }
 
   @Override
