@@ -19,7 +19,9 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
@@ -972,8 +974,23 @@ public class RobotContainer {
                 climbSubsystem));
 
     // Magazine recover
-    new Trigger(() -> (xboxController.getPOV() != -1))
-        .onTrue(new RecoverMagazineCommand(magazineSubsystem));
+    // new Trigger(() -> (xboxController.getPOV() != -1))
+    //     .onTrue(new RecoverMagazineCommand(magazineSubsystem));
+
+    new POVButton(xboxController, 270).onTrue(new RecoverMagazineCommand(magazineSubsystem));
+
+    new POVButton(xboxController, 90)
+        .onTrue(
+            new FunctionalCommand(
+                () -> robotStateSubsystem.startMovingFeed(),
+                () -> robotStateSubsystem.movingShootExecute(),
+                interrupted -> robotStateSubsystem.movingShootEnd(false),
+                () ->
+                    (robotStateSubsystem.getState() != RobotStates.TO_MOVING_FEED
+                        || robotStateSubsystem.getState() != RobotStates.SHOOTING),
+                superStructure,
+                magazineSubsystem,
+                intakeSubsystem));
 
     // // Run auton
     // new JoystickButton(xboxController, XboxController.Button.kStart.value)

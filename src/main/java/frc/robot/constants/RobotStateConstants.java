@@ -6,6 +6,8 @@ public final class RobotStateConstants {
   public static final String kFeedingLookupTablePath = "/home/lvuser/deploy/FeedingLookupTable.csv";
   public static final double kLookupMinDistance = 1.5; // 150cm
   public static final double kLookupMaxDistance = 5.4; // 540cm
+  public static final double kFeedLookupMinDist = 6.2;
+  public static final double kFeedLookupMaxDist = 11.5;
   public static final double kDistanceIncrement = 0.01; // 1cm
   public static final double kDistanceOffset = 0.00;
   public static final double kElbowShootOffset = 0.0000; // .5 .7

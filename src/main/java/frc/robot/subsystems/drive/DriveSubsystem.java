@@ -66,6 +66,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private int velXStableCounts = 0;
   private int velYStableCounts = 0;
   private Pose2d moveAndShootVirtualPose = new Pose2d();
+  private Double feedAngleOffsetDegs = 0.0;
 
   // Grapher stuff
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
@@ -142,7 +143,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
       io.drive(vXmps, vYmps, vOmegaRadps, true);
     } else {
       double vOmegaRadpsNew;
-      if (isFeeding) vOmegaRadpsNew = getvOmegaToFeedTarget();
+      if (isFeeding && isMoveAndShoot)
+        vOmegaRadpsNew = getvOmegaToFeedTarget(moveAndShootVirtualPose);
+      else if (isFeeding) vOmegaRadpsNew = getvOmegaToFeedTarget();
       else if (isMoveAndShoot) vOmegaRadpsNew = getvOmegaToGoal(moveAndShootVirtualPose);
       else if (tuningYaw) {
         vOmegaRadpsNew = getvOmegaToGoal();
@@ -179,6 +182,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public double getvOmegaToGoal(Pose2d pos) {
     trackingSetpoint = pos.getRotation().getRadians() + getShooterAngleToSpeaker(pos).getRadians();
+    return omegaShootTrackController.calculate(pos.getRotation().getRadians(), trackingSetpoint);
+  }
+
+  public double getvOmegaToFeedTarget(Pose2d pos) {
+    trackingSetpoint = pos.getRotation().getRadians() + getShooterAngleToFeedPose(pos).getRadians();
     return omegaShootTrackController.calculate(pos.getRotation().getRadians(), trackingSetpoint);
   }
 
@@ -348,6 +356,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     this.moveAndShootVirtualPose = virtualPose;
   }
 
+  public void setFeedOffsetAngle(Double offsetDegs) {
+    org.littletonrobotics.junction.Logger.recordOutput("ShootingData/FeedOffset", offsetDegs);
+    this.feedAngleOffsetDegs = offsetDegs;
+  }
+
   public Rotation2d getShooterAngleToSpeaker() {
     if (robotStateSubsystem.getAllianceColor() == Alliance.Blue)
       return RobotConstants.kBlueSpeakerPos
@@ -382,12 +395,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
           .minus(getPoseMeters().getTranslation())
           .getAngle()
           .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
-          .rotateBy(new Rotation2d(RobotConstants.kDegreeFeedOffset));
+          .rotateBy(new Rotation2d(feedAngleOffsetDegs));
     return RobotConstants.kRedFeedTargetPos
         .minus(getPoseMeters().getTranslation())
         .getAngle()
         .minus(getPoseMeters().getRotation().rotateBy(RobotConstants.kShooterHeading))
-        .rotateBy(new Rotation2d(RobotConstants.kDegreeFeedOffset));
+        .rotateBy(new Rotation2d(feedAngleOffsetDegs));
   }
 
   public Rotation2d getShooterAngleToFeedPose(Pose2d robotPose) {
@@ -396,12 +409,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
           .minus(robotPose.getTranslation())
           .getAngle()
           .minus(robotPose.getRotation().rotateBy(RobotConstants.kShooterHeading))
-          .rotateBy(new Rotation2d(RobotConstants.kDegreeFeedOffset));
+          .rotateBy(new Rotation2d(feedAngleOffsetDegs));
     return RobotConstants.kRedFeedTargetPos
         .minus(robotPose.getTranslation())
         .getAngle()
         .minus(robotPose.getRotation().rotateBy(RobotConstants.kShooterHeading))
-        .rotateBy(new Rotation2d(RobotConstants.kDegreeFeedOffset));
+        .rotateBy(new Rotation2d(feedAngleOffsetDegs));
   }
 
   public DriveStates getDriveState() {
@@ -978,6 +991,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("YAW Vel", () -> lastVelocity[2]),
         new Measure("Angle to goal", () -> getShooterAngleToSpeaker().getDegrees()),
         new Measure("Distance to goal", () -> getDistanceToSpeaker()),
+        new Measure("Distance to feed", () -> getDistanceToFeedTarget()),
         new Measure("Is Yaw Tuning", () -> getIsTuningYaw() ? 1 : 0),
         new Measure(
             "Angle For Goal",
@@ -986,6 +1000,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
                     + getShooterAngleToSpeaker().getDegrees())),
         new Measure("MoveShoot Angle", () -> trackingSetpoint),
         new Measure("AngleToFeed", () -> getShooterAngleToFeedGoal().getDegrees()),
-        new Measure("TOF Sensor", () -> tofSensor.get() ? 1.0 : 0.0));
+        new Measure("TOF Sensor", () -> tofSensor.get() ? 1.0 : 0.0),
+        new Measure("Shoot Offset Angle", () -> feedAngleOffsetDegs));
   }
 }
