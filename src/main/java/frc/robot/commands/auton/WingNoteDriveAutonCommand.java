@@ -126,14 +126,14 @@ public class WingNoteDriveAutonCommand extends Command implements AutoCommandInt
 
   @Override
   public boolean isFinished() {
-    return timer.hasElapsed(trajectory.getTotalTimeSeconds())
-        || robotStateSubsystem.intakeHasNote();
+    return timer.hasElapsed(trajectory.getTotalTimeSeconds());
   }
 
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.setEnableHolo(false);
     driveSubsystem.setDeadEyeDrive(false);
+    driveSubsystem.recordAutoTrajectory(null);
 
     if (!lastPath) {
       driveSubsystem.calculateController(

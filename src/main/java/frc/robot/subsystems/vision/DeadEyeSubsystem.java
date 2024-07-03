@@ -41,7 +41,7 @@ public class DeadEyeSubsystem extends MeasurableSubsystem {
     for (Rect targ : data.targets) {
       //   data.targetsOrderedByBottomRightX()
       if (targ.center().y <= VisionConstants.kBumperPixelLine) validTargs.add(targ);
-      org.littletonrobotics.junction.Logger.recordOutput("Deadeye/Pixel Y", targ.center().y);
+      // org.littletonrobotics.junction.Logger.recordOutput("Deadeye/Pixel Y", targ.center().y);
     }
     validTargs.sort(
         Comparator.comparingInt(r -> -((Rect) r).center().y)

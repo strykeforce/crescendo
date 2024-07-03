@@ -133,6 +133,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
   public void end(boolean interrupted) {
     driveSubsystem.setEnableHolo(false);
     driveSubsystem.setDeadEyeDrive(false);
+    driveSubsystem.recordAutoTrajectory(null);
 
     if (!lastPath) {
       driveSubsystem.calculateController(

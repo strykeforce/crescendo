@@ -84,6 +84,7 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.setEnableHolo(false);
+    driveSubsystem.recordAutoTrajectory(null);
 
     if (!lastPath) {
       driveSubsystem.calculateController(

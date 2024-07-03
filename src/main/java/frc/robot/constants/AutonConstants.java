@@ -13,12 +13,15 @@ public final class AutonConstants {
   public static final double kIDeadEyeXDrive = 0.0;
   public static final double kDDeadEyeXDrive = 0.0;
   public static final double kMaxVelDeadeyeDrive = 4.0;
+  public static final double kMaxAutonVelDeadeyeDrive = 2.0;
   public static final double kMaxAccelDeadeyeDrive = 3.5;
   public static final double kXSpeed = 2.0;
   public static final double kMaxXOff = 1.0;
   public static final double kSwitchXLine = 6.5;
-  public static final double kWingSwitchXLine = 2.0;
+  public static final double kWingSwitchXLine = 1.4;
   public static final double kPercentLeft = 0.65;
+  public static final double kDeadeyeHuntOmegaRadps = -1.5;
+  public static final double kFoundNoteLoopCounts = 3;
 
   public static final int kSwitchStableCounts = 100;
 

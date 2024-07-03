@@ -17,6 +17,8 @@ public class DeadeyeHuntCommand extends Command {
   private ProfiledPIDController deadeyeYDrive;
   private PIDController deadeyeXDrive;
   private LedSubsystem ledSubsystem;
+  private HuntState huntState;
+  private int seenNote = 0;
 
   public DeadeyeHuntCommand(
       DeadEyeSubsystem deadeye,
@@ -34,12 +36,13 @@ public class DeadeyeHuntCommand extends Command {
             AutonConstants.kIDeadEyeYDrive,
             AutonConstants.kDDeadEyeYDrive,
             new Constraints(
-                AutonConstants.kMaxVelDeadeyeDrive, AutonConstants.kMaxAccelDeadeyeDrive));
+                AutonConstants.kMaxAutonVelDeadeyeDrive, AutonConstants.kMaxAccelDeadeyeDrive));
     deadeyeXDrive =
         new PIDController(
             AutonConstants.kPDeadEyeXDrive,
             AutonConstants.kIDeadEyeXDrive,
             AutonConstants.kDDeadEyeXDrive);
+    huntState = HuntState.SEARCHING;
   }
 
   @Override
@@ -51,30 +54,49 @@ public class DeadeyeHuntCommand extends Command {
       double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
+      seenNote++;
     } else {
-      driveSubsystem.move(0.0, 0.0, -4.0, false);
+      driveSubsystem.move(0.0, 0.0, AutonConstants.kDeadeyeHuntOmegaRadps, false);
     }
   }
 
   @Override
   public void execute() {
-    if (deadeye.getNumTargets() > 0) {
-      double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
-      double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
-      driveSubsystem.recordYVel(ySpeed);
-      driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
-    } else {
-      driveSubsystem.move(0.0, 0.0, -4.0, false);
+    switch (huntState) {
+      case SEARCHING:
+        if (deadeye.getNumTargets() > 0) {
+          seenNote++;
+          if (seenNote >= AutonConstants.kFoundNoteLoopCounts) {
+            huntState = HuntState.DRIVING;
+          }
+        } else {
+          driveSubsystem.move(0.0, 0.0, AutonConstants.kDeadeyeHuntOmegaRadps, false);
+          seenNote = 0;
+        }
+        break;
+      case DRIVING:
+        if (deadeye.getNumTargets() > 0) {
+          double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
+          double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
+          driveSubsystem.recordYVel(ySpeed);
+          driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
+        }
+        break;
     }
   }
 
   @Override
   public void end(boolean interrupted) {
-    driveSubsystem.move(0, 0, 0, true);
+    driveSubsystem.move(0, 0, 0, false);
   }
 
   @Override
   public boolean isFinished() {
     return robotStateSubsystem.hasNote();
+  }
+
+  private enum HuntState {
+    SEARCHING,
+    DRIVING
   }
 }

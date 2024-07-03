@@ -94,7 +94,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
             new SequentialCommandGroup(
                 new IgnoreNotesCommand(
                     robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-                new WaitCommand(1.5),
+                new WaitCommand(2.0),
                 new IntakeCommand(
                     robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))),
         new ParallelCommandGroup(
@@ -116,6 +116,12 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+        new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
+        new AutoWaitNoteStagedCommand(robotStateSubsystem),
+        new VisionShootCommand(
+            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+
+        // Backup
         new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
