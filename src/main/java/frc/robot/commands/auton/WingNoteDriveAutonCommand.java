@@ -103,7 +103,8 @@ public class WingNoteDriveAutonCommand extends Command implements AutoCommandInt
         case NORM_DRIVE:
           driveSubsystem.calculateController(desiredState, robotHeading);
           if (deadeye.getNumTargets() > 0
-              && timer.hasElapsed(trajectory.getTotalTimeSeconds() * AutonConstants.kPercentLeft)
+              && timer.hasElapsed(
+                  trajectory.getTotalTimeSeconds() * AutonConstants.kWingPercentLeft)
               && ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
                       && curX >= AutonConstants.kWingSwitchXLine)
                   || (robotStateSubsystem.getAllianceColor() == Alliance.Red

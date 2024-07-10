@@ -23,8 +23,8 @@ target_yaw = 0.0 #degrees
 
 [[internal_points]]
     x = 4.0
-    y = 5.0
+    y = 5.05
 
 [[internal_points]]
     x = 3.007
-    y = 5.113
+    y = 5.163

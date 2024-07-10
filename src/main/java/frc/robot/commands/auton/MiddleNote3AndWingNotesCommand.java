@@ -103,6 +103,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
                 new AutoWaitNoteStagedCommand(robotStateSubsystem),
                 new PrepShooterCommand(
                     superStructure, robotStateSubsystem, AutonConstants.Setpoints.MS3))),
+        new WaitCommand(0.02),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         middleShoot3WingNote3,
         new ParallelCommandGroup(
@@ -119,13 +120,13 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
         new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
-            robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-
-        // Backup
-        new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
-        new AutoWaitNoteStagedCommand(robotStateSubsystem),
-        new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+
+    // Backup
+    // new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
+    // new AutoWaitNoteStagedCommand(robotStateSubsystem),
+    // new VisionShootCommand(
+    //     robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void generateTrajectory() {

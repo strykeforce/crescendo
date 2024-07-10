@@ -20,6 +20,7 @@ public final class AutonConstants {
   public static final double kSwitchXLine = 6.5;
   public static final double kWingSwitchXLine = 1.4;
   public static final double kPercentLeft = 0.65;
+  public static final double kWingPercentLeft = 0.5;
   public static final double kDeadeyeHuntOmegaRadps = -1.5;
   public static final double kFoundNoteLoopCounts = 3;
 
@@ -163,7 +164,7 @@ public final class AutonConstants {
         new Pose2d(3.052, 3.063, Rotation2d.fromDegrees(-47.39)); // Disrupt auto
 
     // Path Midpoints
-    public static final Pose2d MP1 = new Pose2d(2.5, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
+    public static final Pose2d MP1 = new Pose2d(2.7, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
     public static final Pose2d MP2 = new Pose2d(3.89, 7.2, Rotation2d.fromDegrees(-90)); // AS4
   }
 
