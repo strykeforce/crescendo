@@ -634,6 +634,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.AUTO_DISRUPT);
   }
 
+  public void autoIgnoreNote() {
+    superStructure.autoIgnoreNote(allianceColor);
+    intakeSubsystem.toIntaking();
+    magazineSubsystem.toFastEmptying();
+
+    setState(RobotStates.AUTO_IGNORE_NOTE);
+  }
+
   public void toTune() {
     setState(RobotStates.TO_TUNE);
     superStructure.shootTune(elbowOffset);
@@ -1204,6 +1212,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         break;
       case AUTO_DISRUPT:
         break;
+      case AUTO_IGNORE_NOTE:
+        break;
       case SOURCE_INTAKE:
         if (magazineSubsystem.hasPiece()) {
           setState(RobotStates.TO_HIGH_FEED);
@@ -1310,6 +1320,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     AUTO_DISRUPT,
     SOURCE_INTAKE,
     TO_HIGH_FEED,
-    HIGH_FEED
+    HIGH_FEED,
+    AUTO_IGNORE_NOTE
   }
 }

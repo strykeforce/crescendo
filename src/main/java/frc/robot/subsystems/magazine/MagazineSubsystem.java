@@ -226,6 +226,13 @@ public class MagazineSubsystem extends MeasurableSubsystem implements ClosedLoop
     setState(MagazineStates.EJECTING);
   }
 
+  public void toFastEmptying() {
+    resetRevBeamCounts();
+    io.enableLimitSwitches(false, false);
+    setSpeed(MagazineConstants.kFastEmptyingSpeed);
+    setState(MagazineStates.EJECTING);
+  }
+
   // Periodic
   @Override
   public void periodic() {

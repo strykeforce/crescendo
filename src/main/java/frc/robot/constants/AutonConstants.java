@@ -13,11 +13,16 @@ public final class AutonConstants {
   public static final double kIDeadEyeXDrive = 0.0;
   public static final double kDDeadEyeXDrive = 0.0;
   public static final double kMaxVelDeadeyeDrive = 4.0;
+  public static final double kMaxAutonVelDeadeyeDrive = 2.0;
   public static final double kMaxAccelDeadeyeDrive = 3.5;
   public static final double kXSpeed = 2.0;
   public static final double kMaxXOff = 1.0;
   public static final double kSwitchXLine = 6.5;
+  public static final double kWingSwitchXLine = 1.4;
   public static final double kPercentLeft = 0.65;
+  public static final double kWingPercentLeft = 0.5;
+  public static final double kDeadeyeHuntOmegaRadps = -1.5;
+  public static final double kFoundNoteLoopCounts = 3;
 
   public static final int kSwitchStableCounts = 100;
 
@@ -113,6 +118,7 @@ public final class AutonConstants {
     // Starting Positions
     public static final Pose2d MI1 =
         new Pose2d(1.47, 5.55, Rotation2d.fromDegrees(0.0)); // 1.34 on x
+    public static final Pose2d MI2 = new Pose2d(1.47, 4.905, Rotation2d.fromDegrees(0.0));
     public static final Pose2d AI1 = new Pose2d(1.09, 6.94, Rotation2d.fromDegrees(50));
     public static final Pose2d AI2 = new Pose2d(1.34, 6.275, Rotation2d.fromDegrees(0.0));
     public static final Pose2d AI3 = new Pose2d(1.43764, 7.33425, Rotation2d.fromDegrees(90.0));
@@ -147,6 +153,8 @@ public final class AutonConstants {
     public static final Pose2d AS3 = new Pose2d(1.43764, 7.33425, Rotation2d.fromDegrees(90.0));
     public static final Pose2d MS1 = new Pose2d(4.3, 5.55, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS2 = new Pose2d(4.3, 6.5, Rotation2d.fromDegrees(0.0));
+    public static final Pose2d MS3 =
+        MI1; // new Pose2d(1.57, 4.737, Rotation2d.fromDegrees(0.0)); // y = 5.05
     public static final Pose2d NAS1 = new Pose2d(4.2, 2.8, Rotation2d.fromDegrees(-33.2));
     public static final Pose2d NAS2 =
         new Pose2d(4.55, 4.6, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
@@ -156,7 +164,7 @@ public final class AutonConstants {
         new Pose2d(3.052, 3.063, Rotation2d.fromDegrees(-47.39)); // Disrupt auto
 
     // Path Midpoints
-    public static final Pose2d MP1 = new Pose2d(2.5, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
+    public static final Pose2d MP1 = new Pose2d(2.7, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
     public static final Pose2d MP2 = new Pose2d(3.89, 7.2, Rotation2d.fromDegrees(-90)); // AS4
   }
 

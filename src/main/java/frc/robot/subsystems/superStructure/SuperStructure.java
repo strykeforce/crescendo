@@ -547,6 +547,30 @@ public class SuperStructure extends MeasurableSubsystem {
     nextState = SuperStructureStates.AUTO_DISRUPT;
   }
 
+  public void autoIgnoreNote(Alliance alliance) {
+    elbowSetpoint = SuperStructureConstants.kElbowIgnoreNoteSetPoint;
+    wristSetpoint = SuperStructureConstants.kWristIgnoreNoteSetPoint;
+    leftShooterSpeed =
+        alliance == Alliance.Blue
+            ? SuperStructureConstants.kBlueLeftShooterIgnoreNoteSetPoint
+            : SuperStructureConstants.kBlueRightShooterIgnoreNoteSetPoint;
+    rightShooterSpeed =
+        alliance == Alliance.Blue
+            ? SuperStructureConstants.kBlueRightShooterIgnoreNoteSetPoint
+            : SuperStructureConstants.kBlueLeftShooterIgnoreNoteSetPoint;
+
+    shooterSubsystem.setLeftSpeed(leftShooterSpeed);
+    shooterSubsystem.setRightSpeed(rightShooterSpeed);
+    wristSubsystem.setPosition(wristSetpoint);
+    elbowSubsystem.setPosition(elbowSetpoint);
+
+    logger.info("{} -> TRANSFER(AUTO_IGNORE_NOTE)", curState);
+    isPrecise = false;
+    flipMagazineOut = false;
+    curState = SuperStructureStates.TRANSFER;
+    nextState = SuperStructureStates.AUTO_IGNORE_NOTE;
+  }
+
   // Periodic
   @Override
   public void periodic() {
@@ -617,6 +641,8 @@ public class SuperStructure extends MeasurableSubsystem {
         break;
       case AUTO_DISRUPT:
         break;
+      case AUTO_IGNORE_NOTE:
+        break;
       case BLOCK:
         break;
     }
@@ -665,6 +691,7 @@ public class SuperStructure extends MeasurableSubsystem {
     AUTO_DISRUPT,
     HIGH_FEEDING,
     SOURCE_INTAKE,
-    BLOCK
+    BLOCK,
+    AUTO_IGNORE_NOTE
   }
 }

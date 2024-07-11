@@ -27,6 +27,7 @@ public final class MagazineConstants {
   public static final double kTrapReleaseTime = 0.75;
   public static final double kAmpReleaseSpeed = 40.0; // 20.0
   public static final double kPodiumRumbleSpeed = 80;
+  public static final double kFastEmptyingSpeed = -55; // -75
 
   public static final TalonFXConfiguration getMagazineConfig() {
     TalonFXConfiguration config = new TalonFXConfiguration();

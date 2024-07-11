@@ -3,6 +3,9 @@
     "RoboRIO": {
       "RoboRIO Input": {
         "open": true
+      },
+      "window": {
+        "visible": true
       }
     }
   },
@@ -10,6 +13,11 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Mode": "String Chooser"
+    }
+  },
+  "NetworkTables": {
+    "Persistent Values": {
+      "open": false
     }
   },
   "NetworkTables Info": {

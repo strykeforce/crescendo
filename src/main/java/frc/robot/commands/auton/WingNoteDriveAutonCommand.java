@@ -19,7 +19,7 @@ import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandInterface {
+public class WingNoteDriveAutonCommand extends Command implements AutoCommandInterface {
   private final DriveSubsystem driveSubsystem;
   private Trajectory trajectory;
   private final Timer timer = new Timer();
@@ -35,7 +35,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
   private DriveState curState = DriveState.NORM_DRIVE;
   private LedSubsystem ledSubsystem;
 
-  public MiddleNoteDriveAutonCommand(
+  public WingNoteDriveAutonCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       DeadEyeSubsystem deadeye,
@@ -103,11 +103,12 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
         case NORM_DRIVE:
           driveSubsystem.calculateController(desiredState, robotHeading);
           if (deadeye.getNumTargets() > 0
-              && timer.hasElapsed(trajectory.getTotalTimeSeconds() * AutonConstants.kPercentLeft)
+              && timer.hasElapsed(
+                  trajectory.getTotalTimeSeconds() * AutonConstants.kWingPercentLeft)
               && ((robotStateSubsystem.getAllianceColor() == Alliance.Blue
-                      && curX >= AutonConstants.kSwitchXLine)
+                      && curX >= AutonConstants.kWingSwitchXLine)
                   || (robotStateSubsystem.getAllianceColor() == Alliance.Red
-                      && curX <= DriveConstants.kFieldMaxX - AutonConstants.kSwitchXLine))) {
+                      && curX <= DriveConstants.kFieldMaxX - AutonConstants.kWingSwitchXLine))) {
             curState = DriveState.DEADEYE_DRIVE;
             driveSubsystem.setDeadEyeDrive(true);
             ledSubsystem.setColor(120, 38, 109);
