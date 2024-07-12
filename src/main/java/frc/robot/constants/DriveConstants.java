@@ -169,11 +169,14 @@ public final class DriveConstants {
 
   public static CurrentLimitsConfigs getNormDriveLimits() {
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
-    currentConfig.SupplyCurrentLimit = 45; // 40
-    currentConfig.SupplyCurrentThreshold = 50; // 45
+    currentConfig.SupplyCurrentLimit = 30; // 45
+    currentConfig.SupplyCurrentThreshold = 35; // 50
     currentConfig.SupplyTimeThreshold = 0.0;
+
+    currentConfig.StatorCurrentLimit = 140;
+
     currentConfig.SupplyCurrentLimitEnable = true;
-    currentConfig.StatorCurrentLimitEnable = false;
+    currentConfig.StatorCurrentLimitEnable = true;
     return currentConfig;
   }
 
