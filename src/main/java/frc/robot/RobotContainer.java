@@ -66,7 +66,6 @@ import frc.robot.commands.robotState.BlockCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
-import frc.robot.commands.robotState.FeedCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.MovingVisionShootCommand;
@@ -1089,18 +1088,18 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
         .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
-    new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onFalse(
-            new FeedCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onTrue(
-            new FeedCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onFalse(
-            new FeedCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(driveJoystick, Button.SWF_UP.id)
+    //     .onFalse(
+    //         new FeedCommand(
+    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(driveJoystick, Button.SWF_DWN.id)
+    //     .onTrue(
+    //         new FeedCommand(
+    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(driveJoystick, Button.SWF_DWN.id)
+    //     .onFalse(
+    //         new FeedCommand(
+    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void configureClimbTestBindings() {

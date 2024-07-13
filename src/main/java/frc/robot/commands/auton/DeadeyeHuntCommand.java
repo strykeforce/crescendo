@@ -3,6 +3,7 @@ package frc.robot.commands.auton;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -56,7 +57,13 @@ public class DeadeyeHuntCommand extends Command {
       driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
       seenNote++;
     } else {
-      driveSubsystem.move(0.0, 0.0, AutonConstants.kDeadeyeHuntOmegaRadps, false);
+      driveSubsystem.move(
+          0.0,
+          0.0,
+          robotStateSubsystem.getAllianceColor() == Alliance.Blue
+              ? AutonConstants.kDeadeyeHuntOmegaRadps
+              : -AutonConstants.kDeadeyeHuntOmegaRadps,
+          false);
     }
   }
 
@@ -70,7 +77,13 @@ public class DeadeyeHuntCommand extends Command {
             huntState = HuntState.DRIVING;
           }
         } else {
-          driveSubsystem.move(0.0, 0.0, AutonConstants.kDeadeyeHuntOmegaRadps, false);
+          driveSubsystem.move(
+              0.0,
+              0.0,
+              robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                  ? AutonConstants.kDeadeyeHuntOmegaRadps
+                  : -AutonConstants.kDeadeyeHuntOmegaRadps,
+              false);
           seenNote = 0;
         }
         break;

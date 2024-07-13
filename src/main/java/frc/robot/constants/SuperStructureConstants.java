@@ -56,7 +56,7 @@ public final class SuperStructureConstants {
   // SUBWOOFER
   public static final double kWristSubwooferSetPoint = kWristIntakeSetPoint;
   public static final double kElbowSubwooferSetPoint = kElbowIntakeSetPoint;
-  public static final double kShooterSubwooferSetPoint = 50; // 60
+  public static final double kShooterSubwooferSetPoint = 55; // 60
 
   // FEEDING
   public static final double kWristFeedingSetPoint = kWristIntakeSetPoint;

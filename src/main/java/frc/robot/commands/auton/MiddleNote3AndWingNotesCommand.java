@@ -1,11 +1,13 @@
 package frc.robot.commands.auton;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.TurnUntilAngleCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.robotState.IgnoreNotesCommand;
@@ -117,6 +119,15 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
+        new TurnUntilAngleCommand(
+            driveSubsystem,
+            Rotation2d.fromDegrees(
+                robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                    ? AutonConstants.kDeadeyeHuntStartYawDegs
+                    : -AutonConstants.kDeadeyeHuntStartYawDegs),
+            robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                ? AutonConstants.kDeadeyeHuntOmegaRadps
+                : -AutonConstants.kDeadeyeHuntOmegaRadps),
         new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(

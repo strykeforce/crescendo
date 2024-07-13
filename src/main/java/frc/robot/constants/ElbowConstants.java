@@ -88,7 +88,7 @@ public final class ElbowConstants {
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     Slot0Configs slot0 = new Slot0Configs();
-    slot0.kP = 150.0; // 1.2
+    slot0.kP = 150.0; // 150
     slot0.kI = 0.0;
     slot0.kD = 0.0;
     slot0.kS = 0.0;
@@ -99,7 +99,7 @@ public final class ElbowConstants {
     config.Slot0 = slot0;
 
     Slot1Configs slot1 = new Slot1Configs();
-    slot1.kP = 150.0; // 1.2
+    slot1.kP = 130.0; // 150
     slot1.kI = 175.0;
     slot1.kD = 0.0;
     slot1.kS = 0.0;
