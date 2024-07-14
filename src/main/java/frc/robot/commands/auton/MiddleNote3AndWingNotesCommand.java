@@ -14,7 +14,9 @@ import frc.robot.commands.robotState.IgnoreNotesCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
+import frc.robot.commands.superStructure.SpinUpWheelsCommand;
 import frc.robot.constants.AutonConstants;
+import frc.robot.constants.SuperStructureConstants;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
@@ -99,12 +101,22 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
                 new IntakeCommand(
                     robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))),
         new ParallelCommandGroup(
-            middleNote3MiddleShoot3, new AutoWaitNoteStagedCommand(robotStateSubsystem)),
+            middleNote3MiddleShoot3,
+            new AutoWaitNoteStagedCommand(robotStateSubsystem),
+            new SpinUpWheelsCommand(
+                superStructure,
+                SuperStructureConstants.kShooterSubwooferSetPoint,
+                SuperStructureConstants.kShooterSubwooferSetPoint)),
         new WaitCommand(0.02),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         middleShoot3WingNote3,
         new ParallelCommandGroup(
-            wingNote3MidInit, new AutoWaitNoteStagedCommand(robotStateSubsystem)),
+            wingNote3MidInit,
+            new AutoWaitNoteStagedCommand(robotStateSubsystem),
+            new SpinUpWheelsCommand(
+                superStructure,
+                SuperStructureConstants.kShooterSubwooferSetPoint,
+                SuperStructureConstants.kShooterSubwooferSetPoint)),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         midInitWingNote1,
         new AutoWaitNoteStagedCommand(robotStateSubsystem),

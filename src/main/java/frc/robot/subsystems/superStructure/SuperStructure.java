@@ -424,7 +424,7 @@ public class SuperStructure extends MeasurableSubsystem {
   }
 
   public void fixedFeeding(double wheelSpeed) {
-    elbowSetpoint = SuperStructureConstants.kElbowSubwooferSetPoint;
+    elbowSetpoint = SuperStructureConstants.kElbowFeedingSetPoint;
     wristSetpoint = SuperStructureConstants.kWristSubwooferSetPoint;
     leftShooterSpeed =
         SuperStructureConstants.kLeftShooterFeedingSetPoint
