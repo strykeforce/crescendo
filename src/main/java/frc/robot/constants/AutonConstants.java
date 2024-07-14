@@ -16,7 +16,7 @@ public final class AutonConstants {
   public static final double kMaxAutonVelDeadeyeDrive = 2.0;
   public static final double kMaxAccelDeadeyeDrive = 3.5;
   public static final double kXSpeed = 2.0;
-  public static final double kMaxXOff = 1.0;
+  public static final double kMaxXOff = 1.93; // 1.0
   public static final double kSwitchXLine = 6.5;
   public static final double kWingSwitchXLine = 1.4;
   public static final double kPercentLeft = 0.65;

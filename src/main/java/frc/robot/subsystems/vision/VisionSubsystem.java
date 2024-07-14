@@ -279,6 +279,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
   public void periodic() {
     double gyroBuffer =
         FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
+
+    // double gyroBuffer =
+    //     FastMath.normalizeMinusPiPi(driveSubsystem.getPoseMeters().getRotation().getRadians());
     gyroData.addFirst(gyroBuffer);
     org.littletonrobotics.junction.Logger.recordOutput("VisionSubsystem/gyroBuffer", gyroBuffer);
 
@@ -389,6 +392,13 @@ public class VisionSubsystem extends MeasurableSubsystem {
         updatesToWheels++;
 
         fedStdDevs = scaledStdDev.get(0, 0);
+
+        // if (fedStdDevs < VisionConstants.kThetaStdThres && result.getNumTags() >= 2) {
+        //   scaledStdDev.set(2, 0, VisionConstants.kThetaStdDevUsed);
+        // } else {
+        //   scaledStdDev.set(2, 0, VisionConstants.kThetaStdDevRejected);
+        // }
+
         if (visionUpdates)
           driveSubsystem.addVisionMeasurement(
               new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1000000, scaledStdDev);

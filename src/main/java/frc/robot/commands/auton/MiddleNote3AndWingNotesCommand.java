@@ -12,7 +12,6 @@ import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.robotState.IgnoreNotesCommand;
 import frc.robot.commands.robotState.IntakeCommand;
-import frc.robot.commands.robotState.PrepShooterCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
 import frc.robot.constants.AutonConstants;
@@ -100,20 +99,12 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
                 new IntakeCommand(
                     robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem))),
         new ParallelCommandGroup(
-            middleNote3MiddleShoot3,
-            new SequentialCommandGroup(
-                new AutoWaitNoteStagedCommand(robotStateSubsystem),
-                new PrepShooterCommand(
-                    superStructure, robotStateSubsystem, AutonConstants.Setpoints.MS3))),
+            middleNote3MiddleShoot3, new AutoWaitNoteStagedCommand(robotStateSubsystem)),
         new WaitCommand(0.02),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         middleShoot3WingNote3,
         new ParallelCommandGroup(
-            wingNote3MidInit,
-            new SequentialCommandGroup(
-                new AutoWaitNoteStagedCommand(robotStateSubsystem),
-                new PrepShooterCommand(
-                    superStructure, robotStateSubsystem, AutonConstants.Setpoints.MI1))),
+            wingNote3MidInit, new AutoWaitNoteStagedCommand(robotStateSubsystem)),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
         midInitWingNote1,
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
@@ -121,10 +112,11 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
         new TurnUntilAngleCommand(
             driveSubsystem,
+            robotStateSubsystem,
             Rotation2d.fromDegrees(
                 robotStateSubsystem.getAllianceColor() == Alliance.Blue
                     ? AutonConstants.kDeadeyeHuntStartYawDegs
-                    : -AutonConstants.kDeadeyeHuntStartYawDegs),
+                    : 180 - AutonConstants.kDeadeyeHuntStartYawDegs),
             robotStateSubsystem.getAllianceColor() == Alliance.Blue
                 ? AutonConstants.kDeadeyeHuntOmegaRadps
                 : -AutonConstants.kDeadeyeHuntOmegaRadps),
