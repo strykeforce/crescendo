@@ -1,5 +1,6 @@
 package frc.robot.subsystems.auto;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -251,6 +252,14 @@ public class AutoSwitch extends MeasurableSubsystem {
             List.of(2, 3, 1),
             4.0,
             AutonConstants.Setpoints.AS2);
+      case 0x06:
+        return new DoNothingCommand(
+            robotStateSubsystem,
+            driveSubsystem,
+            superStructure,
+            magazineSubsystem,
+            elbowSubsystem,
+            AutonConstants.Setpoints.AI1);
       case 0x10:
         return new AmpMid_5PieceCommand(
             driveSubsystem,
@@ -452,7 +461,12 @@ public class AutoSwitch extends MeasurableSubsystem {
             ledSubsystem);
       case 0x30:
         return new DoNothingCommand(
-            robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
+            robotStateSubsystem,
+            driveSubsystem,
+            superStructure,
+            magazineSubsystem,
+            elbowSubsystem,
+            new Pose2d());
 
       case 0x31:
         return new DisruptAutonCommand(

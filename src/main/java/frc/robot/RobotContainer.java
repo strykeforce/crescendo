@@ -66,7 +66,6 @@ import frc.robot.commands.robotState.BlockCommand;
 import frc.robot.commands.robotState.ClimbCommand;
 import frc.robot.commands.robotState.ClimbTrapDecendCommand;
 import frc.robot.commands.robotState.DecendCommand;
-import frc.robot.commands.robotState.FeedCommand;
 import frc.robot.commands.robotState.FullTrapClimbCommand;
 import frc.robot.commands.robotState.IntakeCommand;
 import frc.robot.commands.robotState.MovingVisionShootCommand;
@@ -80,6 +79,7 @@ import frc.robot.commands.robotState.SourceIntakeCommand;
 import frc.robot.commands.robotState.SpeedUpPassCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.TogglePunchAirCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -956,10 +956,10 @@ public class RobotContainer {
         .onTrue(new SpeedUpPassCommand(robotStateSubsystem, superStructure));
 
     // Defense
-    // new JoystickButton(xboxController, XboxController.Button.kB.value)
-    //     .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
 
-    new JoystickButton(xboxController, XboxController.Button.kB.value).onTrue(testAuto);
+    // new JoystickButton(xboxController, XboxController.Button.kB.value).onTrue(testAuto);
 
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure,
@@ -1088,18 +1088,18 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
         .onFalse(new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem));
 
-    new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onFalse(
-            new FeedCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onTrue(
-            new FeedCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
-    new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onFalse(
-            new FeedCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(driveJoystick, Button.SWF_UP.id)
+    //     .onFalse(
+    //         new FeedCommand(
+    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(driveJoystick, Button.SWF_DWN.id)
+    //     .onTrue(
+    //         new FeedCommand(
+    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(driveJoystick, Button.SWF_DWN.id)
+    //     .onFalse(
+    //         new FeedCommand(
+    //             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
   }
 
   public void configureClimbTestBindings() {
