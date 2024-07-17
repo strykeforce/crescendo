@@ -106,7 +106,7 @@ public final class SuperStructureConstants {
 
   // Auto Ignore Note
   public static final double kElbowIgnoreNoteSetPoint = kElbowSubwooferSetPoint;
-  public static final double kBlueLeftShooterIgnoreNoteSetPoint = 10;
-  public static final double kBlueRightShooterIgnoreNoteSetPoint = 50;
+  public static final double kBlueLeftShooterIgnoreNoteSetPoint = 10; // 10
+  public static final double kBlueRightShooterIgnoreNoteSetPoint = 42; // 50
   public static final double kWristIgnoreNoteSetPoint = kWristSubwooferSetPoint;
 }
