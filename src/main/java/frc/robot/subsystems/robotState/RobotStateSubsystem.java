@@ -51,6 +51,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
+  private FeedMode feedMode = FeedMode.WALL;
 
   private double[][] shootingLookupTable;
   private double[][] feedingLookupTable;
@@ -130,6 +131,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       logger.info("{} -> {}", this.curState, robotState);
       this.curState = robotState;
     }
+  }
+
+  public FeedMode getFeedMode() {
+    return feedMode;
   }
 
   public void grabElbowOffsetPreferences() {
@@ -293,23 +298,23 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toAmp() {
-    if (speedUpPass) {
-      driveSubsystem.setIsAligningShot(false);
-      superStructure.lowFeedShot(allianceColor == Alliance.Blue);
-      intakeSubsystem.toEjecting();
-      ledSubsystem.setOff();
-      setState(RobotStates.TO_FEED);
+    // if (speedUpPass) {
+    //   driveSubsystem.setIsAligningShot(false);
+    //   superStructure.lowFeeding(allianceColor == Alliance.Blue);
+    //   intakeSubsystem.toEjecting();
+    //   ledSubsystem.setOff();
+    //   setState(RobotStates.TO_FEED);
+    //   feedMode = FeedMode.LOW;
+    // } else {
+    driveSubsystem.setIsAligningShot(false);
+    magazineSubsystem.toAmp();
+    superStructure.amp();
+    intakeSubsystem.toEjecting();
+    // intakeSubsystem.setPercent(0.0);
+    ledSubsystem.setOff();
 
-    } else {
-      driveSubsystem.setIsAligningShot(false);
-      magazineSubsystem.toAmp();
-      superStructure.amp();
-      intakeSubsystem.toEjecting();
-      // intakeSubsystem.setPercent(0.0);
-      ledSubsystem.setOff();
-
-      setState(RobotStates.TO_AMP);
-    }
+    setState(RobotStates.TO_AMP);
+    // }
   }
 
   public void startShootKnownPos(Pose2d pos) {
@@ -329,6 +334,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_SHOOT);
   }
 
+  // Unused
   public void startFeed() {
     usingDistance = false;
     shootKnownPos = false;
@@ -495,11 +501,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toPreparePodium() {
     if (speedUpPass) {
-      driveSubsystem.setIsAligningShot(false);
-      superStructure.highFeedShot(allianceColor == Alliance.Blue);
-      intakeSubsystem.toEjecting();
-      ledSubsystem.setOff();
-      setState(RobotStates.TO_FEED);
+      if (feedMode == FeedMode.WALL) {
+        feedMode = FeedMode.MIDDLE;
+      } else {
+        feedMode = FeedMode.WALL;
+      }
 
     } else {
       driveSubsystem.setIsAligningShot(false);
@@ -540,6 +546,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     intakeSubsystem.setPercent(0.0);
 
     setState(RobotStates.TO_FEED);
+    feedMode = FeedMode.WALL;
+  }
+
+  public void toMiddleFeeding() {
+    ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
+    driveSubsystem.setIsAligningShot(false);
+    intakeSubsystem.setPercent(0.0);
+    superStructure.middleFeeding(
+        FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+    intakeSubsystem.setPercent(0.0);
+
+    setState(RobotStates.TO_FEED);
+    feedMode = FeedMode.MIDDLE;
   }
 
   public void prepareClimb() {
@@ -620,8 +639,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       safeStow = false;
       magazineSubsystem.toReleaseGamePiece();
       setState(RobotStates.RELEASE);
-    } else {
+    } else if (feedMode == FeedMode.WALL) {
       toFixedFeeding();
+    } else if (feedMode == FeedMode.MIDDLE) {
+      toMiddleFeeding();
     }
     ledSubsystem.setOff();
   }
@@ -673,7 +694,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   // Periodic
   @Override
   public void periodic() {
-    if (!isAuto && DriverStation.getMatchTime() <= 25.0 && DriverStation.isTeleopEnabled()) {
+    if (!isAuto && DriverStation.getMatchTime() <= 30.0 && DriverStation.isTeleopEnabled()) {
       ledSubsystem.setBlinking(true);
     } else {
       ledSubsystem.setBlinking(false);
@@ -684,19 +705,26 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           || superStructure.getNextState() == SuperStructureStates.STOW
           || superStructure.getNextState() == SuperStructureStates.LOW_FEEDING
           || superStructure.getNextState() == SuperStructureStates.FEEDING
-          || superStructure.getNextState() == SuperStructureStates.HIGH_FEEDING) {
+          || superStructure.getNextState() == SuperStructureStates.HIGH_FEEDING
+          || superStructure.getNextState() == SuperStructureStates.MIDDLE_FEEDING) {
 
         hasStoppedWheels = false;
         if (superStructure.getNextState() == SuperStructureStates.INTAKE
             || superStructure.getNextState() == SuperStructureStates.STOW
             || superStructure.getNextState() == SuperStructureStates.FEEDING) {
           ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
-          superStructure.fixedFeeding(
-              FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+
+          if (superStructure.getNextState() == SuperStructureStates.MIDDLE_FEEDING) {
+            superStructure.middleFeeding(
+                FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+          } else {
+            superStructure.fixedFeeding(
+                FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+          }
         }
       }
       if (superStructure.getNextState() == SuperStructureStates.LOW_FEEDING) {
-        superStructure.lowFeedShot(allianceColor == Alliance.Blue);
+        superStructure.lowFeeding(allianceColor == Alliance.Blue);
       }
       if (superStructure.getNextState() == SuperStructureStates.HIGH_FEEDING) {
         superStructure.highFeedShot(allianceColor == Alliance.Blue);
@@ -1322,5 +1350,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TO_HIGH_FEED,
     HIGH_FEED,
     AUTO_IGNORE_NOTE
+  }
+
+  public enum FeedMode {
+    WALL,
+    MIDDLE,
+    LOW
   }
 }

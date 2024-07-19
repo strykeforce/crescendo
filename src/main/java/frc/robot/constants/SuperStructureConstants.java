@@ -58,11 +58,17 @@ public final class SuperStructureConstants {
   public static final double kElbowSubwooferSetPoint = kElbowIntakeSetPoint;
   public static final double kShooterSubwooferSetPoint = 55; // 60
 
-  // FEEDING
+  // WALL FEEDING
   public static final double kWristFeedingSetPoint = kWristIntakeSetPoint;
   public static final double kElbowFeedingSetPoint = kElbowSubwooferSetPoint;
-  public static final double kLeftShooterFeedingSetPoint = 50; // 60
+  public static final double kLeftShooterFeedingSetPoint = 60;
   public static final double kRightShooterFeedingSetPoint = 40;
+
+  // MIDDLE FEEDING
+  public static final double kElbowMiddleFeedingSetPoint = 0.035;
+  public static final double kWristMiddleFeedingSetPoint = kWristFeedingSetPoint;
+  public static final double kLeftShooterMiddleFeedingSetPoint = 50;
+  public static final double kRightShooterMiddleFeedingSetPoint = 40;
 
   // EJECTING
   public static final double kWristEjectingSetPoint = kWristStowSetPoint; // -2245
@@ -70,10 +76,10 @@ public final class SuperStructureConstants {
   public static final double kShooterEjectingSetPoint = 8.0;
 
   // LOW FEEDING
-  public static final double kWristLowFeedShotSetPoint = kWristIntakeSetPoint;
-  public static final double kElbowLowFeedShotSetPoint = 0.13;
-  public static final double kLeftShooterLowFeedShotSetPoint = 80;
-  public static final double kRightShooterLowFeedShotSetPoint = 40;
+  public static final double kWristLowFeedingShotSetPoint = kWristIntakeSetPoint;
+  public static final double kElbowLowFeedingShotSetPoint = 0.13;
+  public static final double kLeftShooterLowFeedingShotSetPoint = 80;
+  public static final double kRightShooterLowFeedingShotSetPoint = 40;
 
   // HIGH FEEDING
   public static final double kWristHighFeedShotSetPoint = kWristIntakeSetPoint;

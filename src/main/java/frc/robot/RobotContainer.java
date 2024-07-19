@@ -113,6 +113,7 @@ import frc.robot.subsystems.magazine.MagazineIOFX;
 import frc.robot.subsystems.magazine.MagazineSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.FeedMode;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.shooter.ShooterIOFX;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -643,6 +644,13 @@ public class RobotContainer {
 
     allianceColor =
         Shuffleboard.getTab("Match")
+            .addBoolean(
+                "Middle Pass Mode?", () -> robotStateSubsystem.getFeedMode() == FeedMode.MIDDLE)
+            .withSize(1, 1)
+            .withPosition(5, 3);
+
+    allianceColor =
+        Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
             .withProperties(Map.of("colorWhenFalse", "blue", "colorWhenTrue", "red"))
             .withSize(2, 2)
@@ -907,7 +915,9 @@ public class RobotContainer {
 
     // UnJam Note
     new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
-        .onTrue(new UnJamUpperNoteCommand(magazineSubsystem));
+        .onTrue(
+            new UnJamUpperNoteCommand(magazineSubsystem, intakeSubsystem, robotStateSubsystem)
+                .withTimeout(0.5));
 
     // Open Loop Elbow
     // new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
