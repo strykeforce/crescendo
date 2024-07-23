@@ -10,10 +10,10 @@
         </encoder>
     </appender>
 
-    <logger name="org.strykeforce.thirdcoast" level="DEBUG"/>
-    <logger name="org.eclipse.jetty" level="INFO"/>
+    <logger name="org.strykeforce.thirdcoast" level="WARN"/>
+    <logger name="org.eclipse.jetty" level="WARN"/>
 
-    <root level="verbose">
+    <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
 

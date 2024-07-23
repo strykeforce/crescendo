@@ -1,5 +1,6 @@
 package frc.robot.subsystems.auto;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -15,6 +16,7 @@ import frc.robot.commands.auton.FastAmpMid_5PieceCommand;
 import frc.robot.commands.auton.FastAmpMid_5PieceM2Command;
 import frc.robot.commands.auton.FastSmartSourceCommand;
 import frc.robot.commands.auton.MiddleFourPieceCommand;
+import frc.robot.commands.auton.MiddleNote3AndWingNotesCommand;
 import frc.robot.commands.auton.NonAmpAutoCommand;
 import frc.robot.commands.auton.SmartAmpIgnoreWingAutoCommand;
 import frc.robot.commands.auton.SmartMidFourOrFiveThenSearch;
@@ -251,6 +253,14 @@ public class AutoSwitch extends MeasurableSubsystem {
             List.of(2, 3, 1),
             4.0,
             AutonConstants.Setpoints.AS2);
+      case 0x06:
+        return new DoNothingCommand(
+            robotStateSubsystem,
+            driveSubsystem,
+            superStructure,
+            magazineSubsystem,
+            elbowSubsystem,
+            AutonConstants.Setpoints.AI1);
       case 0x10:
         return new AmpMid_5PieceCommand(
             driveSubsystem,
@@ -291,6 +301,16 @@ public class AutoSwitch extends MeasurableSubsystem {
             ledSubsystem);
       case 0x14:
         return new FallBack4PieceCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            superStructure,
+            magazineSubsystem,
+            intakeSubsystem,
+            elbowSubsystem,
+            deadeye,
+            ledSubsystem);
+      case 15:
+        return new MiddleNote3AndWingNotesCommand(
             driveSubsystem,
             robotStateSubsystem,
             superStructure,
@@ -478,7 +498,12 @@ public class AutoSwitch extends MeasurableSubsystem {
 
       case 0x30:
         return new DoNothingCommand(
-            robotStateSubsystem, driveSubsystem, superStructure, magazineSubsystem, elbowSubsystem);
+            robotStateSubsystem,
+            driveSubsystem,
+            superStructure,
+            magazineSubsystem,
+            elbowSubsystem,
+            new Pose2d());
 
       case 0x31:
         return new DisruptAutonCommand(

@@ -13,12 +13,17 @@ public final class AutonConstants {
   public static final double kIDeadEyeXDrive = 0.0;
   public static final double kDDeadEyeXDrive = 0.0;
   public static final double kMaxVelDeadeyeDrive = 4.0;
+  public static final double kMaxAutonVelDeadeyeDrive = 2.0;
   public static final double kMaxAccelDeadeyeDrive = 3.5;
   public static final double kXSpeed = 2.0;
-  public static final double kMaxXOff = 1.0;
+  public static final double kMaxXOff = 1.93; // 1.0
   public static final double kSwitchXLine = 6.5;
-  public static final double kWingSwitchXLine = 2.0;
+  public static final double kWingSwitchXLine = 1.4;
   public static final double kPercentLeft = 0.65;
+  public static final double kWingPercentLeft = 0.5;
+  public static final double kDeadeyeHuntOmegaRadps = -1.5;
+  public static final double kDeadeyeHuntStartYawDegs = -10;
+  public static final double kFoundNoteLoopCounts = 3;
 
   public static final int kSwitchStableCounts = 100;
 
@@ -194,7 +199,7 @@ public final class AutonConstants {
     public static final Pose2d MS1 = new Pose2d(4.3, 5.55, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS2 = new Pose2d(4.3, 6.5, Rotation2d.fromDegrees(0.0));
     public static final Pose2d MS3 =
-        new Pose2d(1.57, 4.737, Rotation2d.fromDegrees(0.0)); // y = 5.05
+        MI1; // new Pose2d(1.57, 4.737, Rotation2d.fromDegrees(0.0)); // y = 5.05
     public static final Pose2d NAS1 = new Pose2d(4.2, 2.8, Rotation2d.fromDegrees(-33.2));
     public static final Pose2d NAS2 =
         new Pose2d(4.55, 4.6, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
@@ -203,11 +208,10 @@ public final class AutonConstants {
     public static final Pose2d NAS3 =
         new Pose2d(3.052, 3.063, Rotation2d.fromDegrees(-47.39)); // Disrupt auto
     public static final Pose2d NAS4 =
-        new Pose2d(
-          1.93, 4.11, Rotation2d.fromDegrees(-47.39)); // TODO figure out correct location
+        new Pose2d(1.93, 4.11, Rotation2d.fromDegrees(-47.39)); // TODO figure out correct location
 
     // Path Midpoints
-    public static final Pose2d MP1 = new Pose2d(2.5, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
+    public static final Pose2d MP1 = new Pose2d(2.7, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
     public static final Pose2d MP2 = new Pose2d(3.89, 7.2, Rotation2d.fromDegrees(-90)); // AS4
   }
 

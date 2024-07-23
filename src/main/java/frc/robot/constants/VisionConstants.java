@@ -20,6 +20,10 @@ public final class VisionConstants {
   public static final int kMaxTimesOffWheels = 5;
   public static final double kBumperPixelLine = 87; // 100
 
+  //   public static final double kThetaStdDevUsed = Units.degreesToRadians(0.02);
+  //   public static final double kThetaStdDevRejected = Units.degreesToRadians(360);
+  //   public static final double kThetaStdThres = 0.2;
+
   // Velocity Filter
   public static final double kLinearCoeffOnVelFilter = 0.1;
   public static final double kOffsetOnVelFilter = 0.10;

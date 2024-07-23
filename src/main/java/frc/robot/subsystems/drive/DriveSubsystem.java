@@ -88,7 +88,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", autoTrajectory);
+    // org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", autoTrajectory);
     this.io = io;
 
     this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
@@ -184,6 +184,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Closed-Loop (Velocity Controlled) Swerve Movement
   public void move(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move X", vXmps);
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move Y", vYmps);
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move Omega", vOmegaRadps);
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
@@ -837,7 +840,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput(
         "ShootingData/DistanceToGoal", getDistanceToSpeaker());
 
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", autoTrajectory);
+    // org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", autoTrajectory);
     // Compute acceleration
     accelX =
         (getFieldRelSpeed().vxMetersPerSecond - prevVelX)

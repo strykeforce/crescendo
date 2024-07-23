@@ -1,9 +1,12 @@
 package frc.robot.commands.auton;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.ResetOdomCommand;
+import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.subsystems.auto.AutoCommandInterface;
@@ -28,7 +31,8 @@ public class DoNothingCommand extends SequentialCommandGroup implements AutoComm
       DriveSubsystem driveSubsystem,
       SuperStructure superStructure,
       MagazineSubsystem magazineSubsystem,
-      ElbowSubsystem elbowSubsystem) {
+      ElbowSubsystem elbowSubsystem,
+      Pose2d start) {
     this.robotStateSubsystem = robotStateSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.superStructure = superStructure;
@@ -39,6 +43,8 @@ public class DoNothingCommand extends SequentialCommandGroup implements AutoComm
         new ParallelCommandGroup(
             new ZeroElbowCommand(elbowSubsystem), // zero elbow
             new ResetGyroCommand(driveSubsystem)), // reset gyro
+        new setAngleOffsetCommand(driveSubsystem, start.getRotation().getDegrees()),
+        new ResetOdomCommand(driveSubsystem, start),
         new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem)); // shoot
   }
 

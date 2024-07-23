@@ -60,7 +60,7 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
             driveSubsystem, robotStateSubsystem, deadeye, ledSubsystem, firstPathName, true, true);
     secondPath =
         new WingNoteDriveAutonCommand(
-            driveSubsystem, robotStateSubsystem, deadeye, ledSubsystem, firstPathName, true, false);
+            driveSubsystem, robotStateSubsystem, deadeye, ledSubsystem, secondPathName, true, false);
     this.pathHandler = pathHandler;
     this.robotStateSubsystem = robotStateSubsystem;
     this.pathNames = pathNames;
