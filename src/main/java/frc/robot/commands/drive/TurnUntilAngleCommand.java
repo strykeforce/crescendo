@@ -1,6 +1,5 @@
 package frc.robot.commands.drive;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,17 +16,23 @@ public class TurnUntilAngleCommand extends Command {
   public TurnUntilAngleCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
-      Rotation2d target,
+      double target,
       double vOmega) {
     this.driveSubsystem = driveSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
-    this.target = target.getDegrees();
+    this.target = target;
     this.vOmega = vOmega;
 
-    if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
-      this.target = Units.radiansToDegrees(FastMath.normalizeZeroTwoPi(target.getRadians()));
-    }
     addRequirements(driveSubsystem);
+  }
+
+  // Must call in generateTrajectory()
+  public void updateColor() {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
+      this.vOmega = -vOmega;
+      this.target =
+          Units.radiansToDegrees(FastMath.normalizeZeroTwoPi(Units.degreesToRadians(180 - target)));
+    }
   }
 
   @Override
