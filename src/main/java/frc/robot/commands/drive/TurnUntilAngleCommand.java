@@ -50,7 +50,9 @@ public class TurnUntilAngleCommand extends Command {
     if (robotStateSubsystem.getAllianceColor() == Alliance.Blue) {
       return driveSubsystem.getGyroRotation2d().getDegrees() <= target;
     } else {
-      return driveSubsystem.getGyroRotation2d().getDegrees() >= target;
+      return Units.radiansToDegrees(
+              FastMath.normalizeZeroTwoPi(driveSubsystem.getGyroRotation2d().getRadians()))
+          >= target;
     }
   }
 
