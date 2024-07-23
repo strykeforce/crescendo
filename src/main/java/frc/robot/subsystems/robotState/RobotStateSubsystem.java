@@ -760,8 +760,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           superStructure.spinUp();
         } else if (speedUpPass) {
           ChassisSpeeds speeds = driveSubsystem.getFieldRelSpeed();
-          superStructure.fixedFeeding(
-              FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond));
+          double vel = FastMath.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+
+          if (feedMode == FeedMode.WALL) {
+            superStructure.fixedFeeding(vel);
+          } else if (feedMode == FeedMode.MIDDLE) {
+            superStructure.middleFeeding(vel);
+          }
         } else {
           superStructure.stopShoot();
         }
@@ -781,6 +786,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           // Magazine stops running upon detecting a game piece
           intakeSubsystem.setPercent(0);
           ledSubsystem.setBlue();
+
           toStow();
           break;
         }

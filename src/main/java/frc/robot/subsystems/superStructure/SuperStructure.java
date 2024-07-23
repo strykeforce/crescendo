@@ -658,7 +658,6 @@ public class SuperStructure extends MeasurableSubsystem {
       case FEEDING:
         break;
       case MIDDLE_FEEDING:
-        
         break;
       case PREP_CLIMB:
         break;
