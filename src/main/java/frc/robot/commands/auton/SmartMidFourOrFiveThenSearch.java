@@ -28,12 +28,13 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
     implements AutoCommandInterface {
   private PathHandler pathHandler;
   private boolean hasGenerated = false;
-  MiddleNoteDriveAutonCommand firstPath;
-  WingNoteDriveAutonCommand secondPath;
-  List<Integer> preferences;
-  String[][] pathNames;
-  Double numPieces;
-  Alliance alliance = Alliance.Blue;
+  private MiddleNoteDriveAutonCommand firstPath;
+  private WingNoteDriveAutonCommand secondPath;
+  private DeadeyeHuntRotateCommand deadeyeHuntRotateCommand;
+  private List<Integer> preferences;
+  private String[][] pathNames;
+  private double numPieces;
+  private Alliance alliance = Alliance.Blue;
   private RobotStateSubsystem robotStateSubsystem;
   private Pose2d shootPose;
 
@@ -51,7 +52,7 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
       String secondPathName,
       String[][] pathNames,
       List<Integer> preferences,
-      Double numPieces,
+      double numPieces,
       Pose2d shootPose) {
     addRequirements(
         driveSubsystem, superStructure, magazineSubsystem, intakeSubsystem, elbowSubsystem);
@@ -60,7 +61,20 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
             driveSubsystem, robotStateSubsystem, deadeye, ledSubsystem, firstPathName, true, true);
     secondPath =
         new WingNoteDriveAutonCommand(
-            driveSubsystem, robotStateSubsystem, deadeye, ledSubsystem, secondPathName, true, false);
+            driveSubsystem,
+            robotStateSubsystem,
+            deadeye,
+            ledSubsystem,
+            secondPathName,
+            true,
+            false);
+    deadeyeHuntRotateCommand =
+        new DeadeyeHuntRotateCommand(
+            deadeye,
+            driveSubsystem,
+            robotStateSubsystem,
+            ledSubsystem,
+            AutonConstants.kHuntEndAngle);
     this.pathHandler = pathHandler;
     this.robotStateSubsystem = robotStateSubsystem;
     this.pathNames = pathNames;
@@ -82,12 +96,7 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
             new TurnToAngleCommand(driveSubsystem, AutonConstants.kHuntStartAngle),
-            new DeadeyeHuntRotateCommand(
-                deadeye,
-                driveSubsystem,
-                robotStateSubsystem,
-                ledSubsystem,
-                AutonConstants.kHuntEndAngle),
+            deadeyeHuntRotateCommand,
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)
             // new ToggleVisionUpdatesCommand(driveSubsystem)
@@ -101,6 +110,8 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
     pathHandler.generateTrajectory();
     pathHandler.setShotLoc(shootPose);
     firstPath.generateTrajectory();
+    secondPath.generateTrajectory();
+    deadeyeHuntRotateCommand.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }
