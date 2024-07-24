@@ -51,7 +51,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState = RobotStates.IDLE;
-  private FeedMode feedMode = FeedMode.WALL;
+  private FeedMode feedMode = FeedMode.MIDDLE;
 
   private double[][] shootingLookupTable;
   private double[][] feedingLookupTable;
