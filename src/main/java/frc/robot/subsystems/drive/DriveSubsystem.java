@@ -88,7 +88,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
-    // org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", autoTrajectory);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Swerve/Auto Trajectory", autoTrajectory); // FIXME BAD BAD BAD
     this.io = io;
 
     this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
