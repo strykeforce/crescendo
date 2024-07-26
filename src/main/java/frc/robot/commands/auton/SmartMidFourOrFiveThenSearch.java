@@ -1,9 +1,11 @@
 package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.drive.AutoTimeDriveCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.TurnToAngleCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
@@ -93,10 +95,14 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
             firstPath,
             new StartPathHandlerCommand(pathHandler),
             secondPath,
+            new AutoWaitNoteStagedCommand(robotStateSubsystem),
+            new AutoTimeDriveCommand(driveSubsystem, -0.5, 0.0, 0.5),
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-            new TurnToAngleCommand(driveSubsystem, AutonConstants.kHuntStartAngle),
+            new TurnToAngleCommand(
+                driveSubsystem, Rotation2d.fromRadians(AutonConstants.kHuntStartAngle)),
             deadeyeHuntRotateCommand,
+            new AutoTimeDriveCommand(driveSubsystem, 0.5, 0.0, 0.5),
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)
             // new ToggleVisionUpdatesCommand(driveSubsystem)

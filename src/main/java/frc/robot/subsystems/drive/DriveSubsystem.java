@@ -88,8 +88,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
-    org.littletonrobotics.junction.Logger.recordOutput(
-        "Swerve/Auto Trajectory", autoTrajectory); // FIXME BAD BAD BAD
+    // org.littletonrobotics.junction.Logger.recordOutput(
+    //     "Swerve/Auto Trajectory", autoTrajectory); // FIXME BAD BAD BAD
     this.io = io;
 
     this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
@@ -101,7 +101,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaSpin));
+                DriveConstants.kMaxOmegaTuned, DriveConstants.kMaxAccelOmegaSpin));
     omegaShootTrackController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
     omegaSpinController =
         new ProfiledPIDController(
@@ -109,7 +109,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaSpin));
+                DriveConstants.kMaxOmegaTuned, DriveConstants.kMaxAccelOmegaSpin));
     omegaSpinController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     // Setup Holonomic Controller
@@ -119,7 +119,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaPath));
+                DriveConstants.kMaxOmegaTuned, DriveConstants.kMaxAccelOmegaPath));
     omegaController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     xController =
@@ -252,7 +252,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holonomicController.getThetaController().setP(kP);
     holonomicController
         .getThetaController()
-        .setConstraints(new Constraints(DriveConstants.kMaxOmega, accel));
+        .setConstraints(new Constraints(DriveConstants.kMaxOmegaTuned, accel));
   }
 
   public void resetHolonomicController(double yaw) {
@@ -744,7 +744,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "NAS3":
           pose = Setpoints.NAS3;
           break;
-
+        case "NAS4":
+          pose = Setpoints.NAS4;
+          break;
         default:
           logger.warn("Bad data point {}", table.getString("dataPoint"));
           return new Pose2d();
@@ -755,16 +757,19 @@ public class DriveSubsystem extends MeasurableSubsystem {
       double Y = pose.getY();
 
       if (table.contains("angle")) {
+        logger.info("Parsing angle {}", table.get("angle"));
         angle = table.getDouble("angle");
         logger.info("Changing angle to {}", angle);
       }
 
       if (table.contains("dX")) {
+        logger.info("Parsing dY {}", table.get("dX"));
         X = X + table.getDouble("dX");
         logger.info("Changing X to {}", X);
       }
 
       if (table.contains("dY")) {
+        logger.info("Parsing dY {}", table.get("dY"));
         Y = Y + table.getDouble("dY");
         logger.info("Changing Y to {}", Y);
       }
@@ -772,6 +777,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
       return pose;
     } else {
+      logger.info("Parsing x {}", table.get("x"));
+      logger.info("Parsing y {}", table.get("y"));
+      logger.info("Parsing angle {}", table.get("angle"));
       return new Pose2d(
           table.getDouble("x"),
           table.getDouble("y"),

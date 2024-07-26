@@ -66,9 +66,13 @@ public final class DriveConstants {
   //   public static final double kWheelDiameterInches = 3.0 * 506.0 / 500.0;
   public static final double kMaxSpeedMetersPerSecond = 5.09; // 6.495
 
-  public static final double kMaxOmega =
+  public static final double kMaxOmegaTuned =
       (kMaxSpeedMetersPerSecond / Math.hypot(kRobotWidth / 2.0, kRobotLength / 2.0))
           / 2.0; // wheel locations below
+
+  public static final double kMaxOmega =
+      (kMaxSpeedMetersPerSecond / Math.hypot(kRobotWidth / 2.0, kRobotLength / 2.0))
+          / 1.0; // wheel locations below
 
   public static final double kPlaceMovePercent = 0.2;
   public static final double kPlaceYawPercent = 0.2;

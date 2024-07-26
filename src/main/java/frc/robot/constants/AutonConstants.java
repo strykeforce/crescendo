@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
 public final class AutonConstants {
   public static final double kDelayForPickup = 0.15; // 0.2 -> 0.1 -> 0.15
@@ -207,8 +208,7 @@ public final class AutonConstants {
         new Pose2d(4.36, 4.74, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
     public static final Pose2d NAS3 =
         new Pose2d(3.052, 3.063, Rotation2d.fromDegrees(-47.39)); // Disrupt auto
-    public static final Pose2d NAS4 =
-        new Pose2d(1.93, 4.11, Rotation2d.fromDegrees(-47.39)); // TODO figure out correct location
+    public static final Pose2d NAS4 = new Pose2d(1.93, 4.11, Rotation2d.fromDegrees(143.27));
 
     // Path Midpoints
     public static final Pose2d MP1 = new Pose2d(2.7, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
@@ -224,7 +224,7 @@ public final class AutonConstants {
 
   public static final double kDisruptIntakingMiddleNote1Y = 7.0;
   public static final double kDisruptIntakingMiddleNote2Y = 5.2;
-  public static final Rotation2d kHuntStartAngle = new Rotation2d().fromDegrees(210);
-  public static final Rotation2d kHuntEndAngle = new Rotation2d().fromDegrees(150);
-  public static final double kHuntTurnSpeed = 0.01;
+  public static final double kHuntStartAngle = Units.degreesToRadians(180);
+  public static final double kHuntEndAngle = Units.degreesToRadians(150);
+  public static final double kHuntTurnSpeed = 2.0;
 }
