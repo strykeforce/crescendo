@@ -96,13 +96,13 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
             new StartPathHandlerCommand(pathHandler),
             secondPath,
             new AutoWaitNoteStagedCommand(robotStateSubsystem),
-            new AutoTimeDriveCommand(driveSubsystem, -0.5, 0.0, 0.5),
+            new AutoTimeDriveCommand(driveSubsystem, -1.0, 0.0, 0.5),
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
             new TurnToAngleCommand(
                 driveSubsystem, Rotation2d.fromRadians(AutonConstants.kHuntStartAngle)),
             deadeyeHuntRotateCommand,
-            new AutoTimeDriveCommand(driveSubsystem, 0.5, 0.0, 0.5),
+            new AutoTimeDriveCommand(driveSubsystem, 1.0, 0.0, 0.5),
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)
             // new ToggleVisionUpdatesCommand(driveSubsystem)

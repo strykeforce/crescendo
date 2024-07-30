@@ -1,6 +1,7 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
@@ -41,5 +42,11 @@ public class AutoTimeDriveCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.move(0, 0, 0, true);
+  }
+
+  public void updateColor(Alliance color) {
+    if (color == Alliance.Red) {
+      vX = -vX;
+    }
   }
 }

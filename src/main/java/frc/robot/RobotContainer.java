@@ -328,7 +328,7 @@ public class RobotContainer {
     configureTuningDashboard();
     robotStateSubsystem.setAllianceColor(Alliance.Blue);
 
-    RobotController.setBrownoutVoltage(6.0); // 6.3, want test 5.75
+    RobotController.setBrownoutVoltage(5.75); // 6.3, want test 5.75
 
     // configureTelemetry();
     // configurePitDashboard();

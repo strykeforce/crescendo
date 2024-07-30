@@ -54,7 +54,7 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
   @Override
   public void initialize() {
     deltaTurn =
-        turnToInverted - driveSubsystem.getGyroRotation2d().getRadians() >= 0
+        turnToInverted - getNormalizedGyro() >= 0
             ? AutonConstants.kHuntTurnSpeed
             : -AutonConstants.kHuntTurnSpeed;
     ledSubsystem.setColor(120, 38, 109);
@@ -64,8 +64,8 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
       double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
-    } else if (deltaTurn > 0 && turnToInverted < driveSubsystem.getGyroRotation2d().getRadians()
-        || deltaTurn < 0 && turnToInverted > driveSubsystem.getGyroRotation2d().getRadians()) {
+    } else if (deltaTurn > 0 && turnToInverted < getNormalizedGyro()
+        || deltaTurn < 0 && turnToInverted > getNormalizedGyro()) {
       reachedEnd = true;
     } else {
       driveSubsystem.move(0.0, 0.0, deltaTurn, false);
@@ -79,8 +79,8 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
       double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       driveSubsystem.recordYVel(ySpeed);
       driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
-    } else if (deltaTurn > 0 && turnToInverted < driveSubsystem.getGyroRotation2d().getRadians()
-        || deltaTurn < 0 && turnToInverted > driveSubsystem.getGyroRotation2d().getRadians()) {
+    } else if (deltaTurn > 0 && turnToInverted < getNormalizedGyro()
+        || deltaTurn < 0 && turnToInverted > getNormalizedGyro()) {
       reachedEnd = true;
     } else {
       driveSubsystem.move(0.0, 0.0, deltaTurn, false);
@@ -103,5 +103,11 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
   @Override
   public boolean hasGenerated() {
     return true;
+  }
+
+  public double getNormalizedGyro() {
+    return robotStateSubsystem.getAllianceColor() == Alliance.Blue
+        ? FastMath.normalizeZeroTwoPi(driveSubsystem.getGyroRotation2d().getRadians())
+        : driveSubsystem.getGyroRotation2d().getRadians();
   }
 }
