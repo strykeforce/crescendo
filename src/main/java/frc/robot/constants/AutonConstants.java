@@ -23,7 +23,7 @@ public final class AutonConstants {
   public static final double kPercentLeft = 0.65;
   public static final double kWingPercentLeft = 0.5;
   public static final double kDeadeyeHuntOmegaRadps = -1.5;
-  public static final double kDeadeyeHuntStartYawDegs = -10;
+  public static final double kDeadeyeHuntStartYawDegs = -7;
   public static final double kFoundNoteLoopCounts = 3;
 
   public static final int kSwitchStableCounts = 100;

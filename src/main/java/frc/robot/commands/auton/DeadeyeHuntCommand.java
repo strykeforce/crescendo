@@ -51,19 +51,17 @@ public class DeadeyeHuntCommand extends Command {
     ledSubsystem.setColor(120, 38, 109);
 
     driveSubsystem.setIsAligningShot(false);
+
+    driveSubsystem.move(
+        0.0,
+        0.0,
+        robotStateSubsystem.getAllianceColor() == Alliance.Blue
+            ? AutonConstants.kDeadeyeHuntOmegaRadps
+            : -AutonConstants.kDeadeyeHuntOmegaRadps,
+        false);
+
     if (deadeye.getNumTargets() > 0) {
-      double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
-      double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
-      driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
       seenNote++;
-    } else {
-      driveSubsystem.move(
-          0.0,
-          0.0,
-          robotStateSubsystem.getAllianceColor() == Alliance.Blue
-              ? AutonConstants.kDeadeyeHuntOmegaRadps
-              : -AutonConstants.kDeadeyeHuntOmegaRadps,
-          false);
     }
   }
 
