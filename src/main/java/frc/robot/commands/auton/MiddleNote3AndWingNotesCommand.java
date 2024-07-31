@@ -148,7 +148,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
     middleShoot3WingNote3.generateTrajectory();
     wingNote3MidInit.generateTrajectory();
     midInitWingNote1.generateTrajectory();
-    turnUntilAngleCommand.updateColor();
+    turnUntilAngleCommand.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }

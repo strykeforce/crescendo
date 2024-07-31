@@ -1,13 +1,12 @@
 package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.AutoTimeDriveCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.drive.TurnToAngleCommand;
+import frc.robot.commands.drive.TurnUntilAngleCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
 import frc.robot.commands.pathHandler.StartPathHandlerCommand;
@@ -33,6 +32,8 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
   private MiddleNoteDriveAutonCommand firstPath;
   private WingNoteDriveAutonCommand secondPath;
   private DeadeyeHuntRotateCommand deadeyeHuntRotateCommand;
+  private AutoTimeDriveCommand wingNote3Reverse;
+  private AutoTimeDriveCommand speakerShotReverse;
   private List<Integer> preferences;
   private String[][] pathNames;
   private double numPieces;
@@ -83,26 +84,33 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
     this.preferences = preferences;
     this.numPieces = numPieces;
     this.shootPose = shootPose;
+
+    this.wingNote3Reverse =
+        new AutoTimeDriveCommand(driveSubsystem, robotStateSubsystem, -1.0, 0.0, 0.5);
+    this.speakerShotReverse =
+        new AutoTimeDriveCommand(driveSubsystem, robotStateSubsystem, 1.0, 0.0, 0.4);
+
     addCommands(
         new SequentialCommandGroup(
             new ResetGyroCommand(driveSubsystem),
             new ParallelCommandGroup(
                 new setAngleOffsetCommand(driveSubsystem, -50.0),
                 new ZeroElbowCommand(elbowSubsystem)),
-            // new ToggleVisionUpdatesCommand(driveSubsystem),
-            // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(-50)),
             new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
             firstPath,
             new StartPathHandlerCommand(pathHandler),
             secondPath,
             new AutoWaitNoteStagedCommand(robotStateSubsystem),
-            new AutoTimeDriveCommand(driveSubsystem, -1.0, 0.0, 0.5),
+            wingNote3Reverse,
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-            new TurnToAngleCommand(
-                driveSubsystem, Rotation2d.fromRadians(AutonConstants.kHuntStartAngle)),
+            new TurnUntilAngleCommand(
+                driveSubsystem,
+                robotStateSubsystem,
+                AutonConstants.kHuntStartAngle,
+                -AutonConstants.kHuntTurnSpeed),
             deadeyeHuntRotateCommand,
-            new AutoTimeDriveCommand(driveSubsystem, 1.0, 0.0, 0.5),
+            speakerShotReverse,
             new VisionShootCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)
             // new ToggleVisionUpdatesCommand(driveSubsystem)
@@ -118,6 +126,8 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
     firstPath.generateTrajectory();
     secondPath.generateTrajectory();
     deadeyeHuntRotateCommand.generateTrajectory();
+    wingNote3Reverse.generateTrajectory();
+    speakerShotReverse.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }

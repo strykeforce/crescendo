@@ -26,15 +26,6 @@ public class TurnUntilAngleCommand extends Command {
     addRequirements(driveSubsystem);
   }
 
-  // Must call in generateTrajectory()
-  public void updateColor() {
-    if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
-      this.vOmega = -vOmega;
-      this.target =
-          Units.radiansToDegrees(FastMath.normalizeZeroTwoPi(Units.degreesToRadians(180 - target)));
-    }
-  }
-
   @Override
   public void initialize() {
     driveSubsystem.move(0, 0, vOmega, false);
@@ -58,4 +49,12 @@ public class TurnUntilAngleCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {}
+
+  public void generateTrajectory() {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
+      this.vOmega = -vOmega;
+      this.target =
+          Units.radiansToDegrees(FastMath.normalizeZeroTwoPi(Units.degreesToRadians(180 - target)));
+    }
+  }
 }

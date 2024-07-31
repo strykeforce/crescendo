@@ -126,7 +126,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
 
   @Override
   public boolean isFinished() {
-    return timer.hasElapsed(trajectory.getTotalTimeSeconds());
+    return timer.hasElapsed(trajectory.getTotalTimeSeconds()) || (robotStateSubsystem.hasNote() && timer.hasElapsed(trajectory.getTotalTimeSeconds()));
   }
 
   @Override

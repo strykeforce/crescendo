@@ -2,14 +2,14 @@ package frc.robot.commands.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import net.jafama.FastMath;
 
-public class TurnToAngleCommand extends InstantCommand {
-  DriveSubsystem driveSubsystem;
-  Rotation2d angle;
+public class TurnToAngleCommand extends Command {
+  private DriveSubsystem driveSubsystem;
+  private Rotation2d angle;
 
   public TurnToAngleCommand(DriveSubsystem driveSubsystem, Rotation2d angle) {
     this.driveSubsystem = driveSubsystem;
