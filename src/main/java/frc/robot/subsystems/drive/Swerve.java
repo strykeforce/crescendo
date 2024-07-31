@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,9 +18,11 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.SPI;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.strykeforce.gyro.SF_PIGEON2;
 import org.strykeforce.healthcheck.Checkable;
@@ -30,14 +33,18 @@ import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.swerve.V6TalonSwerveModule;
 import org.strykeforce.swerve.V6TalonSwerveModule.ClosedLoopUnits;
 import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.Measurable;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class Swerve implements SwerveIO, Checkable {
+public class Swerve implements SwerveIO, Checkable, Measurable {
   @HealthCheck private final SwerveDrive swerveDrive;
 
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;
 
   private SF_PIGEON2 pigeon;
+
+  private AHRS ahrs;
 
   private TalonFXConfigurator configurator;
 
@@ -97,6 +104,7 @@ public class Swerve implements SwerveIO, Checkable {
     }
 
     pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "*");
+    ahrs = new AHRS(SPI.Port.kMXP, 2_000_000, (byte) 200);
     pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
     swerveDrive = new SwerveDrive(false, 0.02, pigeon, swerveModules);
     swerveDrive.resetGyro();
@@ -193,6 +201,7 @@ public class Swerve implements SwerveIO, Checkable {
 
   public void resetGyro() {
     swerveDrive.resetGyro();
+    ahrs.reset();
   }
 
   public void updateSwerve() {
@@ -240,6 +249,10 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.gyroPitch = pigeon.getPitch();
     inputs.gyroRoll = pigeon.getRoll();
     inputs.gyroRate = swerveDrive.getGyroRate();
+    inputs.navXRotation2d = ahrs.getRotation2d();
+    inputs.navXPitch = ahrs.getPitch();
+    inputs.navXRoll = ahrs.getRoll();
+    inputs.navXRate = ahrs.getRate();
     inputs.isConnected = pigeon.getPigeon2().getUpTime().hasUpdated();
     inputs.poseMeters = swerveDrive.getPoseMeters();
     inputs.updateCount = pigeon.getPigeon2().getTemperature().getValueAsDouble();
@@ -255,5 +268,25 @@ public class Swerve implements SwerveIO, Checkable {
   public void registerWith(TelemetryService telemetryService) {
     swerveDrive.registerWith(telemetryService);
     pigeon.registerWith(telemetryService);
+    this.registerWith(telemetryService);
+  }
+
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of(
+        new Measure("navXPitch", () -> ahrs.getRotation2d().getDegrees()),
+        new Measure("navXPitch", () -> ahrs.getPitch()),
+        new Measure("navXPitch", () -> ahrs.getRoll()),
+        new Measure("navXPitch", () -> ahrs.getRate()));
+  }
+
+  @Override
+  public String getDescription() {
+    return "Swerve Drive";
+  }
+
+  @Override
+  public int getDeviceId() {
+    return 100;
   }
 }

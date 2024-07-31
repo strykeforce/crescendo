@@ -26,6 +26,10 @@ public interface SwerveIO {
     public double gyroPitch = 0.0;
     public double gyroRoll = 0.0;
     public double gyroRate = 0.0;
+    public Rotation2d navXRotation2d = new Rotation2d();
+    public double navXPitch = 0.0;
+    public double navXRoll = 0.0;
+    public double navXRate = 0.0;
     public boolean isConnected = false;
     public Pose2d poseMeters = new Pose2d();
     public double updateCount = 0;
