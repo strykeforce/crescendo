@@ -7,6 +7,8 @@ target_yaw = -34.439 #degrees
 
 [start_pose]
     dataPoint = "M5"
+    dX = -0.5
+    dY = 0.35
 
 [end_pose]
     dataPoint = "NAS4"

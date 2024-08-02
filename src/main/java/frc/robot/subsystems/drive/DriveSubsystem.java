@@ -84,10 +84,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private boolean updateVision = true;
   private double avgTemp = 0.0;
 
+  private int trajectoryCount = 0;
+
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", new Trajectory());
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", "Nothing");
+
     this.io = io;
 
     this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
@@ -133,6 +136,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // trajectory output (no
     // closing the loop on x,y,theta errors)
     holonomicController.setEnabled(true);
+  }
+
+  public void logTrajectory(Trajectory traj) {
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Auto Trajectories/Trajectory " + trajectoryCount, traj);
+    trajectoryCount++;
   }
 
   // Open-Loop Swerve Movements
@@ -505,6 +514,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void setIsTuningYaw(boolean isTuningYaw) {
     this.tuningYaw = isTuningYaw;
     if (isTuningYaw) resetOmegaController();
+  }
+
+  public void setAutoDebugMsg(String msg) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", msg);
   }
 
   public boolean getIsTuningYaw() {

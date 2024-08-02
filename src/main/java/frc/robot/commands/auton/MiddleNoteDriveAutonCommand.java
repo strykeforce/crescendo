@@ -67,6 +67,9 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
     PathData pathdata = driveSubsystem.generateTrajectory(trajectoryName);
     trajectory = pathdata.trajectory;
     robotHeading = pathdata.targetYaw;
+
+    driveSubsystem.logTrajectory(trajectory);
+
     logger.info("trajectory generated");
     trajectoryGenerated = true;
   }
@@ -78,6 +81,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
 
   @Override
   public void initialize() {
+    driveSubsystem.setAutoDebugMsg("Initialize " + trajectoryName);
     driveSubsystem.setEnableHolo(true);
     driveSubsystem.recordAutoTrajectory(trajectory);
     Pose2d initialPose = trajectory.getInitialPose();
@@ -126,7 +130,10 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
 
   @Override
   public boolean isFinished() {
-    return timer.hasElapsed(trajectory.getTotalTimeSeconds()) || (robotStateSubsystem.hasNote() && timer.hasElapsed(trajectory.getTotalTimeSeconds()));
+    return timer.hasElapsed(trajectory.getTotalTimeSeconds())
+        || (robotStateSubsystem.hasNote()
+            && timer.hasElapsed(
+                trajectory.getTotalTimeSeconds() * AutonConstants.kTerminateWithNotePercentLeft));
   }
 
   @Override
@@ -144,6 +151,7 @@ public class MiddleNoteDriveAutonCommand extends Command implements AutoCommandI
 
     driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
+    driveSubsystem.setAutoDebugMsg("End " + trajectoryName);
     trajectoryGenerated = false;
   }
 

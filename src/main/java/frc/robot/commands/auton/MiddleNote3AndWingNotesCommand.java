@@ -90,7 +90,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
         new TurnUntilAngleCommand(
             driveSubsystem,
             robotStateSubsystem,
-            AutonConstants.kDeadeyeHuntStartYawDegs,
+            AutonConstants.kDeadeyeHuntStartYawRads,
             AutonConstants.kDeadeyeHuntOmegaRadps);
 
     addCommands(

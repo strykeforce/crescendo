@@ -1,17 +1,22 @@
 package frc.robot.commands.drive;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import net.jafama.FastMath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class TurnUntilAngleCommand extends Command {
+public class TurnUntilAngleCommand extends Command implements AutoCommandInterface {
   private DriveSubsystem driveSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
-  private double target;
+  private double targetRads;
   private double vOmega;
+  private boolean normalizedZeroTwoPi = false;
+  private boolean generated = false;
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public TurnUntilAngleCommand(
       DriveSubsystem driveSubsystem,
@@ -20,7 +25,7 @@ public class TurnUntilAngleCommand extends Command {
       double vOmega) {
     this.driveSubsystem = driveSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
-    this.target = target;
+    this.targetRads = target;
     this.vOmega = vOmega;
 
     addRequirements(driveSubsystem);
@@ -28,6 +33,15 @@ public class TurnUntilAngleCommand extends Command {
 
   @Override
   public void initialize() {
+    double currRads = driveSubsystem.getGyroRotation2d().getRadians();
+
+    if (vOmega > 0 && targetRads < currRads || vOmega < 0 && targetRads > currRads) {
+      targetRads = FastMath.normalizeZeroTwoPi(targetRads);
+      normalizedZeroTwoPi = true;
+      logger.info("Normalizing 0 - 2 pi: targetRads = {}", targetRads);
+    }
+
+    driveSubsystem.setAutoDebugMsg("Turning until " + FastMath.toDegrees(targetRads));
     driveSubsystem.move(0, 0, vOmega, false);
   }
 
@@ -38,23 +52,35 @@ public class TurnUntilAngleCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    if (robotStateSubsystem.getAllianceColor() == Alliance.Blue) {
-      return driveSubsystem.getGyroRotation2d().getDegrees() <= target;
-    } else {
-      return Units.radiansToDegrees(
-              FastMath.normalizeZeroTwoPi(driveSubsystem.getGyroRotation2d().getRadians()))
-          >= target;
+    double currRads = driveSubsystem.getGyroRotation2d().getRadians();
+
+    if (normalizedZeroTwoPi) {
+      currRads = FastMath.normalizeZeroTwoPi(currRads);
     }
+
+    // logger.info("vOmega = {}, currRads = {}, targetRads = {}", vOmega, currRads, targetRads);
+
+    return vOmega > 0 && currRads >= targetRads || vOmega < 0 && currRads <= targetRads;
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    driveSubsystem.setAutoDebugMsg("Finished turning until " + FastMath.toDegrees(targetRads));
+  }
 
+  @Override
   public void generateTrajectory() {
     if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
       this.vOmega = -vOmega;
-      this.target =
-          Units.radiansToDegrees(FastMath.normalizeZeroTwoPi(Units.degreesToRadians(180 - target)));
+      this.targetRads = FastMath.normalizeMinusPiPi(FastMath.PI - targetRads);
+      logger.info("Flipping for RED: vOmega = {}, targetRads = {}", vOmega, targetRads);
     }
+
+    generated = true;
+  }
+
+  @Override
+  public boolean hasGenerated() {
+    return generated;
   }
 }

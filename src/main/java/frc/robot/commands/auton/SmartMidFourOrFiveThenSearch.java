@@ -9,6 +9,7 @@ import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.TurnUntilAngleCommand;
 import frc.robot.commands.drive.setAngleOffsetCommand;
 import frc.robot.commands.elbow.ZeroElbowCommand;
+import frc.robot.commands.pathHandler.KillPathHandlerCommand;
 import frc.robot.commands.pathHandler.StartPathHandlerCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
 import frc.robot.commands.robotState.VisionShootCommand;
@@ -99,6 +100,7 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
             new SubWooferCommand(robotStateSubsystem, superStructure, magazineSubsystem),
             firstPath,
             new StartPathHandlerCommand(pathHandler),
+            new KillPathHandlerCommand(pathHandler),
             secondPath,
             new AutoWaitNoteStagedCommand(robotStateSubsystem),
             wingNote3Reverse,
@@ -108,13 +110,11 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
                 driveSubsystem,
                 robotStateSubsystem,
                 AutonConstants.kHuntStartAngle,
-                -AutonConstants.kHuntTurnSpeed),
+                -AutonConstants.kRotateAngleSpeed),
             deadeyeHuntRotateCommand,
             speakerShotReverse,
             new VisionShootCommand(
-                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)
-            // new ToggleVisionUpdatesCommand(driveSubsystem)
-            ));
+                robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem)));
   }
 
   public void generateTrajectory() {

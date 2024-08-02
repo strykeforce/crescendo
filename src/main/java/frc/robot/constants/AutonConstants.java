@@ -2,7 +2,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import net.jafama.FastMath;
 
 public final class AutonConstants {
   public static final double kDelayForPickup = 0.15; // 0.2 -> 0.1 -> 0.15
@@ -21,9 +21,10 @@ public final class AutonConstants {
   public static final double kSwitchXLine = 6.5;
   public static final double kWingSwitchXLine = 1.4;
   public static final double kPercentLeft = 0.65;
+  public static final double kTerminateWithNotePercentLeft = 0.8;
   public static final double kWingPercentLeft = 0.5;
   public static final double kDeadeyeHuntOmegaRadps = -1.5;
-  public static final double kDeadeyeHuntStartYawDegs = -7;
+  public static final double kDeadeyeHuntStartYawRads = FastMath.toRadians(-7);
   public static final double kFoundNoteLoopCounts = 3;
 
   public static final int kSwitchStableCounts = 100;
@@ -224,7 +225,8 @@ public final class AutonConstants {
 
   public static final double kDisruptIntakingMiddleNote1Y = 7.0;
   public static final double kDisruptIntakingMiddleNote2Y = 5.2;
-  public static final double kHuntStartAngle = Units.degreesToRadians(180);
-  public static final double kHuntEndAngle = Units.degreesToRadians(150);
+  public static final double kHuntStartAngle = FastMath.toRadians(180);
+  public static final double kHuntEndAngle = FastMath.toRadians(60);
   public static final double kHuntTurnSpeed = 2.0;
+  public static final double kRotateAngleSpeed = 4.0;
 }

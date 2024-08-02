@@ -24,6 +24,7 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
   private double turnToInverted;
   private double deltaTurn;
   private boolean reachedEnd = false;
+  private boolean generated = false;
 
   public DeadeyeHuntRotateCommand(
       DeadEyeSubsystem deadeye,
@@ -53,8 +54,9 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
 
   @Override
   public void initialize() {
+    driveSubsystem.setAutoDebugMsg("DeadEYE Hunt Initialized");
     deltaTurn =
-        turnToInverted - getNormalizedGyro() >= 0
+        turnToInverted - getCorrectRange() >= 0
             ? AutonConstants.kHuntTurnSpeed
             : -AutonConstants.kHuntTurnSpeed;
     ledSubsystem.setColor(120, 38, 109);
@@ -64,8 +66,8 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
       double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
-    } else if (deltaTurn > 0 && turnToInverted < getNormalizedGyro()
-        || deltaTurn < 0 && turnToInverted > getNormalizedGyro()) {
+    } else if (deltaTurn > 0 && turnToInverted < getCorrectRange()
+        || deltaTurn < 0 && turnToInverted > getCorrectRange()) {
       reachedEnd = true;
     } else {
       driveSubsystem.move(0.0, 0.0, deltaTurn, false);
@@ -79,12 +81,17 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
       double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
       driveSubsystem.recordYVel(ySpeed);
       driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
-    } else if (deltaTurn > 0 && turnToInverted < getNormalizedGyro()
-        || deltaTurn < 0 && turnToInverted > getNormalizedGyro()) {
+    } else if (deltaTurn > 0 && turnToInverted < getCorrectRange()
+        || deltaTurn < 0 && turnToInverted > getCorrectRange()) {
       reachedEnd = true;
     } else {
       driveSubsystem.move(0.0, 0.0, deltaTurn, false);
     }
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    driveSubsystem.setAutoDebugMsg("Finished Deadeye Hunt");
   }
 
   @Override
@@ -98,14 +105,16 @@ public class DeadeyeHuntRotateCommand extends Command implements AutoCommandInte
         robotStateSubsystem.getAllianceColor() == Alliance.Blue
             ? FastMath.normalizeZeroTwoPi(turnTo)
             : Math.PI - FastMath.normalizeZeroTwoPi(turnTo);
+
+    generated = true;
   }
 
   @Override
   public boolean hasGenerated() {
-    return true;
+    return generated;
   }
 
-  public double getNormalizedGyro() {
+  public double getCorrectRange() {
     return robotStateSubsystem.getAllianceColor() == Alliance.Blue
         ? FastMath.normalizeZeroTwoPi(driveSubsystem.getGyroRotation2d().getRadians())
         : driveSubsystem.getGyroRotation2d().getRadians();

@@ -67,6 +67,9 @@ public class WingNoteDriveAutonCommand extends Command implements AutoCommandInt
     PathData pathdata = driveSubsystem.generateTrajectory(trajectoryName);
     trajectory = pathdata.trajectory;
     robotHeading = pathdata.targetYaw;
+
+    driveSubsystem.logTrajectory(trajectory);
+
     logger.info("trajectory generated");
     trajectoryGenerated = true;
   }
@@ -78,6 +81,7 @@ public class WingNoteDriveAutonCommand extends Command implements AutoCommandInt
 
   @Override
   public void initialize() {
+    driveSubsystem.setAutoDebugMsg("Initialize " + trajectoryName);
     driveSubsystem.setEnableHolo(true);
     driveSubsystem.recordAutoTrajectory(trajectory);
     Pose2d initialPose = trajectory.getInitialPose();
@@ -145,6 +149,7 @@ public class WingNoteDriveAutonCommand extends Command implements AutoCommandInt
 
     driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
+    driveSubsystem.setAutoDebugMsg("End " + trajectoryName);
     trajectoryGenerated = false;
   }
 
