@@ -32,9 +32,15 @@ public class AutoTimeDriveCommand extends Command {
 
   @Override
   public void initialize() {
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
+      vX = -vX;
+      driveSubsystem.setAutoDebugMsg("AutoTimeDriveCmd Flipping for red: " + vX + ", " + vY);
+    }
+
     timer.reset();
     timer.start();
     driveSubsystem.move(vX, vY, 0.0, true);
+    driveSubsystem.setAutoDebugMsg("Start AutoTimeDriveCmd: " + vX + ", " + vY);
   }
 
   @Override
@@ -50,11 +56,6 @@ public class AutoTimeDriveCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.move(0, 0, 0, true);
-  }
-
-  public void generateTrajectory() {
-    if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
-      vX = -vX;
-    }
+    driveSubsystem.setAutoDebugMsg("End AutoTimeDriveCmd: " + vX + ", " + vY);
   }
 }

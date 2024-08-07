@@ -126,8 +126,6 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
     firstPath.generateTrajectory();
     secondPath.generateTrajectory();
     deadeyeHuntRotateCommand.generateTrajectory();
-    wingNote3Reverse.generateTrajectory();
-    speakerShotReverse.generateTrajectory();
     hasGenerated = true;
     alliance = robotStateSubsystem.getAllianceColor();
   }

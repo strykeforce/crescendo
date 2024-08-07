@@ -856,7 +856,9 @@ public class RobotContainer {
     allianceColor.withProperties(Map.of("colorWhenTrue", "red", "colorWhenFalse", "blue"));
     robotStateSubsystem.setAllianceColor(alliance);
 
+    driveSubsystem.setRecordTrajectoryAllowed(true);
     autoSwitch.getAutoCommand().generateTrajectory();
+    driveSubsystem.setRecordTrajectoryAllowed(false);
 
     // Flips gyro angle if alliance is red team
     if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {

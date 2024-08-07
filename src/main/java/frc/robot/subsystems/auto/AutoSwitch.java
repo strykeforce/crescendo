@@ -309,7 +309,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             elbowSubsystem,
             deadeye,
             ledSubsystem);
-      case 15:
+      case 0x15:
         return new MiddleNote3AndWingNotesCommand(
             driveSubsystem,
             robotStateSubsystem,

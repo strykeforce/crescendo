@@ -85,6 +85,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double avgTemp = 0.0;
 
   private int trajectoryCount = 0;
+  private boolean allowRecordTrajectory = false;
 
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
@@ -138,10 +139,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holonomicController.setEnabled(true);
   }
 
+  public void setRecordTrajectoryAllowed(boolean allowed) {
+    this.allowRecordTrajectory = allowed;
+  }
+
   public void logTrajectory(Trajectory traj) {
-    org.littletonrobotics.junction.Logger.recordOutput(
-        "Auto Trajectories/Trajectory " + trajectoryCount, traj);
-    trajectoryCount++;
+    if (allowRecordTrajectory) {
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "Auto Trajectories/Trajectory " + trajectoryCount, traj);
+      trajectoryCount++;
+    }
   }
 
   // Open-Loop Swerve Movements
