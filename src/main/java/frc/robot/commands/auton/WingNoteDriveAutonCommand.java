@@ -131,7 +131,9 @@ public class WingNoteDriveAutonCommand extends Command implements AutoCommandInt
 
   @Override
   public boolean isFinished() {
-    return timer.hasElapsed(trajectory.getTotalTimeSeconds());
+    return timer.hasElapsed(trajectory.getTotalTimeSeconds())|| (robotStateSubsystem.hasNote()
+    && timer.hasElapsed(
+        trajectory.getTotalTimeSeconds() * AutonConstants.kTerminateWithNotePercentLeft));
   }
 
   @Override
