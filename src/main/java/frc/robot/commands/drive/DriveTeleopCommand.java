@@ -72,7 +72,7 @@ public class DriveTeleopCommand extends Command {
           DriveConstants.kMaxSpeedMetersPerSecond
               * strLimiter.calculate(
                   MathUtil.applyDeadband(strStick.getAsDouble(), DriveConstants.kDeadbandAllStick)),
-          -DriveConstants.kMaxAccelOmegaPath
+          -DriveConstants.kMaxOmega
               * yawLimiter.calculate(
                   MathUtil.applyDeadband(
                       yawStick.getAsDouble(), DriveConstants.kDeadbandAllStick)));

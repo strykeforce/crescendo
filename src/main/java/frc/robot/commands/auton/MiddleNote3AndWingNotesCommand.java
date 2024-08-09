@@ -1,6 +1,5 @@
 package frc.robot.commands.auton;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -34,6 +33,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
   private WingNoteDriveAutonCommand middleShoot3WingNote3;
   private DriveAutonCommand wingNote3MidInit;
   private WingNoteDriveAutonCommand midInitWingNote1;
+  private TurnUntilAngleCommand turnUntilAngleCommand;
 
   private boolean hasGenerated = false;
   private Alliance alliance = Alliance.Blue;
@@ -86,6 +86,13 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
             true,
             false);
 
+    turnUntilAngleCommand =
+        new TurnUntilAngleCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            AutonConstants.kDeadeyeHuntStartYawRads,
+            AutonConstants.kDeadeyeHuntOmegaRadps);
+
     addCommands(
         new ResetGyroCommand(driveSubsystem),
         new ParallelCommandGroup(
@@ -122,16 +129,7 @@ public class MiddleNote3AndWingNotesCommand extends SequentialCommandGroup
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(
             robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem),
-        new TurnUntilAngleCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            Rotation2d.fromDegrees(
-                robotStateSubsystem.getAllianceColor() == Alliance.Blue
-                    ? AutonConstants.kDeadeyeHuntStartYawDegs
-                    : 180 - AutonConstants.kDeadeyeHuntStartYawDegs),
-            robotStateSubsystem.getAllianceColor() == Alliance.Blue
-                ? AutonConstants.kDeadeyeHuntOmegaRadps
-                : -AutonConstants.kDeadeyeHuntOmegaRadps),
+        turnUntilAngleCommand,
         new DeadeyeHuntCommand(deadeye, driveSubsystem, robotStateSubsystem, ledSubsystem),
         new AutoWaitNoteStagedCommand(robotStateSubsystem),
         new VisionShootCommand(

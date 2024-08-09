@@ -5,6 +5,7 @@
 package frc.robot;
 
 import ch.qos.logback.classic.util.ContextInitializer;
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -147,6 +148,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    SignalLogger.start();
     m_robotContainer.enableDeadeye();
     logger.info("Teleop Init | Match #{}", DriverStation.getMatchNumber());
     m_robotContainer.setIsAuto(false);

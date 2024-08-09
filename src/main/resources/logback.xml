@@ -13,7 +13,7 @@
     <logger name="org.strykeforce.thirdcoast" level="WARN"/>
     <logger name="org.eclipse.jetty" level="WARN"/>
 
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 

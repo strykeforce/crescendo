@@ -162,6 +162,7 @@ public class PathHandler extends MeasurableSubsystem {
   public void killPathHandler() {
     driveSubsystem.move(0.0, 0.0, 0.0, true);
     setState(PathStates.DONE);
+    handling = false;
   }
 
   public void startNewPath(PathData path) {

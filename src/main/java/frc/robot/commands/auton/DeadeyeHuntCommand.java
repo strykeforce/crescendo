@@ -48,22 +48,21 @@ public class DeadeyeHuntCommand extends Command {
 
   @Override
   public void initialize() {
+    driveSubsystem.setAutoDebugMsg("Initialize DeadEYE Hunt - Rotating");
     ledSubsystem.setColor(120, 38, 109);
 
     driveSubsystem.setIsAligningShot(false);
+
+    driveSubsystem.move(
+        0.0,
+        0.0,
+        robotStateSubsystem.getAllianceColor() == Alliance.Blue
+            ? AutonConstants.kDeadeyeHuntOmegaRadps
+            : -AutonConstants.kDeadeyeHuntOmegaRadps,
+        false);
+
     if (deadeye.getNumTargets() > 0) {
-      double ySpeed = deadeyeYDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
-      double xSpeed = deadeyeXDrive.calculate(deadeye.getDistanceToCamCenter(), 0.0);
-      driveSubsystem.move(AutonConstants.kXSpeed / (xSpeed * xSpeed + 1), ySpeed, 0.0, false);
       seenNote++;
-    } else {
-      driveSubsystem.move(
-          0.0,
-          0.0,
-          robotStateSubsystem.getAllianceColor() == Alliance.Blue
-              ? AutonConstants.kDeadeyeHuntOmegaRadps
-              : -AutonConstants.kDeadeyeHuntOmegaRadps,
-          false);
     }
   }
 
@@ -75,6 +74,7 @@ public class DeadeyeHuntCommand extends Command {
           seenNote++;
           if (seenNote >= AutonConstants.kFoundNoteLoopCounts) {
             huntState = HuntState.DRIVING;
+            driveSubsystem.setAutoDebugMsg("Stop rotating, Note Found!");
           }
         } else {
           driveSubsystem.move(
@@ -101,6 +101,7 @@ public class DeadeyeHuntCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.move(0, 0, 0, false);
+    driveSubsystem.setAutoDebugMsg("End DeadEYE Hunt");
   }
 
   @Override

@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import net.jafama.FastMath;
 
 public final class AutonConstants {
   public static final double kDelayForPickup = 0.15; // 0.2 -> 0.1 -> 0.15
@@ -20,9 +21,10 @@ public final class AutonConstants {
   public static final double kSwitchXLine = 6.5;
   public static final double kWingSwitchXLine = 1.4;
   public static final double kPercentLeft = 0.65;
+  public static final double kTerminateWithNotePercentLeft = 0.8;
   public static final double kWingPercentLeft = 0.5;
   public static final double kDeadeyeHuntOmegaRadps = -1.5;
-  public static final double kDeadeyeHuntStartYawDegs = -10;
+  public static final double kDeadeyeHuntStartYawRads = FastMath.toRadians(-7);
   public static final double kFoundNoteLoopCounts = 3;
 
   public static final int kSwitchStableCounts = 100;
@@ -115,6 +117,50 @@ public final class AutonConstants {
     {null, null, null, null, null, null}
   };
 
+  public static final String[][] kNonAmpSpecialPathMatrix = {
+    {null, null, null, null, "NonAmpShoot4_MiddleNote4", "NonAmpShoot4_MiddleNote5"},
+    {
+      null,
+      null,
+      "MiddleNote1_MiddleNote2",
+      "MiddleNote1_MiddleNote3",
+      "MiddleNote1_MiddleNote4",
+      "MiddleNote1_MiddleNote5"
+    },
+    {
+      null,
+      "MiddleNote2_MiddleNote1",
+      null,
+      "MiddleNote2_MiddleNote3",
+      "MiddleNote2_MiddleNote4",
+      "MiddleNote2_MiddleNote5"
+    },
+    {
+      null,
+      "MiddleNote3_MiddleNote1",
+      "MiddleNote3_MiddleNote2",
+      null,
+      "MiddleNote3_MiddleNote4",
+      "MiddleNote3_MiddleNote5"
+    },
+    {
+      "MiddleNote4_NonAmpShoot4",
+      "MiddleNote4_MiddleNote1",
+      "MiddleNote4_MiddleNote2",
+      "MiddleNote4_MiddleNote3",
+      null,
+      "MiddleNote4_MiddleNote5"
+    },
+    {
+      "MiddleNote5_NonAmpShoot4",
+      "MiddleNote5_MiddleNote1",
+      "MiddleNote5_MiddleNote2",
+      "MiddleNote5_MiddleNote3",
+      "MiddleNote5_MiddleNote4",
+      null
+    }
+  };
+
   public final class Setpoints {
     // Starting Positions
     public static final Pose2d MI1 =
@@ -163,6 +209,9 @@ public final class AutonConstants {
         new Pose2d(4.36, 4.74, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
     public static final Pose2d NAS3 =
         new Pose2d(3.052, 3.063, Rotation2d.fromDegrees(-47.39)); // Disrupt auto
+    public static final Pose2d NAS4 = new Pose2d(2.1, 4.11, Rotation2d.fromDegrees(145.561));
+    public static final Pose2d shooterPrepNAS4 =
+        new Pose2d(1.48, 4.65, Rotation2d.fromDegrees(145.561));
 
     // Path Midpoints
     public static final Pose2d MP1 = new Pose2d(2.7, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
@@ -178,4 +227,8 @@ public final class AutonConstants {
 
   public static final double kDisruptIntakingMiddleNote1Y = 7.0;
   public static final double kDisruptIntakingMiddleNote2Y = 5.2;
+  public static final double kHuntStartAngle = FastMath.toRadians(180);
+  public static final double kHuntEndAngle = FastMath.toRadians(60);
+  public static final double kHuntTurnSpeed = 2.0;
+  public static final double kRotateAngleSpeed = 4.0;
 }

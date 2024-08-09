@@ -75,7 +75,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private boolean isFeeding = false;
   private boolean deadEYEAutoDrive = false;
   private boolean isMoveAndShoot = false;
-  private Trajectory autoTrajectory;
 
   private AnalogInput breakerTemp;
 
@@ -85,10 +84,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private boolean updateVision = true;
   private double avgTemp = 0.0;
 
+  private int trajectoryCount = 0;
+  private boolean allowRecordTrajectory = false;
+
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
-    // org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", autoTrajectory);
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", "Nothing");
+
     this.io = io;
 
     this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
@@ -100,7 +103,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaSpin));
+                DriveConstants.kMaxOmegaTuned, DriveConstants.kMaxAccelOmegaSpin));
     omegaShootTrackController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
     omegaSpinController =
         new ProfiledPIDController(
@@ -108,7 +111,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaSpin));
+                DriveConstants.kMaxOmegaTuned, DriveConstants.kMaxAccelOmegaSpin));
     omegaSpinController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     // Setup Holonomic Controller
@@ -118,7 +121,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmegaPath));
+                DriveConstants.kMaxOmegaTuned, DriveConstants.kMaxAccelOmegaPath));
     omegaController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     xController =
@@ -134,6 +137,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // trajectory output (no
     // closing the loop on x,y,theta errors)
     holonomicController.setEnabled(true);
+  }
+
+  public void setRecordTrajectoryAllowed(boolean allowed) {
+    this.allowRecordTrajectory = allowed;
+  }
+
+  public void logTrajectory(Trajectory traj) {
+    if (allowRecordTrajectory) {
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "Auto Trajectories/Trajectory " + trajectoryCount, traj);
+      trajectoryCount++;
+    }
   }
 
   // Open-Loop Swerve Movements
@@ -244,14 +259,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void recordAutoTrajectory(Trajectory traj) {
-    autoTrajectory = traj;
+    // org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", traj);
   }
 
   public void setOmegaKP(double kP, double accel) {
     holonomicController.getThetaController().setP(kP);
     holonomicController
         .getThetaController()
-        .setConstraints(new Constraints(DriveConstants.kMaxOmega, accel));
+        .setConstraints(new Constraints(DriveConstants.kMaxOmegaTuned, accel));
   }
 
   public void resetHolonomicController(double yaw) {
@@ -508,6 +523,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (isTuningYaw) resetOmegaController();
   }
 
+  public void setAutoDebugMsg(String msg) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", msg);
+  }
+
   public boolean getIsTuningYaw() {
     return this.tuningYaw;
   }
@@ -743,7 +762,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         case "NAS3":
           pose = Setpoints.NAS3;
           break;
-
+        case "NAS4":
+          pose = Setpoints.NAS4;
+          break;
         default:
           logger.warn("Bad data point {}", table.getString("dataPoint"));
           return new Pose2d();
@@ -754,16 +775,19 @@ public class DriveSubsystem extends MeasurableSubsystem {
       double Y = pose.getY();
 
       if (table.contains("angle")) {
+        logger.info("Parsing angle {}", table.get("angle"));
         angle = table.getDouble("angle");
         logger.info("Changing angle to {}", angle);
       }
 
       if (table.contains("dX")) {
+        logger.info("Parsing dY {}", table.get("dX"));
         X = X + table.getDouble("dX");
         logger.info("Changing X to {}", X);
       }
 
       if (table.contains("dY")) {
+        logger.info("Parsing dY {}", table.get("dY"));
         Y = Y + table.getDouble("dY");
         logger.info("Changing Y to {}", Y);
       }
@@ -771,6 +795,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
       return pose;
     } else {
+      logger.info("Parsing x {}", table.get("x"));
+      logger.info("Parsing y {}", table.get("y"));
+      logger.info("Parsing angle {}", table.get("angle"));
       return new Pose2d(
           table.getDouble("x"),
           table.getDouble("y"),
@@ -840,7 +867,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput(
         "ShootingData/DistanceToGoal", getDistanceToSpeaker());
 
-    // org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Trajectory", autoTrajectory);
     // Compute acceleration
     accelX =
         (getFieldRelSpeed().vxMetersPerSecond - prevVelX)
