@@ -476,7 +476,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonAmpSpecialPathMatrix,
             List.of(4, 5),
             2.0,
-            AutonConstants.Setpoints.NAS4);
+            AutonConstants.Setpoints.shooterPrepNAS4);
 
       case 0x2A:
         return new SmartMidFourOrFiveThenSearch(
@@ -494,7 +494,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonAmpSpecialPathMatrix,
             List.of(5, 4),
             2.0,
-            AutonConstants.Setpoints.NAS4);
+            AutonConstants.Setpoints.shooterPrepNAS4);
 
       case 0x30:
         return new DoNothingCommand(

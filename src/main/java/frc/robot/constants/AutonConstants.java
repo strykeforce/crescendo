@@ -210,6 +210,8 @@ public final class AutonConstants {
     public static final Pose2d NAS3 =
         new Pose2d(3.052, 3.063, Rotation2d.fromDegrees(-47.39)); // Disrupt auto
     public static final Pose2d NAS4 = new Pose2d(2.1, 4.11, Rotation2d.fromDegrees(145.561));
+    public static final Pose2d shooterPrepNAS4 =
+        new Pose2d(1.48, 4.65, Rotation2d.fromDegrees(145.561));
 
     // Path Midpoints
     public static final Pose2d MP1 = new Pose2d(2.7, 7.67, Rotation2d.fromDegrees(0.0)); // 5,7.61
