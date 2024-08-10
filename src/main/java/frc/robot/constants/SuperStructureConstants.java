@@ -65,7 +65,7 @@ public final class SuperStructureConstants {
   public static final double kRightShooterFeedingSetPoint = 40;
 
   // MIDDLE FEEDING
-  public static final double kElbowMiddleFeedingSetPoint = 0.035;
+  public static final double kElbowMiddleFeedingSetPoint = 0.026; // 0.035
   public static final double kWristMiddleFeedingSetPoint = kWristFeedingSetPoint;
   public static final double kLeftShooterMiddleFeedingSetPoint = 48;
   public static final double kRightShooterMiddleFeedingSetPoint = 37;
