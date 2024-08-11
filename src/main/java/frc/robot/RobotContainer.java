@@ -40,7 +40,6 @@ import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetAzimuthVelocityCommand;
 import frc.robot.commands.drive.ToggleVisionUpdatesCommand;
-import frc.robot.commands.drive.TurnUntilAngleCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowCommand;
 import frc.robot.commands.elbow.ClosedLoopElbowOffsetCommand;
@@ -74,6 +73,7 @@ import frc.robot.commands.robotState.SourceIntakeCommand;
 import frc.robot.commands.robotState.SpeedUpPassCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
+import frc.robot.commands.robotState.TogglePunchAirCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -752,8 +752,8 @@ public class RobotContainer {
         .withSize(1, 1);
     Shuffleboard.getTab("Debug")
         .addDouble("Yaw Target", () -> debugTargetYaw)
-        .withPosition(8, 1)
-        .withSize(5, 2);
+        .withPosition(5, 2)
+        .withSize(1, 1);
 
     newDebugTargetYawSpeed =
         Shuffleboard.getTab("Debug")
@@ -778,8 +778,8 @@ public class RobotContainer {
         .withSize(1, 1);
     Shuffleboard.getTab("Debug")
         .addDouble("Yaw Speed", () -> debugTargetYawSpeed)
-        .withPosition(8, 1)
-        .withSize(5, 5);
+        .withPosition(5, 5)
+        .withSize(1, 1);
   }
 
   public void configureTuningDashboard() {
@@ -946,16 +946,21 @@ public class RobotContainer {
             new PodiumCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
+    // new JoystickButton(xboxController, XboxController.Button.kY.value)
+    //     .onTrue(
+    //         new TurnUntilAngleCommand(
+    //             driveSubsystem, robotStateSubsystem, FastMath.toRadians(-7), -4));
+
     // Speed Up Pass
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(new SpeedUpPassCommand(robotStateSubsystem, superStructure));
 
     // Defense
-    // new JoystickButton(xboxController, XboxController.Button.kB.value)
-    //     .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
-
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new TurnUntilAngleCommand(driveSubsystem, robotStateSubsystem, debugTargetYaw, -4));
+        .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
+
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .onTrue(new TurnUntilAngleCommand(driveSubsystem, robotStateSubsystem, FastMath.PI, -4));
 
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure,

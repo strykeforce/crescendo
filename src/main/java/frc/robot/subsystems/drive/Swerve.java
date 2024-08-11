@@ -21,6 +21,7 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import java.util.function.BooleanSupplier;
+import net.jafama.FastMath;
 import org.strykeforce.gyro.SF_PIGEON2;
 import org.strykeforce.healthcheck.Checkable;
 import org.strykeforce.healthcheck.HealthCheck;
@@ -237,6 +238,8 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.odometryY = swerveDrive.getPoseMeters().getY();
     inputs.odometryRotation2D = swerveDrive.getPoseMeters().getRotation().getDegrees();
     inputs.gyroRotation2d = swerveDrive.getHeading();
+    inputs.normalizedGyroRotation =
+        FastMath.toDegrees(FastMath.normalizeZeroTwoPi(swerveDrive.getHeading().getRadians()));
     inputs.gyroPitch = pigeon.getPitch();
     inputs.gyroRoll = pigeon.getRoll();
     inputs.gyroRate = swerveDrive.getGyroRate();

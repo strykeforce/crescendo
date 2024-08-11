@@ -23,6 +23,7 @@ public interface SwerveIO {
     public double odometryY = 0.0;
     public double odometryRotation2D = 0.0;
     public Rotation2d gyroRotation2d = new Rotation2d();
+    public double normalizedGyroRotation = 0.0;
     public double gyroPitch = 0.0;
     public double gyroRoll = 0.0;
     public double gyroRate = 0.0;

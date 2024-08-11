@@ -1302,6 +1302,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       ledSubsystem.setColor(255, 0, 0);
     }
     org.littletonrobotics.junction.Logger.recordOutput("States/Robot State", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("States/Color", getAllianceColor());
   }
   // Grapher
   @Override

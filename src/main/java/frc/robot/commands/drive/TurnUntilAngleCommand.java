@@ -24,7 +24,8 @@ public class TurnUntilAngleCommand extends Command {
       double vOmega) {
     this.driveSubsystem = driveSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
-    this.targetRads = FastMath.normalizeMinusPiPi(targetRads);
+    this.targetRads = target;
+
     this.vOmega = vOmega;
 
     addRequirements(driveSubsystem);
@@ -32,20 +33,25 @@ public class TurnUntilAngleCommand extends Command {
 
   @Override
   public void initialize() {
+    logger.info("targetRads initial: {}", targetRads);
+    targetRads = FastMath.normalizeZeroTwoPi(targetRads);
+
     if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
       this.vOmega = -vOmega;
-      this.targetRads = FastMath.normalizeMinusPiPi(FastMath.PI - targetRads);
+      this.targetRads = FastMath.normalizeZeroTwoPi(FastMath.PI - targetRads);
       logger.info("Flipping for RED: vOmega = {} targetRads = {}", vOmega, targetRads);
     }
 
-    double currRads = driveSubsystem.getGyroRotation2d().getRadians();
+    double currRads = FastMath.normalizeZeroTwoPi(driveSubsystem.getGyroRotation2d().getRadians());
+
+    logger.info("vOmega = {} currRads = {} targetRads = {}", vOmega, currRads, targetRads);
 
     prevRads = currRads;
 
     if (vOmega > 0 && targetRads < currRads || vOmega < 0 && targetRads > currRads) {
       targetRads = FastMath.normalizeZeroTwoPi(targetRads);
       containsDiscontinuity = true;
-      logger.info("Yaw must cross PI / -PI: currRads = {}, targetRads = {}", currRads, targetRads);
+      logger.info("Yaw must cross 0: currRads = {}, targetRads = {}", currRads, targetRads);
     }
 
     driveSubsystem.setAutoDebugMsg("Turning until " + FastMath.toDegrees(targetRads));
@@ -59,7 +65,7 @@ public class TurnUntilAngleCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    double currRads = driveSubsystem.getGyroRotation2d().getRadians();
+    double currRads = FastMath.normalizeZeroTwoPi(driveSubsystem.getGyroRotation2d().getRadians());
 
     if (containsDiscontinuity) {
       if (FastMath.abs(currRads - prevRads) > FastMath.PI) {

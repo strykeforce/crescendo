@@ -123,6 +123,7 @@ public class SmartMidFourOrFiveThenSearch extends SequentialCommandGroup
     pathHandler.setNumPieces(numPieces);
     pathHandler.generateTrajectory();
     pathHandler.setShotLoc(shootPose);
+    pathHandler.setDriveToShootAtEndRegardless(true);
     firstPath.generateTrajectory();
     secondPath.generateTrajectory();
     deadeyeHuntRotateCommand.generateTrajectory();
