@@ -3,7 +3,7 @@ max_acceleration = 3.0 #m/s
 start_velocity = 0.0 #m/s
 end_velocity = 0.0 #m/s 
 is_reversed = false
-target_yaw = -34.439 #degrees
+target_yaw = -35.7538 #degrees
 
 [start_pose]
     dataPoint = "M5"

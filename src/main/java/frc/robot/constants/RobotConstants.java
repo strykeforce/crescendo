@@ -41,7 +41,7 @@ public class RobotConstants {
       new Translation2d(kBlueSpeakerXPos + 1, kBlueSpeakerYPos + 1);
 
   public static final double kDegreeShootOffset =
-      Units.degreesToRadians(-3.5); // -3.5 - RED is -4.5!
+      Units.degreesToRadians(-1.5); // OLD BLUE -3.5 - RED is -5.5! BLUE is -1.5!!
 
   // Robot Sizes
   public static final double kShooterOffset = 0.2; // meters
