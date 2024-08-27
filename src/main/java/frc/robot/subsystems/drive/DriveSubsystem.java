@@ -813,6 +813,23 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return avgTemp;
   }
 
+  public PIDController getxController() {
+    return xController;
+  }
+
+  public PIDController getyController() {
+    return yController;
+  }
+
+  public ProfiledPIDController getomegaController() {
+    return omegaController;
+  }
+
+  public PIDController getomegaControllerNonProfiled() {
+    return new PIDController(
+        omegaController.getP(), omegaController.getI(), omegaController.getD());
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);

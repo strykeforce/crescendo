@@ -129,6 +129,7 @@ public final class AutonConstants {
             DriveConstants.kFieldMaxY - kAmpZoneWidth - DriveConstants.kRobotLength,
             Rotation2d.fromDegrees(-90));
     public static final Pose2d NAI1 = new Pose2d(1.00, 4.19, Rotation2d.fromDegrees(-50));
+    // {"dataType":"choreo/waypoint","x":1,"y":4.19,"heading":-0.872665,"isInitialGuess":false,"translationConstrained":true,"headingConstrained":true,"controlIntervalCount":23}
     public static final Pose2d NAI2 =
         new Pose2d(
             1.93294 - DriveConstants.kRobotLength / 2 - 0.13,

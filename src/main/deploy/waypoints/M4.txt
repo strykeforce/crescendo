@@ -1,0 +1,1 @@
+{"dataType":"choreo/waypoint","x":8.270494,"y":2.429256,"heading":0,"isInitialGuess":false,"translationConstrained":true,"headingConstrained":true,"controlIntervalCount":40}
