@@ -30,6 +30,7 @@ public class PathHandler extends MeasurableSubsystem {
   private PathStates curState = PathStates.DONE;
   private DeadEyeSubsystem deadeye;
   private boolean useDeadeye;
+  private boolean driveToShootAtEndRegardless = false;
   private ArrayList<Integer> noteOrder;
   private PathData nextPath;
   private PathData lastReturnedPath;
@@ -134,6 +135,10 @@ public class PathHandler extends MeasurableSubsystem {
 
   public void setShotLoc(Pose2d shotLoc) {
     this.shotLoc = shotLoc;
+  }
+
+  public void setDriveToShootAtEndRegardless(boolean val) {
+    this.driveToShootAtEndRegardless = val;
   }
 
   public boolean hasNewPath() {
@@ -321,6 +326,17 @@ public class PathHandler extends MeasurableSubsystem {
             if (noteOrder.size() > 1) {
               nextPathName = pathNames[noteOrder.get(0)][noteOrder.get(1)];
               nextPath = paths[noteOrder.get(0)][noteOrder.get(1)];
+            } else if (driveToShootAtEndRegardless && !noteOrder.isEmpty()) {
+              logger.info("FETCH -> DRIVE_SHOOT");
+              logger.info("" + noteOrder.toString());
+              deadeyeFlag = false;
+              nextPath = paths[noteOrder.get(0)][0];
+              logger.info("Begin Trajectory " + pathNames[noteOrder.get(0)][0]);
+              noteOrder.remove(0);
+              curState = PathStates.DRIVE_SHOOT;
+              isSpinningUp = false;
+              startNewPath(nextPath);
+              break;
             } else {
               curState = PathStates.DONE;
               break;

@@ -499,22 +499,28 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     // setState(RobotStates.DEFENSE);
   }
 
+  public void blockShot() {
+    superStructure.block();
+    intakeSubsystem.toReversing();
+    magazineSubsystem.setPercent(0.0);
+  }
+
   public void toPreparePodium() {
-    if (speedUpPass) {
-      if (feedMode == FeedMode.WALL) {
-        feedMode = FeedMode.MIDDLE;
-      } else {
-        feedMode = FeedMode.WALL;
-      }
-
+    // if (speedUpPass) {
+    if (feedMode == FeedMode.WALL) {
+      feedMode = FeedMode.MIDDLE;
     } else {
-      driveSubsystem.setIsAligningShot(false);
-      intakeSubsystem.setPercent(0.0);
-      superStructure.preparePodium();
-      ledSubsystem.setOff();
-
-      setState(RobotStates.TO_PODIUM);
+      feedMode = FeedMode.WALL;
     }
+
+    // } else {
+    //   driveSubsystem.setIsAligningShot(false);
+    //   intakeSubsystem.setPercent(0.0);
+    //   superStructure.preparePodium();
+    //   ledSubsystem.setOff();
+
+    //   setState(RobotStates.TO_PODIUM);
+    // }
   }
 
   public void toSourceIntake() {
@@ -1302,6 +1308,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       ledSubsystem.setColor(255, 0, 0);
     }
     org.littletonrobotics.junction.Logger.recordOutput("States/Robot State", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("States/Color", getAllianceColor());
   }
   // Grapher
   @Override

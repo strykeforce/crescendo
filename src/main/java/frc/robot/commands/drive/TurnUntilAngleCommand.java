@@ -5,13 +5,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import net.jafama.FastMath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TurnUntilAngleCommand extends Command {
   private DriveSubsystem driveSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
   private double targetRads;
   private double vOmega;
-  private boolean normalizedZeroTwoPi = false;
+  private double prevRads;
+  private boolean containsDiscontinuity = false;
+  private static final Logger logger = LoggerFactory.getLogger(TurnUntilAngleCommand.class);
 
   public TurnUntilAngleCommand(
       DriveSubsystem driveSubsystem,
@@ -21,6 +25,7 @@ public class TurnUntilAngleCommand extends Command {
     this.driveSubsystem = driveSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
     this.targetRads = target;
+
     this.vOmega = vOmega;
 
     addRequirements(driveSubsystem);
@@ -28,19 +33,25 @@ public class TurnUntilAngleCommand extends Command {
 
   @Override
   public void initialize() {
+    logger.info("targetRads initial: {}", targetRads);
+    targetRads = FastMath.normalizeZeroTwoPi(targetRads);
+
     if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
       this.vOmega = -vOmega;
-      this.targetRads = FastMath.normalizeMinusPiPi(FastMath.PI - targetRads);
-      driveSubsystem.setAutoDebugMsg(
-          "Flipping for RED: vOmega = " + vOmega + ", targetRads = " + targetRads);
+      this.targetRads = FastMath.normalizeZeroTwoPi(FastMath.PI - targetRads);
+      logger.info("Flipping for RED: vOmega = {} targetRads = {}", vOmega, targetRads);
     }
 
-    double currRads = driveSubsystem.getGyroRotation2d().getRadians();
+    double currRads = FastMath.normalizeZeroTwoPi(driveSubsystem.getGyroRotation2d().getRadians());
+
+    logger.info("vOmega = {} currRads = {} targetRads = {}", vOmega, currRads, targetRads);
+
+    prevRads = currRads;
 
     if (vOmega > 0 && targetRads < currRads || vOmega < 0 && targetRads > currRads) {
       targetRads = FastMath.normalizeZeroTwoPi(targetRads);
-      normalizedZeroTwoPi = true;
-      driveSubsystem.setAutoDebugMsg("Normalizing 0 - 2 pi: targetRads = " + targetRads);
+      containsDiscontinuity = true;
+      logger.info("Yaw must cross 0: currRads = {}, targetRads = {}", currRads, targetRads);
     }
 
     driveSubsystem.setAutoDebugMsg("Turning until " + FastMath.toDegrees(targetRads));
@@ -54,15 +65,19 @@ public class TurnUntilAngleCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    double currRads = driveSubsystem.getGyroRotation2d().getRadians();
+    double currRads = FastMath.normalizeZeroTwoPi(driveSubsystem.getGyroRotation2d().getRadians());
 
-    if (normalizedZeroTwoPi) {
-      currRads = FastMath.normalizeZeroTwoPi(currRads);
+    if (containsDiscontinuity) {
+      if (FastMath.abs(currRads - prevRads) > FastMath.PI) {
+        containsDiscontinuity = false;
+        logger.info("Crossed discontinuity");
+      }
     }
 
-    // logger.info("vOmega = {}, currRads = {}, targetRads = {}", vOmega, currRads, targetRads);
+    prevRads = currRads;
 
-    return vOmega > 0 && currRads >= targetRads || vOmega < 0 && currRads <= targetRads;
+    return !containsDiscontinuity
+        && (vOmega > 0 && currRads >= targetRads || vOmega < 0 && currRads <= targetRads);
   }
 
   @Override

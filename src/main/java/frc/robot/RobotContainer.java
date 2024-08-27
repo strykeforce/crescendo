@@ -19,15 +19,10 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
-import frc.robot.commands.auton.AmpInitial_WingNotes_ACommand;
-import frc.robot.commands.auton.AmpInitial_WingNotes_BCommand;
-import frc.robot.commands.auton.MiddleNote3AndWingNotesCommand;
-import frc.robot.commands.auton.NonAmpAutoCommand;
-import frc.robot.commands.auton.NonAmpInit_TravelNotesCommand;
-import frc.robot.commands.auton.NonAmpInitial_Note3Command;
 import frc.robot.commands.auton.TestDeadeyeCleanUpCommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
@@ -38,7 +33,6 @@ import frc.robot.commands.climb.ToggleRatchetCommand;
 import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.TrapClimbCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
-import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.HoldDriveSafeCommand;
 import frc.robot.commands.drive.IdleDriveCommand;
@@ -79,7 +73,6 @@ import frc.robot.commands.robotState.SourceIntakeCommand;
 import frc.robot.commands.robotState.SpeedUpPassCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.SubWooferCommand;
-import frc.robot.commands.robotState.TogglePunchAirCommand;
 import frc.robot.commands.robotState.TunedShotCommand;
 import frc.robot.commands.robotState.TuningOffCommand;
 import frc.robot.commands.robotState.TuningShootCommand;
@@ -124,6 +117,7 @@ import frc.robot.subsystems.wrist.WristIOSRX;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryController;
@@ -155,19 +149,9 @@ public class RobotContainer {
 
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
-  private Boolean isEvent = true;
-  private Boolean canivoreStatus = false;
+  private boolean isEvent = true;
+  private boolean canivoreStatus = false;
 
-  private NonAmpAutoCommand nonAmpAutonPath;
-  private NonAmpAutoCommand nonAmpAutoNote3;
-  private NonAmpInitial_Note3Command nonAmpNote3;
-  private NonAmpInit_TravelNotesCommand nonAmpTravelNotes;
-  private AmpInitial_WingNotes_BCommand ampInitial_WingNotes_BCommand;
-  private AmpInitial_WingNotes_ACommand ampInitial_WingNotes_ACommand;
-
-  private MiddleNote3AndWingNotesCommand testAuto;
-  // private HoloContTuningCommand holoContTuningCommand;
-  private DriveAutonCommand calibrateWheelSize;
   public GenericEntry lShooterSpeed;
   public GenericEntry rShooterSpeed;
   public GenericEntry magazineSpeed;
@@ -175,6 +159,11 @@ public class RobotContainer {
   public GenericEntry duplicateShooters;
   public GenericEntry shootDelay;
   private GenericEntry newElbowOffset;
+
+  private GenericEntry newDebugTargetYaw;
+  private GenericEntry newDebugTargetYawSpeed;
+  private double debugTargetYaw = 180;
+  private double debugTargetYawSpeed = -4;
 
   private Swerve swerve;
   private WristIOSRX wristIO;
@@ -254,65 +243,6 @@ public class RobotContainer {
             deadEyeSubsystem,
             ledSubsystem);
 
-    // visionSubsystem.setVisionUpdates(false);
-    nonAmpAutonPath =
-        new NonAmpAutoCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem,
-            elbowSubsystem,
-            "NonAmpInitial1_MiddleNote5",
-            "MiddleNote5_NonAmpShoot2",
-            "NonAmpShoot2_MiddleNote4",
-            "MiddleNote4_NonAmpShoot2");
-    nonAmpAutonPath.generateTrajectory();
-
-    // nonAmpNote3 =
-    //     new NonAmpInitial_Note3Command(
-    //         driveSubsystem,
-    //         robotStateSubsystem,
-    //         superStructure,
-    //         magazineSubsystem,
-    //         intakeSubsystem);
-    // nonAmpNote3.generateTrajectory();
-
-    nonAmpTravelNotes =
-        new NonAmpInit_TravelNotesCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem);
-    nonAmpTravelNotes.generateTrajectory();
-
-    nonAmpAutoNote3 =
-        new NonAmpAutoCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem,
-            elbowSubsystem,
-            "NonAmpInitial1_MiddleNote3",
-            "MiddleNote3_NonAmpShoot2",
-            "NonAmpShoot2_MiddleNote4_B",
-            "MiddleNote4_NonAmpShoot2_B");
-    nonAmpAutoNote3.generateTrajectory();
-
-    testAuto =
-        new MiddleNote3AndWingNotesCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            superStructure,
-            magazineSubsystem,
-            intakeSubsystem,
-            elbowSubsystem,
-            deadEyeSubsystem,
-            ledSubsystem);
-    testAuto.generateTrajectory();
-
     // holoContTuningCommand = new HoloContTuningCommand(driveSubsystem);
     // holoContTuningCommand.generateTrajectory();
 
@@ -373,7 +303,10 @@ public class RobotContainer {
   public void configurePitDashboard() {
 
     Shuffleboard.getTab("Pit")
-        .add("Block Shot", new BlockCommand(superStructure))
+        .add(
+            "Block Shot",
+            new BlockCommand(
+                superStructure, magazineSubsystem, intakeSubsystem, robotStateSubsystem))
         .withPosition(3, 2)
         .withSize(1, 1);
     Shuffleboard.getTab("Pit")
@@ -797,6 +730,58 @@ public class RobotContainer {
             new EjectPieceCommand(robotStateSubsystem, magazineSubsystem, superStructure))
         .withSize(1, 1)
         .withPosition(1, 1);
+
+    newDebugTargetYaw =
+        Shuffleboard.getTab("Debug")
+            .add("Change Yaw Target", debugTargetYaw)
+            .withWidget(BuiltInWidgets.kTextView)
+            .withSize(1, 1)
+            .withPosition(5, 0)
+            .getEntry();
+    Shuffleboard.getTab("Debug")
+        .add(
+            "Set Yaw Target",
+            new FunctionalCommand(
+                () -> newDebugTargetYaw.getDouble(debugTargetYaw),
+                new Runnable() {
+                  public void run() {}
+                },
+                new Consumer<Boolean>() {
+                  public void accept(Boolean t) {}
+                },
+                () -> true))
+        .withPosition(5, 1)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Debug")
+        .addDouble("Yaw Target", () -> debugTargetYaw)
+        .withPosition(5, 2)
+        .withSize(1, 1);
+
+    newDebugTargetYawSpeed =
+        Shuffleboard.getTab("Debug")
+            .add("Change Yaw Speed", debugTargetYawSpeed)
+            .withWidget(BuiltInWidgets.kTextView)
+            .withSize(1, 1)
+            .withPosition(5, 3)
+            .getEntry();
+    Shuffleboard.getTab("Debug")
+        .add(
+            "Set Yaw Speed",
+            new FunctionalCommand(
+                () -> newDebugTargetYawSpeed.getDouble(debugTargetYawSpeed),
+                new Runnable() {
+                  public void run() {}
+                },
+                new Consumer<Boolean>() {
+                  public void accept(Boolean t) {}
+                },
+                () -> true))
+        .withPosition(5, 4)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Debug")
+        .addDouble("Yaw Speed", () -> debugTargetYawSpeed)
+        .withPosition(5, 5)
+        .withSize(1, 1);
   }
 
   public void configureTuningDashboard() {
@@ -963,15 +948,24 @@ public class RobotContainer {
             new PodiumCommand(
                 robotStateSubsystem, superStructure, magazineSubsystem, intakeSubsystem));
 
+    // new JoystickButton(xboxController, XboxController.Button.kY.value)
+    //     .onTrue(
+    //         new TurnUntilAngleCommand(
+    //             driveSubsystem, robotStateSubsystem, FastMath.toRadians(-7), -4));
+
     // Speed Up Pass
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(new SpeedUpPassCommand(robotStateSubsystem, superStructure));
 
     // Defense
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
+        .onTrue(
+            new BlockCommand(
+                superStructure, magazineSubsystem, intakeSubsystem, robotStateSubsystem));
+    // .onTrue(new TogglePunchAirCommand(robotStateSubsystem));
 
-    // new JoystickButton(xboxController, XboxController.Button.kB.value).onTrue(testAuto);
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .onTrue(new TurnUntilAngleCommand(driveSubsystem, robotStateSubsystem, FastMath.PI, -4));
 
     // new JoystickButton(xboxController, XboxController.Button.kB.value)
     //     .onTrue(new ToggleDefenseCommand(robotStateSubsystem, superStructure,
