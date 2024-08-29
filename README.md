@@ -12,7 +12,7 @@
 
 ## CAN Bus
 
-| Subsystem | Type     | Talon      | ID  | Comp PDP | Proto PDP | Motor  | Breaker |
+| Subsystem | Type     | Talon      | ID  | Comp PDH | Proto PDH | Motor  | Breaker |
 | --------- | -------- | ---------- | --- | -------- | --------- | ------ | ------- |
 | Drive     | SRX      | azimuth    | 0   |  16      | 16        | 9015   |         |
 | Drive     | SRX      | azimuth    | 1   |  3       | 2         | 9015   |         |
