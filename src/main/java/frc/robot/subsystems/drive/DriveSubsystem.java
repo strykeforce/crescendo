@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive;
 
+import com.choreo.lib.ChoreoTrajectoryState;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -211,6 +212,21 @@ public class DriveSubsystem extends MeasurableSubsystem {
         holoContOutput.vyMetersPerSecond,
         holoContOutput.omegaRadiansPerSecond,
         false);
+  }
+
+  // Choreo Holonomic Controller
+  public void calculateController(ChoreoTrajectoryState desiredState) {
+    double xFF = desiredState.velocityX;
+    double yFF = desiredState.velocityY;
+    double rotationFF = desiredState.angularVelocity;
+
+    Pose2d pose = inputs.poseMeters;
+    double xFeedback = xController.calculate(pose.getX(), desiredState.x);
+    double yFeedback = yController.calculate(pose.getY(), desiredState.y);
+    double rotationFeedback =
+        omegaController.calculate(pose.getRotation().getRadians(), desiredState.heading);
+
+    io.move(xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, false);
   }
 
   public void driveAutonXController(State desiredState, Rotation2d desiredAngle, double driveY) {

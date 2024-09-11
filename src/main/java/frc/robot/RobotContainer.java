@@ -39,6 +39,7 @@ import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.TrapClimbCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.DriveChoreo2AutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.HoldDriveSafeCommand;
 import frc.robot.commands.drive.IdleDriveCommand;
@@ -511,6 +512,13 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add("Stop Azimuths", new SetAzimuthVelocityCommand(driveSubsystem, 0.0))
         .withPosition(9, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "run ChoreoAuton",
+            new DriveChoreo2AutonCommand(driveSubsystem, "NonAmp1_MiddleNote4", true))
+        .withPosition(9, 2)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
     // .add("Elbow to zero", new ClosedLoopElbowCommand(elbowSubsystem, 0))()
