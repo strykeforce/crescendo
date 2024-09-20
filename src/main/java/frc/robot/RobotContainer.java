@@ -39,7 +39,7 @@ import frc.robot.commands.climb.ToggleTrapBarPosCommand;
 import frc.robot.commands.climb.TrapClimbCommand;
 import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
-import frc.robot.commands.drive.DriveChoreo2AutonCommand;
+import frc.robot.commands.drive.DriveChoreoAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.HoldDriveSafeCommand;
 import frc.robot.commands.drive.IdleDriveCommand;
@@ -517,7 +517,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add(
             "run ChoreoAuton",
-            new DriveChoreo2AutonCommand(driveSubsystem, "NonAmp1_MiddleNote4", true))
+            new DriveChoreoAutonCommand(driveSubsystem, "NonAmp1_MiddleNote4", true, true))
         .withPosition(9, 2)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")

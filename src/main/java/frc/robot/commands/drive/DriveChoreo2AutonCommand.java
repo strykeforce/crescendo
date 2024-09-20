@@ -12,6 +12,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/** do not use. use the better version. */
 public class DriveChoreo2AutonCommand extends Command implements AutoCommandInterface {
   private final DriveSubsystem driveSubsystem;
   private Trajectory trajectory;

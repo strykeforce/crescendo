@@ -238,6 +238,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.move(holoContOutput.vxMetersPerSecond, driveY, holoContOutput.omegaRadiansPerSecond, false);
   }
 
+  public void driveAutonXController(ChoreoTrajectoryState desiredState, double driveY) {
+    double xFF = desiredState.velocityX;
+    double rotationFF = desiredState.angularVelocity;
+
+    Pose2d pose = inputs.poseMeters;
+    double xFeedback = xController.calculate(pose.getX(), desiredState.x);
+    double rotationFeedback =
+        omegaController.calculate(pose.getRotation().getRadians(), desiredState.heading);
+
+    io.move(xFF + xFeedback, driveY, rotationFF + rotationFeedback, false);
+  }
+
   public void resetOdometry(Pose2d pose) {
     io.resetOdometry(pose);
     logger.info("reset odometry with: {}", pose);
