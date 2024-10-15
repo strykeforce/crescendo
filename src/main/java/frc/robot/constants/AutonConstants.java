@@ -204,7 +204,7 @@ public final class AutonConstants {
         MI1; // new Pose2d(1.57, 4.737, Rotation2d.fromDegrees(0.0)); // y = 5.05
     public static final Pose2d NAS1 = new Pose2d(4.2, 2.8, Rotation2d.fromDegrees(-33.2));
     public static final Pose2d NAS2 =
-        new Pose2d(4.55, 4.6, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
+        new Pose2d(4.4, 4.6, Rotation2d.fromDegrees(-12.2)); // 4.55, 4.6 -12.2 -> 4,5.1, -6.7
     public static final Pose2d NAS2_SPIN =
         new Pose2d(4.36, 4.74, Rotation2d.fromDegrees(-12.2)); // 4,5.1, -6.7
     public static final Pose2d NAS3 =
