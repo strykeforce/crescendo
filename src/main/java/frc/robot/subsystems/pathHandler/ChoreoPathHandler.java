@@ -1,17 +1,17 @@
 package frc.robot.subsystems.pathHandler;
 
+import com.choreo.lib.Choreo;
+import com.choreo.lib.ChoreoTrajectory;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.drive.PathData;
 import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.vision.DeadEyeSubsystem;
@@ -24,9 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
-
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
 
 public class ChoreoPathHandler extends MeasurableSubsystem {
 
@@ -108,8 +105,7 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
     Set<Integer> singleNotes = new HashSet<Integer>(noteOrder);
 
     for (int i : singleNotes)
-      for (int j : singleNotes)
-        if (i != j) paths[i][j] = Choreo.getTrajectory(pathNames[i][j]);
+      for (int j : singleNotes) if (i != j) paths[i][j] = Choreo.getTrajectory(pathNames[i][j]);
 
     noteOrder.remove(noteOrder.indexOf(0));
 
@@ -257,7 +253,8 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
           if (deadeye.getNumTargets() > 0)
             driveSubsystem.driveAutonXController(
                 curTrajectory.sample(timer.get(), mirrorTrajectory), yVel);
-          else driveSubsystem.calculateController(curTrajectory.sample(timer.get(), mirrorTrajectory));
+          else
+            driveSubsystem.calculateController(curTrajectory.sample(timer.get(), mirrorTrajectory));
 
           if (robotStateSubsystem.hasNote()) {
             numPieces -= 0.5;

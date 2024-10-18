@@ -70,6 +70,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
+  private ChoreoTrajectoryState holoContChoreoInput =
+      new ChoreoTrajectoryState(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, new double[4], new double[4]);
   private double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
@@ -216,9 +218,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Choreo Holonomic Controller
   public void calculateController(ChoreoTrajectoryState desiredState) {
-    double xFF = desiredState.velocityX;
-    double yFF = desiredState.velocityY;
-    double rotationFF = desiredState.angularVelocity;
+    holoContChoreoInput = desiredState;
+    double xFF = desiredState.x;
+    double yFF = desiredState.y;
+    double rotationFF = desiredState.heading;
 
     Pose2d pose = inputs.poseMeters;
     double xFeedback = xController.calculate(pose.getX(), desiredState.x);
@@ -959,7 +962,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure(
             "Trajectory Rotation2D(deg)",
             () -> holoContInput.poseMeters.getRotation().getDegrees()),
-        new Measure("Desired Gyro Heading(deg)", () -> holoContAngle.getDegrees()),
+        new Measure("Choreo Desired Gyro Heading(deg)", () -> holoContAngle.getDegrees()),
+        new Measure("Choreo Trajectory X", () -> holoContChoreoInput.x),
+        new Measure("Choreo Trajectory Y", () -> holoContChoreoInput.y),
+        new Measure("Choreo Desired Velocity X", () -> holoContChoreoInput.velocityX),
+        new Measure("Choreo Desired Velocity Y", () -> holoContChoreoInput.velocityY),
+        new Measure("Choreo Trajectory Rotation2D(deg)", () -> holoContChoreoInput.heading),
+        new Measure(
+            "Choreo Desired Gyro Heading(deg)", () -> Math.toDegrees(holoContChoreoInput.heading)),
         new Measure("Holonomic Cont Vx", () -> holoContOutput.vxMetersPerSecond),
         new Measure("Holonomic Cont Vy", () -> holoContOutput.vyMetersPerSecond),
         new Measure("Holonomic Cont Vomega", () -> holoContOutput.omegaRadiansPerSecond),

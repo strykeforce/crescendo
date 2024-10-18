@@ -52,11 +52,11 @@ public class DriveChoreoAutonCommand extends Command implements AutoCommandInter
   @Override
   public void initialize() {
     driveSubsystem.setEnableHolo(true);
-    // driveSubsystem.recordAutoTrajectory(trajectory); // cannot record ChoreoTrajectories yet
+    // driveSubsystem.recordAutoTrajectory(trajectory);
     Pose2d initialPose = trajectory.getInitialPose();
-    if (resetOdometry)
-      driveSubsystem.resetOdometry(
-          new Pose2d(initialPose.getTranslation(), driveSubsystem.getGyroRotation2d()));
+    if (resetOdometry) {
+      driveSubsystem.resetOdometry(initialPose);
+    }
     driveSubsystem.resetHolonomicController();
     driveSubsystem.grapherTrajectoryActive(true);
     timer.reset();
@@ -79,7 +79,7 @@ public class DriveChoreoAutonCommand extends Command implements AutoCommandInter
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.setEnableHolo(false);
-    driveSubsystem.recordAutoTrajectory(null);
+    // driveSubsystem.recordAutoTrajectory(null);
 
     if (!interrupted && !lastPath) {
       driveSubsystem.calculateController(
