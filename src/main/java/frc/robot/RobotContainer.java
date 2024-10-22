@@ -580,7 +580,7 @@ public class RobotContainer {
             .addBoolean(
                 "Middle Pass Mode?", () -> robotStateSubsystem.getFeedMode() == FeedMode.MIDDLE)
             .withSize(1, 1)
-            .withPosition(5, 3);
+            .withPosition(6, 2);
 
     allianceColor =
         Shuffleboard.getTab("Match")
