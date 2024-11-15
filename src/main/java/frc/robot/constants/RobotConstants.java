@@ -106,7 +106,7 @@ public class RobotConstants {
 
   public static class CompConstants {
     // Drive
-    public static final double kWheelDiameterInches = 3.0 * 502.0 / 500.0;
+    public static final double kWheelDiameterInches = 3.0 * 508.0 / 500.0;
 
     // Elbow
     public static final double kElbowZero = 0.01465; // 0.0105

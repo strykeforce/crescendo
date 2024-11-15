@@ -72,6 +72,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Rotation2d holoContAngle = new Rotation2d();
   private ChoreoTrajectoryState holoContChoreoInput =
       new ChoreoTrajectoryState(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, new double[4], new double[4]);
+  private ChassisSpeeds holoContChoreoOutput = new ChassisSpeeds();
   private double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
   private boolean isAligningShot = false;
@@ -219,8 +220,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   // Choreo Holonomic Controller
   public void calculateController(ChoreoTrajectoryState desiredState) {
     holoContChoreoInput = desiredState;
-    double xFF = desiredState.x;
-    double yFF = desiredState.y;
+    double xFF = desiredState.velocityX;
+    double yFF = desiredState.velocityY;
     double rotationFF = desiredState.heading;
 
     Pose2d pose = inputs.poseMeters;
@@ -229,7 +230,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
     double rotationFeedback =
         omegaController.calculate(pose.getRotation().getRadians(), desiredState.heading);
 
-    io.move(xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, false);
+    holoContChoreoOutput.vxMetersPerSecond = xFF + xFeedback;
+    holoContChoreoOutput.vyMetersPerSecond = yFF + yFeedback;
+    holoContChoreoOutput.omegaRadiansPerSecond = rotationFF + rotationFeedback;
+
+    io.move(
+        holoContChoreoOutput.vxMetersPerSecond,
+        holoContChoreoOutput.vyMetersPerSecond,
+        holoContChoreoOutput.omegaRadiansPerSecond,
+        false);
   }
 
   public void driveAutonXController(State desiredState, Rotation2d desiredAngle, double driveY) {
@@ -962,6 +971,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure(
             "Trajectory Rotation2D(deg)",
             () -> holoContInput.poseMeters.getRotation().getDegrees()),
+        new Measure("Holonomic Cont Vx", () -> holoContOutput.vxMetersPerSecond),
+        new Measure("Holonomic Cont Vy", () -> holoContOutput.vyMetersPerSecond),
+        new Measure("Holonomic Cont Vomega", () -> holoContOutput.omegaRadiansPerSecond),
         new Measure("Choreo Desired Gyro Heading(deg)", () -> holoContAngle.getDegrees()),
         new Measure("Choreo Trajectory X", () -> holoContChoreoInput.x),
         new Measure("Choreo Trajectory Y", () -> holoContChoreoInput.y),
@@ -970,9 +982,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Choreo Trajectory Rotation2D(deg)", () -> holoContChoreoInput.heading),
         new Measure(
             "Choreo Desired Gyro Heading(deg)", () -> Math.toDegrees(holoContChoreoInput.heading)),
-        new Measure("Holonomic Cont Vx", () -> holoContOutput.vxMetersPerSecond),
-        new Measure("Holonomic Cont Vy", () -> holoContOutput.vyMetersPerSecond),
-        new Measure("Holonomic Cont Vomega", () -> holoContOutput.omegaRadiansPerSecond),
+        new Measure("Choreo Holonomic Cont Vx", () -> holoContChoreoOutput.vxMetersPerSecond),
+        new Measure("Choreo Holonomic Cont Vy", () -> holoContChoreoOutput.vyMetersPerSecond),
+        new Measure(
+            "Choreo Holonomic Cont Vomega", () -> holoContChoreoOutput.omegaRadiansPerSecond),
         new Measure(
             "Holo Controller Omega Err",
             () -> holonomicController.getThetaController().getPositionError()),
