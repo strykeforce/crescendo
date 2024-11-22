@@ -1,7 +1,7 @@
 package frc.robot.subsystems.pathHandler;
 
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
+import choreo.Choreo;
+import choreo.trajectory.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,6 +18,7 @@ import frc.robot.subsystems.vision.DeadEyeSubsystem;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,8 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
   private DeadEyeSubsystem deadeye;
   private boolean useDeadeye;
   private ArrayList<Integer> noteOrder;
-  private ChoreoTrajectory nextPath;
-  private ChoreoTrajectory lastReturnedPath;
+  private Trajectory<SwerveSample> nextPath;
+  private Trajectory<SwerveSample> lastReturnedPath;
   private DriveSubsystem driveSubsystem;
   private double numPieces;
   private Logger logger;
@@ -40,7 +41,7 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
   private boolean handling = false;
   private Timer timer = new Timer();
   private Rotation2d robotHeading;
-  private ChoreoTrajectory curTrajectory;
+  private Trajectory<SwerveSample> curTrajectory;
   private boolean deadeyeFlag = false;
   private int lastNote = 0;
   private boolean mirrorTrajectory = false;
@@ -55,7 +56,7 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
   // Example [0][5] is a path that goes from shooting position to the fifth note
   // Example [1][0] is a path that goes from note one to shooting position
   // Example [1][2] is a path that goes from note one to note two
-  private ChoreoTrajectory[][] paths = new ChoreoTrajectory[6][6];
+  private Trajectory<SwerveSample>[][] paths;
   private String[][] pathNames;
   private Pose2d shotLoc;
 
@@ -105,7 +106,14 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
     Set<Integer> singleNotes = new HashSet<Integer>(noteOrder);
 
     for (int i : singleNotes)
-      for (int j : singleNotes) if (i != j) paths[i][j] = Choreo.getTrajectory(pathNames[i][j]);
+      for (int j : singleNotes)
+        if (i != j) {
+          Optional<Trajectory<SwerveSample>> tempPath = Choreo.loadTrajectory(pathNames[i][j]);
+          if (tempPath.isPresent()) {
+            paths[i][j] = tempPath.get();
+          }
+        }
+    ;
 
     noteOrder.remove(noteOrder.indexOf(0));
 
@@ -155,7 +163,7 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
     canShoot = true;
   }
 
-  public ChoreoTrajectory getNextPath() {
+  public Trajectory<SwerveSample> getNextPath() {
     lastReturnedPath = nextPath;
     if (curState == PathStates.FETCH && noteOrder.size() > 1) noteOrder.remove(0);
     return nextPath;
@@ -166,7 +174,7 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
     setState(PathStates.DONE);
   }
 
-  public void startNewPath(ChoreoTrajectory path) {
+  public void startNewPath(Trajectory<SwerveSample> path) {
     curTrajectory = path;
     driveSubsystem.setEnableHolo(true);
     driveSubsystem.resetHolonomicController();
@@ -175,7 +183,7 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
     timer.reset();
     timer.start();
 
-    driveSubsystem.calculateController(curTrajectory.sample(timer.get(), mirrorTrajectory));
+    driveSubsystem.calculateController(curTrajectory.sampleAt(timer.get(), mirrorTrajectory));
   }
 
   @Override
@@ -208,7 +216,7 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
           }
           break;
         case DRIVE_FETCH:
-          driveSubsystem.calculateController(curTrajectory.sample(timer.get(), mirrorTrajectory));
+          driveSubsystem.calculateController(curTrajectory.sampleAt(timer.get(), mirrorTrajectory));
           double curX = driveSubsystem.getPoseMeters().getX();
 
           if (!timer.hasElapsed(curTrajectory.getTotalTime() * 0.50)
@@ -252,9 +260,10 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
           driveSubsystem.recordYVel(yVel);
           if (deadeye.getNumTargets() > 0)
             driveSubsystem.driveAutonXController(
-                curTrajectory.sample(timer.get(), mirrorTrajectory), yVel);
+                curTrajectory.sampleAt(timer.get(), mirrorTrajectory), yVel);
           else
-            driveSubsystem.calculateController(curTrajectory.sample(timer.get(), mirrorTrajectory));
+            driveSubsystem.calculateController(
+                curTrajectory.sampleAt(timer.get(), mirrorTrajectory));
 
           if (robotStateSubsystem.hasNote()) {
             numPieces -= 0.5;
@@ -337,7 +346,7 @@ public class ChoreoPathHandler extends MeasurableSubsystem {
           break;
 
         case DRIVE_SHOOT:
-          driveSubsystem.calculateController(curTrajectory.sample(timer.get(), mirrorTrajectory));
+          driveSubsystem.calculateController(curTrajectory.sampleAt(timer.get(), mirrorTrajectory));
 
           if (!isSpinningUp
               && robotStateSubsystem.intakeHasNote()

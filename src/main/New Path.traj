@@ -1,0 +1,25 @@
+{
+ "name":"New Path",
+ "version":"v2025.0.0",
+ "snapshot":{
+  "waypoints":[],
+  "constraints":[],
+  "targetDt":0.1
+ },
+ "params":{
+  "waypoints":[
+    {"x":{"exp":"1.970166802406311 m", "val":1.970166802406311}, "y":{"exp":"1.6351099014282227 m", "val":1.6351099014282229}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"5.943910121917725 m", "val":5.943910121917725}, "y":{"exp":"1.6172102689743042 m", "val":1.6172102689743042}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+  "constraints":[],
+  "targetDt":{
+   "exp":"0.1 s",
+   "val":0.1
+  }
+ },
+ "trajectory":{
+  "waypoints":[],
+  "samples":[],
+  "splits":[]
+ },
+ "events":[]
+}

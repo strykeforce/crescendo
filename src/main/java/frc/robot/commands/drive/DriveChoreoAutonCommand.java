@@ -1,20 +1,21 @@
 package frc.robot.commands.drive;
 
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
-import com.choreo.lib.ChoreoTrajectoryState;
+import choreo.Choreo;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.auto.AutoCommandInterface;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DriveChoreoAutonCommand extends Command implements AutoCommandInterface {
   private final DriveSubsystem driveSubsystem;
-  private ChoreoTrajectory trajectory;
+  private Trajectory<SwerveSample> trajectory;
   private final Timer timer = new Timer();
   private static final Logger logger = LoggerFactory.getLogger(DriveAutonCommand.class);
   private Rotation2d robotHeading;
@@ -36,7 +37,10 @@ public class DriveChoreoAutonCommand extends Command implements AutoCommandInter
     this.lastPath = lastPath;
     this.trajectoryName = trajectoryName;
     generateTrajectory();
-    trajectory = Choreo.getTrajectory(trajectoryName);
+    Optional<Trajectory<SwerveSample>> tempTrajectory = Choreo.loadTrajectory(trajectoryName);
+    if (tempTrajectory.isPresent()) {
+      trajectory = tempTrajectory.get();
+    }
     timer.start();
   }
 
@@ -51,7 +55,7 @@ public class DriveChoreoAutonCommand extends Command implements AutoCommandInter
 
   @Override
   public void initialize() {
-    Pose2d initialPose = trajectory.getInitialPose();
+    Pose2d initialPose = trajectory.getInitialPose(mirrorTrajectory);
     if (resetOdometry) {
       driveSubsystem.resetOdometry(initialPose);
     }
@@ -61,13 +65,13 @@ public class DriveChoreoAutonCommand extends Command implements AutoCommandInter
     driveSubsystem.grapherTrajectoryActive(true);
     timer.reset();
     logger.info("Begin Trajectory: {}", trajectoryName);
-    ChoreoTrajectoryState desiredState = trajectory.sample(timer.get(), mirrorTrajectory);
+    SwerveSample desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory);
     driveSubsystem.calculateController(desiredState);
   }
 
   @Override
   public void execute() {
-    ChoreoTrajectoryState desiredState = trajectory.sample(timer.get(), mirrorTrajectory);
+    SwerveSample desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory);
     driveSubsystem.calculateController(desiredState);
   }
 
@@ -83,7 +87,7 @@ public class DriveChoreoAutonCommand extends Command implements AutoCommandInter
 
     if (!interrupted && !lastPath) {
       driveSubsystem.calculateController(
-          trajectory.sample(trajectory.getTotalTime(), mirrorTrajectory));
+          trajectory.sampleAt(trajectory.getTotalTime(), mirrorTrajectory));
     } else {
       driveSubsystem.drive(0, 0, 0);
     }

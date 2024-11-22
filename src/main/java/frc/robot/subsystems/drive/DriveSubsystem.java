@@ -1,6 +1,6 @@
 package frc.robot.subsystems.drive;
 
-import com.choreo.lib.ChoreoTrajectoryState;
+import choreo.trajectory.*;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -70,8 +70,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
-  private ChoreoTrajectoryState holoContChoreoInput =
-      new ChoreoTrajectoryState(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, new double[4], new double[4]);
+  private SwerveSample holoContChoreoInput =
+      new SwerveSample(
+          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, new double[4], new double[4]);
   private ChassisSpeeds holoContChoreoOutput = new ChassisSpeeds();
   private double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
@@ -218,10 +219,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   // Choreo Holonomic Controller
-  public void calculateController(ChoreoTrajectoryState desiredState) {
+  public void calculateController(SwerveSample desiredState) {
     holoContChoreoInput = desiredState;
-    double xFF = desiredState.velocityX;
-    double yFF = desiredState.velocityY;
+    double xFF = desiredState.vx;
+    double yFF = desiredState.vy;
     double rotationFF = desiredState.heading;
 
     Pose2d pose = inputs.poseMeters;
@@ -250,9 +251,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.move(holoContOutput.vxMetersPerSecond, driveY, holoContOutput.omegaRadiansPerSecond, false);
   }
 
-  public void driveAutonXController(ChoreoTrajectoryState desiredState, double driveY) {
-    double xFF = desiredState.velocityX;
-    double rotationFF = desiredState.angularVelocity;
+  public void driveAutonXController(SwerveSample desiredState, double driveY) {
+    double xFF = desiredState.vx;
+    double rotationFF = desiredState.omega;
 
     Pose2d pose = inputs.poseMeters;
     double xFeedback = xController.calculate(pose.getX(), desiredState.x);
@@ -977,8 +978,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Choreo Desired Gyro Heading(deg)", () -> holoContAngle.getDegrees()),
         new Measure("Choreo Trajectory X", () -> holoContChoreoInput.x),
         new Measure("Choreo Trajectory Y", () -> holoContChoreoInput.y),
-        new Measure("Choreo Desired Velocity X", () -> holoContChoreoInput.velocityX),
-        new Measure("Choreo Desired Velocity Y", () -> holoContChoreoInput.velocityY),
+        new Measure("Choreo Desired Velocity X", () -> holoContChoreoInput.vx),
+        new Measure("Choreo Desired Velocity Y", () -> holoContChoreoInput.vy),
         new Measure("Choreo Trajectory Rotation2D(deg)", () -> holoContChoreoInput.heading),
         new Measure(
             "Choreo Desired Gyro Heading(deg)", () -> Math.toDegrees(holoContChoreoInput.heading)),
