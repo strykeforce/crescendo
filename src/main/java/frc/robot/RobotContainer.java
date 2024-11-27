@@ -515,9 +515,7 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
-        .add(
-            "run ChoreoAuton",
-            new DriveChoreoAutonCommand(driveSubsystem, "NonAmp1_MiddleNote4", true, true))
+        .add("run ChoreoAuton", new DriveChoreoAutonCommand(driveSubsystem, "NAI1toM1", true, true))
         .withPosition(9, 2)
         .withSize(1, 1);
     //     Shuffleboard.getTab("Pit")
