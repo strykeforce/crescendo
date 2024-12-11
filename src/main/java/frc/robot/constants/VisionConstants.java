@@ -52,13 +52,13 @@ public final class VisionConstants {
   public static final int kNumCams = 4;
 
   // Names
-  public static final String kCam1Name = "Shooter";
-  public static final String kCam2Name = "Intake";
+  public static final String kCam1Name = "Intake";
+  public static final String kCam2Name = "Shooter";
   public static final String kCam3Name = "AngledShooterLeft";
   public static final String kCam4Name = "AngledShooterRight";
 
-  public static final String kPi1Name = "Shooter";
-  public static final String kPi2Name = "Intake";
+  public static final String kPi1Name = "Intake";
+  public static final String kPi2Name = "Shooter";
   public static final String kPi3Name = "AngledShooters";
 
   // Indexs
@@ -70,11 +70,11 @@ public final class VisionConstants {
   public static final double kLoopTime = 0.02;
   public static final int kCircularBufferSize = 1000;
   // Poses
-  public static final Pose3d kCam1Pose =
+  public static final Pose3d kCam2Pose =
       new Pose3d(
           new Translation3d(-0.27, 0.055, 0.20),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(180.0)));
-  public static final Pose3d kCam2Pose =
+  public static final Pose3d kCam1Pose =
       new Pose3d(
           new Translation3d(-0.21, -0.31, 0.44),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(0.0)));
@@ -86,6 +86,8 @@ public final class VisionConstants {
       new Pose3d(
           new Translation3d(-0.22, -0.335, 0.50),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
+  public static final int[] kUdpPorts = {5802, 5803, 5804, 5804};
+  public static final int kNumPis = 3;
 
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.
