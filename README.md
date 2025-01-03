@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/strykeforce/crescendo/actions/workflows/main.yml/badge.svg)](https://github.com/strykeforce/crescendo/actions/workflows/main.yml)
 
+![airwave](docs/2024-robot.jpeg)
+
 ## Controls
 
 ### Driver Controller
