@@ -4,13 +4,17 @@ import WallEye.UdpSubscriber;
 import WallEye.WallEyeCam;
 import WallEye.WallEyePoseResult;
 import WallEye.WallEyeResult;
+import WallEye.WallEyeTagResult;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -35,18 +39,25 @@ public class VisionSubsystem extends MeasurableSubsystem {
   // Private Variables
   private WallEyeCam[] cams;
 
-  private Translation2d[] offsets = {
-    VisionConstants.kCam1Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam2Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam3Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam4Pose.getTranslation().toTranslation2d()
+  private Translation3d[] offsets = {
+    VisionConstants.kCam1Pose.getTranslation(),
+    VisionConstants.kCam2Pose.getTranslation(),
+    VisionConstants.kCam3Pose.getTranslation(),
+    VisionConstants.kCam4Pose.getTranslation()
   };
 
-  private Rotation2d[] rotsOff = {
-    VisionConstants.kCam1Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam2Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam3Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam4Pose.getRotation().toRotation2d()
+  private double[] heights = {
+    VisionConstants.kCam1Pose.getTranslation().getZ(),
+    VisionConstants.kCam2Pose.getTranslation().getZ(),
+    VisionConstants.kCam3Pose.getTranslation().getZ(),
+    VisionConstants.kCam4Pose.getTranslation().getZ()
+  };
+
+  private Rotation3d[] rotsOff = {
+    VisionConstants.kCam1Pose.getRotation(),
+    VisionConstants.kCam2Pose.getRotation(),
+    VisionConstants.kCam3Pose.getRotation(),
+    VisionConstants.kCam4Pose.getRotation()
   };
 
   private String[] names = {
@@ -69,6 +80,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam3Idx,
     VisionConstants.kCam4Idx
   };
+
+  private WallEyeTagResult[] lastUpdate = new WallEyeTagResult[4];
 
   private UdpSubscriber[] udps;
 
@@ -151,7 +164,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return RobotController.getFPGATime() / 1000000.0;
   }
 
-  private boolean isPoseValidWithWheels(WallEyePoseResult test, Translation2d pose) {
+  private boolean isPoseValidWithWheels(WallEyePoseResult test, Translation3d pose) {
     if (isPoseValidWithoutWheels(test, pose)) {
 
       // Get Speed and current position
@@ -159,7 +172,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
       Pose2d curPose = driveSubsystem.getPoseMeters();
 
       // Find the x and y difference between cam and wheels
-      Translation2d disp = (curPose.getTranslation().minus(pose));
+      Translation2d disp = (curPose.getTranslation().minus(pose.toTranslation2d()));
       double magnitudeVel =
           Math.sqrt(Math.pow(speed.vxMetersPerSecond, 2) + Math.pow(speed.vyMetersPerSecond, 2));
       double magnitudeDisp = Math.sqrt(Math.pow(disp.getX(), 2) + Math.pow(disp.getY(), 2));
@@ -174,7 +187,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return false;
   }
 
-  private boolean isPoseValidWithoutWheels(WallEyePoseResult test, Translation2d location) {
+  private boolean isPoseValidWithoutWheels(WallEyePoseResult test, Translation3d location) {
     return (test.getNumTags() >= 2 || test.getAmbiguity() <= VisionConstants.kMaxAmbig)
         && (location.getX() < DriveConstants.kFieldMaxX && location.getX() > 0)
         && (location.getY() < DriveConstants.kFieldMaxY && location.getY() > 0);
@@ -269,13 +282,25 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
   }
 
-  private Pose2d getCloserPose(Pose2d pose1, Pose2d pose2, double rotation) {
-    if (Math.abs(new Rotation2d(rotation).minus(pose1.getRotation()).getRadians())
-        <= Math.abs(new Rotation2d(rotation).minus(pose2.getRotation()).getRadians())) return pose1;
+  private Pose3d getCloserPose(Pose3d pose1, Pose3d pose2, double rotation) {
+    if (Math.abs(new Rotation2d(rotation).minus(pose1.getRotation().toRotation2d()).getRadians())
+        <= Math.abs(
+            new Rotation2d(rotation).minus(pose2.getRotation().toRotation2d()).getRadians()))
+      return pose1;
     else return pose2;
   }
 
-  private Pose2d getCorrectPose(Pose2d pose1, Pose2d pose2, double timestamp) {
+  private Pose3d getCorrectPose(Pose3d pose1, Pose3d pose2, double timestamp, int camIndex) {
+    double dist1 = Math.abs(heights[camIndex] - pose1.getZ());
+    double dist2 = Math.abs(heights[camIndex] - pose2.getZ());
+
+    if (dist1 < dist2 && dist1 < 0.5 && dist1 > 0) {
+      return pose1;
+    }
+    if (dist1 > dist2 && dist2 < 0.5 && dist2 > 0) {
+      return pose2;
+    }
+
     if (gyroData.size() != VisionConstants.kCircularBufferSize) return pose1;
     double rotation =
         gyroData.get(FastMath.floorToInt((timestamp / 1_000_000.0) / VisionConstants.kLoopTime));
@@ -313,9 +338,21 @@ public class VisionSubsystem extends MeasurableSubsystem {
       if (cams[i].hasNewUpdate()) {
         timeLastVision = getSeconds();
         validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
+        lastUpdate[i] = (WallEyeTagResult) cams[i].getResults();
 
         org.littletonrobotics.junction.Logger.recordOutput(
             "VisionSubsystem/UpdateTime " + names[i], cams[i].getResults().getTimeStamp());
+
+        int[] tags = lastUpdate[i].getTagIDs();
+
+        for (int j = 0; j < tags.length; j++) {
+          org.littletonrobotics.junction.Logger.recordOutput(
+              "VisionSubsystem/TagCenterX " + names[i] + tags[j],
+              lastUpdate[i].getTagCenters().get(j).x());
+          org.littletonrobotics.junction.Logger.recordOutput(
+              "VisionSubsystem/TagCenterY " + names[i] + tags[j],
+              lastUpdate[i].getTagCenters().get(j).y());
+        }
       }
     }
     // Tightens std devs if time elapses
@@ -356,13 +393,13 @@ public class VisionSubsystem extends MeasurableSubsystem {
                         result.getNumTags(),
                         names[idx]));
 
-        Pose2d cameraPose;
-        Translation2d centerPos;
-        Rotation2d cameraRot;
+        Pose3d cameraPose;
+        Translation3d centerPos;
+        Rotation3d cameraRot;
 
         // Get center of Robot pose
         if (result.getNumTags() > 1) {
-          cameraPose = result.getCameraPose().toPose2d();
+          cameraPose = result.getCameraPose();
 
           centerPos =
               cameraPose
@@ -371,14 +408,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
           cameraRot = cameraPose.getRotation().rotateBy(rotsOff[idx]);
         } else {
-          Pose2d cameraPose1 = result.getFirstPose().toPose2d();
-          Pose2d cameraPose2 = result.getSecondPose().toPose2d();
+          Pose3d cameraPose1 = result.getFirstPose();
+          Pose3d cameraPose2 = result.getSecondPose();
 
           cameraPose1 =
-              new Pose2d(
+              new Pose3d(
                   cameraPose1.getTranslation(), cameraPose1.getRotation().rotateBy(rotsOff[idx]));
           cameraPose2 =
-              new Pose2d(
+              new Pose3d(
                   cameraPose2.getTranslation(), cameraPose2.getRotation().rotateBy(rotsOff[idx]));
 
           String outputString = "VisionSubsystem/Pose" + names[idx] + "1";
@@ -386,7 +423,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
           outputString = "VisionSubsystem/Pose" + names[idx] + "2";
           org.littletonrobotics.junction.Logger.recordOutput(outputString, cameraPose2);
 
-          cameraPose = getCorrectPose(cameraPose1, cameraPose2, result.getTimeStamp());
+          cameraPose = getCorrectPose(cameraPose1, cameraPose2, result.getTimeStamp(), idx);
 
           centerPos =
               cameraPose.getTranslation().minus(offsets[idx].rotateBy(cameraPose.getRotation()));
@@ -395,7 +432,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (isPoseValidWithoutWheels(result, centerPos)) {
           String outputAccept = "VisionSubsystem/AcceptedCam" + names[idx] + "Pose";
           org.littletonrobotics.junction.Logger.recordOutput(
-              outputAccept, new Pose2d(centerPos, cameraRot));
+              outputAccept, new Pose2d(centerPos.toTranslation2d(), cameraRot.toRotation2d()));
 
           String rawCamera = "VisionSubsystem/RawAcceptedCam" + names[idx] + "Pose";
           org.littletonrobotics.junction.Logger.recordOutput(
@@ -413,20 +450,30 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
           if (visionUpdates) {
             driveSubsystem.addVisionMeasurement(
-                new Pose2d(centerPos, cameraRot), result.getTimeStamp() / 1_000_000, scaledStdDev);
+                new Pose2d(centerPos.toTranslation2d(), cameraRot.toRotation2d()),
+                result.getTimeStamp() / 1_000_000,
+                scaledStdDev);
           }
 
         } else {
           String output = "VisionSubsystem/NotAcceptedCam" + names[idx] + "Pose";
           org.littletonrobotics.junction.Logger.recordOutput(
-              output, new Pose2d(centerPos, cameraRot));
+              output, new Pose2d(centerPos.toTranslation2d(), cameraRot.toRotation2d()));
 
           String rawCamera = "VisionSubsystem/RawNotAcceptedCam" + names[idx] + "Pose";
           org.littletonrobotics.junction.Logger.recordOutput(
               rawCamera, result.getCameraPose().toPose2d());
         }
+      } else if (res.getFirst() instanceof WallEyeTagResult) {
+        WallEyeTagResult tags = (WallEyeTagResult) res.getFirst();
+
+        int idx = res.getSecond();
       }
     }
+  }
+
+  public WallEyeResult getLastResult(int index) {
+    return lastUpdate[index];
   }
 
   // Grapher

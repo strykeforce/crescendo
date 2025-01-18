@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.ToggleVirtualSwitchCommand;
 import frc.robot.commands.auton.TestDeadeyeCleanUpCommand;
+import frc.robot.commands.auton.TestWalleyeAlignCommand;
 import frc.robot.commands.auton.ToggleIsAutoCommand;
 import frc.robot.commands.climb.ForkOpenLoopCommand;
 import frc.robot.commands.climb.HoldClimbCommand;
@@ -1034,6 +1035,11 @@ public class RobotContainer {
     // XLock
     new JoystickButton(driveJoystick, Button.SWD.id)
         .onTrue(new XLockCommand(driveSubsystem))
+        .onFalse(new XLockCommand(driveSubsystem));
+
+    // Walleye autodrive
+    new JoystickButton(driveJoystick, Button.M_LTRIM_UP.id)
+        .onTrue(new TestWalleyeAlignCommand(visionSubsystem, driveSubsystem, ledSubsystem))
         .onFalse(new XLockCommand(driveSubsystem));
 
     // Auto NotePickUp
