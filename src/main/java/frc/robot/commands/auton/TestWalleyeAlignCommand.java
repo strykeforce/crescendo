@@ -21,7 +21,7 @@ public class TestWalleyeAlignCommand extends Command {
   private final int CAM = 0;
   private final int ALIGN_TAG = 1;
   private final double TARGET_YAW_DEGS = 0;
-  private final double TARGET_TAG_AREA = 138_000;
+  private final double TARGET_TAG_AREA = 205_000;
   private final double TARGET_X = 800;
 
   public TestWalleyeAlignCommand(
@@ -32,9 +32,9 @@ public class TestWalleyeAlignCommand extends Command {
     this.ledSubsystem = ledSubsystem;
     this.curState = AlignStates.YAW;
 
-    walleyeYDrive = new ProfiledPIDController(0.0021, 0, 0, new Constraints(3.0, 3.0));
-    walleyeXDrive = new ProfiledPIDController(0.000009, 0, 0, new Constraints(2.0, 1.0));
-    walleyeOmega = new ProfiledPIDController(4.5, 0, 0, new Constraints(1.0, 1.0));
+    walleyeYDrive = new ProfiledPIDController(0.0019, 0, 0, new Constraints(3.0, 3.0));
+    walleyeXDrive = new ProfiledPIDController(0.00001, 0, 0, new Constraints(2.0, 1.0));
+    walleyeOmega = new ProfiledPIDController(5.0, 0, 0, new Constraints(1.0, 1.0));
     walleyeOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
   }
 
@@ -87,7 +87,7 @@ public class TestWalleyeAlignCommand extends Command {
           double ySpeed = -walleyeYDrive.calculate(TARGET_X - center.x(), 0);
           double xSpeed = -walleyeXDrive.calculate(TARGET_TAG_AREA - area, 0);
 
-          if (Math.abs(TARGET_TAG_AREA - area) < 10_000 || area > TARGET_TAG_AREA) {
+          if (TARGET_TAG_AREA - area < 10_000 || area > TARGET_TAG_AREA) {
             xSpeed = 0;
 
             if (Math.abs(TARGET_X - center.x()) < 3) {
